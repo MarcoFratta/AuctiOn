@@ -50,7 +50,7 @@ describe('User Routes - Middleware Testing', () => {
         it('should pass validation and call the c for valid input', async () => {
             const validUser = { name: 'John Doe', email: 'john@example.com' };
             const controllerMock = jest.spyOn(UserController.prototype, 'createUser');
-            controllerMock.mockImplementation(async (req,res,next) => {res.status(200).send()})
+            controllerMock.mockImplementation(async (_req,res) => {res.status(200).send()})
             const response = await request(app).post('/users').send(validUser);
 
             expect(response.status).toBe(200); // Assume the c is mocked to return 200

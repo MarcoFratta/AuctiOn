@@ -7,8 +7,8 @@ import {
 
 export const ErrorLoggerMiddleware =  (
     err: unknown,
-    req: Request,
-    res: Response,
+    _req: Request,
+    _res: Response,
     next: NextFunction
 ): void => {
     console.error(err);
@@ -17,7 +17,7 @@ export const ErrorLoggerMiddleware =  (
 // Error handler middleware
 export const UserErrorMiddleware = (
     err: unknown,
-    req: Request,
+    _req: Request,
     res: Response,
     next: NextFunction
 ): void => {
@@ -49,11 +49,12 @@ export const UserErrorMiddleware = (
 };
 
 export const GenericErrorMiddleware = (
-    err: unknown,
-    req: Request,
+    _err: unknown,
+    _req: Request,
     res: Response,
-    next: NextFunction
+    _next: NextFunction
 ): void => {
+    console.log("GenericErrorMiddleware");
     res.status(500).json({
         error: 'Internal Server Error',
         message: 'An unexpected error occurred.',

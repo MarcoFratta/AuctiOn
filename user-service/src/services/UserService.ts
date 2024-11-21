@@ -28,7 +28,7 @@ export class UserService {
         const newUser = await this.userRepository.create(userData);
 
         if (!newUser) {
-            throw new Error("Failed to create user. Repository returned null or undefined.");
+            throw new Error("Failed to create user.");
         }
 
         return newUser;
