@@ -4,8 +4,9 @@ import express from 'express';
 
 const userRouter = express.Router();
 
-import { getUsers } from 'api/controllers/UserController';
+import { getAllUsers, addUser } from '../controllers/UserController';
 
-userRouter.get('/', getUsers);
+userRouter.get('/', getAllUsers);
+userRouter.post('/', addUser);
 
 export default userRouter;

@@ -1,5 +1,14 @@
-import { Request, Response } from "express";
+import { Request, Response } from 'express';
+import {createUser, getUsers} from "../../services/UserService";
 
-export const getUsers = (req: Request, res: Response) => {
-    res.json({ message: "List of users" });
+
+export const getAllUsers = async (req: Request, res: Response) => {
+    const users = await getUsers();
+    res.json(users);
+};
+
+export const addUser = async (req: Request, res: Response) => {
+    const user = req.body;
+    const newUser = await createUser(user);
+    res.status(201).json(newUser);
 };
