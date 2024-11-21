@@ -21,7 +21,6 @@ export const UserErrorMiddleware = (
     res: Response,
     next: NextFunction
 ): void => {
-     // Log the error for debugging
 
     if (err instanceof UserNotFoundError) {
          res.status(404).json({
