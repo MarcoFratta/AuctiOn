@@ -8,6 +8,8 @@
 		"noUnusedParameters": false,
 		"noUnusedLocals": true,
 		"resolveJsonModule": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
 		"allowSyntheticDefaultImports": true,
 		"rootDir": ".",
 		"lib": [
