@@ -1,6 +1,7 @@
 import { User } from "../schemas/User";
-import {UserRepository} from "../repositories/UserRepository";
-import {DeleteUserError, UpdateUserError, UserNotFoundError} from "../errors/UserErrors";
+import { UserRepository } from "../repositories/UserRepository";
+import { DeleteUserError, UpdateUserError, UserNotFoundError } from "../errors/UserErrors";
+import logger from "../utils/Logger"; // Assume this is a configured Winston logger
 
 export class UserService {
     private userRepository: UserRepository;
@@ -9,45 +10,57 @@ export class UserService {
         this.userRepository = userRepository;
     }
 
-    // Fetch all users
     async getUsers(): Promise<User[]> {
+        logger.info("Fetching all users.");
         return await this.userRepository.findAll();
     }
 
-    // Fetch a user by ID
     async getUserById(id: string): Promise<User | null> {
+        logger.info(`Fetching user with ID: ${id}`);
         const user = await this.userRepository.findById(id);
         if (!user) {
+            logger.warn(`User with ID ${id} not found.`);
             throw new UserNotFoundError(id);
         }
+        logger.info(`User with ID ${id} fetched successfully.`);
         return user;
     }
 
-    // Create a new user
     async createUser(userData: Omit<User, "id">): Promise<User> {
+        logger.info(`Creating new user: ${JSON.stringify(userData)}`);
         const newUser = await this.userRepository.create(userData);
 
         if (!newUser) {
+            logger.error("Failed to create user. Repository returned null or undefined.");
             throw new Error("Failed to create user.");
         }
 
+        logger.info(`User created successfully with ID: ${newUser.id}`);
         return newUser;
     }
 
-    // Update a user by ID
     async updateUser(id: string, updateData: Partial<User>): Promise<User> {
+        logger.info(`Updating user with ID: ${id}`);
         const updatedUser = await this.userRepository.update(id, updateData);
+
         if (!updatedUser) {
+            logger.warn(`Failed to update user with ID ${id}`);
             throw new UpdateUserError(id);
         }
+
+        logger.info(`User with ID ${id} updated successfully.`);
         return updatedUser;
     }
 
-    // Delete a user by ID
     async deleteUser(id: string): Promise<void> {
+        logger.info(`Deleting user with ID: ${id}`);
         const deleted = await this.userRepository.delete(id);
+
         if (!deleted) {
+            logger.warn(`Failed to delete user with ID ${id}`);
             throw new DeleteUserError(id);
         }
+
+        logger.info(`User with ID ${id} deleted successfully.`);
     }
 }
