@@ -80,7 +80,7 @@ describe('User Routes - Middleware Testing', () => {
         it('should pass validation and call the c for valid input', async () => {
             const validUpdate = { name: 'John Doe', email: 'john@example.com' };
             const controllerMock = jest.spyOn(UserController.prototype, 'updateUser');
-            controllerMock.mockImplementation(async (req,res,next) => {
+            controllerMock.mockImplementation(async (_req, res, _next) => {
                 res.status(200).send()
             })
             const response = await request(app).put('/users/1').send(validUpdate);
@@ -93,7 +93,7 @@ describe('User Routes - Middleware Testing', () => {
     describe('Error Middleware', () => {
         it('should return a 500 error if an exception is thrown', async () => {
             const controllerMock = jest.spyOn(UserController.prototype, 'createUser');
-            controllerMock.mockImplementationOnce(async (req, res, next) => {
+            controllerMock.mockImplementationOnce(async (_req, _res, next) => {
                 next(new Error('Unexpected error'));
             });
 
