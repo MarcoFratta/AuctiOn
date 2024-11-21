@@ -1,6 +1,7 @@
 import { UserService } from "../src/services/UserService";
 import { User } from "../src/schemas/User";
 import { MockUserRepository } from "../src/repositories/MockUserRepository";
+import {DeleteUserError, UpdateUserError} from "../src/errors/UserErrors";
 
 describe("UserService with Mock Repository", () => {
     let userService: UserService;
@@ -66,8 +67,8 @@ describe("UserService with Mock Repository", () => {
         });
 
         it("should throw an error if the user to update is not found", async () => {
-            await expect(userService.updateUser("999", { name: "Non-existent" })).rejects.toThrow(
-                "Unable to update user with ID 999"
+            await expect(userService.updateUser("999", { name: "Non-existent" }))
+                .rejects.toThrow(new UpdateUserError("999")
             );
         });
     });
@@ -84,7 +85,8 @@ describe("UserService with Mock Repository", () => {
         });
 
         it("should throw an error if the user to delete is not found", async () => {
-            await expect(userService.deleteUser("999")).rejects.toThrow("Unable to delete user with ID 999");
+            await expect(userService.deleteUser("999"))
+                .rejects.toThrow(new DeleteUserError("999"));
         });
     });
 });
