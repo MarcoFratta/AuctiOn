@@ -2,11 +2,13 @@ import express from "express";
 import {createUserRouter} from "./routes/UserRoutes";
 import {UserService} from "./services/UserService";
 import {UserController} from "./controllers/UserController";
-import {MockUserRepository} from "./repositories/MockUserRepository";
+import {MongooseUserRepository} from "./repositories/MongoUserRepo";
+import {reverseUserConverter, userConverter} from "./utils/Converters";
 
 const app = express();
 // Initialize dependencies
-export const repository = new MockUserRepository();
+
+export const repository = new MongooseUserRepository(userConverter, reverseUserConverter);
 export const service = new UserService(repository);
 export const controller = new UserController(service);
 
