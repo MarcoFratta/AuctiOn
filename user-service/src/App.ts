@@ -6,9 +6,9 @@ import {MockUserRepository} from "./repositories/MockUserRepository";
 
 const app = express();
 // Initialize dependencies
-const repository = new MockUserRepository();
-const service = new UserService(repository);
-const controller = new UserController(service);
+export const repository = new MockUserRepository();
+export const service = new UserService(repository);
+export const controller = new UserController(service);
 
 // Use the router
 const router = createUserRouter(controller);

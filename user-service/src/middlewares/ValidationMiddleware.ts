@@ -1,17 +1,18 @@
 import { RequestHandler } from 'express';
-import { ZodTypeAny, z } from 'zod';
+import { ZodTypeAny } from 'zod';
+import {validateSchema, ParseError} from "../utils/Validator";
 
 const validate = (schema: ZodTypeAny, source: 'body' | 'params' | 'query'):
     RequestHandler => {
-    return async (req, res, next) => {
+    return (req, res, next) => {
         try {
-            await schema.parseAsync(req[source]);
+            validateSchema(schema, req[source]);
             next();
         } catch (err) {
-            if (err instanceof z.ZodError) {
+            if (err instanceof ParseError) {
                 res.status(400).json({
                     message: `Invalid ${source} schema`,
-                    errors: err.errors,
+                    errors: err.message,
                 });
             } else {
                 next(err);

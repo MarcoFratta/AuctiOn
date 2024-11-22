@@ -9,7 +9,7 @@ jest.mock('../src/controllers/UserController'); // Mock the controller to isolat
 
 describe('User Routes - Middleware Testing', () => {
     let app: express.Application;
-    let c: UserController = new UserController({} as any);
+    const c: UserController = new UserController({} as any);
 
     beforeEach(() => {
         app = express();

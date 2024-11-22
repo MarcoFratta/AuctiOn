@@ -4,6 +4,7 @@ import {
     UpdateUserError,
     DeleteUserError,
 } from '../errors/UserErrors';
+import logger from "../utils/Logger";
 
 export const ErrorLoggerMiddleware =  (
     err: unknown,
@@ -11,7 +12,7 @@ export const ErrorLoggerMiddleware =  (
     _res: Response,
     next: NextFunction
 ): void => {
-    console.error(err);
+    logger.error(err);
     next(err);
 }
 // Error handler middleware
