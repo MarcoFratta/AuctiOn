@@ -90,7 +90,7 @@ out
 
 # Nuxt.js build / generate output
 .nuxt
-dist
+
 
 # Gatsby files
 .cache/
@@ -145,4 +145,5 @@ dist
 # and uncomment the following lines
 # .pnp.*
 .idea
-
+dist
+dist/*
