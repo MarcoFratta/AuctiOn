@@ -9,8 +9,8 @@
   },
   "scripts": {
     "build": "tsc",
-    "start": "node dist/server.js",
-    "dev": "ts-node src/server.ts",
+    "start": "node dist/src/server.js",
+    "dev": "ts-node dist/src/server.ts",
     "eslint": "npx eslint \"src/**/*.{js,ts}\"",
     "test": "jest"
   },
