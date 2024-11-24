@@ -1,0 +1,29 @@
+version: '3.9'
+services:
+  app:
+    build:
+      context: .
+    ports:
+      - "${H_PORT:-3000}:${C_PORT:-3000}" # Default to 3000 if PORT is not defined
+    depends_on:
+      - user-mongodb
+    environment:
+      - PORT=${C_PORT:-3000}
+      - NODE_ENV=${NODE_ENV:-production}
+      - DB_URI=${DB_URI:-mongodb://localhost:27017/users}
+    networks:
+      - user-network
+
+  user-mongodb:
+    image: "mongo:${MONGO_VERSION:-6.0}" # Default to MongoDB 6.0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - user-network
+networks:
+  user-network:
+    driver: bridge
+volumes:
+  mongo_data:

@@ -1,14 +1,15 @@
-import dotenv from 'dotenv';
 
-// Load environment variables from .env file
-dotenv.config();
+
+import {config} from "../configs/config";
 
 import mongoose from 'mongoose';
+import logger from "./Logger";
 
-const DB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/users';
+const DB_URI = config.dbUri
 
 export const connectToDatabase = async () => {
     try {
+        logger.info(`Connecting to MongoDB at: ${DB_URI}`);
         await mongoose.connect(DB_URI);
         console.log('Successfully connected to MongoDB');
     } catch (error) {
