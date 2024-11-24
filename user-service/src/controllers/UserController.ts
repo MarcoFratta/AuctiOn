@@ -44,6 +44,7 @@ export class UserController {
     updateUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         const { id } = req.params;
         const updateData: Partial<User> = req.body;
+        delete updateData.id;
         try {
             const updatedUser = await this.userService.updateUser(id, updateData);
             res.status(200).json(updatedUser);

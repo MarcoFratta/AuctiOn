@@ -11,7 +11,7 @@ const validate = (schema: ZodTypeAny, source: 'body' | 'params' | 'query'):
         } catch (err) {
             if (err instanceof ParseError) {
                 res.status(400).json({
-                    message: `Invalid ${source} schema`,
+                    message: `Invalid ${source}`,
                     errors: err.message,
                 });
             } else {

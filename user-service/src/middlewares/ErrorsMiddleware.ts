@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import {
     UserNotFoundError,
     UpdateUserError,
-    DeleteUserError,
+    DeleteUserError, EmailAlreadyExistsError,
 } from '../errors/UserErrors';
 import logger from "../utils/Logger";
 
@@ -13,6 +13,7 @@ export const ErrorLoggerMiddleware =  (
     next: NextFunction
 ): void => {
     logger.error(err);
+    logger.error(typeof err)
     next(err);
 }
 // Error handler middleware
@@ -40,6 +41,12 @@ export const UserErrorMiddleware = (
     else if (err instanceof DeleteUserError) {
         res.status(400).json({
             error: 'Delete User Error',
+            message: err.message,
+        });
+    }
+    else if (err instanceof EmailAlreadyExistsError) {
+        res.status(400).json({
+            error: 'Email already exists',
             message: err.message,
         });
     }
