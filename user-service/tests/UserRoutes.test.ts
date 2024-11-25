@@ -1,7 +1,7 @@
 import express from 'express';
 import request from 'supertest';
-import { createUserRouter } from '../src/routes/UserRoutes';
-import { UserController } from '../src/controllers/UserController';
+import {createUserRouter} from '../src/routes/UserRoutes';
+import {UserController} from '../src/controllers/UserController';
 
 jest.mock('../src/controllers/UserController'); // Mock the UserController
 
@@ -17,11 +17,21 @@ describe('UserRoutes', () => {
         controllerMock = new UserController({} as any) as jest.Mocked<UserController>;
 
         // Mock methods
-        controllerMock.getUsers = jest.fn(async (_req, res, next) => { res.status(200).send('getUsers called')});
-        controllerMock.getUserById = jest.fn(async (_req, res, next) => {res.status(200).send('getUserById called')});
-        controllerMock.createUser = jest.fn(async (_req, res, next) => {res.status(201).send('createUser called')});
-        controllerMock.updateUser = jest.fn(async (_req, res, next) => {res.status(200).send('updateUser called')});
-        controllerMock.deleteUser = jest.fn(async (_req, res, next) => {res.status(200).send('deleteUser called')});
+        controllerMock.getUsers = jest.fn(async (_req, res, _next) => {
+            res.status(200).send('getUsers called')
+        });
+        controllerMock.getUserById = jest.fn(async (_req, res, _next) => {
+            res.status(200).send('getUserById called')
+        });
+        controllerMock.createUser = jest.fn(async (_req, res, _next) => {
+            res.status(201).send('createUser called')
+        });
+        controllerMock.updateUser = jest.fn(async (_req, res, _next) => {
+            res.status(200).send('updateUser called')
+        });
+        controllerMock.deleteUser = jest.fn(async (_req, res, _next) => {
+            res.status(200).send('deleteUser called')
+        });
 
         // Add routes
         app.use('/users', createUserRouter(controllerMock));
