@@ -1,6 +1,6 @@
 import { User } from "../schemas/User";
 import { UserRepository } from "../repositories/UserRepository";
-import { DeleteUserError, UpdateUserError, UserNotFoundError } from "../errors/UserErrors";
+import { UserNotFoundError } from "../errors/UserErrors";
 import logger from "../utils/Logger"; // Assume this is a configured Winston logger
 
 export class UserService {
@@ -31,7 +31,7 @@ export class UserService {
         const newUser = await this.userRepository.create(userData);
 
         if (!newUser) {
-            logger.error("Failed to create user. Repository returned null or undefined.");
+            logger.error("Failed to create user.");
             throw new Error("Failed to create user.");
         }
 
@@ -45,7 +45,7 @@ export class UserService {
 
         if (!updatedUser) {
             logger.warn(`Failed to update user with ID ${id}`);
-            throw new UpdateUserError(id);
+            throw new UserNotFoundError(id);
         }
 
         logger.info(`User with ID ${id} updated successfully.`);
@@ -58,7 +58,7 @@ export class UserService {
 
         if (!deleted) {
             logger.warn(`Failed to delete user with ID ${id}`);
-            throw new DeleteUserError(id);
+            throw new UserNotFoundError(id);
         }
 
         logger.info(`User with ID ${id} deleted successfully.`);

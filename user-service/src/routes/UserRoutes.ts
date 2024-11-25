@@ -15,7 +15,7 @@ export const createUserRouter = (controller: UserController): express.Router => 
         ErrorLoggerMiddleware, UserErrorMiddleware, GenericErrorMiddleware);
     router.post('/', validateRequestBody(UserSchema), controller.createUser,
         ErrorLoggerMiddleware, UserErrorMiddleware, GenericErrorMiddleware);
-    router.put('/:id', validateRequestBody(UserSchema), controller.updateUser,
+    router.put('/:id', validateRequestBody(UserSchema.partial()), controller.updateUser,
         ErrorLoggerMiddleware, UserErrorMiddleware, GenericErrorMiddleware);
     router.delete('/:id', controller.deleteUser,
         ErrorLoggerMiddleware, UserErrorMiddleware, GenericErrorMiddleware);

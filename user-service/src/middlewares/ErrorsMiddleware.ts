@@ -45,7 +45,7 @@ export const UserErrorMiddleware = (
         });
     }
     else if (err instanceof EmailAlreadyExistsError) {
-        res.status(400).json({
+        res.status(409).json({
             error: 'Email already exists',
             message: err.message,
         });

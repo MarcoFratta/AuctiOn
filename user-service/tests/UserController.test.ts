@@ -13,17 +13,25 @@ describe('UserController', () => {
 
     beforeEach(() => {
         mockService = new UserService({} as any) as jest.Mocked<UserService>;
-        controller = new UserController(mockService);
 
+        // Mocking the methods on the mockService
+        mockService.getUsers = jest.fn();
+        mockService.getUserById = jest.fn();
+        mockService.createUser = jest.fn();
+        mockService.updateUser = jest.fn();
+        mockService.deleteUser = jest.fn();
+
+
+        controller = new UserController(mockService);
         app = express();
         app.use(express.json());
 
         // Mock routes
-        app.get('/users', (req, res, next) => controller.getUsers(req, res, next));
-        app.get('/users/:id', (req, res, next) => controller.getUserById(req, res, next));
-        app.post('/users', (req, res, next) => controller.createUser(req, res, next));
-        app.put('/users/:id', (req, res, next) => controller.updateUser(req, res, next));
-        app.delete('/users/:id', (req, res, next) => controller.deleteUser(req, res, next));
+        app.get('/users', (req, res, next) => { controller.getUsers(req, res, next)});
+        app.get('/users/:id', (req, res, next) => {controller.getUserById(req, res, next)});
+        app.post('/users', (req, res, next) => {controller.createUser(req, res, next)});
+        app.put('/users/:id', (req, res, next) => {controller.updateUser(req, res, next)});
+        app.delete('/users/:id', (req, res, next) => {controller.deleteUser(req, res, next)});
     });
 
     describe('GET /users', () => {

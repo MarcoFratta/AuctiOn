@@ -4,7 +4,7 @@ import { UserSchema } from '../src/schemas/User';
 describe('validateSchema', () => {
     it('should validate the object successfully if the input is valid', () => {
         const validInput = {
-            id: '123',
+            id: '123456789112345678912345',
             name: 'John Doe',
             email: 'john.doe@example.com',
         };

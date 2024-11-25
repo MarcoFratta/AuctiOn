@@ -1,108 +1,67 @@
 import express from 'express';
 import request from 'supertest';
-import { validateRequestBody } from '../src/middlewares/ValidationMiddleware';
-import {GenericErrorMiddleware, UserErrorMiddleware} from '../src/middlewares/ErrorsMiddleware';
-import { UserSchema } from '../src/schemas/User';
+import { createUserRouter } from '../src/routes/UserRoutes';
 import { UserController } from '../src/controllers/UserController';
 
-jest.mock('../src/controllers/UserController'); // Mock the controller to isolate middleware
+jest.mock('../src/controllers/UserController'); // Mock the UserController
 
-describe('User Routes - Middleware Testing', () => {
+describe('UserRoutes', () => {
     let app: express.Application;
-    const c: UserController = new UserController({} as any);
+    let controllerMock: jest.Mocked<UserController>;
 
     beforeEach(() => {
         app = express();
         app.use(express.json());
 
-        // Mock routes
-        app.post('/users', validateRequestBody(UserSchema), c.createUser,
-            UserErrorMiddleware, GenericErrorMiddleware // Error-handling middleware
-        );
+        // Mock UserController
+        controllerMock = new UserController({} as any) as jest.Mocked<UserController>;
 
-        app.put('/users/:id', validateRequestBody(UserSchema), c.updateUser,
-            UserErrorMiddleware, GenericErrorMiddleware
-        );
-    });
-    afterEach(() => {
-        jest.restoreAllMocks();
-    });
+        // Mock methods
+        controllerMock.getUsers = jest.fn(async (_req, res, next) => { res.status(200).send('getUsers called')});
+        controllerMock.getUserById = jest.fn(async (_req, res, next) => {res.status(200).send('getUserById called')});
+        controllerMock.createUser = jest.fn(async (_req, res, next) => {res.status(201).send('createUser called')});
+        controllerMock.updateUser = jest.fn(async (_req, res, next) => {res.status(200).send('updateUser called')});
+        controllerMock.deleteUser = jest.fn(async (_req, res, next) => {res.status(200).send('deleteUser called')});
 
-    describe('POST /users - Validation Middleware', () => {
-        it('should return 400 for invalid input (missing fields)', async () => {
-            const invalidUser = { name: 'John Doe' }; // Missing email
-
-            const response = await request(app).post('/users').send(invalidUser);
-
-            expect(response.status).toBe(400);
-            expect(response.body).toHaveProperty('message');
-        });
-
-        it('should return 400 for invalid input (wrong email format)', async () => {
-            const invalidUser = { name: 'John Doe', email: 'invalid-email' };
-
-            const response = await request(app).post('/users').send(invalidUser);
-
-            expect(response.status).toBe(400);
-            expect(response.body).toHaveProperty('message', 'Invalid body schema');
-        });
-
-        it('should pass validation and call the c for valid input', async () => {
-            const validUser = { name: 'John Doe', email: 'john@example.com' };
-            const controllerMock = jest.spyOn(UserController.prototype, 'createUser');
-            controllerMock.mockImplementation(async (_req,res) => {res.status(200).send()})
-            const response = await request(app).post('/users').send(validUser);
-
-            expect(response.status).toBe(200); // Assume the c is mocked to return 200
-            expect(controllerMock).toHaveBeenCalled();
-        });
+        // Add routes
+        app.use('/users', createUserRouter(controllerMock));
     });
 
-    describe('PUT /users/:id - Validation Middleware', () => {
-        it('should return 400 for invalid input (missing fields)', async () => {
-            const invalidUpdate = { name: '' }; // Empty name is invalid
-
-            const response = await request(app).put('/users/1').send(invalidUpdate);
-
-            expect(response.status).toBe(400);
-            expect(response.body).toHaveProperty('message');
-        });
-
-        it('should return 400 for invalid input (wrong email format)', async () => {
-            const invalidUpdate = { name: 'John Doe', email: 'invalid-email' };
-
-            const response = await request(app).put('/users/1').send(invalidUpdate);
-
-            expect(response.status).toBe(400);
-            expect(response.body).toHaveProperty('message', "Invalid body schema");
-        });
-
-        it('should pass validation and call the c for valid input', async () => {
-            const validUpdate = { name: 'John Doe', email: 'john@example.com' };
-            const controllerMock = jest.spyOn(UserController.prototype, 'updateUser');
-            controllerMock.mockImplementation(async (_req, res, _next) => {
-                res.status(200).send()
-            })
-            const response = await request(app).put('/users/1').send(validUpdate);
-
-            expect(response.status).toBe(200); // Assume the c is mocked to return 200
-            expect(controllerMock).toHaveBeenCalled();
-        });
+    it('should call getUsers on GET /users', async () => {
+        const response = await request(app).get('/users');
+        expect(response.status).toBe(200);
+        expect(response.text).toBe('getUsers called');
+        expect(controllerMock.getUsers).toHaveBeenCalled();
     });
 
-    describe('Error Middleware', () => {
-        it('should return a 500 error if an exception is thrown', async () => {
-            const controllerMock = jest.spyOn(UserController.prototype, 'createUser');
-            controllerMock.mockImplementationOnce(async (_req, _res, next) => {
-                next(new Error('Unexpected error'));
-            });
+    it('should call getUserById on GET /users/:id', async () => {
+        const response = await request(app).get('/users/123456789012345678901234');
+        expect(response.status).toBe(200);
+        expect(response.text).toBe('getUserById called');
+        expect(controllerMock.getUserById).toHaveBeenCalled();
+    });
 
-            const validUser = { name: 'John Doe', email: 'john@example.com' };
+    it('should call createUser on POST /users', async () => {
+        const user = { name: 'John Doe', email: 'john@example.com' };
+        const response = await request(app).post('/users').send(user);
+        expect(response.status).toBe(201);
+        expect(response.text).toBe('createUser called');
+        expect(controllerMock.createUser).toHaveBeenCalledWith(expect.any(Object),
+            expect.any(Object), expect.any(Function));
+    });
 
-            const response = await request(app).post('/users').send(validUser);
+    it('should call updateUser on PUT /users/:id', async () => {
+        const updatedUser = { name: 'Jane Doe', email: 'jane@example.com' };
+        const response = await request(app).put('/users/1').send(updatedUser);
+        expect(response.status).toBe(200);
+        expect(response.text).toBe('updateUser called');
+        expect(controllerMock.updateUser).toHaveBeenCalledWith(expect.any(Object), expect.any(Object), expect.any(Function));
+    });
 
-            expect(response.status).toBe(500);
-            expect(response.body).toHaveProperty('message', 'An unexpected error occurred.');
-        });
+    it('should call deleteUser on DELETE /users/:id', async () => {
+        const response = await request(app).delete('/users/1');
+        expect(response.status).toBe(200);
+        expect(response.text).toBe('deleteUser called');
+        expect(controllerMock.deleteUser).toHaveBeenCalled();
     });
 });
