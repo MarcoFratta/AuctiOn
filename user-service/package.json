@@ -12,7 +12,7 @@
     "start": "node dist/src/server.js",
     "dev": "ts-node dist/src/server.ts",
     "eslint": "npx eslint \"src/**/*.{js,ts}\"",
-    "test": "jest"
+    "test": "npx jest"
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",
