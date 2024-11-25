@@ -4,8 +4,8 @@ module.exports = {
 
   // A list of glob patterns for the test files
   testMatch: [
-    '<rootDir>/tests/*.test.ts' // Match any test files in __tests__ directory
-    //'**/?(*.)+(spec|test).[jt]s?(x)', // Match any file with a .test.js/.spec.js extension
+    '<rootDir>/tests/*.test.ts', // Match any test files in __tests__ directory
+    '<rootDir>/tests/**/*.test.ts', // Match any file with a .test.js/.spec.js extension
   ],
 
   // Transform TypeScript files using ts-jest
