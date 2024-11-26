@@ -1,8 +1,13 @@
 {
   "dependencies": {
+    "@asteasolutions/zod-to-openapi": "^7.2.0",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.7",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
     "mongoose": "^8.8.2",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "winston": "^3.17.0",
     "zod": "^3.23.8",
     "zod-validation-error": "^3.4.0"
@@ -10,9 +15,11 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/src/server.js",
-    "dev": "ts-node dist/src/server.ts",
+    "dev": "ts-node src/server.ts",
+    "docdev": "ts-node openapi/Index.ts",
     "eslint": "npx eslint \"src/**/*.{js,ts}\"",
-    "test": "npx jest"
+    "test": "npx jest",
+    "doc": "node dist/openapi/Index.js"
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",
