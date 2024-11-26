@@ -120,7 +120,7 @@ registry.registerPath({
 
 const openApiSpec = generateOpenAPI();
 // Save the OpenAPI specification to a file
-const swaggerOutputPath = path.join(__dirname, "..", "public", "swagger.json");
+const swaggerOutputPath = path.join(__dirname, "..", "docs", "swagger.json");
 fs.mkdirSync(path.dirname(swaggerOutputPath), {recursive: true});
 fs.writeFileSync(swaggerOutputPath, JSON.stringify(openApiSpec, null, 2), "utf-8");
 

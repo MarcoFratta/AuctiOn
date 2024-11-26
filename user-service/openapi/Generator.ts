@@ -8,8 +8,8 @@ export function generateOpenAPI() {
         openapi: '3.1.0',
         info: {
             version: '1.0.0',
-            title: 'My API',
-            description: 'This is the API',
+            title: 'User service',
+            description: 'User service API',
         }
     }; // your config comes here
     registry.register("user", UserSchema);
