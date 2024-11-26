@@ -149,3 +149,4 @@ dist
 dist/*
 
 public
+*.http
