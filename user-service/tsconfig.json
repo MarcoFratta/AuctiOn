@@ -22,5 +22,9 @@
 		"node_modules",
 		"dist"
 	],
-	"include": ["./src/**/*", "./tests/**/*"]
+	"include": [
+		"./src/**/*",
+		"./tests/**/*",
+		"./openapi/**/*"
+	]
 }

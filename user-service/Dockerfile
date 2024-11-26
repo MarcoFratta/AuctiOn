@@ -14,9 +14,12 @@ RUN npm install
 EXPOSE 8080
 
 COPY src ./src
+COPY openapi ./openapi
 COPY tsconfig.json ./
 
+
 RUN npm run build
+RUN npm run doc
 
 # Start the application
 CMD ["npm", "start"]

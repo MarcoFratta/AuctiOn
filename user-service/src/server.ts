@@ -4,6 +4,7 @@ import {connectToDatabase} from "./utils/MongoDB";
 
 const port = config.port;
 
+
 connectToDatabase()
     .then(() => {
         app.listen(port, () => {
