@@ -1,11 +1,17 @@
-jest.mock("axios");
-jest.mock("bcrypt");
-jest.mock("jsonwebtoken");
-
+import {
+    InvalidPasswordError,
+    InvalidTokenError,
+    UserAlreadyExistsError,
+    UserNotFoundError
+} from "../src/errors/AuthErrors";
 import {AuthService} from "../src/services/AuthService";
 import axios from "axios";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+
+jest.mock("axios");
+jest.mock("bcrypt");
+jest.mock("jsonwebtoken");
 
 describe("AuthService", () => {
     let authService: AuthService;
@@ -46,7 +52,8 @@ describe("AuthService", () => {
 
         (axios.get as jest.Mock).mockResolvedValue({data: {id: "123", ...userData}});
 
-        await expect(authService.registerUser(userData)).rejects.toThrow("User already exists");
+        await expect(authService.registerUser(userData)).rejects
+            .toThrow(new UserAlreadyExistsError(userData.email));
 
         expect(axios.get).toHaveBeenCalledWith(`${userServiceURL}?email=test@example.com`);
         expect(axios.post).not.toHaveBeenCalled();
@@ -75,7 +82,7 @@ describe("AuthService", () => {
 
         (axios.get as jest.Mock).mockResolvedValue({data: null});
 
-        await expect(authService.loginUser(userData)).rejects.toThrow("User not found");
+        await expect(authService.loginUser(userData)).rejects.toThrow(new UserNotFoundError(userData.email));
 
         expect(axios.get).toHaveBeenCalledWith(`${userServiceURL}?email=test@example.com`);
         expect(bcrypt.compare).not.toHaveBeenCalled();
@@ -89,7 +96,7 @@ describe("AuthService", () => {
         (axios.get as jest.Mock).mockResolvedValue({data: user});
         (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
-        await expect(authService.loginUser(userData)).rejects.toThrow("Invalid password");
+        await expect(authService.loginUser(userData)).rejects.toThrow(new InvalidPasswordError());
 
         expect(axios.get).toHaveBeenCalledWith(`${userServiceURL}?email=test@example.com`);
         expect(bcrypt.compare).toHaveBeenCalledWith(userData.password, user.password);
@@ -116,7 +123,7 @@ describe("AuthService", () => {
             throw new Error("Invalid token");
         });
 
-        expect(() => authService.validateToken(token)).toThrow("Invalid token");
+        expect(() => authService.validateToken(token)).toThrow(new InvalidTokenError());
 
         expect(jwt.verify).toHaveBeenCalledWith(token, jwtSecret);
     });
