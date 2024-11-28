@@ -1,0 +1,10 @@
+import {LoginInputData, RegisterInputData, Token, UserOutput} from "../schemas/AuthSchema";
+
+export interface AuthService {
+    register(data: RegisterInputData): Promise<UserOutput>;
+
+    login(data: LoginInputData): Promise<Token>;
+
+    validateToken(token: Token): Promise<UserOutput>;
+
+}
