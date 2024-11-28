@@ -14,7 +14,7 @@ describe('UserRoutes', () => {
         app.use(express.json());
 
         // Mock UserController
-        controllerMock = new UserController({} as any) as jest.Mocked<UserController>;
+        controllerMock = new UserController({} as never) as jest.Mocked<UserController>;
 
         // Mock methods
         controllerMock.getUsers = jest.fn(async (_req, res, _next) => {

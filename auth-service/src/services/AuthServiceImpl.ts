@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import axios from "axios";
 import {InvalidPasswordError, InvalidTokenError, UserAlreadyExistsError, UserNotFoundError} from "../errors/AuthErrors";
 import {AuthService} from "./AuthService";
-import {LoginInputData, RegisterInputData, Token, User, UserOutput} from "../schemas/AuthSchema";
+import {LoginInputData, RegisterInputData, Token, UserOutput} from "../schemas/AuthSchema";
 import logger from "../utils/Logger";
 
 export class AuthServiceImpl implements AuthService {
@@ -16,7 +16,7 @@ export class AuthServiceImpl implements AuthService {
     }
 
     // Register a new user
-    async register(data: RegisterInputData): Promise<User> {
+    async register(data: RegisterInputData): Promise<UserOutput> {
         const {data: existingUser} = await axios.get(`${this.userServiceURL}?email=${data.email}`);
         if (existingUser) throw new UserAlreadyExistsError(data.email);
 
@@ -27,7 +27,7 @@ export class AuthServiceImpl implements AuthService {
             name: data.name,
         });
 
-        return newUser;
+        return {id: newUser.id, email: newUser.email, name: newUser.name};
     }
 
     // Login an existing user
