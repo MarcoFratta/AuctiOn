@@ -1,6 +1,6 @@
 version: '3.9'
 services:
-  app:
+  user-service:
     build:
       context: .
     ports:
@@ -13,11 +13,10 @@ services:
       - DB_URI=${DB_URI:-mongodb://localhost:27017/users}
     networks:
       - user-network
+      - microservices-network
 
   user-mongodb:
     image: "mongo:${MONGO_VERSION:-6.0}" # Default to MongoDB 6.0
-    ports:
-      - "27017:27017"
     volumes:
       - mongo_data:/data/db
     networks:
@@ -25,5 +24,8 @@ services:
 networks:
   user-network:
     driver: bridge
+  microservices-network:
+    external: true
+
 volumes:
   mongo_data:
