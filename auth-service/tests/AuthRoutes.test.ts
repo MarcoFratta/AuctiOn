@@ -61,7 +61,7 @@ describe("Auth Router", () => {
                 .post("/auth/register")
                 .send({
                     email: "test@example.com",
-                    password: "password123",
+                    password: "Password123",
                     name: "Test User",
                 })
                 .expect(201)

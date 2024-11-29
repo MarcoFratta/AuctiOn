@@ -1,8 +1,8 @@
 import {
-    InvalidPasswordError,
     InvalidTokenError,
     UserAlreadyExistsError,
-    UserNotFoundError
+    UserNotFoundError,
+    WrongPasswordError
 } from "../src/errors/AuthErrors";
 import {AuthServiceImpl} from "../src/services/AuthServiceImpl";
 import axios from "axios";
@@ -33,18 +33,27 @@ describe("AuthService", () => {
 
         (axios.get as jest.Mock).mockResolvedValue({data: null});
         (bcrypt.hash as jest.Mock).mockResolvedValue(hashedPassword);
-        (axios.post as jest.Mock).mockResolvedValue({data: {...userData, password: hashedPassword}});
+        (axios.post as jest.Mock).mockResolvedValue({
+            data: {
+                ...userData, id: "11",
+                pHash: hashedPassword
+            }
+        });
+        (jwt.sign as jest.Mock).mockReturnValue("jsonwebtoken");
 
         const result = await authService.register(userData);
 
         expect(axios.get).toHaveBeenCalledWith(`${userServiceURL}?email=test@example.com`);
         expect(bcrypt.hash).toHaveBeenCalledWith(userData.password, 10);
+        expect(jwt.sign).toHaveBeenCalledWith({id: "11", email: userData.email, name: userData.name},
+            "testSecret", {expiresIn: "1h"});
         expect(axios.post).toHaveBeenCalledWith(userServiceURL, {
             email: userData.email,
             password: hashedPassword,
             name: userData.name,
         });
-        expect(result).toEqual({...userData, password: hashedPassword});
+
+        expect(result).toHaveProperty("token", "jsonwebtoken");
     });
 
     it("should throw an error if the user already exists", async () => {
@@ -62,7 +71,7 @@ describe("AuthService", () => {
     // Test for loginUser
     it("should login a user and return a JWT", async () => {
         const userData = {email: "test@example.com", password: "password123"};
-        const user = {id: "123", email: "test@example.com", password: "hashedPassword"};
+        const user = {id: "123", email: "test@example.com", pHash: "hashedPassword"};
         const token = "jsonwebtoken";
 
         (axios.get as jest.Mock).mockResolvedValue({data: user});
@@ -72,7 +81,7 @@ describe("AuthService", () => {
         const result = await authService.login(userData);
 
         expect(axios.get).toHaveBeenCalledWith(`${userServiceURL}?email=test@example.com`);
-        expect(bcrypt.compare).toHaveBeenCalledWith(userData.password, user.password);
+        expect(bcrypt.compare).toHaveBeenCalledWith(userData.password, user.pHash);
         expect(jwt.sign).toHaveBeenCalledWith({id: user.id, email: user.email}, jwtSecret, {expiresIn: "1h"});
         expect(result).toEqual({token});
     });
@@ -91,15 +100,15 @@ describe("AuthService", () => {
 
     it("should throw an error if the password is invalid", async () => {
         const userData = {email: "test@example.com", password: "password123"};
-        const user = {id: "123", email: "test@example.com", password: "hashedPassword"};
+        const user = {id: "123", email: "test@example.com", pHash: "hashedPassword"};
 
         (axios.get as jest.Mock).mockResolvedValue({data: user});
         (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
-        await expect(authService.login(userData)).rejects.toThrow(new InvalidPasswordError());
+        await expect(authService.login(userData)).rejects.toThrow(new WrongPasswordError());
 
         expect(axios.get).toHaveBeenCalledWith(`${userServiceURL}?email=test@example.com`);
-        expect(bcrypt.compare).toHaveBeenCalledWith(userData.password, user.password);
+        expect(bcrypt.compare).toHaveBeenCalledWith(userData.password, user.pHash);
         expect(jwt.sign).not.toHaveBeenCalled();
     });
 

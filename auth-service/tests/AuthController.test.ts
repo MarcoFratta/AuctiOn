@@ -63,7 +63,6 @@ describe("AuthController", () => {
 
     describe("register", () => {
         it("should register a user and return a token", async () => {
-            const newUser = {id: "123", email: "test@example.com", name: "Test User"};
             const token = {token: "mocked-token"};
             req.body = {
                 email: "test@example.com",
@@ -71,21 +70,15 @@ describe("AuthController", () => {
                 name: "Test User",
             };
 
-            authService.register.mockResolvedValue(newUser);
-            authService.login.mockResolvedValue(token);
+            authService.register.mockResolvedValue(token);
 
             await authController.register(req as Request, res as Response, next);
 
             expect(authService.register).toHaveBeenCalledWith(req.body);
-            expect(authService.login).toHaveBeenCalledWith({
-                email: req.body.email,
-                password: req.body.password,
-            });
             expect(res.status).toHaveBeenCalledWith(201);
             expect(res.json).toHaveBeenCalledWith({
                 message: "User registered successfully",
-                user: newUser,
-                ...token,
+                token: {token: token.token},
             });
             expect(next).not.toHaveBeenCalled();
         });
