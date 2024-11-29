@@ -11,12 +11,15 @@ import path from "node:path";
 const app = express();
 // Initialize dependencies
 
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(
-    JSON.parse(fs.readFileSync(path.join(__dirname, "..", "docs", "swagger.json"), "utf-8")), {
+const swaggerPath = path.join(__dirname, "..", "docs", "swagger.json");
+if (fs.existsSync(swaggerPath)) {
+    const doc = JSON.parse(fs.readFileSync(swaggerPath, "utf-8"));
+    app.use('/docs', swaggerUi.serve, swaggerUi.setup(doc, {
         // customCssUrl: path.join(__dirname, "..", "css", "swaggerTheme.css"),
         // customfavIcon: path.join(__dirname, "..", "public", "logo.css"),
         customSiteTitle: 'User Service API Documentation'
     }));
+}
 
 
 export const repository = new MongooseUserRepository(userConverter, reverseUserConverter);
