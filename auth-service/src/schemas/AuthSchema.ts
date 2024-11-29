@@ -29,10 +29,11 @@ export const registeredUser = userSchema.extend({
 export const tokenSchema = z.object({
     token: z.string()
 });
+export const userOutputSchema = registeredUser.omit({pHash: true});
 
 export type RegisterInputData = z.infer<typeof registerSchema>;
 export type LoginInputData = z.infer<typeof loginSchema>;
 export type User = z.infer<typeof registeredUser>;
 export type Token = z.infer<typeof tokenSchema>;
-export type UserOutput = Omit<User, 'pHash'>;
+export type UserOutput = z.infer<typeof userOutputSchema>;
 
