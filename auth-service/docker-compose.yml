@@ -1,0 +1,15 @@
+services:
+  app:
+    build:
+      context: .
+    ports:
+      - '${H_PORT:-3000}:${C_PORT:-3000}' # Default to 3000 if PORT is not defined
+    environment:
+      - PORT=${C_PORT:-3000}
+      - NODE_ENV=${NODE_ENV:-production}
+      - USER_SERVICE_URI=${USER_SERVICE_URI:-http://user-service:3000/users}
+    networks:
+      - microservices-network
+networks:
+  microservices-network:
+    external: true
