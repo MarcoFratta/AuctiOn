@@ -10,7 +10,7 @@ export class UserNotFoundError extends Error {
     }
 }
 
-export class InvalidPasswordError extends Error {
+export class WrongPasswordError extends Error {
     constructor() {
         super(`Invalid password`);
     }
@@ -19,5 +19,11 @@ export class InvalidPasswordError extends Error {
 export class InvalidTokenError extends Error {
     constructor() {
         super(`Invalid token`);
+    }
+}
+
+export class UserServiceUnavailableError extends Error {
+    constructor(message: string) {
+        super(message);
     }
 }
