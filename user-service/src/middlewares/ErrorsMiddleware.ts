@@ -1,9 +1,5 @@
-import { Request, Response, NextFunction } from 'express';
-import {
-    UserNotFoundError,
-    UpdateUserError,
-    DeleteUserError, EmailAlreadyExistsError,
-} from '../errors/UserErrors';
+import {NextFunction, Request, Response} from 'express';
+import {DeleteUserError, EmailAlreadyExistsError, UpdateUserError, UserNotFoundError,} from '../errors/UserErrors';
 import logger from "../utils/Logger";
 
 export const ErrorLoggerMiddleware =  (
@@ -61,7 +57,6 @@ export const GenericErrorMiddleware = (
     res: Response,
     _next: NextFunction
 ): void => {
-    console.log("GenericErrorMiddleware");
     res.status(500).json({
         error: 'Internal Server Error',
         message: 'An unexpected error occurred.',
