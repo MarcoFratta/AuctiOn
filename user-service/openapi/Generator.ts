@@ -1,5 +1,5 @@
 import {OpenApiGeneratorV31, OpenAPIRegistry} from "@asteasolutions/zod-to-openapi";
-import {UserID, UserSchema} from "../src/schemas/User";
+import {userId, userSchema} from "../src/schemas/User";
 
 export const registry = new OpenAPIRegistry();
 
@@ -12,7 +12,7 @@ export function generateOpenAPI() {
             description: 'User service API',
         }
     }; // your config comes here
-    registry.register("user", UserSchema);
-    registry.register("userId", UserID);
+    registry.register("user", userSchema);
+    registry.register("userId", userId);
     return new OpenApiGeneratorV31(registry.definitions).generateDocument(config);
 }

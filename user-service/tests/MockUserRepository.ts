@@ -1,6 +1,6 @@
-import { UserRepository } from "../src/repositories/UserRepository";
-import { User } from "../src/schemas/User";
-import {EmailAlreadyExistsError} from "../src/errors/UserErrors";
+import {UserRepository} from "../src/repositories/UserRepository";
+import {User} from "../src/schemas/User";
+import {EmailAlreadyExistsError, IdAlreadyExistsError} from "../src/errors/UserErrors";
 
 export class MockUserRepository implements UserRepository {
     private users: User[] = [];
@@ -13,18 +13,15 @@ export class MockUserRepository implements UserRepository {
         return this.users.find((user) => user.id === id) || null;
     }
 
-    async create(userData: Omit<User, "id">): Promise<User> {
+    async create(userData: User): Promise<User> {
         if (this.users.map((user) => user.email).includes(userData.email)) {
             throw new EmailAlreadyExistsError(userData.email);
         }
-        const newUser = { id: String(this.users.length + 1), ...userData };
-        let s = ""
-        for (let i = 0; i < 24 - newUser.id.length; i++) {
-            s += "0"
+        if (this.users.map((user) => user.id).includes(userData.id)) {
+            throw new IdAlreadyExistsError(userData.id!);
         }
-        newUser.id = s + newUser.id
-        this.users.push(newUser);
-        return newUser;
+        this.users.push(userData);
+        return userData;
     }
 
     async update(id: string, updateData: Partial<User>): Promise<User | null> {
@@ -40,4 +37,9 @@ export class MockUserRepository implements UserRepository {
         this.users = this.users.filter((user) => user.id !== id);
         return this.users.length < initialLength;
     }
+
+    async findByEmail(email: string): Promise<User | null> {
+        return this.users.find((user) => user.email === email) || null;
+    }
+
 }

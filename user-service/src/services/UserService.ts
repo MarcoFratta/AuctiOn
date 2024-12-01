@@ -1,6 +1,6 @@
-import { User } from "../schemas/User";
-import { UserRepository } from "../repositories/UserRepository";
-import { UserNotFoundError } from "../errors/UserErrors";
+import {User} from "../schemas/User";
+import {UserRepository} from "../repositories/UserRepository";
+import {UserNotFoundError} from "../errors/UserErrors";
 import logger from "../utils/Logger"; // Assume this is a configured Winston logger
 
 export class UserService {
@@ -20,13 +20,13 @@ export class UserService {
         const user = await this.userRepository.findById(id);
         if (!user) {
             logger.warn(`User with ID ${id} not found.`);
-            throw new UserNotFoundError(id);
+            throw new UserNotFoundError("id", id);
         }
         logger.info(`User with ID ${id} fetched successfully.`);
         return user;
     }
 
-    async createUser(userData: Omit<User, "id">): Promise<User> {
+    async createUser(userData: User): Promise<User> {
         logger.info(`Creating new user: ${JSON.stringify(userData)}`);
         const newUser = await this.userRepository.create(userData);
 
@@ -45,7 +45,7 @@ export class UserService {
 
         if (!updatedUser) {
             logger.warn(`Failed to update user with ID ${id}`);
-            throw new UserNotFoundError(id);
+            throw new UserNotFoundError("id", id);
         }
 
         logger.info(`User with ID ${id} updated successfully.`);
@@ -58,9 +58,20 @@ export class UserService {
 
         if (!deleted) {
             logger.warn(`Failed to delete user with ID ${id}`);
-            throw new UserNotFoundError(id);
+            throw new UserNotFoundError("id", id);
         }
 
         logger.info(`User with ID ${id} deleted successfully.`);
+    }
+
+    async getUserByEmail(email: string) {
+        logger.info(`Fetching user with email: ${email}`);
+        const user = await this.userRepository.findByEmail(email);
+        if (!user) {
+            logger.warn(`User with email ${email} not found.`);
+            throw new UserNotFoundError("email", email);
+        }
+        logger.info(`User with email ${email} fetched successfully.`);
+        return user;
     }
 }

@@ -1,15 +1,15 @@
-import { validateSchema, ParseError } from '../src/utils/Validator';
-import { UserSchema } from '../src/schemas/User';
+import {ParseError, validateSchema} from '../src/utils/Validator';
+import {userSchema} from '../src/schemas/User';
 
 describe('validateSchema', () => {
     it('should validate the object successfully if the input is valid', () => {
         const validInput = {
-            id: '123456789112345678912345',
+            id: '1234',
             name: 'John Doe',
             email: 'john.doe@example.com',
         };
 
-        const result = validateSchema(UserSchema, validInput);
+        const result = validateSchema(userSchema, validInput);
 
         expect(result).toEqual(validInput);
     });
@@ -20,15 +20,17 @@ describe('validateSchema', () => {
             email: 'not-an-email',
         };
 
-        expect(() => validateSchema(UserSchema, invalidInput)).toThrow(ParseError);
+        expect(() => validateSchema(userSchema, invalidInput)).toThrow(ParseError);
 
         try {
-            validateSchema(UserSchema, invalidInput);
+            validateSchema(userSchema, invalidInput);
         } catch (error) {
             if (error instanceof ParseError) {
                 expect(error.message).toEqual(
-                    "Validation error: String must contain at least 1 character(s) at" +
-                    " \"name\"; Invalid email at \"email\"");
+                    "Validation error: " +
+                    'Required at "id";' +
+                    " String must contain at least 1 character(s) at" +
+                    ' "name"; Invalid email at "email"');
             } else {
                 throw error; // Re-throw unexpected errors
             }
@@ -40,17 +42,6 @@ describe('validateSchema', () => {
             email: 'john.doe@example.com',
         };
 
-        expect(() => validateSchema(UserSchema, missingFieldInput)).toThrow(ParseError);
-    });
-
-    it('should validate successfully when optional fields are omitted', () => {
-        const validInput = {
-            name: 'Jane Doe',
-            email: 'jane.doe@example.com',
-        };
-
-        const result = validateSchema(UserSchema, validInput);
-
-        expect(result).toEqual(validInput);
+        expect(() => validateSchema(userSchema, missingFieldInput)).toThrow(ParseError);
     });
 });

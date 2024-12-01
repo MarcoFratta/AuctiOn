@@ -30,7 +30,7 @@ describe('UserRepository with MongoMemoryServer', () => {
     });
 
     it('should create and retrieve a user', async () => {
-        const userInput = {name: 'John Doe', email: 'john@example.com'};
+        const userInput = {id: "1", name: 'John Doe', email: 'john@example.com'};
         const createdUser = await repository.create(userInput);
 
         expect(createdUser.name).toBe('John Doe');
@@ -42,8 +42,9 @@ describe('UserRepository with MongoMemoryServer', () => {
     });
 
     it('should delete a user', async () => {
-        const userInput = {name: 'Jane Doe', email: 'jane@example.com'};
+        const userInput = {id: "1", name: 'Jane Doe', email: 'jane@example.com'};
         const createdUser = await repository.create(userInput);
+        console.log(createdUser)
 
         await repository.delete(createdUser.id!);
 
@@ -51,7 +52,7 @@ describe('UserRepository with MongoMemoryServer', () => {
         expect(users).toHaveLength(0);
     });
     it('should update a user', async () => {
-        const userInput = {name: 'Jane Doe', email: 'jane@example.com'}
+        const userInput = {id: "1", name: 'Jane Doe', email: 'jane@example.com'}
         const createdUser = await repository.create(userInput);
         const updatedUser = await repository.update(createdUser.id!, {name: 'Jonny Doe'});
         const retrievedUser = await repository.findById(createdUser.id!);

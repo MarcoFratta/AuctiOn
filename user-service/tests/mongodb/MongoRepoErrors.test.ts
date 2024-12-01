@@ -35,25 +35,23 @@ describe('UserRepository with MongoMemoryServer', () => {
     });
 
     it('should throw an error when trying to create a user with a duplicate email', async () => {
-        const userInput = {name: 'John Doe', email: 'john@example.com'};
-
+        const userInput = {id: "1", name: 'John Doe', email: 'john@example.com'};
         // Create the first user
         await repository.create(userInput);
-
         // Try creating a second user with the same email
-        await expect(repository.create(userInput)).rejects.toThrow(
-            new EmailAlreadyExistsError(userInput.email)// MongoDB-specific error message
-        );
+        const userInput2 = {id: "2", name: 'Jane Doe', email: 'john@example.com'};
+        await expect(repository.create(userInput2)).rejects.toThrow(
+            new EmailAlreadyExistsError(userInput.email));
     });
 
     it('should throw an error if the database connection fails', async () => {
         // Simulate a database disconnection
         await mongoose.connection.close();
 
-        const userInput = {name: 'Jane Doe', email: 'jane@example.com'};
+        const userInput = {id: "1", name: 'Jane Doe', email: 'jane@example.com'};
 
         await expect(repository.create(userInput)).rejects.toThrow(
-            'Unexpected db error'// Connection error
+            'Client must be connected before running operations'// Connection error
         );
 
         // Reconnect for subsequent tests

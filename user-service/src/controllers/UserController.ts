@@ -6,6 +6,7 @@ import logger from "../utils/Logger";
 export class UserController {
     private readonly userService: UserService;
 
+
     constructor(userService: UserService) {
         this.userService = userService;
     }
@@ -18,7 +19,15 @@ export class UserController {
             next(error);
         }
     };
-
+    getUserByEmail = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        const {email} = req.params;
+        try {
+            const user = await this.userService.getUserByEmail(email);
+            res.status(200).json(user);
+        } catch (error) {
+            next(error);
+        }
+    }
     // Other methods as arrow functions
     getUserById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         const { id } = req.params;
@@ -33,7 +42,7 @@ export class UserController {
     createUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
             logger.log("info", `Creating new user: ${this}`);
-            const userData: Omit<User, "id"> = req.body;
+            const userData: User = req.body;
             const newUser = await this.userService.createUser(userData);
             res.status(201).json(newUser);
         } catch (error) {

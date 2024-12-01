@@ -1,4 +1,4 @@
-import {UserID, UserSchema} from "../src/schemas/User";
+import {userEmail, userId, userSchema} from "../src/schemas/User";
 import {generateOpenAPI, registry} from "./Generator";
 import * as path from "node:path";
 import * as fs from "node:fs";
@@ -17,7 +17,7 @@ registry.registerPath({
             description: 'A list of users',
             content: {
                 'application/json': {
-                    schema: z.array(UserSchema),
+                    schema: z.array(userSchema),
                 },
             },
         },
@@ -31,14 +31,14 @@ registry.registerPath({
     description: 'Get user data by its ID',
     summary: 'Get a single user',
     request: {
-        params: UserID,
+        params: userId,
     },
     responses: {
         200: {
             description: 'Object with user data',
             content: {
                 'application/json': {
-                    schema: UserSchema,
+                    schema: userSchema,
                 },
             },
         },
@@ -46,6 +46,29 @@ registry.registerPath({
             description: 'User not found',
         },
     },
+});
+registry.registerPath({
+    method: 'get',
+    path: '/users/email/{email}',
+    description: 'Get user data by its email',
+    summary: 'Get a single user',
+    request: {
+        params: userEmail,
+    },
+    responses: {
+        200: {
+            description: 'Object with user data',
+            content: {
+                'application/json': {
+                    schema: userSchema,
+                },
+            },
+        },
+        404: {
+            description: 'User not found',
+        },
+    },
+
 });
 
 // 3. Create a user
@@ -58,7 +81,7 @@ registry.registerPath({
         body: {
             content: {
                 'application/json': {
-                    schema: UserSchema,
+                    schema: userSchema,
                 },
             },
         },
@@ -80,11 +103,11 @@ registry.registerPath({
     description: 'Update an existing user',
     summary: 'Modify a user',
     request: {
-        params: UserID,
+        params: userId,
         body: {
             content: {
                 'application/json': {
-                    schema: UserSchema.partial(),
+                    schema: userSchema.partial(),
                 },
             },
         },
@@ -106,7 +129,7 @@ registry.registerPath({
     description: 'Delete a user by ID',
     summary: 'Remove a user',
     request: {
-        params: UserID,
+        params: userId,
     },
     responses: {
         204: {

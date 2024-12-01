@@ -23,6 +23,9 @@ describe('UserRoutes', () => {
         controllerMock.getUserById = jest.fn(async (_req, res, _next) => {
             res.status(200).send('getUserById called')
         });
+        controllerMock.getUserByEmail = jest.fn(async (_req, res, _next) => {
+            res.status(200).send('getUserByEmail called')
+        });
         controllerMock.createUser = jest.fn(async (_req, res, _next) => {
             res.status(201).send('createUser called')
         });
@@ -35,6 +38,9 @@ describe('UserRoutes', () => {
 
         // Add routes
         app.use('/users', createUserRouter(controllerMock));
+    });
+    afterAll(() => {
+        jest.clearAllMocks();
     });
 
     it('should call getUsers on GET /users', async () => {
@@ -50,9 +56,15 @@ describe('UserRoutes', () => {
         expect(response.text).toBe('getUserById called');
         expect(controllerMock.getUserById).toHaveBeenCalled();
     });
+    it('should call getUserByEmail on GET /users/email/:email', async () => {
+        const response = await request(app).get('/users/email/john@doe.com');
+        expect(response.status).toBe(200);
+        expect(response.text).toBe('getUserByEmail called');
+        expect(controllerMock.getUserByEmail).toHaveBeenCalled();
+    });
 
     it('should call createUser on POST /users', async () => {
-        const user = { name: 'John Doe', email: 'john@example.com' };
+        const user = {id: '1', name: 'John Doe', email: 'john@example.com'};
         const response = await request(app).post('/users').send(user);
         expect(response.status).toBe(201);
         expect(response.text).toBe('createUser called');

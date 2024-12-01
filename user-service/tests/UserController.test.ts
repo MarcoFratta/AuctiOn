@@ -1,8 +1,8 @@
 import express from 'express';
 import request from 'supertest';
-import { UserController } from '../src/controllers/UserController';
-import { UserService } from '../src/services/UserService';
-import { User } from '../src/schemas/User';
+import {UserController} from '../src/controllers/UserController';
+import {UserService} from '../src/services/UserService';
+import {User} from '../src/schemas/User';
 
 jest.mock('../src/services/UserService');
 
@@ -20,6 +20,7 @@ describe('UserController', () => {
         mockService.createUser = jest.fn();
         mockService.updateUser = jest.fn();
         mockService.deleteUser = jest.fn();
+        mockService.getUserByEmail = jest.fn();
 
 
         controller = new UserController(mockService);
@@ -29,6 +30,9 @@ describe('UserController', () => {
         // Mock routes
         app.get('/users', (req, res, next) => { controller.getUsers(req, res, next)});
         app.get('/users/:id', (req, res, next) => {controller.getUserById(req, res, next)});
+        app.get('/users/email/:email', (req, res, next) => {
+            controller.getUserByEmail(req, res, next)
+        });
         app.post('/users', (req, res, next) => {controller.createUser(req, res, next)});
         app.put('/users/:id', (req, res, next) => {controller.updateUser(req, res, next)});
         app.delete('/users/:id', (req, res, next) => {controller.deleteUser(req, res, next)});
@@ -89,15 +93,14 @@ describe('UserController', () => {
     describe('POST /users', () => {
         it('should create a new user', async () => {
             const newUser: User = { name: 'Jane Doe', email: 'jane@example.com', id: '2' };
-            const userInput = { name: 'Jane Doe', email: 'jane@example.com' };
 
             mockService.createUser.mockResolvedValue(newUser);
 
-            const response = await request(app).post('/users').send(userInput);
+            const response = await request(app).post('/users').send(newUser);
 
             expect(response.status).toBe(201);
             expect(response.body).toEqual(newUser);
-            expect(mockService.createUser).toHaveBeenCalledWith(userInput);
+            expect(mockService.createUser).toHaveBeenCalledWith(newUser);
         });
 
         it('should return an error', async () => {
@@ -142,6 +145,16 @@ describe('UserController', () => {
             expect(response.status).toBe(500);
         });
     });
+    describe('GET /users/:email', () => {
+        it('should return a user by email', async () => {
+            const mockUser: User = {id: '1', name: 'John Doe', email: 'john@doe.com'}
+            mockService.getUserByEmail.mockResolvedValue(mockUser);
+            const response = await request(app).get('/users/email/john@doe.com').send();
+            expect(response.status).toBe(200);
+            expect(response.body).toEqual(mockUser);
+
+        });
+    });
 
     describe('DELETE /users/:id', () => {
         it('should delete a user', async () => {
@@ -169,4 +182,5 @@ describe('UserController', () => {
             expect(response.status).toBe(500);
         });
     });
+
 });
