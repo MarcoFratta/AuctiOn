@@ -4,17 +4,37 @@ import axios from 'axios'
 import * as console from 'node:console'
 import {config} from '../src/configs/config'
 import app from '../src/App'
+import {MongoMemoryServer} from 'mongodb-memory-server'
+import {closeLocalMongoConnection, localMongoConnection} from './common'
+import {RegisterInputData} from '../src/schemas/AuthSchema'
 
 // Mock Axios
 jest.mock('axios')
 const mockedAxios = axios as jest.Mocked<typeof axios>
-const userServiceUrl = 'http://test/users'
-config.userServiceUrl = userServiceUrl
+const userServiceUrl = config.userServiceUrl
 
 describe('Auth Service Integration Tests with Axios Mock', () => {
+    let mongoServer: MongoMemoryServer
+    beforeAll(async () => {
+        mongoServer = await localMongoConnection()
+    })
+    afterAll(async () => {
+        await closeLocalMongoConnection(mongoServer)
+    })
     afterEach(() => {
         jest.clearAllMocks()
     })
+
+    async function register(user: RegisterInputData): Promise<any> {
+        mockedAxios.get.mockResolvedValueOnce({data: null})
+        mockedAxios.post.mockResolvedValue({data: user})
+        // Perform the request
+        return await request(app).post('/auth/register').send({
+            email: 'test@example.com',
+            name: 'Test User',
+            password: 'Password1',
+        })
+    }
 
     describe('POST /auth/register', () => {
         it('should register a user and return a token', async () => {
@@ -24,37 +44,25 @@ describe('Auth Service Integration Tests with Axios Mock', () => {
                 email: 'test@example.com',
                 name: 'Test User',
             }
-            mockedAxios.get.mockResolvedValueOnce({data: null})
-            mockedAxios.post.mockResolvedValue({
-                data: {
-                    pHash: 'mocked-hashed-password',
-                    ...user,
-                },
-            })
-            // Mock User Service response for login
-            // Perform the request
-            const response = await request(app).post('/auth/register').send({
-                email: 'test@example.com',
-                name: 'Test User',
-                password: 'Password1',
-            })
-
+            const response = await register({...user, password: 'Password1'})
             console.log(response.body)
             // Assert the response
             expect(response.status).toBe(201)
-
             // Assert that response.body is an object containing 'message' and 'token'
             expect(response.body).toHaveProperty('message')
-            expect(response.body).toHaveProperty('token')
+            expect(response.body).toHaveProperty('user')
+            expect(response.body.user).toHaveProperty('id')
+            expect(response.body.id).not.toBe(user.id)
+            expect(response.body.id).not.toBe('')
+            expect(response.body.user).toHaveProperty('token')
             // Assert that message is a string
             expect(typeof response.body.message).toBe('string')
             // Assert that token is a non-empty string
-            expect(typeof response.body.token.token).toBe('string')
-            expect(response.body.token.token).not.toBe('')
-
+            expect(typeof response.body.user.token).toBe('string')
+            expect(response.body.user.token).not.toBe('')
             // Ensure Axios calls were made with correct parameters
             expect(mockedAxios.get).toHaveBeenCalledWith(
-                userServiceUrl + '?email=test@example.com'
+                userServiceUrl + '/email/test@example.com'
             )
         })
     })
@@ -62,29 +70,32 @@ describe('Auth Service Integration Tests with Axios Mock', () => {
     describe('POST /auth/login', () => {
         it('should log in a user and return a token', async () => {
             // Mock User Service response for user fetch
-            mockedAxios.get.mockResolvedValueOnce({
-                data: {
-                    id: 'test-user-id',
-                    email: 'test@example.com',
-                    name: 'Test User',
-                    pHash: '$2b$10$6eF40k8AeXLXZBCottZduedBCpBR3BOeCcVJPUuwYbh9p5UszZU/W',
-                },
-            })
+            const user = {email: 'test@example.com', name: 'Test User'}
 
+            const id = (await register({...user, password: 'Password1'})).body
+                .user.id
+            mockedAxios.get.mockResolvedValueOnce({data: {...user, id: id}})
             const response = await request(app).post('/auth/login').send({
                 email: 'test@example.com',
                 password: 'Password1',
             })
 
-            expect(response.body).toHaveProperty('token')
+            expect(response.body.user).toHaveProperty('token')
+            expect(response.body.user.token).not.toBe('')
+            expect(response.status).toBe(200)
+            expect(response.body.user).toHaveProperty('id')
+            expect(response.body.user.id).not.toBe('')
+            expect(response.body.user).toHaveProperty('email')
+            expect(response.body.user.email).toBe(user.email)
+            expect(response.body.user).toHaveProperty('name')
+            expect(response.body.user.name).toBe(user.name)
             // Assert that message is a string
-            expect(typeof response.body.token).toBe('string')
-            expect(response.body.token).not.toBe('')
+            expect(typeof response.body.user.token).toBe('string')
+            expect(response.body.user.token).not.toBe('')
 
             expect(mockedAxios.get).toHaveBeenCalledWith(
-                userServiceUrl + '?email=test@example.com'
+                userServiceUrl + '/email/test@example.com'
             )
-            console.log(response.body)
         })
     })
 
@@ -92,31 +103,21 @@ describe('Auth Service Integration Tests with Axios Mock', () => {
         it('should validate a token successfully', async () => {
             // Mock User Service response for token validation
             const user = {
-                id: 'test-user-id',
                 email: 'test@example.com',
                 name: 'Test User',
             }
-            mockedAxios.get.mockResolvedValueOnce({data: null})
-            mockedAxios.post.mockResolvedValue({
-                data: {
-                    pHash: 'mocked-hashed-password',
-                    ...user,
-                },
-            })
-            // Mock User Service response for login
-            // Perform the request
-            const response = await request(app).post('/auth/register').send({
-                email: 'test@example.com',
-                name: 'Test User',
-                password: 'Password1',
-            })
-            console.log(response.body)
+            const response = await register({...user, password: 'Password1'})
 
             const res = await request(app).post('/auth/validate').send({
-                token: response.body.token.token,
+                token: response.body.user.token,
             })
             expect(res.status).toBe(200)
-            expect(res.body).toEqual(user)
+            expect(res.body).toHaveProperty('id')
+            expect(res.body.id).not.toBe('')
+            expect(res.body).toHaveProperty('email')
+            expect(res.body.email).toBe(user.email)
+            expect(res.body).toHaveProperty('name')
+            expect(res.body.name).toBe(user.name)
         })
     })
 
@@ -140,7 +141,7 @@ describe('Auth Service Integration Tests with Axios Mock', () => {
             )
 
             expect(mockedAxios.get).toHaveBeenCalledWith(
-                userServiceUrl + '?email=test@example.com'
+                userServiceUrl + '/email/test@example.com'
             )
         })
     })

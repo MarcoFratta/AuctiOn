@@ -2,10 +2,19 @@ import request from 'supertest'
 import app from '../src/App' // Assuming `app` is your Express app
 import axios from 'axios'
 import {UserServiceUnavailableError} from '../src/errors/AuthErrors'
+import {MongoMemoryServer} from 'mongodb-memory-server'
+import {closeLocalMongoConnection, localMongoConnection} from './common'
 
 jest.mock('axios')
 
 describe('Error Use Cases', () => {
+    let mongoServer: MongoMemoryServer
+    beforeAll(async () => {
+        mongoServer = await localMongoConnection()
+    })
+    afterAll(async () => {
+        await closeLocalMongoConnection(mongoServer)
+    })
     afterEach(() => {
         jest.clearAllMocks()
     })
@@ -71,14 +80,22 @@ describe('Error Use Cases', () => {
 
         it('should return 400 for an incorrect password', async () => {
             // Mock the user service to return a user
-            ;(axios.get as jest.Mock).mockResolvedValueOnce({
-                data: {email: 'test@example.com', pHash: 'mockedHash'},
-            })
+            const userData = {email: 'test@example.com', name: 'Test User'}
+
+            ;(axios.get as jest.Mock).mockResolvedValueOnce({data: null})
+            ;(axios.post as jest.Mock).mockResolvedValueOnce({data: userData})
+            const id = (
+                await request(app)
+                    .post('/auth/register')
+                    .send({...userData, password: 'Password1'})
+            ).body.user.id
             // Mock bcrypt to return false for password validation
             jest.mock('bcrypt', () => ({
                 compare: jest.fn().mockResolvedValue(false),
             }))
-
+            ;(axios.get as jest.Mock).mockResolvedValueOnce({
+                data: {...userData, id: id},
+            })
             const response = await request(app).post('/auth/login').send({
                 email: 'test@example.com',
                 password: 'wrongPassword',

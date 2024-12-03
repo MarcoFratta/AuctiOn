@@ -1,12 +1,12 @@
 import {
     LoginInputData,
     loginSchema,
-    registeredUser,
     RegisterInputData,
     registerSchema,
     Token,
     tokenSchema,
     User,
+    userSchema,
 } from '../src/schemas/AuthSchema'
 import {validateSchema, ValidationError} from '../src/utils/Validator' // Adjust the import path
 
@@ -99,13 +99,12 @@ describe('AuthSchema Validation with Helper', () => {
     describe('registeredUser', () => {
         it('should validate a correct registered user', () => {
             const input: User = {
-                id: '123',
+                id: '123456789012345678901234',
                 email: 'test@example.com',
                 name: 'Test User',
-                pHash: 'hashed-password',
             }
 
-            const result = validateSchema(registeredUser, input)
+            const result = validateSchema(userSchema, input)
 
             expect(result).toEqual(input)
         })
@@ -114,22 +113,21 @@ describe('AuthSchema Validation with Helper', () => {
             const input = {
                 email: 'test@example.com',
                 name: 'Test User',
-                pHash: 'hashed-password',
             }
 
-            expect(() => validateSchema(registeredUser, input)).toThrow(
+            expect(() => validateSchema(userSchema, input)).toThrow(
                 ValidationError
             )
         })
 
-        it('should fail if pHash is missing', () => {
+        it('should fail if id is not valid', () => {
             const input = {
                 id: '123',
                 email: 'test@example.com',
                 name: 'Test User',
             }
 
-            expect(() => validateSchema(registeredUser, input)).toThrow(
+            expect(() => validateSchema(userSchema, input)).toThrow(
                 ValidationError
             )
         })
