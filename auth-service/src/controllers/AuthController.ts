@@ -17,8 +17,10 @@ export class AuthController {
     ): Promise<void> => {
         const inputData: LoginInputData = req.body
         try {
-            const token = await this.authService.login(inputData)
-            res.status(200).json(token)
+            const user = await this.authService.login(inputData)
+            res.status(200).json({
+                user: user,
+            })
         } catch (error) {
             next(error)
         }
@@ -31,13 +33,13 @@ export class AuthController {
         const inputData: RegisterInputData = req.body
         try {
             logger.info(`Registering user with email: ${inputData.email}`)
-            const token = await this.authService.register(inputData)
+            const user = await this.authService.register(inputData)
             logger.info(
                 `User registered successfully with email: ${inputData.email}`
             )
             res.status(201).json({
                 message: 'User registered successfully',
-                token: token,
+                user: user,
             })
         } catch (error) {
             next(error)
