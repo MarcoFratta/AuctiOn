@@ -6,6 +6,7 @@ import {AuthServiceImpl} from './services/AuthServiceImpl'
 import {AuthController} from './controllers/AuthController'
 import createRouter from './routes/Routes'
 import {config} from './configs/config'
+import {MongoAccountRepo} from './repositories/MongoAccountRepo'
 
 const app = express()
 
@@ -23,12 +24,13 @@ if (fs.existsSync(swaggerPath)) {
         })
     )
 }
-
-export const service = new AuthServiceImpl(
+const repo = new MongoAccountRepo()
+const service = new AuthServiceImpl(
     config.userServiceUrl!,
-    config.jwtSecret
+    config.jwtSecret,
+    repo
 )
-export const controller = new AuthController(service)
+const controller = new AuthController(service)
 
 // Use the router
 const router = createRouter(controller)

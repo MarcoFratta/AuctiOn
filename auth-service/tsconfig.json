@@ -12,19 +12,19 @@
         "forceConsistentCasingInFileNames": true,
         "allowSyntheticDefaultImports": true,
         "rootDir": ".",
-        "lib": [
-            "es6"
-        ],
+      "lib": [
+        "es6"
+      ],
         "strict": true,
         "baseUrl": "./src"
     },
-    "exclude": [
-        "node_modules",
-        "dist"
-    ],
-    "include": [
-        "./src/**/*",
-        "./tests/**/*",
-        "./openapi/**/*"
-    ]
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
+  "include": [
+    "./src/**/*",
+    "./tests/**/*",
+    "./openapi/**/*"
+  ]
 }
