@@ -24,60 +24,61 @@ export class AuthServiceImpl implements AuthService {
     // Register a new user
     async register(data: RegisterInputData): Promise<RegisterOutput> {
         logger.info(`registering user: ${data.email}`)
-        const {data: existingUser} = await axios.get(
-            `${this.userServiceURL}/email/${data.email}`
-        )
-        if (existingUser) throw new UserAlreadyExistsError(data.email)
+        const userExists = await this.getUserByEmail(data.email)
+        if (userExists) throw new UserAlreadyExistsError(data.email)
+
         const hashedPassword = await bcrypt.hash(data.password, 10)
         logger.info(`creating account for user: ${data.email}`)
-        const account = await this.repo.create({pHash: hashedPassword})
-        if (!account) {
-            throw new Error('Failed to create account')
-        }
-        logger.info(`created account with id : ${account.id}`)
-        const {data: newUser} = await axios.post(this.userServiceURL, {
-            id: account.id,
-            email: data.email,
-            name: data.name,
-        })
 
+        const account = await this.repo.create({pHash: hashedPassword})
+        const userInfo: User = validateSchema(userSchema, {...data, id: account.id})
+        logger.info(`created account with id : ${account.id}`)
+        const newUser: User | null = await this.saveUser(userInfo)
         if (!newUser) {
             await this.repo.delete(account.id)
             throw new Error('Failed to create user')
         }
         logger.info(`created user: ${newUser}`)
-        const userInfo = {
-            id: account.id,
-            email: newUser.email,
-            name: newUser.name,
-        }
-        const token = jwt.sign(userInfo, this.jwtSecret, {expiresIn: '1h'})
-        return {token: token, ...userInfo}
+        const finalUser: User = validateSchema(userSchema, newUser)
+        const token = jwt.sign(finalUser, this.jwtSecret, {expiresIn: '1h'})
+        return {token: token, ...finalUser}
     }
 
     // Login an existing user
     async login(data: LoginInputData): Promise<RegisterOutput> {
-        const {data: res} = await axios.get(
-            `${this.userServiceURL}/email/${data.email}`
-        )
-        if (!res) throw new UserNotFoundError(data.email)
-        const user = validateSchema(userSchema, res)
+        const existingUser = await this.getUserByEmail(data.email)
+        if (!existingUser) throw new UserNotFoundError(data.email)
+        const user = validateSchema(userSchema, existingUser)
         logger.info(`logging in user: ${data.email} with id ${user.id}`)
         const account = await this.repo.findById(user.id!)
         if (!account) {
             throw new UserNotFoundError(data.email)
         }
-        logger.info(
-            `found account with id: ${account.id} with hash ${account.pHash}`
-        )
-        const isPasswordValid = await bcrypt.compare(
-            data.password,
-            account.pHash
-        )
+        const isPasswordValid = await bcrypt.compare(data.password, account.pHash)
         if (!isPasswordValid) throw new WrongPasswordError()
         logger.info(`password is valid for user: ${data.email}`)
         const token = jwt.sign(user, this.jwtSecret, {expiresIn: '1h'})
         return {token: token, ...user}
+    }
+
+    private async getUserByEmail(email: string): Promise<User | null> {
+        try {
+            const {data: user} = await axios.get(`${this.userServiceURL}/email/${email}`)
+            return validateSchema(userSchema, user)
+        } catch (e) {
+            return null
+        }
+    }
+
+    private async saveUser(data: User): Promise<User | null> {
+        try {
+            const {data: newUser} = await axios.post(this.userServiceURL, data)
+            return validateSchema(userSchema, newUser)
+        } catch (e) {
+            logger.error(e)
+            return null;
+        }
+
     }
 
     // Validate a JWT
