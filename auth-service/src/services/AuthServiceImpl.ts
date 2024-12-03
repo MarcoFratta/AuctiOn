@@ -1,7 +1,13 @@
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import axios from 'axios'
-import {InvalidTokenError, UserAlreadyExistsError, UserNotFoundError, WrongPasswordError,} from '../errors/AuthErrors'
+import {
+    InvalidTokenError,
+    UserAlreadyExistsError,
+    UserNotFoundError,
+    UserServiceUnavailableError,
+    WrongPasswordError,
+} from '../errors/AuthErrors'
 import {AuthService} from './AuthService'
 import {LoginInputData, RegisterInputData, RegisterOutput, Token, User, userSchema,} from '../schemas/AuthSchema'
 import logger from '../utils/Logger'
@@ -38,6 +44,7 @@ export class AuthServiceImpl implements AuthService {
             await this.repo.delete(account.id)
             throw new Error('Failed to create user')
         }
+        newUser.id = account.id
         logger.info(`created user: ${newUser}`)
         const finalUser: User = validateSchema(userSchema, newUser)
         const token = jwt.sign(finalUser, this.jwtSecret, {expiresIn: '1h'})
@@ -66,6 +73,9 @@ export class AuthServiceImpl implements AuthService {
             const {data: user} = await axios.get(`${this.userServiceURL}/email/${email}`)
             return validateSchema(userSchema, user)
         } catch (e) {
+            if (axios.isAxiosError(e) || e instanceof UserServiceUnavailableError) {
+                throw new UserServiceUnavailableError(e.message)
+            }
             return null
         }
     }
@@ -75,8 +85,11 @@ export class AuthServiceImpl implements AuthService {
             const {data: newUser} = await axios.post(this.userServiceURL, data)
             return validateSchema(userSchema, newUser)
         } catch (e) {
-            logger.error(e)
-            return null;
+            if (axios.isAxiosError(e) || e instanceof UserServiceUnavailableError) {
+                throw new UserServiceUnavailableError(e.message)
+            }
+            logger.error(`Failed to save user: ${e}`)
+            return null
         }
 
     }

@@ -59,7 +59,7 @@ export class AuthController {
         try {
             const decoded = this.authService.validateToken({token: token})
             logger.info(`Token validated successfully ${decoded}`)
-            res.status(200).json(decoded)
+            res.status(200).json({user: decoded})
         } catch (error) {
             next(error)
         }
