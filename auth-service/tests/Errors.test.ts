@@ -22,8 +22,8 @@ describe('Error Use Cases', () => {
     describe('Register Endpoint Error Cases', () => {
         it('should return 400 when the user already exists', async () => {
             // Mock the user service to return an existing user
-            ;(axios.get as jest.Mock).mockResolvedValueOnce({
-                data: {email: 'test@example.com'},
+            (axios.get as jest.Mock).mockResolvedValueOnce({
+                data: {id: "123456789012345678901234", name: "test", email: 'test@example.com'}
             })
 
             const response = await request(app).post('/auth/register').send({
@@ -41,11 +41,8 @@ describe('Error Use Cases', () => {
 
         it('should return 503 when the user service is unavailable', async () => {
             // Mock Axios to throw a connection error
-            ;(axios.get as jest.Mock).mockRejectedValueOnce(
-                new UserServiceUnavailableError(
-                    'User Service is not responding'
-                )
-            )
+            (axios.get as jest.Mock).mockRejectedValueOnce(
+                new UserServiceUnavailableError('User Service is not responding'))
 
             const response = await request(app).post('/auth/register').send({
                 email: 'test@example.com',
@@ -83,7 +80,12 @@ describe('Error Use Cases', () => {
             const userData = {email: 'test@example.com', name: 'Test User'}
 
             ;(axios.get as jest.Mock).mockResolvedValueOnce({data: null})
-            ;(axios.post as jest.Mock).mockResolvedValueOnce({data: userData})
+            ;(axios.post as jest.Mock).mockResolvedValueOnce({
+                data: {
+                    ...userData,
+                    id: '123456789012345678901234'
+                }
+            })
             const id = (
                 await request(app)
                     .post('/auth/register')

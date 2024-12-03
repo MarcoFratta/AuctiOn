@@ -96,7 +96,7 @@ describe('AuthService', () => {
             }
 
         ;(axios.get as jest.Mock).mockResolvedValue({
-            data: {id: '123', email: userData.email, name: userData.name},
+            data: {id: '123456789012345678901234', email: userData.email, name: userData.name},
         })
 
         await expect(authService.register(userData)).rejects.toThrow(

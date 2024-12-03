@@ -27,7 +27,7 @@ describe('Auth Service Integration Tests with Axios Mock', () => {
 
     async function register(user: RegisterInputData): Promise<any> {
         mockedAxios.get.mockResolvedValueOnce({data: null})
-        mockedAxios.post.mockResolvedValue({data: user})
+        mockedAxios.post.mockResolvedValue({data: {...user, id: '123456789012345678901234'}})
         // Perform the request
         return await request(app).post('/auth/register').send({
             email: 'test@example.com',
@@ -40,7 +40,7 @@ describe('Auth Service Integration Tests with Axios Mock', () => {
         it('should register a user and return a token', async () => {
             // Mock User Service response for registration
             const user = {
-                id: 'test-user-id',
+                id: '123456789012345678901234',
                 email: 'test@example.com',
                 name: 'Test User',
             }
@@ -71,14 +71,15 @@ describe('Auth Service Integration Tests with Axios Mock', () => {
         it('should log in a user and return a token', async () => {
             // Mock User Service response for user fetch
             const user = {email: 'test@example.com', name: 'Test User'}
-
-            const id = (await register({...user, password: 'Password1'})).body
-                .user.id
+            const r = (await register({...user, password: 'Password1'}))
+            console.log(r.body)
+            const id = r.body.user.id
             mockedAxios.get.mockResolvedValueOnce({data: {...user, id: id}})
             const response = await request(app).post('/auth/login').send({
                 email: 'test@example.com',
                 password: 'Password1',
             })
+            console.log(response.body)
 
             expect(response.body.user).toHaveProperty('token')
             expect(response.body.user.token).not.toBe('')
@@ -111,13 +112,12 @@ describe('Auth Service Integration Tests with Axios Mock', () => {
             const res = await request(app).post('/auth/validate').send({
                 token: response.body.user.token,
             })
+            console.log(res.body)
             expect(res.status).toBe(200)
-            expect(res.body).toHaveProperty('id')
-            expect(res.body.id).not.toBe('')
-            expect(res.body).toHaveProperty('email')
-            expect(res.body.email).toBe(user.email)
-            expect(res.body).toHaveProperty('name')
-            expect(res.body.name).toBe(user.name)
+            expect(res.body.user).toHaveProperty('id')
+            expect(res.body.user.id).not.toBe('')
+            expect(res.body.user).toHaveProperty('email', user.email)
+            expect(res.body.user).toHaveProperty('name', user.name)
         })
     })
 
