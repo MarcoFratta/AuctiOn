@@ -26,7 +26,10 @@ registry.registerPath({
             description: 'User registered successfully',
             content: {
                 'application/json': {
-                    schema: schemas.tokenSchema,
+                    schema: z.object({
+                        message: z.string(),
+                        user: schemas.registerOutput
+                    }),
                 },
             },
         },
@@ -63,7 +66,7 @@ registry.registerPath({
             description: 'User authenticated successfully',
             content: {
                 'application/json': {
-                    schema: schemas.tokenSchema,
+                    schema: z.object({user: schemas.registerOutput}),
                 },
             },
         },
@@ -110,7 +113,7 @@ registry.registerPath({
             description: 'Token is valid',
             content: {
                 'application/json': {
-                    schema: schemas.userOutputSchema,
+                    schema: schemas.registerSchema,
                 },
             },
         },
@@ -130,7 +133,7 @@ registry.registerPath({
 registry.register('Login an existing user', schemas.loginSchema)
 registry.register('Register new user', schemas.registerSchema)
 registry.register('Validate a JWT token', z.object({token: z.string()}))
-registry.register('User', schemas.userOutputSchema)
+registry.register('User', schemas.registerOutput)
 
 const openApiSpec = generateOpenAPI()
 // Save the OpenAPI specification to a file

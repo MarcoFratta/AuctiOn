@@ -5,11 +5,26 @@ services:
     ports:
       - '${H_PORT:-3000}:${C_PORT:-3000}' # Default to 3000 if PORT is not defined
     environment:
+      - DB_URI=${DB_URI:-mongodb://test:27017/auth}
       - PORT=${C_PORT:-3000}
       - NODE_ENV=${NODE_ENV:-production}
       - USER_SERVICE_URI=${USER_SERVICE_URI:-http://user-service:3000/users}
     networks:
+      - auth-network
       - microservices-network
+    depends_on:
+      - auth-mongodb
+  auth-mongodb:
+    image: "mongo:${MONGO_VERSION:-6.0}" # Default to MongoDB 6.0
+    volumes:
+      - mongo_data:/data/auth-db
+    networks:
+      - auth-network
+
 networks:
+  auth-network:
+    driver: bridge
   microservices-network:
     external: true
+volumes:
+  mongo_data:

@@ -1,10 +1,16 @@
-import app from './App'
-import {config} from './configs/config'
-import logger from './utils/Logger'
+import app from "./App";
+import {config} from "./configs/config";
+import {connectToDatabase} from "./utils/MongoDB";
 
-const port = config.port
-app.listen(port, () => {
-    logger.info(`Auth service running on port ${port}`)
-    logger.info(`Swagger docs available at http://localhost:${port}/docs`)
-    logger.info(`Connected to user service at ${config.userServiceUrl}`)
-})
+const port = config.port;
+
+
+connectToDatabase()
+    .then(() => {
+        app.listen(port, () => {
+            console.log('Server is running on port 3000');
+        });
+    })
+    .catch((error) => {
+        console.error('Failed to start server due to database connection error:', error);
+    });
