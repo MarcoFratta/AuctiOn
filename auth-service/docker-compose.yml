@@ -1,5 +1,5 @@
 services:
-  app:
+  auth-service:
     build:
       context: .
     ports:
