@@ -106,4 +106,18 @@ describe('Lobby Schema Validation', () => {
         expect(() =>
             validateSchema(lobbySchema, invalidLobby)).toThrow(ValidationError)
     })
+    test('should throw error for invalid player status', () => {
+        const invalidLobby = {
+            id: 'lobby1',
+            creator: 'user1',
+            players: [
+                { userId: 'player1', status: 'invalid-status' },
+            ],
+            maxPlayers: 5,
+            rounds: 3,
+            status: 'waiting',
+        }
+
+        expect(() => validateSchema(lobbySchema, invalidLobby)).toThrow(ValidationError)
+    })
 })

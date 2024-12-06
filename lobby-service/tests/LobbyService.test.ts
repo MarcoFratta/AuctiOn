@@ -34,7 +34,7 @@ describe('LobbyService', () => {
     test('should delete a lobby successfully', async () => {
         mockLobbyRepository.delete.mockResolvedValue(true)
 
-        await expect(lobbyService.deleteLobby('1')).resolves.toBeUndefined()
+        await expect(lobbyService.deleteLobby('1')).resolves.toBe(true)
         expect(mockLobbyRepository.delete).toHaveBeenCalledWith('1')
     })
 

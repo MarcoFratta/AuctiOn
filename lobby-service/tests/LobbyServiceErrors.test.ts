@@ -2,6 +2,15 @@
 import { LobbyService } from '../src/services/LobbyService'
 import { Lobby } from '../src/schemas/Lobby'
 import { MongoLobbyRepo } from '../src/repositories/MongoLobbyRepo'
+import {
+    LobbyFullError,
+    LobbyNotFoundError,
+    MatchAlreadyInProgressError,
+    NotEnoughPlayersError,
+    PlayerNotFoundError,
+    PlayersNotReadyError,
+    UnauthorizedError,
+} from '../src/errors/LobbyErrors'
 
 jest.mock('../src/repositories/MongoLobbyRepo')
 
@@ -17,14 +26,14 @@ describe('LobbyService Error Handling', () => {
         mockLobbyRepository.delete.mockResolvedValue(false)
 
         await expect(lobbyService.deleteLobby('invalid-id'))
-            .rejects.toThrow('Lobby not found')
+            .rejects.toThrow(LobbyNotFoundError)
     })
 
     test('should throw error when joining a non-existent lobby', async () => {
         mockLobbyRepository.findById.mockResolvedValue(null)
 
         await expect(lobbyService.joinLobby('invalid-id', 'user1'))
-            .rejects.toThrow('Lobby not found')
+            .rejects.toThrow(LobbyNotFoundError)
     })
 
     test('should throw error when joining a full lobby', async () => {
@@ -40,7 +49,7 @@ describe('LobbyService Error Handling', () => {
         mockLobbyRepository.findById.mockResolvedValue(fullLobby)
 
         await expect(lobbyService.joinLobby('1', 'user4'))
-            .rejects.toThrow('Lobby is full')
+            .rejects.toThrow(LobbyFullError)
     })
 
     test('should throw error when leaving a lobby the user is not part of', async () => {
@@ -56,7 +65,7 @@ describe('LobbyService Error Handling', () => {
         mockLobbyRepository.findById.mockResolvedValue(lobby)
 
         await expect(lobbyService.leaveLobby('1', 'user3'))
-            .rejects.toThrow('Player not found in lobby')
+            .rejects.toThrow(PlayerNotFoundError)
     })
 
     test('should throw error when setting status for a non-existent player', async () => {
@@ -72,7 +81,7 @@ describe('LobbyService Error Handling', () => {
         mockLobbyRepository.findById.mockResolvedValue(lobby)
 
         await expect(lobbyService.setStatus('1', 'user3', 'ready'))
-            .rejects.toThrow('Player not found in lobby')
+            .rejects.toThrow(PlayerNotFoundError)
     })
 
     test('should throw error when kicking a player without proper authorization', async () => {
@@ -88,7 +97,7 @@ describe('LobbyService Error Handling', () => {
         mockLobbyRepository.findById.mockResolvedValue(lobby)
 
         await expect(lobbyService.kickPlayer('1', 'user3', 'user2'))
-            .rejects.toThrow('Only the lobby creator can kick players')
+            .rejects.toThrow(UnauthorizedError)
     })
 
     test('should throw error when starting match with insufficient players', async () => {
@@ -104,7 +113,7 @@ describe('LobbyService Error Handling', () => {
         mockLobbyRepository.findById.mockResolvedValue(lobby)
 
         await expect(lobbyService.startMatch('1', 'user1'))
-            .rejects.toThrow('Not enough players to start the match')
+            .rejects.toThrow(NotEnoughPlayersError)
     })
 
     test('should throw error when starting a match with unready players', async () => {
@@ -123,7 +132,7 @@ describe('LobbyService Error Handling', () => {
         mockLobbyRepository.findById.mockResolvedValue(lobby)
 
         await expect(lobbyService.startMatch('1', 'user1'))
-            .rejects.toThrow('All players must be ready to start the match')
+            .rejects.toThrow(PlayersNotReadyError)
     })
 
     test('should throw error when starting a match already in progress', async () => {
@@ -142,6 +151,6 @@ describe('LobbyService Error Handling', () => {
         mockLobbyRepository.findById.mockResolvedValue(lobby)
 
         await expect(lobbyService.startMatch('1', 'user1'))
-            .rejects.toThrow('Match already in progress')
+            .rejects.toThrow(MatchAlreadyInProgressError)
     })
 })
