@@ -1,0 +1,20 @@
+import { z } from '../utils/ZodWrapper'
+
+export const lobbyId = z.object({
+    id: z.string(),
+})
+export const playerSchema = z.object({
+    userId: z.string(),
+    status: z.enum(['ready', 'waiting']).default('waiting'),
+})
+
+export const lobbySchema = z.object({
+    id: lobbyId.shape.id,
+    creator: z.string().min(1).openapi({ example: 'creatorId' }),
+    players: z.array(playerSchema).openapi({ example: [{ userId: 'player1', status: 'waiting' }] }),
+    maxPlayers: z.number().min(1).openapi({ example: 10 }),
+    rounds: z.number().min(1).openapi({ example: 5 }),
+    status: z.enum(['waiting', 'in-progress', 'completed']).default('waiting'),
+})
+
+export type Lobby = z.infer<typeof lobbySchema>;
