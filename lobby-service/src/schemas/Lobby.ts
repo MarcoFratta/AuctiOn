@@ -1,7 +1,7 @@
 import { z } from '../utils/ZodWrapper'
 
 export const lobbyId = z.object({
-    id: z.string(),
+    id: z.string().min(24),
 })
 export const playerStatusSchema = z.enum(['ready', 'waiting'])
 export const playerSchema = z.object({
@@ -19,4 +19,5 @@ export const lobbySchema = z.object({
 })
 
 export type Lobby = z.infer<typeof lobbySchema>;
+export type LobbyId = z.infer<typeof lobbyId.shape.id>;
 export type PlayerStatus = z.infer<typeof playerStatusSchema>;
