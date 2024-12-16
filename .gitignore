@@ -151,3 +151,4 @@ dist/*
 public
 *.http
 docs/*
+/init.bash
