@@ -1,4 +1,4 @@
-import { Lobby, LobbyId, PlayerStatus } from '../schemas/Lobby'
+import { Lobby, PlayerStatus } from '../schemas/Lobby'
 import { LobbyRepository } from '../repositories/LobbyRepository'
 import {
     LobbyFullError,
@@ -25,12 +25,12 @@ export class LobbyService {
         return lobby
     }
 
-    async deleteLobby(id: LobbyId): Promise<boolean> {
+    async deleteLobby(id: string): Promise<boolean> {
         const res = await this.lobbyRepository.delete(id)
         return this.checkLobbyExists(res, id)
     }
 
-    async joinLobby(id: LobbyId, userId: string): Promise<Lobby> {
+    async joinLobby(id: string, userId: string): Promise<Lobby> {
         const res: Lobby | null = await this.lobbyRepository.findById(id)
         const lobby = this.checkLobbyExists(res, id)
         if (lobby.players.length >= lobby.maxPlayers) {
@@ -42,7 +42,7 @@ export class LobbyService {
         }))!
     }
 
-    async leaveLobby(id: LobbyId, userId: string): Promise<Lobby> {
+    async leaveLobby(id: string, userId: string): Promise<Lobby> {
         const res = await this.lobbyRepository.findById(id)
         const lobby = this.checkLobbyExists(res, id)
         if (!lobby.players.find(player =>
@@ -59,7 +59,7 @@ export class LobbyService {
     }
 
 
-    async kickPlayer(id: LobbyId, creator: string, playerId: string): Promise<Lobby> {
+    async kickPlayer(id: string, creator: string, playerId: string): Promise<Lobby> {
         const res = await this.lobbyRepository.findById(id)
         const lobby = this.checkLobbyExists(res, id)
         if (lobby.creator !== creator) {
@@ -68,7 +68,7 @@ export class LobbyService {
         return this.leaveLobby(id, playerId)
     }
 
-    async setStatus(id: LobbyId, userId: string, status: PlayerStatus): Promise<Lobby> {
+    async setStatus(id: string, userId: string, status: PlayerStatus): Promise<Lobby> {
         const res = await this.lobbyRepository.findById(id)
         const lobby = this.checkLobbyExists(res, id)
         const player = lobby.players.find(player => player.userId === userId)
@@ -83,7 +83,7 @@ export class LobbyService {
         return update
     }
 
-    async startMatch(id: LobbyId, creator: string): Promise<Lobby> {
+    async startMatch(id: string, creator: string): Promise<Lobby> {
         const res = await this.lobbyRepository.findById(id)
         const lobby = this.checkLobbyExists(res, id)
         if (lobby.creator !== creator) {
