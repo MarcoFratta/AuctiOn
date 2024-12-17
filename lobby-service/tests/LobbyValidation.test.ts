@@ -4,7 +4,7 @@ import { validateSchema, ValidationError } from '../src/utils/Validator'
 describe('Lobby Schema Validation', () => {
     test('should validate a correct lobby', () => {
         const validLobby: Lobby = {
-            id: 'lobby1',
+            id: '123456789012345678901234',
             creator: 'user1',
             players: [
                 { userId: 'player1', status: 'waiting' },
@@ -28,7 +28,7 @@ describe('Lobby Schema Validation', () => {
 
     test('should throw error for invalid maxPlayers value', () => {
         const invalidLobby = {
-            id: 'lobby1',
+            id: '123456789012345678901234',
             creator: 'user1',
             players: [],
             maxPlayers: 0,
@@ -41,7 +41,7 @@ describe('Lobby Schema Validation', () => {
 
     test('should throw error for invalid rounds value', () => {
         const invalidLobby = {
-            id: 'lobby1',
+            id: '123456789012345678901234',
             creator: 'user1',
             players: [],
             maxPlayers: 5,
@@ -54,7 +54,7 @@ describe('Lobby Schema Validation', () => {
 
     test('should throw error for invalid player status', () => {
         const invalidLobby = {
-            id: 'lobby1',
+            id: '123456789012345678901234',
             creator: 'user1',
             players: [
                 { userId: 'player1', status: 'invalid-status' },
@@ -69,7 +69,7 @@ describe('Lobby Schema Validation', () => {
 
     test('should throw error for invalid status field', () => {
         const invalidLobby = {
-            id: 'lobby1',
+            id: '123456789012345678901234',
             creator: 'user1',
             players: [],
             maxPlayers: 5,
@@ -82,7 +82,7 @@ describe('Lobby Schema Validation', () => {
 
     test('should throw error for players field not being an array', () => {
         const invalidLobby = {
-            id: 'lobby1',
+            id: '123456789012345678901234',
             creator: 'user1',
             players: 'not-an-array',
             maxPlayers: 5,
@@ -95,7 +95,7 @@ describe('Lobby Schema Validation', () => {
 
     test('should throw error for missing player fields', () => {
         const invalidLobby = {
-            id: 'lobby1',
+            id: '123456789012345678901234',
             creator: 'user1',
             players: [{ userId: 'player1' }, { status: 'waiting' }],
             maxPlayers: 5,
@@ -108,7 +108,7 @@ describe('Lobby Schema Validation', () => {
     })
     test('should throw error for invalid player status', () => {
         const invalidLobby = {
-            id: 'lobby1',
+            id: '123456789012345678901234',
             creator: 'user1',
             players: [
                 { userId: 'player1', status: 'invalid-status' },

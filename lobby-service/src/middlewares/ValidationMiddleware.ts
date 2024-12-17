@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express'
 import { ZodTypeAny } from 'zod'
-import { ParseError, validateSchema } from '../utils/Validator'
+import { validateSchema, ValidationError } from '../utils/Validator'
 
 const validate = (schema: ZodTypeAny, source: 'body' | 'params' | 'query'):
     RequestHandler => {
@@ -9,7 +9,7 @@ const validate = (schema: ZodTypeAny, source: 'body' | 'params' | 'query'):
             validateSchema(schema, req[source])
             next()
         } catch (err) {
-            if (err instanceof ParseError) {
+            if (err instanceof ValidationError) {
                 res.status(400).json({
                     message: `Invalid ${source}`,
                     errors: err.message,
