@@ -1,4 +1,4 @@
-import { Lobby, LobbyId } from '../schemas/Lobby'
+import { Lobby } from '../schemas/Lobby'
 import { LobbyRepository } from './LobbyRepository'
 import { LobbyModel } from '../models/LobbyModel'
 import { reverseLobbyConverter } from '../utils/Converters'
@@ -16,7 +16,7 @@ export class MongoLobbyRepo implements LobbyRepository {
         }
     }
 
-    async delete(id: LobbyId): Promise<boolean> {
+    async delete(id: string): Promise<boolean> {
         try {
             const res = await LobbyModel.findByIdAndDelete(id)
             return !!res
@@ -25,7 +25,7 @@ export class MongoLobbyRepo implements LobbyRepository {
         }
     }
 
-    async findById(id: LobbyId): Promise<Lobby | null> {
+    async findById(id: string): Promise<Lobby | null> {
         try {
             const lobby = await LobbyModel.findById(id)
             return lobby ? this.rev.convert(lobby.toObject()) : null
@@ -34,7 +34,7 @@ export class MongoLobbyRepo implements LobbyRepository {
         }
     }
 
-    async update(id: LobbyId, updateData: Partial<Omit<Lobby, 'id'>>): Promise<Lobby | null> {
+    async update(id: string, updateData: Partial<Omit<Lobby, 'id'>>): Promise<Lobby | null> {
         try {
             const updatedLobby = await LobbyModel.findByIdAndUpdate(id, updateData, { new: true })
             return updatedLobby ? this.rev.convert(updatedLobby.toObject()) : null

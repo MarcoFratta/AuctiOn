@@ -1,11 +1,11 @@
-import { Lobby, LobbyId } from '../schemas/Lobby'
+import { Lobby } from '../schemas/Lobby'
 
 export interface LobbyRepository {
     create(lobbyData: Omit<Lobby, 'id'>): Promise<Lobby>;
 
-    delete(id: LobbyId): Promise<boolean>;
+    delete(id: string): Promise<boolean>;
 
-    findById(id: LobbyId): Promise<Lobby | null>;
+    findById(id: string): Promise<Lobby | null>;
 
-    update(id: LobbyId, updateData: Partial<Omit<Lobby, 'id'>>): Promise<Lobby | null>;
+    update(id: string, updateData: Partial<Omit<Lobby, 'id'>>): Promise<Lobby | null>;
 }
