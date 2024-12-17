@@ -45,3 +45,9 @@ export class MatchAlreadyInProgressError extends Error {
         super('Match is already in progress')
     }
 }
+
+export class UserNotAuthenticatedError extends Error {
+    constructor() {
+        super('User is not authenticated')
+    }
+}
