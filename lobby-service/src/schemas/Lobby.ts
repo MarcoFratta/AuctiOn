@@ -1,14 +1,16 @@
 import { z } from '../utils/ZodWrapper'
 
-export const lobbyId = z.string().min(24)
+export const idSchema = z.string().length(24)
+export const lobbyId = z.object({
+    id: idSchema,
+})
 export const playerStatusSchema = z.enum(['ready', 'waiting'])
 export const playerSchema = z.object({
     userId: z.string(),
     status: playerStatusSchema,
 })
 
-export const lobbySchema = z.object({
-    id: lobbyId,
+export const lobbySchema = lobbyId.extend({
     creator: z.string().min(1).openapi({ example: 'creatorId' }),
     players: z.array(playerSchema).openapi({ example: [{ userId: 'player1', status: 'waiting' }] }),
     maxPlayers: z.number().min(1).openapi({ example: 10 }),
