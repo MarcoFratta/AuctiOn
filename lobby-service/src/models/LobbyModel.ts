@@ -12,7 +12,7 @@ const LobbySchema = new Schema<ILobby>({
     creator: { type: String, required: true },
     players: [{
         userId: String,
-        status: { type: String, enum: ['ready | waiting'], default: 'waiting' },
+        status: { type: String, enum: ['ready', 'waiting'], default: 'waiting' },
     }],
     maxPlayers: { type: Number, required: true },
     rounds: { type: Number, required: true },
