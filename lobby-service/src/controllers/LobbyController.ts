@@ -54,7 +54,10 @@ export class LobbyController {
             const { id }: LobbyId = validateSchema(lobbyId, req.params)
             const userId = req.user!.id
             const updatedLobby: Lobby = await this.lobbyService.leaveLobby(id, userId)
-            res.status(200).json(updatedLobby)
+            res.status(200).json({
+                message: 'Successfully left the lobby',
+                lobby: updatedLobby,
+            })
         } catch (error) {
             next(error)
         }
@@ -67,7 +70,10 @@ export class LobbyController {
             const creatorId = req.user!.id
             const playerId = req.body.playerId
             const updatedLobby: Lobby = await this.lobbyService.kickPlayer(id, creatorId, playerId)
-            res.status(200).json(updatedLobby)
+            res.status(200).json({
+                message: 'Player kicked',
+                lobby: updatedLobby,
+            })
         } catch (error) {
             next(error)
         }
