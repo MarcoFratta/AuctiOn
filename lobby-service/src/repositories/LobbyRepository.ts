@@ -7,5 +7,5 @@ export interface LobbyRepository {
 
     findById(id: string): Promise<Lobby | null>;
 
-    update(id: string, updateData: Partial<Omit<Lobby, 'id'>>): Promise<Lobby | null>;
+    update(id: string, lobby: Partial<Lobby>): Promise<Lobby | null>;
 }

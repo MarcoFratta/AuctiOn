@@ -38,9 +38,13 @@ export class MongoLobbyRepo implements LobbyRepository {
         }
     }
 
-    async update(id: string, updateData: Partial<Omit<Lobby, 'id'>>): Promise<Lobby | null> {
+    async update(id: string, lobby: Lobby): Promise<Lobby | null> {
         try {
-            const updatedLobby = await LobbyModel.findByIdAndUpdate(id, updateData, { new: true })
+            const updatedLobby = await LobbyModel.findByIdAndUpdate(
+                id,
+                { $set: lobby },
+                { new: true },
+            )
             return updatedLobby ? this.rev.convert(updatedLobby.toObject()) : null
         } catch (error) {
             logger.error(error)
