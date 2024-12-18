@@ -25,7 +25,7 @@ export const AuthMiddleware = async (
         }
 
         // Validate the token using the Auth service
-        const { data: response } = await axios.post(AUTH_SERVICE_URL, { token: token })
+        const { data: response } = await axios.post(AUTH_SERVICE_URL + '/validate', { token: token })
         // Extract user info from the auth service response
         // Add user information to the request object
         req.user = validateSchema(userSchema, response)
