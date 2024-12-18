@@ -2,11 +2,12 @@ import request from 'supertest'
 import axios from 'axios'
 
 import * as console from 'node:console'
-import {config} from '../src/configs/config'
+import { config } from '../src/configs/config'
 import app from '../src/App'
-import {MongoMemoryServer} from 'mongodb-memory-server'
-import {closeLocalMongoConnection, localMongoConnection} from './common'
-import {RegisterInputData} from '../src/schemas/AuthSchema'
+import { MongoMemoryServer } from 'mongodb-memory-server'
+import { closeLocalMongoConnection, localMongoConnection } from './common'
+import { RegisterInputData } from '../src/schemas/AuthSchema'
+import { UserServiceUnavailableError } from '../src/errors/AuthErrors'
 
 // Mock Axios
 jest.mock('axios')
@@ -125,7 +126,7 @@ describe('Auth Service Integration Tests with Axios Mock', () => {
         it('should handle errors from the User Service gracefully', async () => {
             // Mock User Service failure
             mockedAxios.post.mockRejectedValueOnce(
-                new Error('User Service error')
+                new UserServiceUnavailableError('User Service error'),
             )
 
             const response = await request(app).post('/auth/register').send({
@@ -134,10 +135,10 @@ describe('Auth Service Integration Tests with Axios Mock', () => {
                 password: 'Password1',
             })
 
-            expect(response.status).toBe(500)
+            expect(response.status).toBe(503)
             expect(response.body).toHaveProperty(
                 'error',
-                'Internal Server Error'
+                'Service Temporary Unavailable',
             )
 
             expect(mockedAxios.get).toHaveBeenCalledWith(
