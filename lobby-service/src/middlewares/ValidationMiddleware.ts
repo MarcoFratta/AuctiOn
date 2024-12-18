@@ -2,8 +2,10 @@ import { RequestHandler } from 'express'
 import { ZodTypeAny } from 'zod'
 import { validateSchema, ValidationError } from '../utils/Validator'
 
-const validate = (schema: ZodTypeAny, source: 'body' | 'params' | 'query'):
-    RequestHandler => {
+const validate = (
+    schema: ZodTypeAny,
+    source: 'body' | 'params' | 'query',
+): RequestHandler => {
     return (req, res, next) => {
         try {
             validateSchema(schema, req[source])

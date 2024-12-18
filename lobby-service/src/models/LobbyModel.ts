@@ -1,22 +1,32 @@
 import { Document, model, Schema } from 'mongoose'
 
 export interface ILobby extends Document {
-    creator: string;
-    players: { userId: string, status: 'ready' | 'waiting' }[];
-    maxPlayers: number;
-    rounds: number;
-    status: 'waiting' | 'in-progress' | 'completed';
+    creator: string
+    players: { userId: string; status: 'ready' | 'waiting' }[]
+    maxPlayers: number
+    rounds: number
+    status: 'waiting' | 'in-progress' | 'completed'
 }
 
 const LobbySchema = new Schema<ILobby>({
     creator: { type: String, required: true },
-    players: [{
-        userId: String,
-        status: { type: String, enum: ['ready', 'waiting'], default: 'waiting' },
-    }],
+    players: [
+        {
+            userId: String,
+            status: {
+                type: String,
+                enum: ['ready', 'waiting'],
+                default: 'waiting',
+            },
+        },
+    ],
     maxPlayers: { type: Number, required: true },
     rounds: { type: Number, required: true },
-    status: { type: String, enum: ['waiting', 'in-progress', 'completed'], default: 'waiting' },
+    status: {
+        type: String,
+        enum: ['waiting', 'in-progress', 'completed'],
+        default: 'waiting',
+    },
 })
 
 LobbySchema.virtual('id').get(function() {

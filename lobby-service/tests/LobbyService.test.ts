@@ -154,5 +154,4 @@ describe('LobbyService', () => {
         expect(result!.players[0].userId).toBe('user3')
         expect(mockLobbyRepository.update).toHaveBeenCalled()
     })
-
 })

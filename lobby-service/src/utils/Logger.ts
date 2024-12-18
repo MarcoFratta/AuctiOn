@@ -17,8 +17,8 @@ const format = winston.format.combine(
     winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     winston.format.printf(
         ({ timestamp, level, message }) =>
-            `${timestamp} [${level.toUpperCase()}]: ${message}`,
-    ),
+            `${timestamp} [${level.toUpperCase()}]: ${message}`
+    )
 )
 
 // Define transports

@@ -3,7 +3,7 @@ import { ILobby, LobbyModel } from '../models/LobbyModel'
 import { validateSchema } from './Validator'
 
 export interface Converters<Input, Output> {
-    convert(input: Input): Output;
+    convert(input: Input): Output
 }
 
 // Convert string to ObjectId
@@ -18,7 +18,8 @@ export const lobbyConverter: Converters<Lobby, ILobby> = {
 export const reverseLobbyConverter: Converters<ILobby, Lobby> = {
     convert(input: ILobby): Lobby {
         return <Lobby>validateSchema(lobbySchema, {
-            id: input._id, ...input,
+            id: input._id,
+            ...input,
         })
     },
 }

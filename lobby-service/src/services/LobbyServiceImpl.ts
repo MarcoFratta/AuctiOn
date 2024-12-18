@@ -37,8 +37,7 @@ export class LobbyServiceImpl implements LobbyService {
     async joinLobby(id: string, userId: string): Promise<Lobby> {
         const res: Lobby | null = await this.lobbyRepository.findById(id)
         const lobby = this.checkLobbyExists(res, id)
-        if (lobby.players.find(player =>
-            player.userId === userId)) {
+        if (lobby.players.find((player) => player.userId === userId)) {
             throw new UserAlreadyJoined()
         }
         if (lobby.players.length >= lobby.maxPlayers) {
@@ -53,8 +52,7 @@ export class LobbyServiceImpl implements LobbyService {
     async leaveLobby(id: string, userId: string): Promise<Lobby> {
         const res = await this.lobbyRepository.findById(id)
         const lobby = this.checkLobbyExists(res, id)
-        if (!lobby.players.find(player =>
-            player.userId === userId)) {
+        if (!lobby.players.find((player) => player.userId === userId)) {
             throw new PlayerNotFoundError()
         }
         if (lobby.status === 'in-progress') {
@@ -64,17 +62,23 @@ export class LobbyServiceImpl implements LobbyService {
             await this.lobbyRepository.delete(id)
             throw new Error('Lobby creator left, lobby deleted')
         }
-        lobby.players = lobby.players.filter(player =>
-            player.userId !== userId)
-        const update = await this.lobbyRepository.update(id, { players: lobby.players })
+        lobby.players = lobby.players.filter(
+            (player) => player.userId !== userId,
+        )
+        const update = await this.lobbyRepository.update(id, {
+            players: lobby.players,
+        })
         if (!update) {
             throw new Error('Failed to leave lobby')
         }
         return update
     }
 
-
-    async kickPlayer(id: string, creator: string, playerId: string): Promise<Lobby> {
+    async kickPlayer(
+        id: string,
+        creator: string,
+        playerId: string,
+    ): Promise<Lobby> {
         const res = await this.lobbyRepository.findById(id)
         const lobby = this.checkLobbyExists(res, id)
         if (lobby.creator !== creator) {
@@ -83,25 +87,34 @@ export class LobbyServiceImpl implements LobbyService {
         return this.leaveLobby(id, playerId)
     }
 
-    async setStatus(id: string, userId: string, status: PlayerStatus): Promise<Lobby> {
+    async setStatus(
+        id: string,
+        userId: string,
+        status: PlayerStatus,
+    ): Promise<Lobby> {
         const res = await this.lobbyRepository.findById(id)
         const lobby = this.checkLobbyExists(res, id)
 
-        const playerIndex = lobby.players.findIndex(player => player.userId === userId)
+        const playerIndex = lobby.players.findIndex(
+            (player) => player.userId === userId,
+        )
         if (playerIndex === -1) {
             throw new PlayerNotFoundError()
         }
 
         lobby.players[playerIndex].status = status
         // Save the updated players array
-        logger.info(`Setting status for player: ${userId} in lobby: ${id} to ${status}`)
-        const update = await this.lobbyRepository.update(id, { players: lobby.players })
+        logger.info(
+            `Setting status for player: ${userId} in lobby: ${id} to ${status}`,
+        )
+        const update = await this.lobbyRepository.update(id, {
+            players: lobby.players,
+        })
         if (!update) {
             throw new Error('Failed to set player status')
         }
         return update
     }
-
 
     async startMatch(id: string, creator: string): Promise<Lobby> {
         const res = await this.lobbyRepository.findById(id)
@@ -115,10 +128,12 @@ export class LobbyServiceImpl implements LobbyService {
         if (lobby.status === 'in-progress') {
             throw new MatchAlreadyInProgressError()
         }
-        if (lobby.players.some(player => player.status !== 'ready')) {
+        if (lobby.players.some((player) => player.status !== 'ready')) {
             throw new PlayersNotReadyError()
         }
-        const update = await this.lobbyRepository.update(id, { status: 'in-progress' })
+        const update = await this.lobbyRepository.update(id, {
+            status: 'in-progress',
+        })
         if (!update) {
             throw new Error('Failed to start match')
         }

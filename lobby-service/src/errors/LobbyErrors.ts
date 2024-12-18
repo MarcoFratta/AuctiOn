@@ -61,7 +61,5 @@ export class UserAlreadyJoined extends Error {
 export class ServiceUnavailableError extends Error {
     constructor() {
         super('Service not available')
-
     }
-
 }

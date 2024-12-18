@@ -45,7 +45,9 @@ export class MongoLobbyRepo implements LobbyRepository {
                 { $set: lobby },
                 { new: true },
             )
-            return updatedLobby ? this.rev.convert(updatedLobby.toObject()) : null
+            return updatedLobby
+                ? this.rev.convert(updatedLobby.toObject())
+                : null
         } catch (error) {
             logger.error(error)
             throw new Error('An error occurred while updating the lobby')

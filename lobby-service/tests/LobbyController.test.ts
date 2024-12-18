@@ -29,17 +29,24 @@ describe('LobbyController', () => {
             const createdLobby: Lobby = {
                 ...lobbyData,
                 creator: 'creatorId',
-                id: '123456789012345678901234', status: 'waiting',
+                id: '123456789012345678901234',
+                status: 'waiting',
             }
             mockRequest.body = lobbyData
             mockLobbyService.createLobby.mockResolvedValue(createdLobby)
             mockResponse.status.mockReturnThis()
             mockResponse.json.mockReturnThis()
 
-            await lobbyController.createLobby(mockRequest, mockResponse, mockNext)
+            await lobbyController.createLobby(
+                mockRequest,
+                mockResponse,
+                mockNext,
+            )
 
             expect(mockLobbyService.createLobby).toHaveBeenCalledWith({
-                ...lobbyData, creator: 'creatorId', status: 'waiting',
+                ...lobbyData,
+                creator: 'creatorId',
+                status: 'waiting',
             })
             expect(mockResponse.status).toHaveBeenCalledWith(201)
             expect(mockResponse.json).toHaveBeenCalledWith({
@@ -57,7 +64,9 @@ describe('LobbyController', () => {
                 id: id,
                 creator: 'creatorId',
                 players: [{ userId: userId, status: 'waiting' }],
-                maxPlayers: 10, rounds: 5, status: 'waiting',
+                maxPlayers: 10,
+                rounds: 5,
+                status: 'waiting',
             }
 
             mockRequest.params = { id }
@@ -81,8 +90,11 @@ describe('LobbyController', () => {
             const id = '123456789012345678901234'
             const updatedLobby: Lobby = {
                 id,
-                creator: 'creatorId', players: [],
-                maxPlayers: 10, rounds: 5, status: 'waiting',
+                creator: 'creatorId',
+                players: [],
+                maxPlayers: 10,
+                rounds: 5,
+                status: 'waiting',
             }
 
             mockRequest.params = { id }
@@ -90,9 +102,16 @@ describe('LobbyController', () => {
             mockResponse.status.mockReturnThis()
             mockResponse.json.mockReturnThis()
 
-            await lobbyController.leaveLobby(mockRequest, mockResponse, mockNext)
+            await lobbyController.leaveLobby(
+                mockRequest,
+                mockResponse,
+                mockNext,
+            )
 
-            expect(mockLobbyService.leaveLobby).toHaveBeenCalledWith(id, 'creatorId')
+            expect(mockLobbyService.leaveLobby).toHaveBeenCalledWith(
+                id,
+                'creatorId',
+            )
             expect(mockResponse.status).toHaveBeenCalledWith(200)
             expect(mockResponse.json).toHaveBeenCalledWith({
                 message: anyString(),
@@ -108,7 +127,11 @@ describe('LobbyController', () => {
             const playerId = 'playerId'
             const updatedLobby: Lobby = {
                 id,
-                creator, players: [], maxPlayers: 10, rounds: 5, status: 'waiting',
+                creator,
+                players: [],
+                maxPlayers: 10,
+                rounds: 5,
+                status: 'waiting',
             }
 
             mockRequest.params = { id }
@@ -117,9 +140,17 @@ describe('LobbyController', () => {
             mockResponse.status.mockReturnThis()
             mockResponse.json.mockReturnThis()
 
-            await lobbyController.kickPlayer(mockRequest, mockResponse, mockNext)
+            await lobbyController.kickPlayer(
+                mockRequest,
+                mockResponse,
+                mockNext,
+            )
 
-            expect(mockLobbyService.kickPlayer).toHaveBeenCalledWith(id, creator, playerId)
+            expect(mockLobbyService.kickPlayer).toHaveBeenCalledWith(
+                id,
+                creator,
+                playerId,
+            )
             expect(mockResponse.status).toHaveBeenCalledWith(200)
             expect(mockResponse.json).toHaveBeenCalledWith({
                 message: anyString(),
@@ -134,8 +165,11 @@ describe('LobbyController', () => {
             const status = 'ready'
             const updatedLobby: Lobby = {
                 id,
-                creator: 'creatorId', players: [{ userId: 'creatorId', status }],
-                maxPlayers: 10, rounds: 5, status: 'waiting',
+                creator: 'creatorId',
+                players: [{ userId: 'creatorId', status }],
+                maxPlayers: 10,
+                rounds: 5,
+                status: 'waiting',
             }
 
             mockRequest.params = { id }
@@ -146,7 +180,11 @@ describe('LobbyController', () => {
 
             await lobbyController.setStatus(mockRequest, mockResponse, mockNext)
 
-            expect(mockLobbyService.setStatus).toHaveBeenCalledWith(id, 'creatorId', status)
+            expect(mockLobbyService.setStatus).toHaveBeenCalledWith(
+                id,
+                'creatorId',
+                status,
+            )
             expect(mockResponse.status).toHaveBeenCalledWith(200)
             expect(mockResponse.json).toHaveBeenCalledWith({
                 message: anyString(),
@@ -161,8 +199,11 @@ describe('LobbyController', () => {
             const creator = 'creatorId'
             const updatedLobby: Lobby = {
                 id,
-                creator, players: [],
-                maxPlayers: 10, rounds: 5, status: 'in-progress',
+                creator,
+                players: [],
+                maxPlayers: 10,
+                rounds: 5,
+                status: 'in-progress',
             }
 
             mockRequest.params = { id }
@@ -170,9 +211,16 @@ describe('LobbyController', () => {
             mockResponse.status.mockReturnThis()
             mockResponse.json.mockReturnThis()
 
-            await lobbyController.startMatch(mockRequest, mockResponse, mockNext)
+            await lobbyController.startMatch(
+                mockRequest,
+                mockResponse,
+                mockNext,
+            )
 
-            expect(mockLobbyService.startMatch).toHaveBeenCalledWith(id, creator)
+            expect(mockLobbyService.startMatch).toHaveBeenCalledWith(
+                id,
+                creator,
+            )
             expect(mockResponse.status).toHaveBeenCalledWith(200)
             expect(mockResponse.json).toHaveBeenCalledWith({
                 message: anyString(),

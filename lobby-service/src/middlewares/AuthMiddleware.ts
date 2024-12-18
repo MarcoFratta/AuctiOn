@@ -9,7 +9,7 @@ import { ServiceUnavailableError } from '../errors/LobbyErrors'
 const AUTH_SERVICE_URL = config.authServiceUri
 
 export interface AuthenticatedRequest extends Request {
-    user?: User; // Extend the Request type with user info
+    user?: User // Extend the Request type with user info
 }
 
 export const AuthMiddleware = async (
@@ -26,15 +26,20 @@ export const AuthMiddleware = async (
         }
 
         // Validate the token using the Auth service
-        const { data: response } = await axios.post(AUTH_SERVICE_URL + '/validate',
-            { token: token })
+        const { data: response } = await axios.post(
+            AUTH_SERVICE_URL + '/validate',
+            { token: token },
+        )
         // Extract user info from the auth service response
         // Add user information to the request object
         req.user = validateSchema(userSchema, response)
         next()
     } catch (error) {
         logger.error(error)
-        if (axios.isAxiosError(error) || error instanceof ServiceUnavailableError) {
+        if (
+            axios.isAxiosError(error) ||
+            error instanceof ServiceUnavailableError
+        ) {
             res.status(503).json({
                 error: 'Service Temporary Unavailable',
                 message: 'Service is not responding',

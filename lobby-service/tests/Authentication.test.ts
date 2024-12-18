@@ -12,7 +12,9 @@ const mockAxios = axios as jest.Mocked<typeof axios>
 jest.mock('../src/utils/Validator', () => ({
     validateSchema: jest.fn(),
 }))
-const mockValidateSchema = validateSchema as jest.MockedFunction<typeof validateSchema>
+const mockValidateSchema = validateSchema as jest.MockedFunction<
+    typeof validateSchema
+>
 
 jest.mock('../src/utils/Logger')
 
@@ -34,11 +36,7 @@ describe('AuthMiddleware', () => {
     it('should redirect to /login if no token is provided', async () => {
         req.headers = { authorization: undefined }
 
-        await AuthMiddleware(
-            req as Request,
-            mockResponse as Response,
-            mockNext,
-        )
+        await AuthMiddleware(req as Request, mockResponse as Response, mockNext)
 
         expect(mockResponse.redirect).toHaveBeenCalledWith('/login')
         expect(mockNext).not.toHaveBeenCalled()
@@ -48,11 +46,7 @@ describe('AuthMiddleware', () => {
         req.headers = { authorization: 'Bearer invalidToken' }
         mockAxios.post.mockRejectedValue(new Error('Invalid token'))
 
-        await AuthMiddleware(
-            req as Request,
-            mockResponse as Response,
-            mockNext,
-        )
+        await AuthMiddleware(req as Request, mockResponse as Response, mockNext)
 
         expect(mockResponse.redirect).toHaveBeenCalledWith('/login')
         expect(mockNext).not.toHaveBeenCalled()
@@ -75,11 +69,7 @@ describe('AuthMiddleware', () => {
         })
         mockValidateSchema.mockReturnValue(mockUser)
 
-        await AuthMiddleware(
-            req as Request,
-            mockResponse as Response,
-            mockNext,
-        )
+        await AuthMiddleware(req as Request, mockResponse as Response, mockNext)
 
         expect(mockAxios.post).toHaveBeenCalledWith(AUTH_SERVICE_URL, {
             token: 'validToken',
@@ -93,11 +83,7 @@ describe('AuthMiddleware', () => {
         req.headers = { authorization: 'Bearer validToken' }
         mockAxios.post.mockRejectedValue(new Error('Unexpected error'))
 
-        await AuthMiddleware(
-            req as Request,
-            mockResponse as Response,
-            mockNext,
-        )
+        await AuthMiddleware(req as Request, mockResponse as Response, mockNext)
 
         expect(mockResponse.redirect).toHaveBeenCalledWith('/login')
         expect(mockNext).not.toHaveBeenCalled()

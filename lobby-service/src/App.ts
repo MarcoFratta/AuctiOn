@@ -20,7 +20,7 @@ if (fs.existsSync(swaggerPath)) {
             // customCssUrl: path.join(__dirname, "..", "css", "swaggerTheme.css"),
             // customfavIcon: path.join(__dirname, "..", "public", "logo.css"),
             customSiteTitle: 'Lobby Service API Documentation',
-        }),
+        })
     )
 }
 const repo = new MongoLobbyRepo()

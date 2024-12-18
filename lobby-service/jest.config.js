@@ -16,12 +16,11 @@ module.exports = {
     // Set up testing environment for Node.js (for backend projects)
     testEnvironment: 'node',
 
-
     // Enable a coverage collection (useful for testing code coverage)
     collectCoverage: true,
     collectCoverageFrom: [
         'src/**/*.{ts,js}', // Collect coverage from all source files
-        '!src/**/*.d.ts',   // Exclude TypeScript definition files
+        '!src/**/*.d.ts', // Exclude TypeScript definition files
     ],
 
     // Specify where to output coverage reports

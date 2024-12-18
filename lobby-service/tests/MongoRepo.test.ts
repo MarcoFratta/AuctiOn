@@ -100,7 +100,10 @@ describe('MongoLobbyRepo', () => {
         })
         await lobby.save()
 
-        const updateData: Partial<Lobby> = { maxPlayers: 6, status: 'in-progress' }
+        const updateData: Partial<Lobby> = {
+            maxPlayers: 6,
+            status: 'in-progress',
+        }
         const updatedLobby = await repo.update(lobby.id, updateData)
 
         expect(updatedLobby).not.toBeNull()
@@ -109,7 +112,9 @@ describe('MongoLobbyRepo', () => {
     })
 
     test('should return null when updating a non-existent lobby', async () => {
-        const updatedLobby = await repo.update('123456789012345678901234', { maxPlayers: 6 })
+        const updatedLobby = await repo.update('123456789012345678901234', {
+            maxPlayers: 6,
+        })
         expect(updatedLobby).toBeNull()
     })
 })

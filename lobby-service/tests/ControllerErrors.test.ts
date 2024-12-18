@@ -108,7 +108,6 @@ describe('Error Middleware Tests', () => {
                 message: error.message,
             })
         })
-
     })
 
     describe('GenericErrorMiddleware', () => {
