@@ -4,6 +4,7 @@ import { validateSchema } from '../utils/Validator'
 import { User, userSchema } from '../schemas/User'
 import logger from '../utils/Logger'
 import { config } from '../configs/config'
+import { ServiceUnavailableError } from '../errors/LobbyErrors'
 
 const AUTH_SERVICE_URL = config.authServiceUri
 
@@ -25,13 +26,21 @@ export const AuthMiddleware = async (
         }
 
         // Validate the token using the Auth service
-        const { data: response } = await axios.post(AUTH_SERVICE_URL + '/validate', { token: token })
+        const { data: response } = await axios.post(AUTH_SERVICE_URL + '/validate',
+            { token: token })
         // Extract user info from the auth service response
         // Add user information to the request object
         req.user = validateSchema(userSchema, response)
         next()
     } catch (error) {
-        logger.error('Authentication error:')
-        res.redirect('/login')
+        logger.error(error)
+        if (axios.isAxiosError(error) || error instanceof ServiceUnavailableError) {
+            res.status(503).json({
+                error: 'Service Temporary Unavailable',
+                message: 'Service is not responding',
+            })
+        } else {
+            res.redirect('/login')
+        }
     }
 }

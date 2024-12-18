@@ -5,6 +5,7 @@ import {
     NotEnoughPlayersError,
     PlayerNotFoundError,
     PlayersNotReadyError,
+    ServiceUnavailableError,
     UnauthorizedError,
 } from '../errors/LobbyErrors'
 import { NextFunction, Request, Response } from 'express'
@@ -62,6 +63,11 @@ export const LobbyErrorMiddleware = (
         res.status(400).json({
             error: 'Match Already In Progress',
             message: err.message,
+        })
+    } else if (err instanceof ServiceUnavailableError) {
+        res.status(503).json({
+            error: 'Service Temporary Unavailable',
+            message: 'Service is not responding',
         })
     } else {
         next(err) // Pass to the generic error handler
