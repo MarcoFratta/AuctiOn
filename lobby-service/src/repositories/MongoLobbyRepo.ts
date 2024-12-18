@@ -2,6 +2,7 @@ import { Lobby } from '../schemas/Lobby'
 import { LobbyRepository } from './LobbyRepository'
 import { LobbyModel } from '../models/LobbyModel'
 import { reverseLobbyConverter } from '../utils/Converters'
+import logger from '../utils/Logger'
 
 export class MongoLobbyRepo implements LobbyRepository {
     private readonly rev = reverseLobbyConverter
@@ -12,6 +13,7 @@ export class MongoLobbyRepo implements LobbyRepository {
             await lobby.save()
             return this.rev.convert(lobby.toObject())
         } catch (error) {
+            logger.error(error)
             throw new Error('An error occurred while creating the lobby')
         }
     }
@@ -21,6 +23,7 @@ export class MongoLobbyRepo implements LobbyRepository {
             const res = await LobbyModel.findByIdAndDelete(id)
             return !!res
         } catch (error) {
+            logger.error(error)
             throw new Error('An error occurred while deleting the lobby')
         }
     }
@@ -30,6 +33,7 @@ export class MongoLobbyRepo implements LobbyRepository {
             const lobby = await LobbyModel.findById(id)
             return lobby ? this.rev.convert(lobby.toObject()) : null
         } catch (error) {
+            logger.error(error)
             throw new Error('An error occurred while finding the lobby')
         }
     }
@@ -39,6 +43,7 @@ export class MongoLobbyRepo implements LobbyRepository {
             const updatedLobby = await LobbyModel.findByIdAndUpdate(id, updateData, { new: true })
             return updatedLobby ? this.rev.convert(updatedLobby.toObject()) : null
         } catch (error) {
+            logger.error(error)
             throw new Error('An error occurred while updating the lobby')
         }
     }
