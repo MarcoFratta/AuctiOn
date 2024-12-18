@@ -1,46 +1,55 @@
 // LobbyController.ts
 import { NextFunction, Response } from 'express'
-import { LobbyService } from '../services/LobbyService'
+import { LobbyServiceImpl } from '../services/LobbyServiceImpl'
 import { validateSchema } from '../utils/Validator'
 import { AuthenticatedRequest } from '../middlewares/AuthMiddleware'
-import { Lobby, LobbyId, lobbyId, lobbySchema } from '../schemas/Lobby'
+import { Lobby, LobbyConfig, LobbyId, lobbyId, PlayerStatus, playerStatusSchema } from '../schemas/Lobby'
+import { createNewLobby } from '../schemas/LobbyFactory'
+import logger from '../utils/Logger'
 
 export class LobbyController {
-    private readonly lobbyService: LobbyService
+    private readonly lobbyService: LobbyServiceImpl
 
-    constructor(lobbyService: LobbyService) {
+    constructor(lobbyService: LobbyServiceImpl) {
         this.lobbyService = lobbyService
     }
 
 
     // Create a new lobby
-    async createLobby(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    createLobby = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
         try {
             const creatorId = req.user!.id
-            req.body.status = 'waiting'
-            req.body.creator = creatorId
-            const lobbyData: Omit<Lobby, 'id'> = validateSchema(lobbySchema.omit({ id: true }), req.body)
-            const createdLobby: Lobby = await this.lobbyService.createLobby(lobbyData)
-            res.status(201).json(createdLobby)
+            logger.info(`Creating lobby for user: ${creatorId}`)
+            const lobbyConfig: LobbyConfig = req.body
+            const lobby = createNewLobby(lobbyConfig, creatorId)
+            logger.info(`Created lobby: ${lobby}`)
+            const createdLobby: Lobby = await this.lobbyService.createLobby(lobby)
+            res.status(201).json({
+                message: 'Lobby created successfully',
+                lobby: createdLobby,
+            })
         } catch (error) {
             next(error)
         }
     }
 
     // Join a lobby
-    async joinLobby(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    joinLobby = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
         try {
             const { id }: LobbyId = validateSchema(lobbyId, req.params)
             const userId = req.user!.id
             const updatedLobby: Lobby = await this.lobbyService.joinLobby(id, userId)
-            res.status(200).json(updatedLobby)
+            res.status(200).json({
+                message: 'Successfully joined the lobby',
+                lobby: updatedLobby,
+            })
         } catch (error) {
             next(error)
         }
     }
 
     // Leave the lobby
-    async leaveLobby(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    leaveLobby = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
         try {
             const { id }: LobbyId = validateSchema(lobbyId, req.params)
             const userId = req.user!.id
@@ -52,7 +61,7 @@ export class LobbyController {
     }
 
     // Kick a player from a lobby
-    async kickPlayer(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    kickPlayer = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
         try {
             const { id }: LobbyId = validateSchema(lobbyId, req.params)
             const creatorId = req.user!.id
@@ -65,28 +74,32 @@ export class LobbyController {
     }
 
     // Set a player's status
-    async setStatus(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    setStatus = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
         try {
-            const { id }: LobbyId = validateSchema(lobbyId, req.params)
+            const id = req.params.id
             const userId = req.user!.id
-            const status = req.body.status
+            const status: PlayerStatus = validateSchema(playerStatusSchema, req.body).status
+            logger.info(`Setting status for player: ${userId} in lobby: ${id} to ${status}`)
             const updatedLobby: Lobby = await this.lobbyService.setStatus(id, userId, status)
-            if (!updatedLobby) {
-                res.status(404).json({ message: 'Lobby not found' })
-            }
-            res.status(200).json(updatedLobby)
+            res.status(200).json({
+                message: 'Player status updated',
+                lobby: updatedLobby,
+            })
         } catch (error) {
             next(error)
         }
     }
 
     // Start a match
-    async startMatch(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    startMatch = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
         try {
             const { id }: LobbyId = validateSchema(lobbyId, req.params)
             const creatorId = req.user!.id
             const updatedLobby: Lobby = await this.lobbyService.startMatch(id, creatorId)
-            res.status(200).json(updatedLobby)
+            res.status(200).json({
+                message: 'Match started',
+                lobby: updatedLobby,
+            })
         } catch (error) {
             next(error)
         }
