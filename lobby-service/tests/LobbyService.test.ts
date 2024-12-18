@@ -1,12 +1,12 @@
 // lobbyService.test.ts
-import { LobbyService } from '../src/services/LobbyService'
+import { LobbyServiceImpl } from '../src/services/LobbyServiceImpl'
 import { Lobby } from '../src/schemas/Lobby'
 import { MongoLobbyRepo } from '../src/repositories/MongoLobbyRepo'
 
 jest.mock('../src/repositories/MongoLobbyRepo')
 
 const mockLobbyRepository = new MongoLobbyRepo() as jest.Mocked<MongoLobbyRepo>
-const lobbyService = new LobbyService(mockLobbyRepository)
+const lobbyService = new LobbyServiceImpl(mockLobbyRepository)
 
 describe('LobbyService', () => {
     beforeEach(() => {

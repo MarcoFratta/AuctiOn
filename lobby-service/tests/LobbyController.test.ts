@@ -1,12 +1,12 @@
 import { LobbyController } from '../src/controllers/LobbyController'
-import { LobbyService } from '../src/services/LobbyService'
+import { LobbyServiceImpl } from '../src/services/LobbyServiceImpl'
 import { Response } from 'express'
-import { mock, mockReset } from 'jest-mock-extended'
+import { anyString, mock, mockReset } from 'jest-mock-extended'
 import { Lobby } from '../src/schemas/Lobby'
 import { AuthenticatedRequest } from '../src/middlewares/AuthMiddleware'
 
 // Mocking LobbyService
-const mockLobbyService = mock<LobbyService>()
+const mockLobbyService = mock<LobbyServiceImpl>()
 const lobbyController = new LobbyController(mockLobbyService)
 
 // Mocking Express request, response, and next function
@@ -38,9 +38,14 @@ describe('LobbyController', () => {
 
             await lobbyController.createLobby(mockRequest, mockResponse, mockNext)
 
-            expect(mockLobbyService.createLobby).toHaveBeenCalledWith(lobbyData)
+            expect(mockLobbyService.createLobby).toHaveBeenCalledWith({
+                ...lobbyData, creator: 'creatorId', status: 'waiting',
+            })
             expect(mockResponse.status).toHaveBeenCalledWith(201)
-            expect(mockResponse.json).toHaveBeenCalledWith(createdLobby)
+            expect(mockResponse.json).toHaveBeenCalledWith({
+                message: anyString(),
+                lobby: createdLobby,
+            })
         })
     })
 
@@ -64,7 +69,10 @@ describe('LobbyController', () => {
 
             expect(mockLobbyService.joinLobby).toHaveBeenCalledWith(id, userId)
             expect(mockResponse.status).toHaveBeenCalledWith(200)
-            expect(mockResponse.json).toHaveBeenCalledWith(updatedLobby)
+            expect(mockResponse.json).toHaveBeenCalledWith({
+                message: anyString(),
+                lobby: updatedLobby,
+            })
         })
     })
 
@@ -86,7 +94,10 @@ describe('LobbyController', () => {
 
             expect(mockLobbyService.leaveLobby).toHaveBeenCalledWith(id, 'creatorId')
             expect(mockResponse.status).toHaveBeenCalledWith(200)
-            expect(mockResponse.json).toHaveBeenCalledWith(updatedLobby)
+            expect(mockResponse.json).toHaveBeenCalledWith({
+                message: anyString(),
+                lobby: updatedLobby,
+            })
         })
     })
 
@@ -110,7 +121,10 @@ describe('LobbyController', () => {
 
             expect(mockLobbyService.kickPlayer).toHaveBeenCalledWith(id, creator, playerId)
             expect(mockResponse.status).toHaveBeenCalledWith(200)
-            expect(mockResponse.json).toHaveBeenCalledWith(updatedLobby)
+            expect(mockResponse.json).toHaveBeenCalledWith({
+                message: anyString(),
+                lobby: updatedLobby,
+            })
         })
     })
 
@@ -134,7 +148,10 @@ describe('LobbyController', () => {
 
             expect(mockLobbyService.setStatus).toHaveBeenCalledWith(id, 'creatorId', status)
             expect(mockResponse.status).toHaveBeenCalledWith(200)
-            expect(mockResponse.json).toHaveBeenCalledWith(updatedLobby)
+            expect(mockResponse.json).toHaveBeenCalledWith({
+                message: anyString(),
+                lobby: updatedLobby,
+            })
         })
     })
 
@@ -157,7 +174,10 @@ describe('LobbyController', () => {
 
             expect(mockLobbyService.startMatch).toHaveBeenCalledWith(id, creator)
             expect(mockResponse.status).toHaveBeenCalledWith(200)
-            expect(mockResponse.json).toHaveBeenCalledWith(updatedLobby)
+            expect(mockResponse.json).toHaveBeenCalledWith({
+                message: anyString(),
+                lobby: updatedLobby,
+            })
         })
     })
     it('should throw if the user is not authenticated', () => {

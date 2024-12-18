@@ -1,5 +1,5 @@
 // lobbyServiceErrorHandling.test.ts
-import { LobbyService } from '../src/services/LobbyService'
+import { LobbyServiceImpl } from '../src/services/LobbyServiceImpl'
 import { Lobby } from '../src/schemas/Lobby'
 import { MongoLobbyRepo } from '../src/repositories/MongoLobbyRepo'
 import {
@@ -10,12 +10,13 @@ import {
     PlayerNotFoundError,
     PlayersNotReadyError,
     UnauthorizedError,
+    UserAlreadyJoined,
 } from '../src/errors/LobbyErrors'
 
 jest.mock('../src/repositories/MongoLobbyRepo')
 
 const mockLobbyRepository = new MongoLobbyRepo() as jest.Mocked<MongoLobbyRepo>
-const lobbyService = new LobbyService(mockLobbyRepository)
+const lobbyService = new LobbyServiceImpl(mockLobbyRepository)
 
 describe('LobbyService Error Handling', () => {
     beforeEach(() => {
@@ -34,6 +35,21 @@ describe('LobbyService Error Handling', () => {
 
         await expect(lobbyService.joinLobby('invalid-id', 'user1'))
             .rejects.toThrow(LobbyNotFoundError)
+    })
+    test('should throw error when joining a lobby the user is already part of', async () => {
+        const lobby: Lobby = {
+            id: '1',
+            rounds: 2,
+            creator: 'user1',
+            players: [{ userId: 'user1', status: 'waiting' }],
+            maxPlayers: 4,
+            status: 'waiting',
+        }
+
+        mockLobbyRepository.findById.mockResolvedValue(lobby)
+
+        await expect(lobbyService.joinLobby('1', 'user1'))
+            .rejects.toThrow(UserAlreadyJoined)
     })
 
     test('should throw error when joining a full lobby', async () => {
