@@ -38,7 +38,7 @@ export class MongoLobbyRepo implements LobbyRepository {
         }
     }
 
-    async update(id: string, lobby: Lobby): Promise<Lobby | null> {
+    async update(id: string, lobby: Partial<Lobby>): Promise<Lobby | null> {
         try {
             const updatedLobby = await LobbyModel.findByIdAndUpdate(
                 id,
