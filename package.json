@@ -1,0 +1,36 @@
+{
+    "name": "acution",
+    "version": "1.0.0",
+    "main": "index.js",
+    "type": "module",
+    "scripts": {
+        "test:auth": "npm test --workspace=auth-service",
+        "test:lobby": "npm test --workspace=lobby-service",
+        "test:user": "npm test --workspace=user-service",
+        "test:all": "npm-run-all test:auth test:lobby test:user",
+        "prepare": "husky"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://dvcs.apice.unibo.it/pika-lab/courses/ds/projects/ds-project-frattarola-ay2223.git"
+    },
+    "author": "marco frattarola",
+    "license": "ISC",
+    "description": "",
+    "workspaces": [
+        "packages/*"
+    ],
+    "devDependencies": {
+        "@commitlint/cli": "^19.6.1",
+        "@commitlint/config-conventional": "^19.6.0",
+        "@typescript-eslint/eslint-plugin": "^8.18.1",
+        "@typescript-eslint/parser": "^8.18.1",
+        "commitlint": "^19.6.1",
+        "eslint": "^9.17.0",
+        "husky": "^9.1.7",
+        "lerna": "^8.1.9",
+        "lint-staged": "^15.2.11",
+        "npm-run-all": "^4.1.5",
+        "prettier": "^3.4.2"
+    }
+}

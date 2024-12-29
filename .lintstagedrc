@@ -1,0 +1,6 @@
+{
+    "!(**/__tests__/**/*)**/*.{ts,tsx}": [
+      "prettier --write"
+    ],
+    "**/*.{html,js,json,css,scss,md,mdx}": ["prettier -w"]
+}
