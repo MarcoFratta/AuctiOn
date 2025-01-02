@@ -1,6 +1,2 @@
-<<<<<<< HEAD
-
-=======
 node .husky/pre-commit.js
->>>>>>> c774751 (chore: fix project structure bug)
-npx lint-staged
+

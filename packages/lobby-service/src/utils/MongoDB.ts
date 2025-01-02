@@ -1,22 +1,3 @@
-<<<<<<< HEAD
-import { config } from '../configs/config'
-
-import mongoose from 'mongoose'
-import logger from './Logger'
-
-const DB_URI = config.dbUri
-
-export const connectToDatabase = async () => {
-    try {
-        logger.info(`Connecting to MongoDB at: ${DB_URI}`)
-        await mongoose.connect(DB_URI)
-        console.log('Successfully connected to MongoDB')
-    } catch (error) {
-        console.error('Error connecting to MongoDB:', error)
-        process.exit(1) // Exit the process if the connection fails
-    }
-}
-=======
 import { config } from '../configs/config';
 
 import mongoose from 'mongoose';
@@ -34,4 +15,3 @@ export const connectToDatabase = async () => {
     process.exit(1); // Exit the process if the connection fails
   }
 };
->>>>>>> c774751 (chore: fix project structure bug)

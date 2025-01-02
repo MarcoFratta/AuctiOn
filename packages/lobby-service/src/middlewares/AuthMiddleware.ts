@@ -12,7 +12,11 @@ export interface AuthenticatedRequest extends Request {
   user?: User; // Extend the Request type with user info
 }
 
-export const AuthMiddleware = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+export const AuthMiddleware = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
   try {
     const token = req.headers.authorization?.split(' ')[1]; // Extract the Bearer token from Authorization header
 

@@ -1,78 +1,29 @@
-<<<<<<< HEAD
-import { NextFunction, Request, Response } from 'express'
-import {
-    DeleteUserError,
-    EmailAlreadyExistsError,
-    UpdateUserError,
-    UserNotFoundError,
-} from '../errors/UserErrors'
-import logger from '../utils/Logger'
-
-export const ErrorLoggerMiddleware = (
-    err: unknown,
-    _req: Request,
-    _res: Response,
-    next: NextFunction
-): void => {
-    logger.error(err)
-    logger.error(typeof err)
-    next(err)
-}
-// Error handler middleware
-export const UserErrorMiddleware = (
-    err: unknown,
-    _req: Request,
-    res: Response,
-    next: NextFunction
-): void => {
-    if (err instanceof UserNotFoundError) {
-        res.status(404).json({
-            error: 'User Not Found',
-            message: err.message,
-        })
-    } else if (err instanceof UpdateUserError) {
-        res.status(400).json({
-            error: 'Update User Error',
-            message: err.message,
-        })
-    } else if (err instanceof DeleteUserError) {
-        res.status(400).json({
-            error: 'Delete User Error',
-            message: err.message,
-        })
-    } else if (err instanceof EmailAlreadyExistsError) {
-        res.status(409).json({
-            error: 'Email already exists',
-            message: err.message,
-        })
-    } else {
-        next(err)
-    }
-}
-
-export const GenericErrorMiddleware = (
-    _err: unknown,
-    _req: Request,
-    res: Response,
-    _next: NextFunction
-): void => {
-    res.status(500).json({
-        error: 'Internal Server Error',
-        message: 'An unexpected error occurred.',
-    })
-}
-=======
 import { NextFunction, Request, Response } from 'express';
-import { DeleteUserError, EmailAlreadyExistsError, UpdateUserError, UserNotFoundError } from '../errors/UserErrors';
+import {
+  DeleteUserError,
+  EmailAlreadyExistsError,
+  UpdateUserError,
+  UserNotFoundError,
+} from '../errors/UserErrors';
 import logger from '../utils/Logger';
 
-export const ErrorLoggerMiddleware = (err: unknown, _req: Request, _res: Response, next: NextFunction): void => {
+export const ErrorLoggerMiddleware = (
+  err: unknown,
+  _req: Request,
+  _res: Response,
+  next: NextFunction,
+): void => {
   logger.error(err);
   logger.error(typeof err);
   next(err);
 };
 // Error handler middleware
-export const UserErrorMiddleware = (err: unknown, _req: Request, res: Response, next: NextFunction): void => {
+export const UserErrorMiddleware = (
+  err: unknown,
+  _req: Request,
+  res: Response,
+  next: NextFunction,
+): void => {
   if (err instanceof UserNotFoundError) {
     res.status(404).json({
       error: 'User Not Found',
@@ -98,10 +49,14 @@ export const UserErrorMiddleware = (err: unknown, _req: Request, res: Response, 
   }
 };
 
-export const GenericErrorMiddleware = (_err: unknown, _req: Request, res: Response, _next: NextFunction): void => {
+export const GenericErrorMiddleware = (
+  _err: unknown,
+  _req: Request,
+  res: Response,
+  _next: NextFunction,
+): void => {
   res.status(500).json({
     error: 'Internal Server Error',
     message: 'An unexpected error occurred.',
   });
 };
->>>>>>> c774751 (chore: fix project structure bug)

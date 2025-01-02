@@ -15,7 +15,11 @@ export class LobbyController {
   }
 
   // Create a new lobby
-  createLobby = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  createLobby = async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
     try {
       const creatorId = req.user!.id;
       logger.info(`Creating lobby for user: ${creatorId}`);
@@ -33,7 +37,11 @@ export class LobbyController {
   };
 
   // Join a lobby
-  joinLobby = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  joinLobby = async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
     try {
       const { id }: LobbyId = validateSchema(lobbyId, req.params);
       const userId = req.user!.id;
@@ -48,7 +56,11 @@ export class LobbyController {
   };
 
   // Leave the lobby
-  leaveLobby = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  leaveLobby = async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
     try {
       const { id }: LobbyId = validateSchema(lobbyId, req.params);
       const userId = req.user!.id;
@@ -63,7 +75,11 @@ export class LobbyController {
   };
 
   // Kick a player from a lobby
-  kickPlayer = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  kickPlayer = async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
     try {
       const { id }: LobbyId = validateSchema(lobbyId, req.params);
       const creatorId = req.user!.id;
@@ -79,7 +95,11 @@ export class LobbyController {
   };
 
   // Set a player's status
-  setStatus = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  setStatus = async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
     try {
       const id = req.params.id;
       const userId = req.user!.id;
@@ -96,7 +116,11 @@ export class LobbyController {
   };
 
   // Start a match
-  startMatch = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  startMatch = async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
     try {
       const { id }: LobbyId = validateSchema(lobbyId, req.params);
       const creatorId = req.user!.id;

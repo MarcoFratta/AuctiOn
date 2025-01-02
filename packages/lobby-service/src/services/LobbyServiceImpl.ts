@@ -87,7 +87,7 @@ export class LobbyServiceImpl implements LobbyService {
 
     const playerIndex = lobby.players.findIndex((player) => player.userId === userId);
     if (playerIndex === -1) {
-      throw new PlayerNotFoundError();
+      throw (new PlayerNotFoundError());
     }
 
     lobby.players[playerIndex].status = status;

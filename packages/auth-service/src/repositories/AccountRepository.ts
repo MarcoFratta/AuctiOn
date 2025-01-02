@@ -1,15 +1,3 @@
-<<<<<<< HEAD
-import { Account } from '../schemas/AuthSchema'
-
-export interface AccountRepository {
-    findById(id: string): Promise<Account | null>
-
-    create(userData: Omit<Account, 'id'>): Promise<Account>
-
-    update(id: string, updateData: Partial<Account>): Promise<Account | null>
-
-    delete(id: string): Promise<boolean>
-=======
 import { Account } from '../schemas/AuthSchema';
 
 export interface AccountRepository {
@@ -20,5 +8,4 @@ export interface AccountRepository {
   update(id: string, updateData: Partial<Account>): Promise<Account | null>;
 
   delete(id: string): Promise<boolean>;
->>>>>>> c774751 (chore: fix project structure bug)
 }
