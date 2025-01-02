@@ -29,8 +29,15 @@ export class MongoAccountRepo implements AccountRepository {
   }
 
   // Update an account by ID
-  async update(id: string, updateData: Partial<Account>): Promise<Account | null> {
-    const updatedAccount = await AccountModel.findByIdAndUpdate(id, updateData, { new: true });
+  async update(
+    id: string,
+    updateData: Partial<Account>,
+  ): Promise<Account | null> {
+    const updatedAccount = await AccountModel.findByIdAndUpdate(
+      id,
+      updateData,
+      { new: true },
+    );
     const plainObject = updatedAccount?.toObject();
     return plainObject ? this.toAccount(plainObject) : null;
   }

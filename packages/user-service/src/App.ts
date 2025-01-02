@@ -25,7 +25,10 @@ if (fs.existsSync(swaggerPath)) {
   );
 }
 
-export const repository = new MongooseUserRepository(userConverter, reverseUserConverter);
+export const repository = new MongooseUserRepository(
+  userConverter,
+  reverseUserConverter,
+);
 export const service = new UserService(repository);
 export const controller = new UserController(service);
 

@@ -10,7 +10,11 @@ export class UserController {
     this.userService = userService;
   }
 
-  getUsers = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+  getUsers = async (
+    _req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
     try {
       const users = await this.userService.getUsers();
       res.status(200).json(users);
@@ -18,7 +22,11 @@ export class UserController {
       next(error);
     }
   };
-  getUserByEmail = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  getUserByEmail = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
     const { email } = req.params;
     try {
       const user = await this.userService.getUserByEmail(email);
@@ -28,7 +36,11 @@ export class UserController {
     }
   };
   // Other methods as arrow functions
-  getUserById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  getUserById = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
     const { id } = req.params;
     try {
       const user = await this.userService.getUserById(id);
@@ -38,7 +50,11 @@ export class UserController {
     }
   };
 
-  createUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  createUser = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
     try {
       logger.log('info', `Creating new user: ${this}`);
       const userData: User = req.body;
@@ -49,7 +65,11 @@ export class UserController {
     }
   };
 
-  updateUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  updateUser = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
     const { id } = req.params;
     const updateData: Partial<User> = req.body;
     delete updateData.id;
@@ -61,7 +81,11 @@ export class UserController {
     }
   };
 
-  deleteUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  deleteUser = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
     const { id } = req.params;
     try {
       await this.userService.deleteUser(id);

@@ -2,8 +2,10 @@ import { RequestHandler } from 'express';
 import { ZodTypeAny } from 'zod';
 import { ParseError, validateSchema } from '../utils/Validator';
 
-const validate = (schema: ZodTypeAny, source: 'body' | 'params' | 'query'): RequestHandler =>
-{
+const validate = (
+  schema: ZodTypeAny,
+  source: 'body' | 'params' | 'query',
+): RequestHandler => {
   return (req, res, next) => {
     try {
       validateSchema(schema, req[source]);
@@ -19,7 +21,7 @@ const validate = (schema: ZodTypeAny, source: 'body' | 'params' | 'query'): Requ
       }
     }
   };
-}
+};
 
 const validateRequestBody = (schema: ZodTypeAny): RequestHandler => {
   return validate(schema, 'body');

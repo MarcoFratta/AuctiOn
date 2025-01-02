@@ -1,9 +1,4 @@
 {
-<<<<<<< HEAD
-    "$schema": "node_modules/lerna/schemas/lerna-schema.json",
-    "version": "independent"
-=======
   "$schema": "node_modules/lerna/schemas/lerna-schema.json",
   "version": "independent"
->>>>>>> c774751 (chore: fix project structure bug)
 }

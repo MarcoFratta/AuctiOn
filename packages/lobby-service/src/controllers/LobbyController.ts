@@ -3,7 +3,14 @@ import { NextFunction, Response } from 'express';
 import { LobbyServiceImpl } from '../services/LobbyServiceImpl';
 import { validateSchema } from '../utils/Validator';
 import { AuthenticatedRequest } from '../middlewares/AuthMiddleware';
-import { Lobby, LobbyConfig, LobbyId, lobbyId, PlayerStatus, playerStatusSchema } from '../schemas/Lobby';
+import {
+  Lobby,
+  LobbyConfig,
+  LobbyId,
+  lobbyId,
+  PlayerStatus,
+  playerStatusSchema,
+} from '../schemas/Lobby';
 import { createNewLobby } from '../schemas/LobbyFactory';
 import logger from '../utils/Logger';
 
@@ -64,7 +71,10 @@ export class LobbyController {
     try {
       const { id }: LobbyId = validateSchema(lobbyId, req.params);
       const userId = req.user!.id;
-      const updatedLobby: Lobby = await this.lobbyService.leaveLobby(id, userId);
+      const updatedLobby: Lobby = await this.lobbyService.leaveLobby(
+        id,
+        userId,
+      );
       res.status(200).json({
         message: 'Successfully left the lobby',
         lobby: updatedLobby,
@@ -84,7 +94,11 @@ export class LobbyController {
       const { id }: LobbyId = validateSchema(lobbyId, req.params);
       const creatorId = req.user!.id;
       const playerId = req.body.playerId;
-      const updatedLobby: Lobby = await this.lobbyService.kickPlayer(id, creatorId, playerId);
+      const updatedLobby: Lobby = await this.lobbyService.kickPlayer(
+        id,
+        creatorId,
+        playerId,
+      );
       res.status(200).json({
         message: 'Player kicked',
         lobby: updatedLobby,
@@ -103,9 +117,18 @@ export class LobbyController {
     try {
       const id = req.params.id;
       const userId = req.user!.id;
-      const status: PlayerStatus = validateSchema(playerStatusSchema, req.body).status;
-      logger.info(`Setting status for player: ${userId} in lobby: ${id} to ${status}`);
-      const updatedLobby: Lobby = await this.lobbyService.setStatus(id, userId, status);
+      const status: PlayerStatus = validateSchema(
+        playerStatusSchema,
+        req.body,
+      ).status;
+      logger.info(
+        `Setting status for player: ${userId} in lobby: ${id} to ${status}`,
+      );
+      const updatedLobby: Lobby = await this.lobbyService.setStatus(
+        id,
+        userId,
+        status,
+      );
       res.status(200).json({
         message: 'Player status updated',
         lobby: updatedLobby,
@@ -124,7 +147,10 @@ export class LobbyController {
     try {
       const { id }: LobbyId = validateSchema(lobbyId, req.params);
       const creatorId = req.user!.id;
-      const updatedLobby: Lobby = await this.lobbyService.startMatch(id, creatorId);
+      const updatedLobby: Lobby = await this.lobbyService.startMatch(
+        id,
+        creatorId,
+      );
       res.status(200).json({
         message: 'Match started',
         lobby: updatedLobby,

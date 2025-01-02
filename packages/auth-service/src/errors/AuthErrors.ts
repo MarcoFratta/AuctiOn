@@ -1,29 +1,29 @@
 export class UserAlreadyExistsError extends Error {
-    constructor(email: string) {
-        super(`User with Email ${email} already exists`)
-    }
+  constructor(email: string) {
+    super(`User with Email ${email} already exists`);
+  }
 }
 
 export class UserNotFoundError extends Error {
-    constructor(email: string) {
-        super(`User with email ${email} not found`)
-    }
+  constructor(email: string) {
+    super(`User with email ${email} not found`);
+  }
 }
 
 export class WrongPasswordError extends Error {
-    constructor() {
-        super(`Invalid password`)
-    }
+  constructor() {
+    super(`Invalid password`);
+  }
 }
 
 export class InvalidTokenError extends Error {
-    constructor() {
-        super(`Invalid token`)
-    }
+  constructor() {
+    super(`Invalid token`);
+  }
 }
 
 export class UserServiceUnavailableError extends Error {
-    constructor(message: string) {
-        super(message)
-    }
+  constructor(message: string) {
+    super(message);
+  }
 }

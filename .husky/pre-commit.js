@@ -1,5 +1,8 @@
-import { execSync } from 'child_process';
-import fs from 'fs';
+const { execSync } = require('child_process');
+const fs = require('fs');
+
+// Your existing code remains unchanged after this
+
 
 // Helper function to run shell commands
 const runCommand = (cmd) => {

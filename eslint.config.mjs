@@ -1,28 +1,24 @@
-import tseslint from 'typescript-eslint';
+// eslint.config.mjs
+import globals from "globals";
+import pluginJs from "@eslint/js";
+import tseslint from "typescript-eslint";
+import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 
-export default tseslint.config(
-  tseslint.configs.recommendedTypeChecked,
-  tseslint.configs.stylisticTypeChecked,
+
+export default [
+  {files: ["**/*.{ts}"]},
+  {languageOptions: { globals: globals.browser }},
+  pluginJs.configs.recommended,
+  ...tseslint.configs.recommended,
+  eslintPluginPrettierRecommended,
   {
-    files: ['**/*.{ts,tsx,mts,cts}'],
     rules: {
-      // turns a rule on with no configuration (i.e. uses the default configuration)
-      '@typescript-eslint/no-unused-vars': 'off',
-      // turns on a rule with configuration
-      '@typescript-eslint/no-explicit-any': ['warn', { ignoreRestArgs: true }],
-      '@typescript-eslint/no-unsafe-assignment': 'off',
-      '@typescript-eslint/no-unsafe-member-access': 'off',
-      '@typescript-eslint/no-unsafe-argument': 'off',
-      '@typescript-eslint/no-base-to-string': 'off',
-      '@typescript-eslint/restrict-template-expressions': 'off',
+      eqeqeq: "off",
+      "@typescript-eslint/no-unused-vars": "off",
+      "prefer-const": ["error", { ignoreReadBeforeAssign: true }],
     },
   },
   {
-    languageOptions: {
-      parserOptions: {
-        projectService: true,
-        tsconfigRootDir: import.meta.dirname,
-      },
-    },
+    ignores: ["**/__tests__/**/*", "**/*.{js,cjs,mjs}"]
   },
-);
+];

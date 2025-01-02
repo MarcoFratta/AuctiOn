@@ -1,5 +1,8 @@
 import express from 'express';
-import { validateRequestBody, validateRequestParams } from '../middlewares/ValidationMiddleware';
+import {
+  validateRequestBody,
+  validateRequestParams,
+} from '../middlewares/ValidationMiddleware';
 import { userEmail, userId, userSchema } from '../schemas/User';
 import { UserController } from '../controllers/UserController';
 import {
@@ -8,7 +11,9 @@ import {
   UserErrorMiddleware,
 } from '../middlewares/ErrorsMiddleware';
 
-export const createUserRouter = (controller: UserController): express.Router => {
+export const createUserRouter = (
+  controller: UserController,
+): express.Router => {
   const router = express.Router();
 
   // Routes

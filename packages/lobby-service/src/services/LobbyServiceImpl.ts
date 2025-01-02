@@ -72,7 +72,11 @@ export class LobbyServiceImpl implements LobbyService {
     return update;
   }
 
-  async kickPlayer(id: string, creator: string, playerId: string): Promise<Lobby> {
+  async kickPlayer(
+    id: string,
+    creator: string,
+    playerId: string,
+  ): Promise<Lobby> {
     const res = await this.lobbyRepository.findById(id);
     const lobby = this.checkLobbyExists(res, id);
     if (lobby.creator !== creator) {
@@ -81,18 +85,26 @@ export class LobbyServiceImpl implements LobbyService {
     return this.leaveLobby(id, playerId);
   }
 
-  async setStatus(id: string, userId: string, status: PlayerStatus): Promise<Lobby> {
+  async setStatus(
+    id: string,
+    userId: string,
+    status: PlayerStatus,
+  ): Promise<Lobby> {
     const res = await this.lobbyRepository.findById(id);
     const lobby = this.checkLobbyExists(res, id);
 
-    const playerIndex = lobby.players.findIndex((player) => player.userId === userId);
+    const playerIndex = lobby.players.findIndex(
+      (player) => player.userId === userId,
+    );
     if (playerIndex === -1) {
-      throw (new PlayerNotFoundError());
+      throw new PlayerNotFoundError();
     }
 
     lobby.players[playerIndex].status = status;
     // Save the updated players array
-    logger.info(`Setting status for player: ${userId} in lobby: ${id} to ${status}`);
+    logger.info(
+      `Setting status for player: ${userId} in lobby: ${id} to ${status}`,
+    );
     const update = await this.lobbyRepository.update(id, {
       players: lobby.players,
     });

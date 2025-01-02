@@ -9,17 +9,8 @@
     "outDir": "./dist",
     "rootDir": ".",
     "baseUrl": "./src",
-    "types": [
-      "@types/jest"
-    ]
+    "types": ["@types/jest"]
   },
-  "include": [
-    "./src/**/*",
-    "./__tests__/**/*",
-    "./docs/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  "include": ["./src/**/*", "./__tests__/**/*", "./docs/**/*"],
+  "exclude": ["node_modules", "dist"]
 }

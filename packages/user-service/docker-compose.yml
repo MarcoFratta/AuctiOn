@@ -4,7 +4,7 @@ services:
     build:
       context: .
     ports:
-      - "${H_PORT:-3000}:${C_PORT:-3000}" # Default to 3000 if PORT is not defined
+      - '${H_PORT:-3000}:${C_PORT:-3000}' # Default to 3000 if PORT is not defined
     depends_on:
       - user-mongodb
     environment:
@@ -16,7 +16,7 @@ services:
       - microservices-network
 
   user-mongodb:
-    image: "mongo:${MONGO_VERSION:-6.0}" # Default to MongoDB 6.0
+    image: 'mongo:${MONGO_VERSION:-6.0}' # Default to MongoDB 6.0
     volumes:
       - mongo_data:/data/db
     networks:

@@ -25,7 +25,11 @@ if (fs.existsSync(swaggerPath)) {
   );
 }
 const repo = new MongoAccountRepo();
-const service = new AuthServiceImpl(config.userServiceUrl, config.jwtSecret, repo);
+const service = new AuthServiceImpl(
+  config.userServiceUrl,
+  config.jwtSecret,
+  repo,
+);
 const controller = new AuthController(service);
 
 // Use the router

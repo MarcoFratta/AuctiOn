@@ -17,7 +17,10 @@ export const userSchema = z.object({
 });
 export const registerSchema = userSchema
   .extend({
-    password: z.string().min(8).regex(passwordRegex, { message: passwordError }),
+    password: z
+      .string()
+      .min(8)
+      .regex(passwordRegex, { message: passwordError }),
   })
   .omit({ id: true });
 

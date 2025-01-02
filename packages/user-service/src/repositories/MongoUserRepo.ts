@@ -21,7 +21,9 @@ export class MongooseUserRepository implements UserRepository {
   // Find all users
   async findAll(): Promise<User[]> {
     const users = await UserModel.find();
-    return users.map((user) => this.reverseUserConverter.convert(user.toObject()));
+    return users.map((user) =>
+      this.reverseUserConverter.convert(user.toObject()),
+    );
   }
 
   // Find a user by ID

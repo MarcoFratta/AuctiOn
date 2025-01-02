@@ -22,7 +22,9 @@ export const lobbyConfigSchema = z.object({
 export const lobbySchema = lobbyId
   .extend({
     creator: z.string().min(1).openapi({ example: 'creatorId' }),
-    players: z.array(playerSchema).openapi({ example: [{ userId: 'player1', status: 'waiting' }] }),
+    players: z
+      .array(playerSchema)
+      .openapi({ example: [{ userId: 'player1', status: 'waiting' }] }),
     status: z.enum(['waiting', 'in-progress', 'completed']),
   })
   .merge(lobbyConfigSchema);

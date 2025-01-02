@@ -10,7 +10,11 @@ export class AuthController {
     this.authService = authService;
   }
 
-  login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  login = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
     const inputData: LoginInputData = req.body;
     try {
       const user = await this.authService.login(inputData);
@@ -21,12 +25,18 @@ export class AuthController {
       next(error);
     }
   };
-  register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  register = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
     const inputData: RegisterInputData = req.body;
     try {
       logger.info(`Registering user with email: ${inputData.email}`);
       const user = await this.authService.register(inputData);
-      logger.info(`User registered successfully with email: ${inputData.email}`);
+      logger.info(
+        `User registered successfully with email: ${inputData.email}`,
+      );
       res.status(201).json({
         message: 'User registered successfully',
         user: user,

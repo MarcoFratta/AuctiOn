@@ -6,7 +6,10 @@ export const createNewPlayer = (userId: string): Player => {
     status: 'waiting',
   };
 };
-export const createNewLobby = (config: LobbyConfig, creatorId: string): Omit<Lobby, 'id'> => {
+export const createNewLobby = (
+  config: LobbyConfig,
+  creatorId: string,
+): Omit<Lobby, 'id'> => {
   return {
     creator: creatorId,
     players: [createNewPlayer(creatorId)],

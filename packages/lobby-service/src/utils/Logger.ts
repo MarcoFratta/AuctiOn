@@ -16,7 +16,8 @@ const level = process.env.NODE_ENV === 'production' ? 'info' : 'debug';
 const format = winston.format.combine(
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
   winston.format.printf(
-    ({ timestamp, level, message }) => `${timestamp} [${level.toUpperCase()}]: ${message}`,
+    ({ timestamp, level, message }) =>
+      `${timestamp} [${level.toUpperCase()}]: ${message}`,
   ),
 );
 
@@ -29,10 +30,10 @@ const transports = [
 
 // Create the logger
 const logger = winston.createLogger({
-    level,
-    levels,
-    format,
-    transports,
-})
+  level,
+  levels,
+  format,
+  transports,
+});
 
-export default logger;;
+export default logger;
