@@ -1,6 +1,15 @@
 {
+<<<<<<< HEAD
   "trailingComma": "es5",
   "tabWidth": 4,
   "semi": false,
   "singleQuote": true
+=======
+  "semi": true,
+  "singleQuote": true,
+  "trailingComma": "es5",
+  "tabWidth": 2,
+    "printWidth": 120,
+  "arrowParens": "always"
+>>>>>>> c774751 (chore: fix project structure bug)
 }

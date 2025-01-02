@@ -1,3 +1,8 @@
 # Ignore artifacts:
 dist
+<<<<<<< HEAD
 logs
+=======
+logs
+**/__tests__/*
+>>>>>>> c774751 (chore: fix project structure bug)

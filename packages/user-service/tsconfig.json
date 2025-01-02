@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
     "extends": "../../tsconfig.base.json",
     "compilerOptions": {
         "composite": true,
@@ -12,4 +13,19 @@
     },
     "include": ["./src/**/*", "./__tests__/**/*", "./docs/**/*"],
     "exclude": ["node_modules", "dist"]
+=======
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "incremental": true,
+    "outDir": "./dist",
+    "rootDir": ".",
+    "baseUrl": "./src",
+    "types": ["@types/jest"]
+  },
+  "include": ["./src/**/*", "./__tests__/**/*", "./docs/**/*"],
+  "exclude": ["node_modules", "dist"]
+>>>>>>> c774751 (chore: fix project structure bug)
 }

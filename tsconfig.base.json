@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
     "compilerOptions": {
         "target": "es6",
         "module": "commonjs",
@@ -12,4 +13,20 @@
         "allowSyntheticDefaultImports": true,
         "typeRoots": ["./node_modules"]
     }
+=======
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "sourceMap": true,
+    "strict": true,
+    "declaration": true,
+    "moduleResolution": "node",
+    "declarationMap": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "typeRoots": ["./node_modules"]
+  }
+>>>>>>> c774751 (chore: fix project structure bug)
 }
