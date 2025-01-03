@@ -5,6 +5,7 @@ import axios from 'axios';
 import { Request, Response } from 'express';
 import { jest } from '@jest/globals';
 import { config } from '../src/configs/config';
+import { mock, MockProxy, mockReset } from 'jest-mock-extended';
 
 jest.mock('axios');
 const mockAxios = axios as jest.Mocked<typeof axios>;
@@ -19,34 +20,48 @@ jest.mock('../src/utils/Logger');
 const AUTH_SERVICE_URL = config.authServiceUri;
 
 describe('AuthMiddleware', () => {
-  let req: Partial<AuthenticatedRequest>;
-  let mockResponse: Partial<Response>;
-  let mockNext = jest.fn();
+  let mockRequest: MockProxy<AuthenticatedRequest>;
+  let mockResponse: MockProxy<Response>;
+  let mockNext: jest.Mock;
 
   beforeEach(() => {
-    req = {};
-    mockResponse = {};
-    mockResponse.redirect = jest.fn();
+    mockRequest = mock<AuthenticatedRequest>();
+    mockResponse = mock<Response>();
     mockNext = jest.fn();
-    jest.clearAllMocks();
+
+    // Reset mocks
+    mockReset(mockRequest);
+    mockReset(mockResponse);
+    mockReset(mockNext);
+
+    // Setup default behavior for response methods
+    mockResponse.status.mockReturnThis();
+    mockResponse.json.mockReturnThis();
   });
 
-  it('should redirect to /login if no token is provided', async () => {
-    req.headers = { authorization: undefined };
+  it('should return 401 unauthorized if no token is provided', async () => {
+    mockRequest.headers = { authorization: undefined };
 
-    await AuthMiddleware(req as Request, mockResponse as Response, mockNext);
+    await AuthMiddleware(mockRequest as Request, mockResponse as Response, mockNext);
 
-    expect(mockResponse.redirect).toHaveBeenCalledWith('/login');
+    expect(mockResponse.status).toHaveBeenCalledWith(401);
+    expect(mockResponse.json).toHaveBeenCalledWith({ error: 'Unauthorized' });
     expect(mockNext).not.toHaveBeenCalled();
   });
 
-  it('should redirect to /login if token validation fails', async () => {
-    req.headers = { authorization: 'Bearer invalidToken' };
-    mockAxios.post.mockRejectedValue(new Error('Invalid token'));
+  it('should return 401 unauthorized if token validation fails', async () => {
+    mockRequest.headers = { authorization: 'Bearer invalidToken' };
+    mockAxios.post.mockRejectedValue({
+      response: {
+        status: 401,
+        data: { error: 'Unauthorized' },
+      },
+    });
 
-    await AuthMiddleware(req as Request, mockResponse as Response, mockNext);
+    await AuthMiddleware(mockRequest as Request, mockResponse as Response, mockNext);
 
-    expect(mockResponse.redirect).toHaveBeenCalledWith('/login');
+    expect(mockResponse.status).toHaveBeenCalledWith(401);
+    expect(mockResponse.json).toHaveBeenCalledWith({ error: 'Unauthorized' });
     expect(mockNext).not.toHaveBeenCalled();
   });
 
@@ -57,33 +72,39 @@ describe('AuthMiddleware', () => {
       email: 'test@example.com',
     };
 
-    req.headers = { authorization: 'Bearer validToken' };
+    mockRequest.headers = { authorization: 'Bearer validToken' };
     mockAxios.post.mockResolvedValue({
       data: mockUser,
-      status: 0,
+      status: 200,
       statusText: '',
       headers: {},
       config: { url: '' },
     });
     mockValidateSchema.mockReturnValue(mockUser);
 
-    await AuthMiddleware(req as Request, mockResponse as Response, mockNext);
+    await AuthMiddleware(mockRequest as Request, mockResponse as Response, mockNext);
 
     expect(mockAxios.post).toHaveBeenCalledWith(AUTH_SERVICE_URL + '/validate', {
       token: 'validToken',
     });
     expect(mockValidateSchema).toHaveBeenCalledWith(userSchema, mockUser);
-    expect(req).toHaveProperty('user', mockUser);
+    expect(mockRequest).toHaveProperty('user', mockUser);
     expect(mockNext).toHaveBeenCalled();
   });
 
-  it('should redirect to /login if there is an error during authentication', async () => {
-    req.headers = { authorization: 'Bearer validToken' };
-    mockAxios.post.mockRejectedValue(new Error('Unexpected error'));
+  it('should return 401 unauthorized if there is an error during authentication', async () => {
+    mockRequest.headers = { authorization: 'Bearer validToken' };
+    mockAxios.post.mockRejectedValue({
+      response: {
+        status: 401,
+        data: { error: 'Unauthorized' },
+      },
+    });
 
-    await AuthMiddleware(req as Request, mockResponse as Response, mockNext);
+    await AuthMiddleware(mockRequest as Request, mockResponse as Response, mockNext);
 
-    expect(mockResponse.redirect).toHaveBeenCalledWith('/login');
+    expect(mockResponse.status).toHaveBeenCalledWith(401);
+    expect(mockResponse.json).toHaveBeenCalledWith({ error: 'Unauthorized' });
     expect(mockNext).not.toHaveBeenCalled();
   });
 });

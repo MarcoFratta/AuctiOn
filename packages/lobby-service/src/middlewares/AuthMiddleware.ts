@@ -21,7 +21,9 @@ export const AuthMiddleware = async (
     const token = req.headers.authorization?.split(' ')[1]; // Extract the Bearer token from Authorization header
 
     if (!token) {
-      res.redirect('/login');
+      res.status(401).json({
+        error: 'Unauthorized',
+      });
       return;
     }
 
@@ -42,7 +44,9 @@ export const AuthMiddleware = async (
         message: 'Service is not responding',
       });
     } else {
-      res.redirect('/login');
+      res.status(401).json({
+        error: 'Unauthorized',
+      });
     }
   }
 };

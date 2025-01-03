@@ -94,7 +94,7 @@ describe('Lobby Service Integration Tests with Auth Service Mock', () => {
         .set('Authorization', 'Bearer invalidToken')
         .send({ name: 'Test Lobby', maxPlayers: 4 });
 
-      expect(response.status).toBe(302);
+      expect(response.status).toBe(401);
       expect(mockedAxios.post).toHaveBeenCalled();
     });
   });
