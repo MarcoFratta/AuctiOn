@@ -1,6 +1,6 @@
 {
   "**/*.{ts,tsx}": [
   "prettier --w",
-  "eslint --max-warnings=0 --fix --config eslint.config.mjs"],
+  "eslint --max-warnings=0 --fix --no-warn-ignored --config eslint.config.mjs"],
   "**/*.{html,js,json,css,scss,md,mdx}": ["prettier -w"]
 }
