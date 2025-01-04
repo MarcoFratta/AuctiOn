@@ -1,7 +1,7 @@
 import request from 'supertest';
 import app from '../src/App'; // Assuming `app` is your Express app
 import axios from 'axios';
-import { UserServiceUnavailableError } from '../src/errors/AuthErrors';
+import { UserNotFoundError, UserServiceUnavailableError } from '../src/errors/AuthErrors';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { closeLocalMongoConnection, localMongoConnection } from './common';
 
@@ -69,7 +69,7 @@ describe('Error Use Cases', () => {
     describe('Login Endpoint Error Cases', () => {
         it('should return 404 when the user is not found', async () => {
             // Mock the user service to return null or empty data
-          ;(axios.get as jest.Mock).mockResolvedValueOnce({ data: null });
+          ;(axios.get as jest.Mock).mockRejectedValueOnce(new UserNotFoundError('nonexistent@example.com'));
 
             const response = await request(app).post('/auth/login').send({
                 email: 'nonexistent@example.com',
@@ -87,7 +87,7 @@ describe('Error Use Cases', () => {
             // Mock the user service to return a user
           const userData = { email: 'test@example.com', name: 'Test User' }
 
-          ;(axios.get as jest.Mock).mockResolvedValueOnce({ data: null })
+          ;(axios.get as jest.Mock).mockRejectedValueOnce(new UserNotFoundError(''));
             ;(axios.post as jest.Mock).mockResolvedValueOnce({
                 data: {
                     ...userData,

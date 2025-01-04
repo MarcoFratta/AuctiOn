@@ -110,23 +110,35 @@ export class AuthServiceImpl implements AuthService {
       );
       return validateSchema(userSchema, user);
     } catch (e) {
-      if (axios.isAxiosError(e) || e instanceof UserServiceUnavailableError) {
-        throw new UserServiceUnavailableError(e.message);
+      logger.error(e);
+      if (axios.isAxiosError(e)) {
+        if (e.response) {
+          if (e.response.status === 404) {
+            return null;
+          }
+        }
+        throw new UserServiceUnavailableError('User service is not responding');
       }
-      return null;
+      if (e instanceof UserNotFoundError) {
+        return null;
+      }
+      throw new UserServiceUnavailableError('User service is not responding');
     }
   }
 
-  private async saveUser(data: User): Promise<User | null> {
+  private async saveUser(data: User): Promise<User> {
     try {
       const { data: newUser } = await axios.post(this.userServiceURL, data);
       return validateSchema(userSchema, newUser);
     } catch (e) {
-      if (axios.isAxiosError(e) || e instanceof UserServiceUnavailableError) {
-        throw new UserServiceUnavailableError(e.message);
+      if (axios.isAxiosError(e)) {
+        if (e.response) {
+          logger.error(`Failed to save user: ${e.response.data.error}`);
+          throw new Error(e.response.data.error);
+        }
       }
       logger.error(`Failed to save user: ${e}`);
-      return null;
+      throw new UserServiceUnavailableError('User service is not responding');
     }
   }
 }

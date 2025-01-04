@@ -7,6 +7,7 @@ import app from '../src/App';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { closeLocalMongoConnection, localMongoConnection } from './common';
 import { RegisterInputData } from '../src/schemas/AuthSchema';
+import { UserNotFoundError } from '../src/errors/AuthErrors';
 
 // Mock Axios
 jest.mock('axios');
@@ -26,7 +27,7 @@ describe('Auth Service Integration Tests with Axios Mock', () => {
   });
 
   async function register(user: RegisterInputData): Promise<any> {
-    mockedAxios.get.mockResolvedValueOnce({ data: null });
+    mockedAxios.get.mockRejectedValueOnce(new UserNotFoundError(user.email));
     mockedAxios.post.mockResolvedValue({
       data: { ...user, id: '123456789012345678901234' },
     });
@@ -130,8 +131,8 @@ describe('Auth Service Integration Tests with Axios Mock', () => {
         password: 'Password1',
       });
 
-      expect(response.status).toBe(500);
-      expect(response.body).toHaveProperty('error', 'Internal Server Error');
+      expect(response.status).toBe(503);
+      expect(response.body).toHaveProperty('error', 'Service Temporary Unavailable');
 
       expect(mockedAxios.get).toHaveBeenCalledWith(userServiceUrl + '/email/test@example.com');
     });

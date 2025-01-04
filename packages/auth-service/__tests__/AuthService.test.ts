@@ -48,7 +48,7 @@ describe('AuthService', () => {
     const hashedPassword = 'hashedPassword';
     const accountId = '123456789012345678901234';
 
-    (axios.get as jest.Mock).mockResolvedValue({ data: null }); // No user exists
+    (axios.get as jest.Mock).mockRejectedValueOnce(new UserNotFoundError(userData.email)); // No user exists
     (bcrypt.hash as jest.Mock).mockResolvedValue(hashedPassword);
     mockAccountRepository.create.mockResolvedValue({
       id: accountId,
@@ -152,7 +152,7 @@ describe('AuthService', () => {
       password: 'password123',
     };
 
-    (axios.get as jest.Mock).mockResolvedValue({ data: null });
+    (axios.get as jest.Mock).mockRejectedValueOnce(new UserNotFoundError(userData.email));
 
     await expect(authService.login(userData)).rejects.toThrow(
       new UserNotFoundError(userData.email),
