@@ -121,6 +121,16 @@ describe('Lobby Service Integration Tests with Auth Service Mock', () => {
         token: validToken.split(' ')[1],
       });
     });
+    it('should return 400 if the lobby does not exist', async () => {
+      actAs(user);
+      const response = await request(app)
+        .post('/lobby/join/123456789012345678901234')
+        .set('Authorization', validToken)
+        .send();
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty('error', 'Lobby Not Found');
+      expect(response.body).toHaveProperty('message');
+    });
   });
   describe('PUT /lobby/status', () => {
     it('should update the player status', async () => {
@@ -175,6 +185,34 @@ describe('Lobby Service Integration Tests with Auth Service Mock', () => {
         'message',
         'Only the lobby ' + 'creator can perform this action',
       );
+    });
+  });
+  describe('POST /lobby/leave', () => {
+    it('should allow a user to leave a lobby', async () => {
+      const lobby = (await createLobby(user)).body.lobby;
+      const newUser = {
+        id: 'newUser',
+        email: 'new@user.com',
+        name: 'newUserName',
+      };
+      await joinUser(lobby, newUser);
+      actAs(newUser);
+      const response = await request(app)
+        .post(`/lobby/leave/${lobby.id}`)
+        .set('Authorization', validToken)
+        .send();
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('message', 'Successfully left the lobby');
+      expect(response.body).toHaveProperty('lobby');
+    });
+    it('should delete the lobby if the creator leaves', async () => {
+      const lobby = (await createLobby(user)).body.lobby;
+      actAs(user);
+      const response = await request(app)
+        .post(`/lobby/leave/${lobby.id}`)
+        .set('Authorization', validToken)
+        .send();
+      expect(response.status).toBe(204);
     });
   });
 

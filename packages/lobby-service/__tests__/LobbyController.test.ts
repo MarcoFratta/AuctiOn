@@ -120,6 +120,26 @@ describe('LobbyController', () => {
                 lobby: updatedLobby,
             })
         })
+        it('should delete the lobby and return 204 if the creator leaves', async () => {
+            const id = '123456789012345678901234';
+            mockRequest.params = { id };
+            mockLobbyService.leaveLobby.mockResolvedValue(null);
+            mockResponse.status.mockReturnThis();
+            mockResponse.send.mockReturnThis();
+
+            await lobbyController.leaveLobby(
+              mockRequest,
+              mockResponse,
+              mockNext,
+            );
+
+            expect(mockLobbyService.leaveLobby).toHaveBeenCalledWith(
+              id,
+              'creatorId',
+            );
+            expect(mockResponse.status).toHaveBeenCalledWith(204);
+            expect(mockResponse.send).toHaveBeenCalled();
+        });
     })
 
     describe('kickPlayer', () => {
