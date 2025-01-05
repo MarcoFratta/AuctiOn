@@ -49,7 +49,7 @@ export class LobbyServiceImpl implements LobbyService {
     }))!;
   }
 
-  async leaveLobby(id: string, userId: string): Promise<Lobby> {
+  async leaveLobby(id: string, userId: string): Promise<Lobby | null> {
     const res = await this.lobbyRepository.findById(id);
     const lobby = this.checkLobbyExists(res, id);
     if (!lobby.players.find((player) => player.userId === userId)) {
@@ -59,8 +59,8 @@ export class LobbyServiceImpl implements LobbyService {
       throw new Error('Cannot leave lobby while match is in progress');
     }
     if (lobby.creator === userId) {
-      await this.lobbyRepository.delete(id);
-      throw new Error('Lobby creator left, lobby deleted');
+      await this.lobbyRepository.delete(id); //notify info
+      return null;
     }
     lobby.players = lobby.players.filter((player) => player.userId !== userId);
     const update = await this.lobbyRepository.update(id, {
@@ -82,7 +82,12 @@ export class LobbyServiceImpl implements LobbyService {
     if (lobby.creator !== creator) {
       throw new UnauthorizedError();
     }
-    return this.leaveLobby(id, playerId);
+    if (playerId === creator) {
+      throw new Error(
+        'Creator cannot kick themselves, use the leave endpoint instead',
+      );
+    }
+    return (await this.leaveLobby(id, playerId))!;
   }
 
   async setStatus(

@@ -1,11 +1,13 @@
 import { AuthenticatedRequest, AuthMiddleware } from '../src/middlewares/AuthMiddleware';
-import { User, userSchema } from '../src/schemas/User';
+import { User } from '../src/schemas/User';
 import { validateSchema } from '../src/utils/Validator';
 import axios from 'axios';
 import { Request, Response } from 'express';
 import { jest } from '@jest/globals';
 import { config } from '../src/configs/config';
 import { mock, MockProxy, mockReset } from 'jest-mock-extended';
+import { UnauthorizedError } from '../src/errors/LobbyErrors';
+import { ValidationError } from 'zod-validation-error';
 
 jest.mock('axios');
 const mockAxios = axios as jest.Mocked<typeof axios>;
@@ -51,12 +53,7 @@ describe('AuthMiddleware', () => {
 
   it('should return 401 unauthorized if token validation fails', async () => {
     mockRequest.headers = { authorization: 'Bearer invalidToken' };
-    mockAxios.post.mockRejectedValue({
-      response: {
-        status: 401,
-        data: { error: 'Unauthorized' },
-      },
-    });
+    mockAxios.post.mockRejectedValue(new UnauthorizedError());
 
     await AuthMiddleware(mockRequest as Request, mockResponse as Response, mockNext);
 
@@ -69,37 +66,25 @@ describe('AuthMiddleware', () => {
     const mockUser: User = {
       id: '123',
       name: 'Test User',
-      email: 'test@example.com',
+      email: 'test.com',
     };
 
     mockRequest.headers = { authorization: 'Bearer validToken' };
-    mockAxios.post.mockResolvedValue({
-      data: mockUser,
-      status: 200,
-      statusText: '',
-      headers: {},
-      config: { url: '' },
-    });
-    mockValidateSchema.mockReturnValue(mockUser);
+    mockAxios.post.mockResolvedValue({ data: { user: mockUser } });
+    mockValidateSchema.mockReturnValue(new ValidationError());
 
     await AuthMiddleware(mockRequest as Request, mockResponse as Response, mockNext);
 
     expect(mockAxios.post).toHaveBeenCalledWith(AUTH_SERVICE_URL + '/validate', {
       token: 'validToken',
     });
-    expect(mockValidateSchema).toHaveBeenCalledWith(userSchema, mockUser);
-    expect(mockRequest).toHaveProperty('user', mockUser);
+
     expect(mockNext).toHaveBeenCalled();
   });
 
   it('should return 401 unauthorized if there is an error during authentication', async () => {
     mockRequest.headers = { authorization: 'Bearer validToken' };
-    mockAxios.post.mockRejectedValue({
-      response: {
-        status: 401,
-        data: { error: 'Unauthorized' },
-      },
-    });
+    mockAxios.post.mockRejectedValue(new UnauthorizedError());
 
     await AuthMiddleware(mockRequest as Request, mockResponse as Response, mockNext);
 

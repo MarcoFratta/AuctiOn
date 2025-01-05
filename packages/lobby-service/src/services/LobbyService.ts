@@ -7,7 +7,7 @@ export interface LobbyService {
 
   joinLobby(id: string, userId: string): Promise<Lobby>;
 
-  leaveLobby(id: string, userId: string): Promise<Lobby>;
+  leaveLobby(id: string, userId: string): Promise<Lobby | null>;
 
   kickPlayer(id: string, creator: string, playerId: string): Promise<Lobby>;
 

@@ -7,6 +7,7 @@ import {
   PlayersNotReadyError,
   ServiceUnavailableError,
   UnauthorizedError,
+  UserAlreadyJoined,
 } from '../errors/LobbyErrors';
 import { NextFunction, Request, Response } from 'express';
 import logger from '../utils/Logger';
@@ -68,6 +69,11 @@ export const LobbyErrorMiddleware = (
     res.status(503).json({
       error: 'Service Temporary Unavailable',
       message: 'Service is not responding',
+    });
+  } else if (err instanceof UserAlreadyJoined) {
+    res.status(400).json({
+      error: 'User Already Joined',
+      message: err.message,
     });
   } else {
     next(err); // Pass to the generic error handler

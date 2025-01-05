@@ -4,7 +4,10 @@ import { validateSchema } from '../utils/Validator';
 import { User, userSchema } from '../schemas/User';
 import logger from '../utils/Logger';
 import { config } from '../configs/config';
-import { ServiceUnavailableError } from '../errors/LobbyErrors';
+import {
+  ServiceUnavailableError,
+  UnauthorizedError,
+} from '../errors/LobbyErrors';
 
 const AUTH_SERVICE_URL = config.authServiceUri;
 
@@ -32,21 +35,34 @@ export const AuthMiddleware = async (
       AUTH_SERVICE_URL + '/validate',
       { token: token },
     );
+    logger.info('Validation response:', response);
     // Extract user info from the auth service response
     // Add user information to the request object
-    req.user = validateSchema(userSchema, response);
+    req.user = validateSchema(userSchema, response.user);
     next();
   } catch (error) {
     logger.error(error);
-    if (axios.isAxiosError(error) || error instanceof ServiceUnavailableError) {
+    if (axios.isAxiosError(error)) {
+      if (error.response?.status === 400) {
+        res.status(401).json({
+          error: 'Unauthorized',
+        });
+        return;
+      }
+    }
+    if (error instanceof ServiceUnavailableError) {
       res.status(503).json({
         error: 'Service Temporary Unavailable',
         message: 'Service is not responding',
       });
-    } else {
+      return;
+    }
+    if (error instanceof UnauthorizedError) {
       res.status(401).json({
         error: 'Unauthorized',
       });
+      return;
     }
+    next(error);
   }
 };

@@ -71,10 +71,14 @@ export class LobbyController {
     try {
       const { id }: LobbyId = validateSchema(lobbyId, req.params);
       const userId = req.user!.id;
-      const updatedLobby: Lobby = await this.lobbyService.leaveLobby(
+      const updatedLobby: Lobby | null = await this.lobbyService.leaveLobby(
         id,
         userId,
       );
+      if (!updatedLobby) {
+        res.status(204).send();
+        return;
+      }
       res.status(200).json({
         message: 'Successfully left the lobby',
         lobby: updatedLobby,

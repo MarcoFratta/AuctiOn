@@ -6,10 +6,11 @@ import {
     PlayerNotFoundError,
     PlayersNotReadyError,
     UnauthorizedError,
-} from '../src/errors/LobbyErrors'
+    UserAlreadyJoined,
+} from '../src/errors/LobbyErrors';
 import { GenericErrorMiddleware, LobbyErrorMiddleware } from '../src/middlewares/ErrorsMiddleware';
-import { NextFunction, Request, Response } from 'express'
-import { mock, mockReset } from 'jest-mock-extended'
+import { NextFunction, Request, Response } from 'express';
+import { mock, mockReset } from 'jest-mock-extended';
 
 const mockRequest = mock<Request>()
 const mockResponse = mock<Response>()
@@ -105,6 +106,17 @@ describe('Error Middleware Tests', () => {
             expect(mockResponse.status).toHaveBeenCalledWith(400)
             expect(mockResponse.json).toHaveBeenCalledWith({
                 error: 'Match Already In Progress',
+                message: error.message,
+            })
+        })
+        it('should handle players already joined error with 400', () => {
+            const error = new UserAlreadyJoined();
+
+            LobbyErrorMiddleware(error, mockRequest, mockResponse, mockNext);
+
+            expect(mockResponse.status).toHaveBeenCalledWith(400);
+            expect(mockResponse.json).toHaveBeenCalledWith({
+                error: 'User Already Joined',
                 message: error.message,
             })
         })

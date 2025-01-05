@@ -6,7 +6,7 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import { closeLocalMongoConnection, localMongoConnection } from './common';
 import { Lobby, LobbyConfig, PlayerStatus } from '../src/schemas/Lobby';
 import { User } from '../src/schemas/User';
-import { ServiceUnavailableError } from '../src/errors/LobbyErrors';
+import { ServiceUnavailableError, UnauthorizedError } from '../src/errors/LobbyErrors';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -37,7 +37,7 @@ async function joinUser(
 }
 
 function actAs(u: User) {
-  mockedAxios.post.mockResolvedValueOnce({ data: u });
+  mockedAxios.post.mockResolvedValueOnce({ data: { user: u } });
 }
 
 async function setPlayerStatus(lobby: Lobby, u: User, status: PlayerStatus) {
@@ -87,7 +87,7 @@ describe('Lobby Service Integration Tests with Auth Service Mock', () => {
     });
 
     it('should return 401 if token is invalid', async () => {
-      mockedAxios.post.mockRejectedValueOnce(new Error('Unauthorized'));
+      mockedAxios.post.mockRejectedValueOnce(new UnauthorizedError());
 
       const response = await request(app)
         .post('/lobby/create')
