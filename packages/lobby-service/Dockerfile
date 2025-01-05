@@ -11,15 +11,13 @@ COPY package*.json ./
 COPY package-lock.json ./
 RUN npm install
 
-# Move to the auth-service folder
-WORKDIR /app/packages/auth-service
+# Move to the lobby-service folder
+WORKDIR /app/packages/lobby-service
 
 # Copy the service-specific files
-COPY packages/auth-service/package*.json ./
-COPY packages/auth-service/tsconfig.json ./
-COPY packages/auth-service/src ./src
-COPY packages/auth-service/docs ./docs
-
+COPY packages/lobby-service/package*.json ./
+COPY packages/lobby-service/tsconfig.json ./
+COPY packages/lobby-service/src ./src
 
 # Install dependencies
 RUN npm install
@@ -29,7 +27,6 @@ EXPOSE 3000
 
 # Build the application
 RUN npm run build
-RUN npm run doc
 
 # Start the application
 CMD ["npm", "start"]

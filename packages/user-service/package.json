@@ -12,9 +12,9 @@
     "build": "tsc",
     "start": "node dist/src/server.js",
     "dev": "ts-node src/server.ts",
-    "docdev": "ts-node openapi/Index.ts",
+    "docdev": "ts-node docs/Index.ts",
     "test": "npx jest",
-    "doc": "node dist/openapi/Index.js"
+    "doc": "node dist/docs/Index.js"
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",

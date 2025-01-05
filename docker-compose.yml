@@ -1,0 +1,82 @@
+services:
+  lobby-service:
+    build:
+      context: .
+      dockerfile: packages/lobby-service/Dockerfile
+    ports:
+      - '${LOBBY_S_H_PORT:-3000}:${LOBBY_S_C_PORT:-3000}' # Default to 3000 if PORT is not defined
+    environment:
+      - DB_URI=${LOBBY_S_DB_URI:-mongodb://test:27017/lobby}
+      - PORT=${LOBBY_S_C_PORT:-3000}
+      - NODE_ENV=${LOBBY_S_NODE_ENV:-production}
+      - AUTH_SERVICE_URI=${LOBBY_S_AUTH_SERVICE_URI:-http://auth-service:3000/auth}
+    networks:
+      - lobby-network
+      - microservices-network
+    depends_on:
+      - lobby-mongodb
+  lobby-mongodb:
+    image: 'mongo:${MONGO_VERSION:-6.0}' # Default to MongoDB 6.0
+    volumes:
+      - mongo_lobby_data:/data/db
+    networks:
+      - lobby-network
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: packages/auth-service/Dockerfile
+    ports:
+      - '${AUTH_S_H_PORT:-3000}:${AUTH_S_C_PORT:-3000}' # Default to 3000 if PORT is not defined
+    environment:
+      - DB_URI=${AUTH_S_DB_URI:-mongodb://test:27017/auth}
+      - PORT=${AUTH_S_C_PORT:-3000}
+      - JWT_SECRET=${AUTH_S_JWT_SECRET}
+      - NODE_ENV=${AUTH_S_NODE_ENV:-production}
+      - USER_SERVICE_URI=${AUTH_S_USER_SERVICE_URI:-http://user-service:3000/users}
+    networks:
+      - auth-network
+      - microservices-network
+    depends_on:
+      - auth-mongodb
+  auth-mongodb:
+    image: 'mongo:${MONGO_VERSION:-6.0}' # Default to MongoDB 6.0
+    volumes:
+      - mongo_auth_data:/data/auth-db
+    networks:
+      - auth-network
+
+  user-service:
+    build:
+      context: .
+      dockerfile: packages/user-service/Dockerfile
+    ports:
+      - '${USER_S_H_PORT:-3000}:${USER_S_C_PORT:-3000}' # Default to 3000 if PORT is not defined
+    depends_on:
+      - user-mongodb
+    environment:
+      - PORT=${USER_S_C_PORT:-3000}
+      - NODE_ENV=${USER_S_NODE_ENV:-production}
+      - DB_URI=${USER_S_DB_URI:-mongodb://localhost:27017/users}
+    networks:
+      - user-network
+      - microservices-network
+  user-mongodb:
+    image: 'mongo:${MONGO_VERSION:-6.0}' # Default to MongoDB 6.0
+    volumes:
+      - mongo_user_data:/data/db
+    networks:
+      - user-network
+networks:
+  lobby-network:
+    driver: bridge
+  auth-network:
+    driver: bridge
+  user-network:
+    driver: bridge
+  microservices-network:
+    external: true
+volumes:
+  mongo_user_data:
+  mongo_auth_data:
+  mongo_lobby_data:

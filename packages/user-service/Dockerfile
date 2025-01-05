@@ -4,20 +4,30 @@ FROM node:18
 # Set the working directory
 WORKDIR /app
 
-# Copy the package.json and package-lock.json files
+
+# Copy the shared tsconfig.base.json from the root context
+COPY tsconfig.base.json ./
 COPY package*.json ./
+COPY package-lock.json ./
+RUN npm install
+
+# Move to the user-service folder
+WORKDIR /app/packages/user-service
+
+# Copy the service-specific files
+COPY packages/user-service/package*.json ./
+COPY packages/user-service/tsconfig.json ./
+COPY packages/user-service/src ./src
+COPY packages/user-service/docs ./docs
+
 
 # Install dependencies
 RUN npm install
 
 # Expose the port the application will run on
-EXPOSE 8080
+EXPOSE 3000
 
-COPY src ./src
-COPY openapi ./openapi
-COPY tsconfig.json ./
-
-
+# Build the application
 RUN npm run build
 RUN npm run doc
 
