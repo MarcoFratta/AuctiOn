@@ -1,6 +1,8 @@
 import * as dotenv from 'dotenv';
 
-dotenv.config({ path: '../../.env' });
+if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development') {
+  dotenv.config({ path: '../../../../.env' });
+}
 
 export const config = {
   port: process.env.PORT ?? 3000,
