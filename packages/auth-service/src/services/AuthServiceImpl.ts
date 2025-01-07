@@ -9,14 +9,7 @@ import {
   WrongPasswordError,
 } from '../errors/AuthErrors';
 import { AuthService } from './AuthService';
-import {
-  LoginInputData,
-  RegisterInputData,
-  RegisterOutput,
-  Token,
-  User,
-  userSchema,
-} from '../schemas/AuthSchema';
+import { LoginInputData, RegisterInputData, RegisterOutput, Token, User, userSchema } from '../schemas/AuthSchema';
 import logger from '../utils/Logger';
 import { validateSchema } from '../utils/Validator';
 import { AccountRepository } from '../repositories/AccountRepository';
@@ -28,7 +21,7 @@ export class AuthServiceImpl implements AuthService {
   constructor(
     userServiceURL: string,
     jwtSecret: string,
-    private repo: AccountRepository,
+    private repo: AccountRepository
   ) {
     this.userServiceURL = userServiceURL;
     this.jwtSecret = jwtSecret;
@@ -49,16 +42,17 @@ export class AuthServiceImpl implements AuthService {
       id: account.id,
     });
     logger.info(`created account with id : ${account.id}`);
-    const newUser: User | null = await this.saveUser(userInfo);
-    if (!newUser) {
+    try {
+      const newUser: User | null = await this.saveUser(userInfo);
+      newUser.id = account.id;
+      logger.info(`created user: ${newUser}`);
+      const finalUser: User = validateSchema(userSchema, newUser);
+      const token = jwt.sign(finalUser, this.jwtSecret, { expiresIn: '1h' });
+      return { token: token, ...finalUser };
+    } catch (e) {
       await this.repo.delete(account.id);
-      throw new Error('Failed to create user');
+      throw e;
     }
-    newUser.id = account.id;
-    logger.info(`created user: ${newUser}`);
-    const finalUser: User = validateSchema(userSchema, newUser);
-    const token = jwt.sign(finalUser, this.jwtSecret, { expiresIn: '1h' });
-    return { token: token, ...finalUser };
   }
 
   // Login an existing user
@@ -82,12 +76,11 @@ export class AuthServiceImpl implements AuthService {
   validateToken(token: Token): User {
     try {
       // Decode and verify the token
-      const decoded: jwt.JwtPayload | string = jwt.verify(
-        token.token,
-        this.jwtSecret,
-      );
+      const decoded: jwt.JwtPayload | string = jwt.verify(token.token, this.jwtSecret);
       logger.info(`decoded token: ${JSON.stringify(decoded)}`);
-      if (!decoded) throw new InvalidTokenError();
+      if (!decoded) {
+        throw new InvalidTokenError();
+      }
       return validateSchema(userSchema, decoded);
     } catch (error) {
       // Handle token expiry error
@@ -105,24 +98,22 @@ export class AuthServiceImpl implements AuthService {
 
   private async getUserByEmail(email: string): Promise<User | null> {
     try {
-      const { data: user } = await axios.get(
-        `${this.userServiceURL}/email/${email}`,
-      );
+      const { data: user } = await axios.get(`${this.userServiceURL}/email/${email}`);
       return validateSchema(userSchema, user);
     } catch (e) {
-      logger.error(e);
+      if (e instanceof UserNotFoundError) {
+        return null;
+      }
       if (axios.isAxiosError(e)) {
         if (e.response) {
           if (e.response.status === 404) {
             return null;
           }
         }
-        throw new UserServiceUnavailableError('User service is not responding');
+        throw new UserServiceUnavailableError(e.message);
       }
-      if (e instanceof UserNotFoundError) {
-        return null;
-      }
-      throw new UserServiceUnavailableError('User service is not responding');
+      logger.error(`Failed to get user by email: ${e}`);
+      throw e;
     }
   }
 
@@ -131,14 +122,11 @@ export class AuthServiceImpl implements AuthService {
       const { data: newUser } = await axios.post(this.userServiceURL, data);
       return validateSchema(userSchema, newUser);
     } catch (e) {
-      if (axios.isAxiosError(e)) {
-        if (e.response) {
-          logger.error(`Failed to save user: ${e.response.data.error}`);
-          throw new Error(e.response.data.error);
-        }
-      }
       logger.error(`Failed to save user: ${e}`);
-      throw new UserServiceUnavailableError('User service is not responding');
+      if (axios.isAxiosError(e) || e instanceof UserServiceUnavailableError) {
+        throw new UserServiceUnavailableError(e.message);
+      }
+      throw e;
     }
   }
 }

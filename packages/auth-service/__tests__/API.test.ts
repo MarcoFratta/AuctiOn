@@ -7,7 +7,7 @@ import app from '../src/App';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { closeLocalMongoConnection, localMongoConnection } from './common';
 import { RegisterInputData } from '../src/schemas/AuthSchema';
-import { UserNotFoundError } from '../src/errors/AuthErrors';
+import { UserNotFoundError, UserServiceUnavailableError } from '../src/errors/AuthErrors';
 
 // Mock Axios
 jest.mock('axios');
@@ -123,7 +123,7 @@ describe('Auth Service Integration Tests with Axios Mock', () => {
   describe('Error Handling', () => {
     it('should handle errors from the User Service gracefully', async () => {
       // Mock User Service failure
-      mockedAxios.post.mockRejectedValueOnce(new Error('User Service error'));
+      mockedAxios.get.mockRejectedValueOnce(new UserServiceUnavailableError('User Service error'));
 
       const response = await request(app).post('/auth/register').send({
         email: 'test@example.com',
