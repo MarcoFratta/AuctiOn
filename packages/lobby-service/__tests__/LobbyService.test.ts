@@ -1,9 +1,9 @@
 // lobbyService.test.ts
-import { LobbyServiceImpl } from '../src/services/LobbyServiceImpl';
-import { MongoLobbyRepo } from '../src/repositories/MongoLobbyRepo';
-import { UserLobbyRepo } from '../src/repositories/UserLobbyRepo';
-import { mock, MockProxy } from 'jest-mock-extended';
-import { Lobby } from '../src/schemas/Lobby';
+import { LobbyServiceImpl } from '../src/services/LobbyServiceImpl'
+import { MongoLobbyRepo } from '../src/repositories/MongoLobbyRepo'
+import { UserLobbyRepo } from '../src/repositories/UserLobbyRepo'
+import { mock, MockProxy } from 'jest-mock-extended'
+import { Lobby } from '../src/schemas/Lobby'
 
 jest.mock('../src/repositories/MongoLobbyRepo');
 jest.mock('../src/repositories/UserLobbyRepo');
@@ -266,7 +266,7 @@ describe('LobbyService', () => {
             mockLobbyRepo.findById.mockResolvedValue(lobby);
 
             await expect(lobbyService.startMatch(lobbyId, nonCreator))
-              .rejects.toThrow('Only the lobby creator can perform this action');
+              .rejects.toThrow('Only the lobby creator can start the match');
         });
     });
 
@@ -354,7 +354,7 @@ describe('LobbyService', () => {
             mockLobbyRepo.findById.mockResolvedValue(lobby);
 
             await expect(lobbyService.kickPlayer(lobbyId, nonCreator, playerToKick))
-              .rejects.toThrow('Only the lobby creator can perform this action');
+              .rejects.toThrow('Only the lobby creator can kick players');
         });
 
         it('should throw if trying to kick creator', async () => {

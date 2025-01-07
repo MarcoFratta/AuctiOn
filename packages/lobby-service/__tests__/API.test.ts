@@ -1,14 +1,14 @@
-import request from 'supertest';
-import axios from 'axios';
-import app from '../src/App';
-import { config } from '../src/configs/config';
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import { closeLocalMongoConnection, localMongoConnection } from './common';
-import { Lobby, LobbyConfig, PlayerStatus } from '../src/schemas/Lobby';
-import { User } from '../src/schemas/User';
-import { ServiceUnavailableError, UnauthorizedError } from '../src/errors/LobbyErrors';
-import { UserLobbyModel } from '../src/models/UserLobbyModel';
-import { LobbyModel } from '../src/models/LobbyModel';
+import request from 'supertest'
+import axios from 'axios'
+import app from '../src/App'
+import { config } from '../src/configs/config'
+import { MongoMemoryServer } from 'mongodb-memory-server'
+import { closeLocalMongoConnection, localMongoConnection } from './common'
+import { Lobby, LobbyConfig, PlayerStatus } from '../src/schemas/Lobby'
+import { User } from '../src/schemas/User'
+import { ServiceUnavailableError, UserNotAuthenticatedError } from '../src/errors/LobbyErrors'
+import { UserLobbyModel } from '../src/models/UserLobbyModel'
+import { LobbyModel } from '../src/models/LobbyModel'
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -95,7 +95,7 @@ describe('Lobby Service Integration Tests with Auth Service Mock', () => {
     });
 
     it('should return 401 if token is invalid', async () => {
-      mockedAxios.post.mockRejectedValueOnce(new UnauthorizedError());
+      mockedAxios.post.mockRejectedValueOnce(new UserNotAuthenticatedError())
 
       const response = await request(app)
         .post('/lobby/create')
@@ -136,7 +136,7 @@ describe('Lobby Service Integration Tests with Auth Service Mock', () => {
         .set('Authorization', validToken)
         .send();
       expect(response.status).toBe(404);
-      expect(response.body).toHaveProperty('error', 'Lobby Not Found');
+      expect(response.body).toHaveProperty('error', 'Not Found')
       expect(response.body).toHaveProperty('message');
     });
   });
@@ -190,10 +190,10 @@ describe('Lobby Service Integration Tests with Auth Service Mock', () => {
         .send();
 
       expect(response.status).toBe(403);
-      expect(response.body).toHaveProperty('error', 'Unauthorized');
+      expect(response.body).toHaveProperty('error', 'Forbidden')
       expect(response.body).toHaveProperty(
         'message',
-        'Only the lobby ' + 'creator can perform this action',
+        'Only the lobby ' + 'creator can start the match',
       );
     });
   });

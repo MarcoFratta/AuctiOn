@@ -1,10 +1,10 @@
-import { ActiveLobbyMiddleware } from '../src/middlewares/ActiveLobbyMiddleware';
-import { UserLobbyRepo } from '../src/repositories/UserLobbyRepo';
-import { Response } from 'express';
-import { AuthenticatedRequest } from '../src/middlewares/AuthMiddleware';
-import { UnauthorizedError, UserAlreadyInLobby, UserNotInActiveLobby } from '../src/errors/LobbyErrors';
-import { mock, MockProxy } from 'jest-mock-extended';
-import { UserLobby } from '../src/schemas/UserLobby';
+import { ActiveLobbyMiddleware } from '../src/middlewares/ActiveLobbyMiddleware'
+import { UserLobbyRepo } from '../src/repositories/UserLobbyRepo'
+import { Response } from 'express'
+import { AuthenticatedRequest } from '../src/middlewares/AuthMiddleware'
+import { UserAlreadyInLobby, UserNotAuthenticatedError, UserNotInActiveLobby } from '../src/errors/LobbyErrors'
+import { mock, MockProxy } from 'jest-mock-extended'
+import { UserLobby } from '../src/schemas/UserLobby'
 
 describe('ActiveLobbyMiddleware', () => {
   let mockUserLobbyRepo: MockProxy<UserLobbyRepo>;
@@ -27,7 +27,7 @@ describe('ActiveLobbyMiddleware', () => {
 
       await middleware.checkNoActiveLobby(mockRequest, mockResponse, mockNext);
 
-      expect(mockNext).toHaveBeenCalledWith(expect.any(UnauthorizedError));
+      expect(mockNext).toHaveBeenCalledWith(expect.any(UserNotAuthenticatedError))
     });
 
     it('should throw UserAlreadyInLobby if user has active lobby', async () => {

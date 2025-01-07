@@ -1,19 +1,19 @@
 // lobbyServiceErrorHandling.test.ts
-import { LobbyServiceImpl } from '../src/services/LobbyServiceImpl';
-import { Lobby } from '../src/schemas/Lobby';
-import { MongoLobbyRepo } from '../src/repositories/MongoLobbyRepo';
-import { UserLobbyRepo } from '../src/repositories/UserLobbyRepo';
-import { mock, MockProxy } from 'jest-mock-extended';
+import { LobbyServiceImpl } from '../src/services/LobbyServiceImpl'
+import { Lobby } from '../src/schemas/Lobby'
+import { MongoLobbyRepo } from '../src/repositories/MongoLobbyRepo'
+import { UserLobbyRepo } from '../src/repositories/UserLobbyRepo'
+import { mock, MockProxy } from 'jest-mock-extended'
 import {
+  ForbiddenError,
   LobbyFullError,
   LobbyNotFoundError,
   MatchAlreadyInProgressError,
   NotEnoughPlayersError,
   PlayerNotFoundError,
   PlayersNotReadyError,
-  UnauthorizedError,
   UserAlreadyJoined,
-} from '../src/errors/LobbyErrors';
+} from '../src/errors/LobbyErrors'
 
 describe('LobbyService Error Handling', () => {
   let mockLobbyRepo: MockProxy<MongoLobbyRepo>;
@@ -191,6 +191,6 @@ describe('LobbyService Error Handling', () => {
 
     await expect(
       lobbyService.kickPlayer('1', 'user3', 'user2'),
-    ).rejects.toThrow(UnauthorizedError);
+    ).rejects.toThrow(new ForbiddenError('Only the lobby creator can kick players'));
   });
 });
