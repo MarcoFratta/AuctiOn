@@ -1,74 +1,50 @@
 import express from 'express';
-import {
-  validateRequestBody,
-  validateRequestParams,
-} from '../middlewares/ValidationMiddleware';
-import {
-  lobbyConfigSchema,
-  lobbyId,
-  playerStatusSchema,
-} from '../schemas/Lobby';
+import { validateRequestBody, validateRequestParams } from '../middlewares/ValidationMiddleware';
+import { lobbyConfigSchema, lobbyIdSchema, playerStatusSchema } from '../schemas/Lobby';
 import { LobbyController } from '../controllers/LobbyController';
-import {
-  ErrorLoggerMiddleware,
-  GenericErrorMiddleware,
-  LobbyErrorMiddleware,
-} from '../middlewares/ErrorsMiddleware';
+import { ErrorLoggerMiddleware, GenericErrorMiddleware, LobbyErrorMiddleware } from '../middlewares/ErrorsMiddleware';
 import { AuthMiddleware } from '../middlewares/AuthMiddleware';
+import { UserLobbyRepo } from '../repositories/UserLobbyRepo';
+import { ActiveLobbyMiddleware } from '../middlewares/ActiveLobbyMiddleware';
 
-const errorsMiddlewares = [
-  ErrorLoggerMiddleware,
-  LobbyErrorMiddleware,
-  GenericErrorMiddleware,
-];
-export const createLobbyRouter = (
-  controller: LobbyController,
-): express.Router => {
+const errorsMiddlewares = [ErrorLoggerMiddleware, LobbyErrorMiddleware, GenericErrorMiddleware];
+
+const userLobbyRepo = new UserLobbyRepo();
+const activeLobbyMiddleware = new ActiveLobbyMiddleware(userLobbyRepo);
+
+export const createLobbyRouter = (controller: LobbyController): express.Router => {
   const router = express.Router();
   router.use(AuthMiddleware);
   // Routes
   router.post(
     '/create',
+    activeLobbyMiddleware.checkNoActiveLobby,
     validateRequestBody(lobbyConfigSchema),
     controller.createLobby,
-    errorsMiddlewares,
+    errorsMiddlewares
   );
 
   router.post(
-    '/join/:id',
-    validateRequestParams(lobbyId),
+    '/:id/join',
+    activeLobbyMiddleware.checkNoActiveLobby,
+    validateRequestParams(lobbyIdSchema),
     controller.joinLobby,
-    errorsMiddlewares,
+    errorsMiddlewares
   );
 
   router.put(
-    '/status/:id',
-    validateRequestParams(lobbyId),
+    '/status',
+    activeLobbyMiddleware.attachActiveLobby,
     validateRequestBody(playerStatusSchema),
     controller.setStatus,
-    errorsMiddlewares,
+    errorsMiddlewares
   );
 
-  router.post(
-    '/leave/:id',
-    validateRequestParams(lobbyId),
-    controller.leaveLobby,
-    errorsMiddlewares,
-  );
+  router.post('/leave', activeLobbyMiddleware.attachActiveLobby, controller.leaveLobby, errorsMiddlewares);
 
-  router.post(
-    '/kick/:id',
-    validateRequestParams(lobbyId),
-    controller.kickPlayer,
-    errorsMiddlewares,
-  );
+  router.post('/kick/:userId', activeLobbyMiddleware.attachActiveLobby, controller.kickPlayer, errorsMiddlewares);
 
-  router.post(
-    '/start/:id',
-    validateRequestParams(lobbyId),
-    controller.startMatch,
-    errorsMiddlewares,
-  );
+  router.post('/start', activeLobbyMiddleware.attachActiveLobby, controller.startMatch, errorsMiddlewares);
 
   return router;
 };

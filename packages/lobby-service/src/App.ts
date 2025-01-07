@@ -6,6 +6,7 @@ import { LobbyServiceImpl } from './services/LobbyServiceImpl';
 import { LobbyController } from './controllers/LobbyController';
 import { createLobbyRouter } from './routes/LobbyRoutes';
 import { MongoLobbyRepo } from './repositories/MongoLobbyRepo';
+import { UserLobbyRepo } from './repositories/UserLobbyRepo';
 
 const app = express();
 
@@ -20,11 +21,12 @@ if (fs.existsSync(swaggerPath)) {
       // customCssUrl: path.join(__dirname, "..", "css", "swaggerTheme.css"),
       // customfavIcon: path.join(__dirname, "..", "public", "logo.css"),
       customSiteTitle: 'Lobby Service API Documentation',
-    }),
+    })
   );
 }
 const repo = new MongoLobbyRepo();
-const service = new LobbyServiceImpl(repo);
+const userLobbyRepo = new UserLobbyRepo();
+const service = new LobbyServiceImpl(repo, userLobbyRepo);
 const controller = new LobbyController(service);
 
 // Use the router

@@ -63,3 +63,16 @@ export class ServiceUnavailableError extends Error {
     super('Service not available');
   }
 }
+
+export class UserAlreadyInLobby extends Error {
+  constructor(lobbyId: string) {
+    super(`User is already in lobby ${lobbyId}`);
+    this.name = 'UserAlreadyInLobby';
+  }
+}
+
+export class UserNotInActiveLobby extends Error {
+  constructor() {
+    super('User has not joined any lobby');
+  }
+}

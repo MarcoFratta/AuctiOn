@@ -1,8 +1,9 @@
 import { Lobby } from '../schemas/Lobby';
 import { LobbyRepository } from './LobbyRepository';
 import { LobbyModel } from '../models/LobbyModel';
-import { reverseLobbyConverter } from '../utils/Converters';
+import { reverseLobbyConverter } from '../converters/LobbyConverters';
 import logger from '../utils/Logger';
+import { LobbyNotFoundError } from '../errors/LobbyErrors';
 
 export class MongoLobbyRepo implements LobbyRepository {
   private readonly rev = reverseLobbyConverter;
@@ -18,14 +19,12 @@ export class MongoLobbyRepo implements LobbyRepository {
     }
   }
 
-  async delete(id: string): Promise<boolean> {
-    try {
-      const res = await LobbyModel.findByIdAndDelete(id);
-      return !!res;
-    } catch (error) {
-      logger.error(error);
-      throw new Error('An error occurred while deleting the lobby');
+  async delete(id: string): Promise<Lobby> {
+    const res = await LobbyModel.findByIdAndDelete(id);
+    if (!res) {
+      throw new LobbyNotFoundError(id);
     }
+    return this.rev.convert(res.toObject());
   }
 
   async findById(id: string): Promise<Lobby | null> {
@@ -40,11 +39,7 @@ export class MongoLobbyRepo implements LobbyRepository {
 
   async update(id: string, lobby: Partial<Lobby>): Promise<Lobby | null> {
     try {
-      const updatedLobby = await LobbyModel.findByIdAndUpdate(
-        id,
-        { $set: lobby },
-        { new: true },
-      );
+      const updatedLobby = await LobbyModel.findByIdAndUpdate(id, { $set: lobby }, { new: true });
       return updatedLobby ? this.rev.convert(updatedLobby.toObject()) : null;
     } catch (error) {
       logger.error(error);

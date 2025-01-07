@@ -7,6 +7,8 @@ import { closeLocalMongoConnection, localMongoConnection } from './common';
 import { Lobby, LobbyConfig, PlayerStatus } from '../src/schemas/Lobby';
 import { User } from '../src/schemas/User';
 import { ServiceUnavailableError, UnauthorizedError } from '../src/errors/LobbyErrors';
+import { UserLobbyModel } from '../src/models/UserLobbyModel';
+import { LobbyModel } from '../src/models/LobbyModel';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -33,7 +35,7 @@ async function joinUser(
   },
 ) {
   actAs(u);
-  return await request(app).post(`/lobby/join/${lobby.id}`).set('Authorization', validToken);
+  return await request(app).post(`/lobby/${lobby.id}/join`).set('Authorization', validToken);
 }
 
 function actAs(u: User) {
@@ -43,7 +45,7 @@ function actAs(u: User) {
 async function setPlayerStatus(lobby: Lobby, u: User, status: PlayerStatus) {
   actAs(u);
   return await request(app)
-    .put(`/lobby/status/${lobby.id}`)
+    .put(`/lobby/status`)
     .set('Authorization', validToken)
     .send({ status });
 }
@@ -53,6 +55,12 @@ describe('Lobby Service Integration Tests with Auth Service Mock', () => {
 
   beforeAll(async () => {
     mongoServer = await localMongoConnection();
+  });
+
+  beforeEach(async () => {
+    await LobbyModel.deleteMany({});
+    await UserLobbyModel.deleteMany({});
+    jest.clearAllMocks();
   });
 
   afterAll(async () => {
@@ -121,10 +129,10 @@ describe('Lobby Service Integration Tests with Auth Service Mock', () => {
         token: validToken.split(' ')[1],
       });
     });
-    it('should return 400 if the lobby does not exist', async () => {
+    it('should return 404 if the lobby does not exist', async () => {
       actAs(user);
       const response = await request(app)
-        .post('/lobby/join/123456789012345678901234')
+        .post('/lobby/123456789012345678901234/join')
         .set('Authorization', validToken)
         .send();
       expect(response.status).toBe(404);
@@ -157,7 +165,7 @@ describe('Lobby Service Integration Tests with Auth Service Mock', () => {
       await setPlayerStatus(lobby, newUser, 'ready');
       actAs(user);
       const response = await request(app)
-        .post(`/lobby/start/${lobby.id} `)
+        .post(`/lobby/start`)
         .set('Authorization', validToken)
         .send();
 
@@ -173,9 +181,11 @@ describe('Lobby Service Integration Tests with Auth Service Mock', () => {
 
     it('should return 403 if user is not the creator', async () => {
       const lobby = (await createLobby(user)).body.lobby;
-      actAs({ id: 'newUser', email: 'new@user.com', name: 'newUserName' });
+      const newUser = { id: 'newUser', email: 'new@user.com', name: 'newUserName' };
+      await joinUser(lobby, newUser);
+      actAs(newUser);
       const response = await request(app)
-        .post(`/lobby/start/${lobby.id} `)
+        .post(`/lobby/start/`)
         .set('Authorization', validToken)
         .send();
 
@@ -198,7 +208,7 @@ describe('Lobby Service Integration Tests with Auth Service Mock', () => {
       await joinUser(lobby, newUser);
       actAs(newUser);
       const response = await request(app)
-        .post(`/lobby/leave/${lobby.id}`)
+        .post(`/lobby/leave/`)
         .set('Authorization', validToken)
         .send();
       expect(response.status).toBe(200);
@@ -209,7 +219,7 @@ describe('Lobby Service Integration Tests with Auth Service Mock', () => {
       const lobby = (await createLobby(user)).body.lobby;
       actAs(user);
       const response = await request(app)
-        .post(`/lobby/leave/${lobby.id}`)
+        .post(`/lobby/leave/`)
         .set('Authorization', validToken)
         .send();
       expect(response.status).toBe(204);

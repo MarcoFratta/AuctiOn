@@ -7,22 +7,21 @@ import { AuthenticatedRequest } from '../src/middlewares/AuthMiddleware';
 import { UserAlreadyJoined } from '../src/errors/LobbyErrors';
 
 // Mocking LobbyService
-const mockLobbyService = mock<LobbyServiceImpl>()
-const lobbyController = new LobbyController(mockLobbyService)
+const mockLobbyService = mock<LobbyServiceImpl>();
+const lobbyController = new LobbyController(mockLobbyService);
 
 // Mocking Express request, response, and next function
-const mockRequest: MockProxy<AuthenticatedRequest> =
-  mock<AuthenticatedRequest>();
-const mockResponse = mock<Response>()
-const mockNext = jest.fn()
+const mockRequest: MockProxy<AuthenticatedRequest> = mock<AuthenticatedRequest>();
+const mockResponse = mock<Response>();
+const mockNext = jest.fn();
 
 beforeEach(() => {
-    mockReset(mockLobbyService)
-    mockReset(mockRequest)
-    mockReset(mockResponse)
-    mockReset(mockNext)
-    mockRequest.user = { id: 'creatorId', name: 'name', email: 'email' }
-})
+  mockReset(mockLobbyService);
+  mockReset(mockRequest);
+  mockReset(mockResponse);
+  mockReset(mockNext);
+  mockRequest.user = { id: 'creatorId', name: 'name', email: 'email' };
+});
 
 describe('LobbyController', () => {
     describe('createLobby', () => {
@@ -89,7 +88,7 @@ describe('LobbyController', () => {
 
     describe('leaveLobby', () => {
         it('should allow a user to leave a lobby and return the updated lobby', async () => {
-            const id = '123456789012345678901234'
+          const id = '123456789012345678901234';
             const updatedLobby: Lobby = {
                 id,
                 creator: 'creatorId',
@@ -97,56 +96,37 @@ describe('LobbyController', () => {
                 maxPlayers: 10,
                 rounds: 5,
                 status: 'waiting',
-            }
+            };
 
-            mockRequest.params = { id }
-            mockLobbyService.leaveLobby.mockResolvedValue(updatedLobby)
-            mockResponse.status.mockReturnThis()
-            mockResponse.json.mockReturnThis()
+          mockRequest.activeLobbyId = id;
+          mockLobbyService.leaveLobby.mockResolvedValue(updatedLobby);
+          mockResponse.status.mockReturnThis();
+          mockResponse.json.mockReturnThis();
 
-            await lobbyController.leaveLobby(
-                mockRequest,
-                mockResponse,
-                mockNext,
-            )
+          await lobbyController.leaveLobby(mockRequest, mockResponse, mockNext);
 
-            expect(mockLobbyService.leaveLobby).toHaveBeenCalledWith(
-                id,
-                'creatorId',
-            )
-            expect(mockResponse.status).toHaveBeenCalledWith(200)
+          expect(mockLobbyService.leaveLobby).toHaveBeenCalledWith(id, 'creatorId');
+          expect(mockResponse.status).toHaveBeenCalledWith(200);
             expect(mockResponse.json).toHaveBeenCalledWith({
                 message: anyString(),
                 lobby: updatedLobby,
-            })
-        })
-        it('should delete the lobby and return 204 if the creator leaves', async () => {
-            const id = '123456789012345678901234';
-            mockRequest.params = { id };
-            mockLobbyService.leaveLobby.mockResolvedValue(null);
-            mockResponse.status.mockReturnThis();
-            mockResponse.send.mockReturnThis();
-
-            await lobbyController.leaveLobby(
-              mockRequest,
-              mockResponse,
-              mockNext,
-            );
-
-            expect(mockLobbyService.leaveLobby).toHaveBeenCalledWith(
-              id,
-              'creatorId',
-            );
-            expect(mockResponse.status).toHaveBeenCalledWith(204);
-            expect(mockResponse.send).toHaveBeenCalled();
+            });
         });
-    })
+
+      it('should throw if user has no active lobby', async () => {
+        mockRequest.activeLobbyId = undefined;
+
+        await lobbyController.leaveLobby(mockRequest, mockResponse, mockNext);
+
+        expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
+        });
+    });
 
     describe('kickPlayer', () => {
         it('should allow a creator to kick a player and return the updated lobby', async () => {
-            const id = '123456789012345678901234'
-            const creator = 'creatorId'
-            const playerId = 'playerId'
+          const id = '123456789012345678901234';
+          const creator = 'creatorId';
+          const playerId = 'playerId';
             const updatedLobby: Lobby = {
                 id,
                 creator,
@@ -154,37 +134,29 @@ describe('LobbyController', () => {
                 maxPlayers: 10,
                 rounds: 5,
                 status: 'waiting',
-            }
+            };
 
-            mockRequest.params = { id }
-            mockRequest.body = { playerId }
-            mockLobbyService.kickPlayer.mockResolvedValue(updatedLobby)
-            mockResponse.status.mockReturnThis()
-            mockResponse.json.mockReturnThis()
+          mockRequest.activeLobbyId = id;
+          mockRequest.body = { playerId };
+          mockLobbyService.kickPlayer.mockResolvedValue(updatedLobby);
+          mockResponse.status.mockReturnThis();
+          mockResponse.json.mockReturnThis();
 
-            await lobbyController.kickPlayer(
-                mockRequest,
-                mockResponse,
-                mockNext,
-            )
+          await lobbyController.kickPlayer(mockRequest, mockResponse, mockNext);
 
-            expect(mockLobbyService.kickPlayer).toHaveBeenCalledWith(
-                id,
-                creator,
-                playerId,
-            )
-            expect(mockResponse.status).toHaveBeenCalledWith(200)
+          expect(mockLobbyService.kickPlayer).toHaveBeenCalledWith(id, creator, playerId);
+          expect(mockResponse.status).toHaveBeenCalledWith(200);
             expect(mockResponse.json).toHaveBeenCalledWith({
                 message: anyString(),
                 lobby: updatedLobby,
-            })
-        })
-    })
+            });
+        });
+    });
 
     describe('setStatus', () => {
       it('should set a player\'s status and return the updated lobby', async () => {
-            const id = '123456789012345678901234'
-            const status = 'ready'
+        const id = '123456789012345678901234';
+        const status = 'ready';
             const updatedLobby: Lobby = {
                 id,
                 creator: 'creatorId',
@@ -192,33 +164,29 @@ describe('LobbyController', () => {
                 maxPlayers: 10,
                 rounds: 5,
                 status: 'waiting',
-            }
+            };
 
-            mockRequest.params = { id }
-            mockRequest.body = { status }
-            mockLobbyService.setStatus.mockResolvedValue(updatedLobby)
-            mockResponse.status.mockReturnThis()
-            mockResponse.json.mockReturnThis()
+        mockRequest.activeLobbyId = id;
+        mockRequest.body = { status };
+        mockLobbyService.setStatus.mockResolvedValue(updatedLobby);
+        mockResponse.status.mockReturnThis();
+        mockResponse.json.mockReturnThis();
 
-            await lobbyController.setStatus(mockRequest, mockResponse, mockNext)
+        await lobbyController.setStatus(mockRequest, mockResponse, mockNext);
 
-            expect(mockLobbyService.setStatus).toHaveBeenCalledWith(
-                id,
-                'creatorId',
-                status,
-            )
-            expect(mockResponse.status).toHaveBeenCalledWith(200)
+        expect(mockLobbyService.setStatus).toHaveBeenCalledWith(id, 'creatorId', status);
+        expect(mockResponse.status).toHaveBeenCalledWith(200);
             expect(mockResponse.json).toHaveBeenCalledWith({
                 message: anyString(),
                 lobby: updatedLobby,
-            })
-        })
-    })
+            });
+      });
+    });
 
     describe('startMatch', () => {
         it('should start a match and return the updated lobby', async () => {
-            const id = '123456789012345678901234'
-            const creator = 'creatorId'
+          const id = '123456789012345678901234';
+          const creator = 'creatorId';
             const updatedLobby: Lobby = {
                 id,
                 creator,
@@ -226,30 +194,24 @@ describe('LobbyController', () => {
                 maxPlayers: 10,
                 rounds: 5,
                 status: 'in-progress',
-            }
+            };
 
-            mockRequest.params = { id }
-            mockLobbyService.startMatch.mockResolvedValue(updatedLobby)
-            mockResponse.status.mockReturnThis()
-            mockResponse.json.mockReturnThis()
+          mockRequest.activeLobbyId = id;
+          mockLobbyService.startMatch.mockResolvedValue(updatedLobby);
+          mockResponse.status.mockReturnThis();
+          mockResponse.json.mockReturnThis();
 
-            await lobbyController.startMatch(
-                mockRequest,
-                mockResponse,
-                mockNext,
-            )
+          await lobbyController.startMatch(mockRequest, mockResponse, mockNext);
 
-            expect(mockLobbyService.startMatch).toHaveBeenCalledWith(
-                id,
-                creator,
-            )
-            expect(mockResponse.status).toHaveBeenCalledWith(200)
+          expect(mockLobbyService.startMatch).toHaveBeenCalledWith(id, creator);
+          expect(mockResponse.status).toHaveBeenCalledWith(200);
             expect(mockResponse.json).toHaveBeenCalledWith({
                 message: anyString(),
                 lobby: updatedLobby,
-            })
-        })
-    })
+            });
+        });
+    });
+
     it('should throw if the user is not authenticated', () => {
         mockRequest.user = undefined
         lobbyController.createLobby(mockRequest, mockResponse, mockNext)

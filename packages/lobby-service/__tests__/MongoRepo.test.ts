@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import { MongoLobbyRepo } from '../src/repositories/MongoLobbyRepo';
 import { LobbyModel } from '../src/models/LobbyModel';
 import { Lobby } from '../src/schemas/Lobby';
+import { LobbyNotFoundError } from '../src/errors/LobbyErrors';
 
 let mongoServer: MongoMemoryServer;
 let repo: MongoLobbyRepo
@@ -41,32 +42,29 @@ describe('MongoLobbyRepo', () => {
     })
 
     test('should delete a lobby by ID', async () => {
-        const lobby = new LobbyModel({
-            id: 'lobby-to-delete',
+        const lobby = await LobbyModel.create({
             creator: 'creator2',
             players: [],
             maxPlayers: 4,
             rounds: 5,
             status: 'waiting',
-        })
-        await lobby.save()
+        });
 
-        const result = await repo.delete(lobby.id)
-        expect(result).toBe(true)
+        const result = await repo.delete(lobby.id);
 
-        const deletedLobby = await LobbyModel.findById(lobby.id)
-        expect(deletedLobby).toBeNull()
-    })
+        expect(result).toBeTruthy();
+        const deletedLobby = await LobbyModel.findById(lobby.id);
+        expect(deletedLobby).toBeNull();
+    });
+
+    test('should throw when deleting a non existent lobby', async () => {
+        const result = repo.delete('123456789012345678901234');
+        await expect(result).rejects.toThrow(LobbyNotFoundError);
+    });
 
     test('should throw error when deleting a lobby with invalid id', async () => {
-        const result = repo.delete('non-existent-id')
-        await expect(result).rejects.toThrow()
-    })
-
-    test('should return false when deleting a non existent lobby', async () => {
-        const result = await repo.delete('123456789012345678901234')
-        expect(result).toBe(false)
-    })
+        await expect(repo.delete('invalid-id')).rejects.toThrow();
+    });
 
     test('should find a lobby by ID', async () => {
         const lobby = new LobbyModel({
