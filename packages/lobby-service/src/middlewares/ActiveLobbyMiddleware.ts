@@ -1,44 +1,44 @@
-import { NextFunction, Response } from 'express';
-import { UserLobbyRepo } from '../repositories/UserLobbyRepo';
-import { UnauthorizedError, UserAlreadyInLobby, UserNotInActiveLobby } from '../errors/LobbyErrors';
-import { AuthenticatedRequest } from './AuthMiddleware';
+import { NextFunction, Response } from 'express'
+import { UserLobbyRepo } from '../repositories/UserLobbyRepo'
+import { UserAlreadyInLobby, UserNotAuthenticatedError, UserNotInActiveLobby } from '../errors/LobbyErrors'
+import { AuthenticatedRequest } from './AuthMiddleware'
 
 export class ActiveLobbyMiddleware {
   constructor(private userLobbyRepo: UserLobbyRepo) {}
 
   checkNoActiveLobby = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
-      const userId = req.user?.id;
+      const userId = req.user?.id
       if (!userId) {
-        throw new UnauthorizedError();
+        throw new UserNotAuthenticatedError()
       }
 
-      const activeLobby = await this.userLobbyRepo.getUserActiveLobby(userId);
+      const activeLobby = await this.userLobbyRepo.getUserActiveLobby(userId)
       if (activeLobby) {
-        throw new UserAlreadyInLobby(activeLobby.lobbyId);
+        throw new UserAlreadyInLobby(activeLobby.lobbyId)
       }
-      next();
+      next()
     } catch (error) {
-      next(error);
+      next(error)
     }
-  };
+  }
 
   attachActiveLobby = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
-      const userId = req.user?.id;
+      const userId = req.user?.id
       if (!userId) {
-        return next(UnauthorizedError);
+        throw new UserNotAuthenticatedError()
       }
 
-      const activeLobby = await this.userLobbyRepo.getUserActiveLobby(userId);
+      const activeLobby = await this.userLobbyRepo.getUserActiveLobby(userId)
       if (activeLobby) {
-        req.activeLobbyId = activeLobby.lobbyId;
+        req.activeLobbyId = activeLobby.lobbyId
       } else {
-        throw new UserNotInActiveLobby();
+        throw new UserNotInActiveLobby()
       }
-      next();
+      next()
     } catch (error) {
-      next(error);
+      next(error)
     }
-  };
+  }
 }

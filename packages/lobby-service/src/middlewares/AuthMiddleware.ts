@@ -1,63 +1,45 @@
-import { NextFunction, Request, Response } from 'express';
-import axios from 'axios';
-import { validateSchema } from '../utils/Validator';
-import { userSchema } from '../schemas/User';
-import logger from '../utils/Logger';
-import { config } from '../configs/config';
-import { ServiceUnavailableError, UnauthorizedError } from '../errors/LobbyErrors';
+import { NextFunction, Request, Response } from 'express'
+import axios from 'axios'
+import { validateSchema } from '../utils/Validator'
+import { userSchema } from '../schemas/User'
+import logger from '../utils/Logger'
+import { config } from '../configs/config'
+import { ServiceUnavailableError, UserNotAuthenticatedError } from '../errors/LobbyErrors'
 
-const AUTH_SERVICE_URL = config.authServiceUri;
+const AUTH_SERVICE_URL = config.authServiceUri
 
 export interface AuthenticatedRequest extends Request {
   user?: {
-    id: string;
-    name: string;
-    email: string;
-  };
-  activeLobbyId?: string;
+    id: string
+    name: string
+    email: string
+  }
+  activeLobbyId?: string
 }
 
 export const AuthMiddleware = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const token = req.headers.authorization?.split(' ')[1]; // Extract the Bearer token from Authorization header
-
+    const token = req.headers.authorization?.split(' ')[1] // Extract the Bearer token from Authorization header
     if (!token) {
-      res.status(401).json({
-        error: 'Unauthorized',
-      });
-      return;
+      return next(new UserNotAuthenticatedError())
     }
-
     // Validate the token using the Auth service
-    const { data: response } = await axios.post(AUTH_SERVICE_URL + '/validate', { token: token });
-    logger.info('Validation response:', response);
-    // Extract user info from the auth service response
+    const { data: response } = await axios.post(AUTH_SERVICE_URL + '/validate', { token: token })
+    if (!response) {
+      return next(new UserNotAuthenticatedError())
+    }
     // Add user information to the request object
-    req.user = validateSchema(userSchema, response.user);
-    next();
+    req.user = validateSchema(userSchema, response.user)
+    logger.info('User authenticated:', response.user.id)
+    next()
   } catch (error) {
-    logger.error(error);
+    logger.error('AuthMiddleware error ', error)
     if (axios.isAxiosError(error)) {
       if (error.response?.status === 400) {
-        res.status(401).json({
-          error: 'Unauthorized',
-        });
-        return;
+        return next(new UserNotAuthenticatedError())
       }
+      return next(new ServiceUnavailableError())
     }
-    if (error instanceof ServiceUnavailableError) {
-      res.status(503).json({
-        error: 'Service Temporary Unavailable',
-        message: 'Service is not responding',
-      });
-      return;
-    }
-    if (error instanceof UnauthorizedError) {
-      res.status(401).json({
-        error: 'Unauthorized',
-      });
-      return;
-    }
-    next(error);
+    return next(error)
   }
-};
+}
