@@ -6,7 +6,6 @@ import { MongoMemoryServer } from 'mongodb-memory-server'
 import { closeLocalMongoConnection, localMongoConnection } from './common'
 import { Lobby, LobbyConfig, PlayerStatus } from '../src/schemas/Lobby'
 import { User } from '../src/schemas/User'
-import { ServiceUnavailableError, UserNotAuthenticatedError } from '../src/errors/LobbyErrors'
 import { UserLobbyModel } from '../src/models/UserLobbyModel'
 import { LobbyModel } from '../src/models/LobbyModel'
 
@@ -22,8 +21,9 @@ const user = {
 };
 
 async function createLobby(u: User, config: Partial<LobbyConfig> = { rounds: 3, maxPlayers: 4 }) {
-  actAs(u);
-  return await request(app).post('/lobby/create').set('Authorization', validToken).send(config);
+  return await request(app).post('/lobby/create')
+    .set('Authorization', validToken)
+    .send({ user: u, ...config })
 }
 
 async function joinUser(
@@ -34,20 +34,16 @@ async function joinUser(
     name: 'newUser',
   },
 ) {
-  actAs(u);
-  return await request(app).post(`/lobby/${lobby.id}/join`).set('Authorization', validToken);
+  return await request(app).post(`/lobby/${lobby.id}/join`)
+    .set('Authorization', validToken)
+    .send({ user: u })
 }
 
-function actAs(u: User) {
-  mockedAxios.post.mockResolvedValueOnce({ data: { user: u } });
-}
-
-async function setPlayerStatus(lobby: Lobby, u: User, status: PlayerStatus) {
-  actAs(u);
+async function setPlayerStatus(u: User, status: PlayerStatus) {
   return await request(app)
     .put(`/lobby/status`)
     .set('Authorization', validToken)
-    .send({ status });
+    .send({ user: u, status });
 }
 
 describe('Lobby Service Integration Tests with Auth Service Mock', () => {
@@ -79,8 +75,8 @@ describe('Lobby Service Integration Tests with Auth Service Mock', () => {
 
       console.log(response.body);
       expect(response.status).toBe(201);
-      expect(response.body).toHaveProperty('message', 'Lobby created successfully'),
-        expect(response.body).toHaveProperty('lobby');
+      expect(response.body).toHaveProperty('message', 'Lobby created successfully')
+      expect(response.body).toHaveProperty('lobby')
       expect(response.body.lobby).toHaveProperty('id');
       expect(response.body.lobby).toHaveProperty('maxPlayers', 4);
       expect(response.body.lobby).toHaveProperty('rounds', 3);
@@ -88,14 +84,10 @@ describe('Lobby Service Integration Tests with Auth Service Mock', () => {
       expect(response.body.lobby).toHaveProperty('status', 'waiting');
       expect(response.body.lobby.players.map((x: { userId: string }) => x.userId)).toContain(
         user.id,
-      ),
-        expect(mockedAxios.post).toHaveBeenCalledWith(`${authServiceUrl}/validate`, {
-        token: validToken.split(' ')[1],
-      });
+      );
     });
 
     it('should return 401 if token is invalid', async () => {
-      mockedAxios.post.mockRejectedValueOnce(new UserNotAuthenticatedError())
 
       const response = await request(app)
         .post('/lobby/create')
@@ -103,7 +95,6 @@ describe('Lobby Service Integration Tests with Auth Service Mock', () => {
         .send({ name: 'Test Lobby', maxPlayers: 4 });
 
       expect(response.status).toBe(401);
-      expect(mockedAxios.post).toHaveBeenCalled();
     });
   });
 
@@ -124,17 +115,12 @@ describe('Lobby Service Integration Tests with Auth Service Mock', () => {
       expect(response.body.lobby.players.map((x: { userId: string }) => x.userId)).toContain(
         user.id,
       );
-
-      expect(mockedAxios.post).toHaveBeenCalledWith(`${authServiceUrl}/validate`, {
-        token: validToken.split(' ')[1],
-      });
     });
     it('should return 404 if the lobby does not exist', async () => {
-      actAs(user);
       const response = await request(app)
         .post('/lobby/123456789012345678901234/join')
         .set('Authorization', validToken)
-        .send();
+        .send({ user: user });
       expect(response.status).toBe(404);
       expect(response.body).toHaveProperty('error', 'Not Found')
       expect(response.body).toHaveProperty('message');
@@ -143,7 +129,7 @@ describe('Lobby Service Integration Tests with Auth Service Mock', () => {
   describe('PUT /lobby/status', () => {
     it('should update the player status', async () => {
       const lobby = (await createLobby(user)).body.lobby;
-      const response = await setPlayerStatus(lobby, user, 'ready');
+      const response = await setPlayerStatus(user, 'ready')
 
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('message', 'Player status updated');
@@ -161,33 +147,28 @@ describe('Lobby Service Integration Tests with Auth Service Mock', () => {
         name: 'user',
       };
       await joinUser(lobby, newUser);
-      await setPlayerStatus(lobby, user, 'ready');
-      await setPlayerStatus(lobby, newUser, 'ready');
-      actAs(user);
+      await setPlayerStatus(user, 'ready')
+      await setPlayerStatus(newUser, 'ready')
+
       const response = await request(app)
         .post(`/lobby/start`)
         .set('Authorization', validToken)
-        .send();
+        .send({ user: user });
 
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('message', 'Match started');
       expect(response.body).toHaveProperty('lobby');
       expect(response.body.lobby).toHaveProperty('status', 'in-progress');
-
-      expect(mockedAxios.post).toHaveBeenCalledWith(`${authServiceUrl}/validate`, {
-        token: validToken.split(' ')[1],
-      });
     });
 
     it('should return 403 if user is not the creator', async () => {
       const lobby = (await createLobby(user)).body.lobby;
       const newUser = { id: 'newUser', email: 'new@user.com', name: 'newUserName' };
       await joinUser(lobby, newUser);
-      actAs(newUser);
       const response = await request(app)
         .post(`/lobby/start/`)
         .set('Authorization', validToken)
-        .send();
+        .send({ user: newUser });
 
       expect(response.status).toBe(403);
       expect(response.body).toHaveProperty('error', 'Forbidden')
@@ -206,41 +187,22 @@ describe('Lobby Service Integration Tests with Auth Service Mock', () => {
         name: 'newUserName',
       };
       await joinUser(lobby, newUser);
-      actAs(newUser);
+
       const response = await request(app)
         .post(`/lobby/leave/`)
         .set('Authorization', validToken)
-        .send();
+        .send({ user: newUser });
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('message', 'Successfully left the lobby');
       expect(response.body).toHaveProperty('lobby');
     });
     it('should delete the lobby if the creator leaves', async () => {
       const lobby = (await createLobby(user)).body.lobby;
-      actAs(user);
       const response = await request(app)
         .post(`/lobby/leave/`)
         .set('Authorization', validToken)
-        .send();
+        .send({ user: user });
       expect(response.status).toBe(204);
-    });
-  });
-
-  describe('Error Handling', () => {
-    it('should handle errors gracefully when Auth Service fails', async () => {
-      mockedAxios.post.mockRejectedValueOnce(new ServiceUnavailableError());
-
-      const response = await request(app)
-        .post('/lobby/create')
-        .set('Authorization', validToken)
-        .send({ name: 'Test Lobby', maxPlayers: 4 });
-      console.log(response.body);
-      expect(response.status).toBe(503);
-      expect(response.body).toHaveProperty('error', 'Service Temporary Unavailable');
-
-      expect(mockedAxios.post).toHaveBeenCalledWith(`${authServiceUrl}/validate`, {
-        token: validToken.split(' ')[1],
-      });
     });
   });
 });

@@ -1,7 +1,7 @@
 import { ActiveLobbyMiddleware } from '../src/middlewares/ActiveLobbyMiddleware'
 import { UserLobbyRepo } from '../src/repositories/UserLobbyRepo'
 import { Response } from 'express'
-import { AuthenticatedRequest } from '../src/middlewares/AuthMiddleware'
+import { AuthenticatedRequest } from '../src/types/Index'
 import { UserAlreadyInLobby, UserNotAuthenticatedError, UserNotInActiveLobby } from '../src/errors/LobbyErrors'
 import { mock, MockProxy } from 'jest-mock-extended'
 import { UserLobby } from '../src/schemas/UserLobby'

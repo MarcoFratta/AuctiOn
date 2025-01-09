@@ -1,10 +1,10 @@
-import { LobbyController } from '../src/controllers/LobbyController';
-import { LobbyServiceImpl } from '../src/services/LobbyServiceImpl';
-import { Response } from 'express';
-import { anyString, mock, MockProxy, mockReset } from 'jest-mock-extended';
-import { Lobby } from '../src/schemas/Lobby';
-import { AuthenticatedRequest } from '../src/middlewares/AuthMiddleware';
-import { UserAlreadyJoined } from '../src/errors/LobbyErrors';
+import { LobbyController } from '../src/controllers/LobbyController'
+import { LobbyServiceImpl } from '../src/services/LobbyServiceImpl'
+import { Response } from 'express'
+import { anyString, mock, MockProxy, mockReset } from 'jest-mock-extended'
+import { Lobby } from '../src/schemas/Lobby'
+import { AuthenticatedRequest } from '../src/types/Index'
+import { UserAlreadyJoined } from '../src/errors/LobbyErrors'
 
 // Mocking LobbyService
 const mockLobbyService = mock<LobbyServiceImpl>();
