@@ -1,8 +1,8 @@
-// eslint.config.mjs
 import globals from 'globals'
 import pluginJs from '@eslint/js'
 import tseslint from 'typescript-eslint'
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
+import unusedImports from 'eslint-plugin-unused-imports'
 
 
 export default [
@@ -25,8 +25,13 @@ export default [
   ...tseslint.configs.recommended,
   eslintPluginPrettierRecommended,
   {
+    files: ['**/*.{ts}'],
+    plugins: {
+      'unused-imports': unusedImports,
+    },
     rules: {
       eqeqeq: "off",
+      'unused-imports/no-unused-imports': 'error',
       "@typescript-eslint/no-unused-vars": "off",
       "prefer-const": ["error", { ignoreReadBeforeAssign: true }],
     },

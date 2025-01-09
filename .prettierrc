@@ -1,5 +1,18 @@
 {
-  "parser": "typescript",
+  "overrides": [
+    {
+      "files": "*.ts",
+      "options": {
+        "parser": "typescript"
+      }
+    },
+    {
+      "files": "*.json",
+      "options": {
+        "parser": "json"
+      }
+    }
+  ],
   "printWidth": 140,
   "tabWidth": 2,
   "semi": false,
