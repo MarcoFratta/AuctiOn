@@ -3,20 +3,13 @@ import { validateRequestBody, validateRequestParams } from '../middlewares/Valid
 import { lobbyConfigSchema, lobbyIdSchema, playerStatusSchema } from '../schemas/Lobby'
 import { LobbyController } from '../controllers/LobbyController'
 import { ErrorLoggerMiddleware, GenericErrorMiddleware, LobbyErrorMiddleware } from '../middlewares/ErrorsMiddleware'
-import { AuthMiddleware } from '../middlewares/AuthMiddleware'
 import { UserLobbyRepo } from '../repositories/UserLobbyRepo'
 import { ActiveLobbyMiddleware } from '../middlewares/ActiveLobbyMiddleware'
-
-const errorsMiddlewares = [ErrorLoggerMiddleware, LobbyErrorMiddleware, GenericErrorMiddleware]
-
 const userLobbyRepo = new UserLobbyRepo()
 const activeLobbyMiddleware = new ActiveLobbyMiddleware(userLobbyRepo)
 
 export const createLobbyRouter = (controller: LobbyController): express.Router => {
   const router = express.Router()
-
-  // Add auth middleware
-  router.use(AuthMiddleware)
 
   // Define routes without error handlers
   router.post('/create', activeLobbyMiddleware.checkNoActiveLobby, validateRequestBody(lobbyConfigSchema), controller.createLobby)
@@ -30,11 +23,6 @@ export const createLobbyRouter = (controller: LobbyController): express.Router =
   router.post('/kick/:userId', activeLobbyMiddleware.attachActiveLobby, controller.kickPlayer)
 
   router.post('/start', activeLobbyMiddleware.attachActiveLobby, controller.startMatch)
-
-  // Add error handlers at the end
-  router.use(ErrorLoggerMiddleware)
-  router.use(LobbyErrorMiddleware)
-  router.use(GenericErrorMiddleware)
 
   return router
 }

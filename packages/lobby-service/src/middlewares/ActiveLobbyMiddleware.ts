@@ -1,7 +1,7 @@
 import { NextFunction, Response } from 'express'
 import { UserLobbyRepo } from '../repositories/UserLobbyRepo'
 import { UserAlreadyInLobby, UserNotAuthenticatedError, UserNotInActiveLobby } from '../errors/LobbyErrors'
-import { AuthenticatedRequest } from './AuthMiddleware'
+import { AuthenticatedRequest } from '../types/Index'
 
 export class ActiveLobbyMiddleware {
   constructor(private userLobbyRepo: UserLobbyRepo) {}
