@@ -1,11 +1,42 @@
-import { NextFunction, Request, Response } from 'express';
-import { AuthServiceClient } from '../services/AuthServiceClient';
-import logger from '../utils/Logger';
+import { NextFunction, Request, Response } from 'express'
+import axios from 'axios'
+import logger from '../utils/Logger'
+import { config } from '../configs/Config'
+import { ServiceUnavailableError, UserNotAuthenticatedError } from '../errors/LobbyErrors'
 
-const createAuthMiddleware = (service: AuthServiceClient) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    logger.info('AuthMiddleware: Checking token...');
-  };
-};
+const AUTH_SERVICE_URL = config.services['auth'].url
 
-export default createAuthMiddleware;
+export interface AuthenticatedRequest extends Request {
+  user?: {
+    id: string
+    name: string
+    email: string
+  }
+}
+
+export const AuthMiddleware = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1] // Extract the Bearer token from Authorization header
+    if (!token) {
+      return next(new UserNotAuthenticatedError())
+    }
+    // Validate the token using the Auth service
+    const { data: response } = await axios.post(AUTH_SERVICE_URL + '/validate', { token: token })
+    if (!response) {
+      return next(new UserNotAuthenticatedError())
+    }
+    // Add user information to the request object
+    req.user = response.user
+    logger.info('User authenticated:', response.user.id)
+    next()
+  } catch (error) {
+    logger.error('AuthMiddleware error ', error)
+    if (axios.isAxiosError(error)) {
+      if (error.response?.status === 400) {
+        return next(new UserNotAuthenticatedError())
+      }
+      return next(new ServiceUnavailableError())
+    }
+    return next(error)
+  }
+}

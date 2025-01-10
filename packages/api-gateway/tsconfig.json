@@ -4,12 +4,13 @@
     "composite": true,
     "declaration": true,
     "declarationMap": true,
+    "esModuleInterop": true,
     "incremental": true,
     "outDir": "./dist",
     "rootDir": ".",
     "baseUrl": "./src",
     "types": ["@types/jest"]
   },
-  "include": ["./src/**/*", "./tests/**/*", "./docs/**/*"],
+  "include": ["./src/**/*", "./__tests__/**/*", "./docs/**/*"],
   "exclude": ["node_modules", "dist"]
 }

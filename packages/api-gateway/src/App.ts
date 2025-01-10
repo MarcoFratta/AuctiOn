@@ -1,25 +1,31 @@
-import express from 'express';
-import { createProxyMiddleware, fixRequestBody } from 'http-proxy-middleware';
-import { AuthServiceClient } from './services/AuthServiceClient';
+import express from 'express'
+import cors from 'cors'
+import rateLimit from 'express-rate-limit'
+import { createRoutes } from './routes/Routes'
+//import { LoggingMiddleware } from './middlewares/logging.middleware';
+import { ErrorLoggerMiddleware, GatewayErrorsMiddleware, GenericErrorMiddleware } from './middlewares/ErrorsMiddleware'
+import { ProxyController } from './controllers/ProxyController'
+import { LoggingMiddleware } from './middlewares/LoggingMiddleware'
 
-import { config } from './configs/config';
-import createAuthMiddleware from './middlewares/AuthMiddleware';
-import logger from './utils/Logger';
+const app = express()
 
-const app = express();
-const authService = new AuthServiceClient(config.authServiceUri);
-const authMiddleware = createAuthMiddleware(authService);
-logger.info(authMiddleware);
+app.use(cors())
+app.use(express.json())
+app.use(LoggingMiddleware.requestLogger)
 
-app.use(express.json());
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 100,
+})
+app.use(limiter)
 
-app.use(
-  '/auth',
-  createProxyMiddleware({
-    target: config.authServiceUri,
-    changeOrigin: true,
-    on: { proxyReq: fixRequestBody },
-  }),
-);
+app.get('/health', (req, res) => {
+  res.json({ status: 'healthy' })
+})
 
-export default app;
+app.use(createRoutes(new ProxyController()))
+app.use(ErrorLoggerMiddleware)
+app.use(GatewayErrorsMiddleware)
+app.use(GenericErrorMiddleware)
+
+export default app

@@ -1,40 +1,64 @@
-import winston from 'winston';
-import { config } from '../configs/config';
+import winston from 'winston'
 
-// Define log levels
-const levels = {
-  error: 0,
-  warn: 1,
-  info: 2,
-  http: 3,
-  debug: 4,
-};
+const logFormat = winston.format.combine(
+  winston.format.timestamp(),
+  winston.format.errors({ stack: true }),
+  winston.format.metadata(),
+  winston.format.json()
+)
 
-// Determine log level based on environment
-const level = config.nodeEnv === 'production' ? 'info' : 'debug';
+const getLogLevel = () => {
+  const nodeEnv = process.env.NODE_ENV || 'development'
 
-// Log format
-const format = winston.format.combine(
-  winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-  winston.format.printf(
-    ({ timestamp, level, message }) =>
-      `${String(timestamp)} [${String(level.toUpperCase())}]: ${String(message)}`,
-  ),
-);
+  return nodeEnv === 'production' ? 'info' : 'debug'
+}
 
-// Define transports
-const transports = [
-  new winston.transports.Console(),
-  new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
-  new winston.transports.File({ filename: 'logs/combined.log' }),
-];
+const getTransports = () => {
+  const nodeEnv = process.env.NODE_ENV || 'development'
+  const transports: winston.transport[] = []
+  // Console transport configuration
+  const consoleTransport = new winston.transports.Console({
+    level: getLogLevel(),
+    format: winston.format.combine(
+      winston.format.colorize(),
+      winston.format.timestamp(),
+      winston.format.printf(({ timestamp, level, message, stack }) => {
+        const messageString = typeof message === 'object' ? JSON.stringify(message, null, 2) : message
 
-// Create the logger
-const logger = winston.createLogger({
-  level,
-  levels,
-  format,
-  transports,
-});
+        const stackString = stack ? `\nStack: ${stack}` : ''
 
-export default logger;
+        return `${timestamp} [${level}]:${messageString}${stackString}`
+      })
+    ),
+  })
+
+  transports.push(consoleTransport)
+
+  //Add file transports in production
+  if (nodeEnv === 'production') {
+    transports.push(
+      new winston.transports.File({
+        filename: 'logs/error.log',
+        level: 'error',
+        maxsize: 5242880, // 5MB
+        maxFiles: 5,
+      }),
+      new winston.transports.File({
+        filename: 'logs/combined.log',
+        level: 'info',
+        maxsize: 5242880, // 5MB
+        maxFiles: 5,
+      })
+    )
+  }
+
+  return transports
+}
+
+export default winston.createLogger({
+  level: getLogLevel(),
+  format: logFormat,
+  transports: getTransports(),
+  // Silence logs in test environment
+  silent: process.env.NODE_ENV === 'test',
+})
