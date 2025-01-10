@@ -17,6 +17,8 @@ services:
       - lobby-mongodb
   lobby-mongodb:
     image: 'mongo:${MONGO_VERSION:-6.0}' # Default to MongoDB 6.0
+    ports:
+      - '27018:27017'
     volumes:
       - mongo_lobby_data:/data/db
     networks:
@@ -67,6 +69,21 @@ services:
       - mongo_user_data:/data/db
     networks:
       - user-network
+  api-gateway:
+    build:
+      context: .
+      dockerfile: packages/api-gateway/Dockerfile
+    ports:
+      - '${GATEWAY_S_H_PORT:-3000}:${GATEWAY_S_C_PORT:-3000}' # Default to 3000 if PORT is not defined
+    environment:
+      - PORT=${GATEWAY_S_C_PORT:-3000}
+      - NODE_ENV=${GATEWAY_S_NODE_ENV:-production}
+      - LOBBY_SERVICE_URI=${GATEWAY_S_LOBBY_SERVICE_URI:-http://lobby-service:3000/lobby}
+      - USER_SERVICE_URI=${GATEWAY_S_USER_SERVICE_URI:-http://user-service:3000/users}
+      - AUTH_SERVICE_URI=${GATEWAY_S_AUTH_SERVICE_URI:-http://auth-service:3000/auth}
+    networks:
+      - microservices-network
+
 networks:
   lobby-network:
     driver: bridge
