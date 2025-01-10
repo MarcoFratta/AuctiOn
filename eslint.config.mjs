@@ -1,13 +1,14 @@
 import globals from 'globals'
-import pluginJs from '@eslint/js'
 import tseslint from 'typescript-eslint'
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
 import unusedImports from 'eslint-plugin-unused-imports'
 
 
-export default [
+export default tseslint.config(
   {
     files: ['**/*.{ts}'],
+    ...tseslint.configs.recommended,
+    eslintPluginPrettierRecommended,
     languageOptions: {
       parser: tseslint.parser,
       parserOptions: {
@@ -20,23 +21,27 @@ export default [
         ...globals.node,
       },
     },
-  },
-  pluginJs.configs.recommended,
-  ...tseslint.configs.recommended,
-  eslintPluginPrettierRecommended,
-  {
-    files: ['**/*.{ts}'],
     plugins: {
+      '@typescript-eslint': tseslint.plugin,
       'unused-imports': unusedImports,
     },
     rules: {
-      eqeqeq: "off",
+      '@typescript-eslint/no-unused-vars': 'off',
+      eqeqeq: 'off',
       'unused-imports/no-unused-imports': 'error',
-      "@typescript-eslint/no-unused-vars": "off",
-      "prefer-const": ["error", { ignoreReadBeforeAssign: true }],
+      'prefer-const': ['error', { ignoreReadBeforeAssign: true }],
+      'unused-imports/no-unused-vars': [
+        'warn',
+        {
+          vars: 'all',
+          varsIgnorePattern: '^_',
+          args: 'after-used',
+          argsIgnorePattern: '^_',
+        },
+      ],
     },
   },
   {
-    ignores: ["**/__tests__/**/*", "**/*.{js,cjs,mjs}"]
+    ignores: ['**/__tests__/**/*', '**/*.{js,cjs,mjs}'],
   }
-];
+);
