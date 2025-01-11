@@ -1,0 +1,10 @@
+import z from 'zod'
+import { ItemsMapSchema } from './Player'
+
+export const SaleSchema = z.object({
+  items: ItemsMapSchema,
+  sellerId: z.string(),
+  endTimestamp: z.date().optional(),
+})
+
+export type Sale = z.infer<typeof SaleSchema>
