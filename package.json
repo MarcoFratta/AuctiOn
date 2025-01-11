@@ -1,13 +1,13 @@
 {
   "name": "acution",
   "version": "1.0.0",
-  "main": "index.js",
   "type": "commonjs",
   "scripts": {
     "test:auth": "npm test --workspace=auth-service",
     "test:lobby": "npm test --workspace=lobby-service",
     "test:user": "npm test --workspace=user-service",
-    "test:all": "npm-run-all test:auth test:lobby test:user",
+    "test:auction": "npm test --workspace=auction-service",
+    "test:all": "npm-run-all test:auth test:lobby test:user test:auction",
     "test": "npm run test:all",
     "lint": "npx eslint --max-warnings=0 --fix --config eslint.config.mjs",
     "prettier": "npx prettier --write .",
