@@ -38,9 +38,18 @@ if (!scopeMatch) {
 
 const scope = scopeMatch[1]; // Extract the scope
 
-// Step 4: Map the scope to a package
-const packagePaths = ['user-service', 'auth-service', 'api-gateway', 'lobby-service'];
-
+// Step 4: Detect package paths dynamically
+const packagesDir = path.resolve('packages')
+let packagePaths = []
+try {
+  packagePaths = fs.readdirSync(packagesDir).filter((file) =>
+    fs.statSync(path.join(packagesDir, file)).isDirectory(),
+  )
+} catch (error) {
+  console.error(`Error reading packages directory: ${error.message}`)
+  process.exit(1)
+}
+console.log('Detected packages:', packagePaths)
 if (!packagePaths.includes(scope)) {
   console.error(`Error: No package found for scope '${scope}'.`);
   process.exit(1);
