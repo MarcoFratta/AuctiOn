@@ -3,8 +3,6 @@ services:
     build:
       context: .
       dockerfile: packages/lobby-service/Dockerfile
-    ports:
-      - '${LOBBY_S_H_PORT:-3000}:${LOBBY_S_C_PORT:-3000}' # Default to 3000 if PORT is not defined
     environment:
       - DB_URI=${LOBBY_S_DB_URI:-mongodb://test:27017/lobby}
       - PORT=${LOBBY_S_C_PORT:-3000}
@@ -28,8 +26,6 @@ services:
     build:
       context: .
       dockerfile: packages/auth-service/Dockerfile
-    ports:
-      - '${AUTH_S_H_PORT:-3000}:${AUTH_S_C_PORT:-3000}' # Default to 3000 if PORT is not defined
     environment:
       - DB_URI=${AUTH_S_DB_URI:-mongodb://test:27017/auth}
       - PORT=${AUTH_S_C_PORT:-3000}
@@ -52,8 +48,6 @@ services:
     build:
       context: .
       dockerfile: packages/user-service/Dockerfile
-    ports:
-      - '${USER_S_H_PORT:-3000}:${USER_S_C_PORT:-3000}' # Default to 3000 if PORT is not defined
     depends_on:
       - user-mongodb
     environment:
