@@ -3,12 +3,11 @@
   "version": "1.0.0",
   "type": "commonjs",
   "scripts": {
-    "test:auth": "npm test --workspace=auth-service",
-    "test:lobby": "npm test --workspace=lobby-service",
-    "test:user": "npm test --workspace=user-service",
-    "test:auction": "npm test --workspace=auction-service",
-    "test:all": "npm-run-all test:auth test:lobby test:user test:auction",
-    "test": "npm run test:all",
+    "test:auth-service": "npm test --workspace=auth-service",
+    "test:lobby-service": "npm test --workspace=lobby-service",
+    "test:user-service": "npm test --workspace=user-service",
+    "test:auction-service": "npm test --workspace=auction-service",
+    "test": "npm-run-all --parallel test:*",
     "lint": "npx eslint --max-warnings=0 --fix --config eslint.config.mjs",
     "prettier": "npx prettier --write .",
     "prepare": "husky"

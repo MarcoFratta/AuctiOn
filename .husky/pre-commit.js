@@ -32,7 +32,7 @@ try {
 const scopeMatch = commitMessage.match(/\(([^)]+)\)/);
 if (!scopeMatch) {
   console.log('No scope found in commit message. Running all tests...');
-  runCommand('npm run test:all'); // Run all tests if no scope is found
+  runCommand('npm test') // Run all tests if no scope is found
   process.exit(0);
 }
 
@@ -57,4 +57,4 @@ if (!packagePaths.includes(scope)) {
 
 // Step 5: Run tests for the corresponding package
 console.log(`Running tests for package: ${scope}`);
-runCommand(`npm test --workspace=${scope}`);
+runCommand(`npm run test:${scope}`)
