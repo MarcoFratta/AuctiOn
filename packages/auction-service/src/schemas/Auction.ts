@@ -10,7 +10,7 @@ export const AuctionSchema = z.object({
   sellerQueue: z.array(PlayerSchema.shape.id),
   currentRound: z.number(),
   currentSale: SaleSchema.optional(),
-  currentBid: BidSchema,
+  currentBid: BidSchema.optional(),
   startTimestamp: z.date(),
 })
 

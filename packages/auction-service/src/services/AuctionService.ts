@@ -5,7 +5,7 @@ import { ItemsMap } from '../schemas/Player'
 export interface AuctionService {
   createAuction: (auction: Auction) => Promise<Auction>
   getAuction: (auctionId: string) => Promise<Auction>
-  playerBid: (playerId: string, bid: Bid) => Promise<Auction>
+  playerBid: (bid: Bid) => Promise<Auction>
   playerSale: (playerId: string, sale: ItemsMap) => Promise<Auction>
   endRound: (auctionId: string) => Promise<Auction>
   endAuction: (auctionId: string) => Promise<Auction>
