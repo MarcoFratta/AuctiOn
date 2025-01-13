@@ -3,7 +3,6 @@ dist
 logs
 docs
 node_modules
-**/__tests__/*
 *.js
 *.cjs
 *.mjs
