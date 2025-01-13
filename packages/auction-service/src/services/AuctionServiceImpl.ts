@@ -25,16 +25,23 @@ export class AuctionServiceImpl implements AuctionService {
 
   async playerBid(playerId: string, bid: Bid): Promise<Auction> {
     const auction: Auction = this.getPlayerAuction(playerId)
+    if (!auction.currentSale) {
+      throw new Error(`Cannot place bid without an active sale`)
+    }
     const player: Player = this.getPlayer(auction, playerId)
+    if (bid.round !== auction.currentRound) {
+      throw new Error(`Bid round must match current round`)
+    }
+    if (bid.playerId == auction.currentSale!.sellerId) {
+      throw new Error(`Player with id ${playerId} cannot bid on their own items`)
+    }
     if (bid.amount > player.money) {
       throw new Error(`Player with id ${playerId} does not have enough money to place bid`)
     }
     if (bid.amount <= auction.currentBid.amount) {
       throw new Error(`Bid amount must be higher than current bid amount`)
     }
-    if (bid.round !== auction.currentRound) {
-      throw new Error(`Bid round must match current round`)
-    }
+
     bid.timestamp = new Date()
     auction.currentBid = bid
     return auction
@@ -43,7 +50,8 @@ export class AuctionServiceImpl implements AuctionService {
   async playerSale(playerId: string, saleItems: ItemsMap): Promise<Auction> {
     const auction: Auction = this.getPlayerAuction(playerId)
     const player: Player = this.getPlayer(auction, playerId)
-    if (playerId !== auction.sellerQueue[auction.currentRound - (1 % auction.sellerQueue.length)]) {
+    const sellerIndex = (auction.currentRound - 1) % auction.sellerQueue.length
+    if (playerId !== auction.sellerQueue[sellerIndex]) {
       throw new Error(`Player with id ${playerId} is not the current seller`)
     }
     for (const item of saleItems.keys()) {
@@ -56,15 +64,11 @@ export class AuctionServiceImpl implements AuctionService {
       items: saleItems,
     }
     auction.currentBid = this.defaultBid(auction.currentRound)
-    player.inventory = new Map([...player.inventory].map(([item, quantity]) => [item, quantity - (saleItems.get(item) ?? 0)]))
     return auction
   }
 
   async endRound(auctionId: string): Promise<Auction> {
-    const auction = this.auctions.get(auctionId)
-    if (!auction) {
-      throw new Error(`Auction with id ${auctionId} not found`)
-    }
+    const auction: Auction = await this.getAuction(auctionId)
     if (auction.currentSale) {
       const highestBid: Bid = auction.currentBid
       const winnerId = auction.currentBid.playerId
@@ -76,6 +80,9 @@ export class AuctionServiceImpl implements AuctionService {
         )
         const seller: Player = this.getPlayer(auction, auction.currentSale!.sellerId)
         seller.money += highestBid.amount
+        seller.inventory = new Map(
+          [...seller.inventory].map(([item, quantity]) => [item, quantity - (auction.currentSale?.items.get(item) ?? 0)])
+        )
       }
 
       auction.currentSale.endTimestamp = new Date()
@@ -92,7 +99,7 @@ export class AuctionServiceImpl implements AuctionService {
   }
 
   async endAuction(auctionId: string): Promise<Auction> {
-    const auction: Auction = this.getAuction(auctionId)
+    const auction: Auction = await this.getAuction(auctionId)
     this.auctions.delete(auction.id)
     // save auction results
     return auction
@@ -127,19 +134,11 @@ export class AuctionServiceImpl implements AuctionService {
     return auction
   }
 
-  private getAuction(auctionId: string) {
+  async getAuction(auctionId: string): Promise<Auction> {
     const auction: Auction | undefined = this.auctions.get(auctionId)
     if (!auction) {
       throw new Error(`Auction with id ${auctionId} not found`)
     }
     return auction
-  }
-
-  private shuffleArray<T>(array: T[]): T[] {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1))
-      ;[array[i], array[j]] = [array[j], array[i]]
-    }
-    return array
   }
 }
