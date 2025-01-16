@@ -36,7 +36,7 @@ module.exports = {
   watchPathIgnorePatterns: ['/node_modules/'],
 
   // Timeout for each test (default is 5000ms)
-  testTimeout: 60000, // Set timeout to 60 seconds
+  testTimeout: 3000, // Set timeout to 60 seconds
 
   // If using Babel or custom transformers
   // transformIgnorePatterns: ['node_modules/'],
