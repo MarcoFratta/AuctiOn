@@ -1,6 +1,7 @@
 import z from 'zod'
+import { ItemSchema } from './Item'
 
-export const ItemsMapSchema = z.map(z.enum(['square', 'triangle', 'circle']), z.number().min(0))
+export const ItemsMapSchema = z.map(ItemSchema, z.number().min(0))
 
 export const PlayerSchema = z.object({
   money: z.number().min(0),

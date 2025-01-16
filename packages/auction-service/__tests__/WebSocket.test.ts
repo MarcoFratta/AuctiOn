@@ -44,4 +44,24 @@ describe('WebSocket Server', () => {
     // Perform assertions after the connection is established
     expect(server.clients.size).toBe(1)
   })
+
+  // it('should receive the current auction state when a client connects', async () => {
+  //   const ws = new WebSocket('ws://localhost:8080')
+  //
+  //   // Wait for the connection to open
+  //   await new Promise<string>((resolve, reject) => {
+  //     ws.on('error', err => {
+  //       logger.error('WebSocket error:', err)
+  //       reject(err)
+  //     })
+  //     ws.on('message', message => {
+  //       logger.info(`Received message: ${message}`)
+  //       resolve(message.toString())
+  //     })
+  //     })
+  //
+  //
+  //   // Perform assertions after the connection is established
+  //   ws.close()
+  // })
 })

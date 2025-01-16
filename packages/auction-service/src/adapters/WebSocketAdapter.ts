@@ -1,8 +1,9 @@
 import WebSocket, { ServerOptions, WebSocketServer } from 'ws'
 import { PlayerEventSource } from './PlayerEventSource'
 import logger from '../utils/Logger'
+import { PlayerChannel } from './PlayerChannel'
 
-export class WebSocketAdapter implements PlayerEventSource {
+export class WebSocketAdapter implements PlayerEventSource, PlayerChannel {
   private wss: WebSocket.Server
   private clients: Map<string, WebSocket> = new Map()
 
@@ -33,13 +34,20 @@ export class WebSocketAdapter implements PlayerEventSource {
     })
   }
 
+  sendToPlayer(playerId: string, message: string): void {
+    const ws = this.clients.get(playerId)
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(message)
+    }
+  }
+
   getServer(): WebSocket.Server {
     return this.wss
   }
 
-  broadcast(message: string): void {
-    this.wss.clients.forEach(client => {
-      if (client.readyState === WebSocket.OPEN) {
+  broadcast(message: string, predicate: (id: string) => boolean): void {
+    this.clients.forEach((client, id) => {
+      if (predicate(id) && client.readyState === WebSocket.OPEN) {
         client.send(message)
       }
     })

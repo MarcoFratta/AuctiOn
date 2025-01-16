@@ -1,10 +1,11 @@
-import { Auction } from '../schemas/Auction'
+import { Auction, AuctionSchema } from '../schemas/Auction'
 import { Bid } from '../schemas/Bid'
 import { ItemsMap, Player } from '../schemas/Player'
 import { AuctionService } from './AuctionService'
 import { PlayOrderStrategy } from './PlayOrderStrategy'
 import { cloneDeep } from 'lodash'
 import logger from '../utils/Logger'
+import { validateSchema } from '../utils/Validator'
 
 export class AuctionServiceImpl implements AuctionService {
   private auctions: Map<string, Auction> = new Map()
@@ -14,7 +15,9 @@ export class AuctionServiceImpl implements AuctionService {
     if (this.auctions.has(auction.id)) {
       throw new Error(`Auction with id ${auction.id} already exists`)
     }
-    const newAuction: Auction = cloneDeep(auction)
+    logger.info(`creating auction: ${JSON.stringify(auction)}`)
+    const newAuction: Auction = validateSchema(AuctionSchema, auction)
+
     newAuction.players = auction.players.map(player => cloneDeep(player))
     newAuction.sellerQueue = PlayOrderStrategy.sameOrder(newAuction.players.map(player => player.id))
     newAuction.players.forEach(player => this.players.set(player.id, auction.id))
@@ -29,7 +32,7 @@ export class AuctionServiceImpl implements AuctionService {
 
   async playerBid(bid: Bid): Promise<Auction> {
     const playerId: string = bid.playerId
-    const auction: Auction = this.getPlayerAuction(playerId)
+    const auction: Auction = this.findPlayerAuction(playerId)
     if (!auction.currentSale) {
       throw new Error(`Cannot place bid without an active sale`)
     }
@@ -53,7 +56,7 @@ export class AuctionServiceImpl implements AuctionService {
   }
 
   async playerSale(playerId: string, saleItems: ItemsMap): Promise<Auction> {
-    const auction: Auction = this.getPlayerAuction(playerId)
+    const auction: Auction = this.findPlayerAuction(playerId)
     const player: Player = this.getPlayer(auction, playerId)
     logger.info(`player: ${playerId} is selling items: ${JSON.stringify(saleItems)}`)
     const sellerIndex = (auction.currentRound - 1) % auction.players.length
@@ -120,12 +123,14 @@ export class AuctionServiceImpl implements AuctionService {
     return cloneDeep(this.findAuctionById(auctionId))
   }
 
-  private getPlayerAuction(playerId: string) {
-    const playerAuctionId = this.players.get(playerId)
-    if (!playerAuctionId) {
-      throw new Error(`Player with id ${playerId} not found`)
-    }
-    return this.findAuctionById(playerAuctionId)
+  async getPlayerAuction(playerId: string): Promise<Auction> {
+    return cloneDeep(this.findPlayerAuction(playerId))
+  }
+
+  async setPlayerState(playerId: string, state: string): Promise<void> {
+    const auction: Auction = this.findPlayerAuction(playerId)
+    const player: Player = this.getPlayer(auction, playerId)
+    player.status = state
   }
 
   private findAuctionById(auctionId: string): Auction {
@@ -134,5 +139,13 @@ export class AuctionServiceImpl implements AuctionService {
       throw new Error(`Auction with id ${auctionId} not found`)
     }
     return auction
+  }
+
+  private findPlayerAuction(playerId: string): Auction {
+    const playerAuctionId = this.players.get(playerId)
+    if (!playerAuctionId) {
+      throw new Error(`Player with id ${playerId} not found`)
+    }
+    return this.findAuctionById(playerAuctionId)
   }
 }
