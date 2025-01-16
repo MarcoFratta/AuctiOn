@@ -6,7 +6,7 @@ export interface AuctionService {
   createAuction: (auction: Auction) => Promise<Auction>
   getAuction: (auctionId: string) => Promise<Auction>
   getPlayerAuction: (playerId: string) => Promise<Auction>
-  setPlayerState: (playerId: string, state: string) => Promise<void>
+  setPlayerState: (playerId: string, state: string) => Promise<Auction>
   playerBid: (bid: Bid) => Promise<Auction>
   playerSale: (playerId: string, sale: ItemsMap) => Promise<Auction>
   endRound: (auctionId: string) => Promise<Auction>

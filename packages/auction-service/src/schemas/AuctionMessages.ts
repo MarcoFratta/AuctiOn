@@ -30,5 +30,8 @@ export const SaleMsgSchema = z.object({
     }),
 })
 
+export const MessageTypeSchema = z.enum(['sell', 'bid'])
+
+export type MessageType = z.infer<typeof MessageTypeSchema>
 export type SaleMessage = z.infer<typeof SaleMsgSchema>
 export type BidMessage = z.infer<typeof BidMsgSchema>

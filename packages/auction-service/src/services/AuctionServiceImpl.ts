@@ -97,10 +97,15 @@ export class AuctionServiceImpl implements AuctionService {
     if (auction.currentRound == auction.maxRound) {
       return this.endAuction(auctionId)
     }
-
-    auction.currentRound++
     auction.currentBid = undefined
     auction.currentSale = undefined
+    return this.goToNextRound(auction, auctionId)
+  }
+
+  async setPlayerState(playerId: string, state: string): Promise<Auction> {
+    const auction: Auction = this.findPlayerAuction(playerId)
+    const player: Player = this.getPlayer(auction, playerId)
+    player.status = state
     return cloneDeep(auction)
   }
 
@@ -127,10 +132,19 @@ export class AuctionServiceImpl implements AuctionService {
     return cloneDeep(this.findPlayerAuction(playerId))
   }
 
-  async setPlayerState(playerId: string, state: string): Promise<void> {
-    const auction: Auction = this.findPlayerAuction(playerId)
-    const player: Player = this.getPlayer(auction, playerId)
-    player.status = state
+  private async goToNextRound(auction: Auction, auctionId: string): Promise<Auction> {
+    auction.currentRound++
+    let disconnectedCounter = 0
+    while (this.getPlayer(auction, this.getCurrentSellerId(auction)).status === 'disconnected') {
+      logger.info(`Player ${this.getCurrentSellerId(auction)} disconnected, skipping round: ${auction.currentRound}`)
+      auction.sellerQueue = this.rotateLeft(auction.sellerQueue)
+      disconnectedCounter++
+      if (disconnectedCounter == auction.players.length - 1) {
+        logger.info(`Too many players disconnected, ending auction: ${auctionId}`)
+        return this.endAuction(auctionId)
+      }
+    }
+    return cloneDeep(auction)
   }
 
   private findAuctionById(auctionId: string): Auction {
@@ -147,5 +161,15 @@ export class AuctionServiceImpl implements AuctionService {
       throw new Error(`Player with id ${playerId} not found`)
     }
     return this.findAuctionById(playerAuctionId)
+  }
+
+  private getCurrentSellerId(auction: Auction): string {
+    return auction.sellerQueue[(auction.currentRound - 1) % auction.players.length]
+  }
+
+  private rotateLeft<T>(array: T[]): T[] {
+    if (array.length === 0) return array // Handle empty array
+    const [first, ...rest] = array
+    return [...rest, first]
   }
 }

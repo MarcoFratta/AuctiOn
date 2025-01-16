@@ -45,7 +45,16 @@ describe('AuctionController', () => {
   test('should handle player disconnection', async () => {
     const playerId = 'player1'
 
-    auctionService.setPlayerState.mockResolvedValue()
+    auctionService.setPlayerState.mockResolvedValue({
+      id: 'auction1',
+      players: [],
+      maxRound: 10,
+      sellerQueue: ['player1', 'player2'],
+      currentRound: 1,
+      currentSale: undefined,
+      currentBid: undefined,
+      startTimestamp: new Date(),
+    })
 
     await auctionController['handlePlayerDisconnect'](playerId)
 

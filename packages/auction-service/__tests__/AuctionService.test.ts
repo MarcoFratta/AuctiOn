@@ -232,4 +232,60 @@ describe('AuctionServiceImpl', () => {
     const updatedAuction = await service.getAuction('auction1')
     expect(updatedAuction.players[0].inventory.get('square')).toBe(5)
   })
+
+  it('should skip disconnected players and end the auction if only one player is connected', async () => {
+    const auction = {
+      id: 'auction1',
+      players: [
+        { id: 'player1', money: 100, inventory: new Map(), status: 'active' },
+        { id: 'player3', money: 200, inventory: new Map(), status: 'disconnected' },
+        { id: 'player2', money: 200, inventory: new Map(), status: 'disconnected' },
+      ],
+      maxRound: 10,
+      sellerQueue: ['player1', 'player2', 'player3'],
+      currentRound: 1,
+      currentSale: undefined,
+      currentBid: undefined,
+      startTimestamp: new Date(),
+    }
+    await service.createAuction(auction)
+    const endAuction = jest.spyOn(service, 'endAuction')
+    const result = await service.endRound('auction1')
+
+    expect(result.currentRound).toBe(2)
+    expect(result.maxRound).toBe(10)
+    expect(endAuction).toHaveBeenCalled()
+    expect(result.players.find(p => p.id === 'player1')?.status).toBe('active')
+    expect(result.players.find(p => p.id === 'player2')?.status).toBe('disconnected')
+    expect(result.players.find(p => p.id === 'player3')?.status).toBe('disconnected')
+  })
+
+  it('should skip a disconnected player when determining the next seller', async () => {
+    const auction = {
+      id: 'auction1',
+      players: [
+        { id: 'player1', money: 100, inventory: new Map(), status: 'active' },
+        { id: 'player2', money: 200, inventory: new Map(), status: 'disconnected' },
+        { id: 'player3', money: 150, inventory: new Map([['square', 2]]), status: 'active' },
+      ],
+      maxRound: 10,
+      sellerQueue: ['player1', 'player2', 'player3'],
+      currentRound: 1,
+      currentSale: undefined,
+      currentBid: undefined,
+      startTimestamp: new Date(),
+    }
+    await service.createAuction(auction)
+
+    const endAuction = jest.spyOn(service, 'endAuction')
+    const result = await service.endRound('auction1')
+
+    expect(result.currentRound).toBe(2)
+    expect(result.players.find(p => p.id === 'player2')?.status).toBe('disconnected')
+    expect(result.players.find(p => p.id === 'player1')?.status).toBe('active')
+    expect(result.players.find(p => p.id === 'player3')?.status).toBe('active')
+    expect(result.maxRound).toBe(10)
+    expect(endAuction).not.toHaveBeenCalled()
+    await service.playerSale('player3', new Map([['square', 2]]))
+  })
 })
