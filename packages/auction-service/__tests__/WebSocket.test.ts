@@ -6,15 +6,24 @@ import logger from '../src/utils/Logger'
 describe('WebSocket Server', () => {
   let server: Server
   let httpServer: any
+  let adapter: WebSocketAdapter
+  let port: number
 
   beforeEach(done => {
     // Set up the HTTP server and WebSocket server before each test
     httpServer = createServer()
-    const adapter = new WebSocketAdapter({ server: httpServer })
+    adapter = new WebSocketAdapter({ server: httpServer })
     server = adapter.getServer()
 
-    httpServer.listen(8080, () => {
-      done()
+    httpServer.listen(0, () => {
+      const address = httpServer.address()
+      if (address && typeof address === 'object') {
+        port = address.port // Save the dynamically assigned port
+        logger.info(`Test server started on port ${port}`)
+        done()
+      } else {
+        done(new Error('Failed to assign a dynamic port'))
+      }
     })
   })
 
@@ -26,7 +35,7 @@ describe('WebSocket Server', () => {
   })
 
   it('should allow clients to connect', async () => {
-    const ws = new WebSocket('ws://localhost:8080')
+    const ws = new WebSocket(`ws://localhost:${port}/player1`)
 
     // Wait for the connection to open
     await new Promise<void>((resolve, reject) => {
@@ -45,23 +54,67 @@ describe('WebSocket Server', () => {
     expect(server.clients.size).toBe(1)
   })
 
-  // it('should receive the current auction state when a client connects', async () => {
-  //   const ws = new WebSocket('ws://localhost:8080')
-  //
-  //   // Wait for the connection to open
-  //   await new Promise<string>((resolve, reject) => {
-  //     ws.on('error', err => {
-  //       logger.error('WebSocket error:', err)
-  //       reject(err)
-  //     })
-  //     ws.on('message', message => {
-  //       logger.info(`Received message: ${message}`)
-  //       resolve(message.toString())
-  //     })
-  //     })
-  //
-  //
-  //   // Perform assertions after the connection is established
-  //   ws.close()
-  // })
+  it('should send and receive messages correctly', async () => {
+    const ws = new WebSocket(`ws://localhost:${port}/player1`)
+
+    await new Promise<void>((resolve, reject) => {
+      ws.on('open', () => {
+        logger.info('Client connected')
+        ws.send(JSON.stringify({ type: 'bid', bid: { amount: 100, round: 1 } }))
+        resolve()
+      })
+
+      ws.on('error', err => {
+        logger.error('WebSocket error:', err)
+        reject(err)
+      })
+    })
+
+    await new Promise<void>((resolve, reject) => {
+      adapter.onPlayerMessage((playerId, message) => {
+        expect(playerId).toBe('player1')
+        expect(JSON.parse(message)).toEqual({ type: 'bid', bid: { amount: 100, round: 1 } })
+        resolve()
+      })
+    })
+
+    ws.close()
+  })
+
+  it('should handle player connection', async () => {
+    adapter.onPlayerConnect((playerId: string) => {
+      expect(playerId).toBe('player1')
+    })
+
+    const ws = new WebSocket(`ws://localhost:${port}/player1`)
+
+    await new Promise<void>((resolve, reject) => {
+      ws.on('open', () => {
+        logger.info('Player connected')
+        resolve()
+      })
+
+      ws.on('error', err => {
+        logger.error('WebSocket error:', err)
+        reject(err)
+      })
+    })
+
+    ws.close()
+  })
+
+  it('should handle player disconnection', async () => {
+    await new Promise<void>((resolve, reject) => {
+      adapter.onPlayerDisconnect((playerId: string) => {
+        expect(playerId).toBe('player1')
+        resolve()
+      })
+
+      const ws = new WebSocket(`ws://localhost:${port}/player1`)
+      ws.on('open', () => {
+        ws.close()
+      })
+      ws.on('error', reject)
+    })
+  })
 })

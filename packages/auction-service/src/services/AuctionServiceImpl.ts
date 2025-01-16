@@ -10,6 +10,8 @@ import { validateSchema } from '../utils/Validator'
 export class AuctionServiceImpl implements AuctionService {
   private auctions: Map<string, Auction> = new Map()
   private players: Map<string, string> = new Map()
+  private onRoundEndCallback: ((auction: Auction) => void)[] = []
+  private onAuctionEndCallback: ((auction: Auction) => void)[] = []
 
   async createAuction(auction: Auction): Promise<Auction> {
     if (this.auctions.has(auction.id)) {
@@ -34,6 +36,7 @@ export class AuctionServiceImpl implements AuctionService {
     const playerId: string = bid.playerId
     const auction: Auction = this.findPlayerAuction(playerId)
     if (!auction.currentSale) {
+      logger.error(bid)
       throw new Error(`Cannot place bid without an active sale`)
     }
     const player: Player = this.getPlayer(auction, playerId)
@@ -95,11 +98,14 @@ export class AuctionServiceImpl implements AuctionService {
       // TODO: save auction sale results
     }
     if (auction.currentRound == auction.maxRound) {
+      logger.info(`Reached max round: ${auction.maxRound}, ending auction: ${auctionId}`)
       return this.endAuction(auctionId)
     }
     auction.currentBid = undefined
     auction.currentSale = undefined
-    return this.goToNextRound(auction, auctionId)
+    const res = this.goToNextRound(auction, auctionId)
+    res.then(auction => this.onRoundEndCallback.forEach(callback => callback(auction)))
+    return res
   }
 
   async setPlayerState(playerId: string, state: string): Promise<Auction> {
@@ -111,9 +117,12 @@ export class AuctionServiceImpl implements AuctionService {
 
   async endAuction(auctionId: string): Promise<Auction> {
     const auction: Auction = this.findAuctionById(auctionId)
+    logger.info(`ending auction: ${auctionId}`)
     this.auctions.delete(auction.id)
     // TODO: save auction results
-    return cloneDeep(auction)
+    const res = cloneDeep(auction)
+    this.onAuctionEndCallback.forEach(callback => callback(res))
+    return res
   }
 
   private getPlayer(auction: Auction, playerId: string) {
@@ -130,6 +139,14 @@ export class AuctionServiceImpl implements AuctionService {
 
   async getPlayerAuction(playerId: string): Promise<Auction> {
     return cloneDeep(this.findPlayerAuction(playerId))
+  }
+
+  onRoundEnd(callback: (auction: Auction) => void): void {
+    this.onRoundEndCallback.push(callback)
+  }
+
+  onAuctionEnd(callback: (auction: Auction) => void): void {
+    this.onAuctionEndCallback.push(callback)
   }
 
   private async goToNextRound(auction: Auction, auctionId: string): Promise<Auction> {

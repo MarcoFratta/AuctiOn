@@ -4,7 +4,7 @@ import logger from '../utils/Logger'
 import { PlayerChannel } from './PlayerChannel'
 
 export class WebSocketAdapter implements PlayerEventSource, PlayerChannel {
-  private wss: WebSocket.Server
+  private readonly wss: WebSocket.Server
   private clients: Map<string, WebSocket> = new Map()
 
   private connectListeners: ((playerId: string) => void)[] = []
@@ -23,10 +23,12 @@ export class WebSocketAdapter implements PlayerEventSource, PlayerChannel {
         this.notifyConnect(playerId)
 
         ws.on('message', (message: string) => {
+          logger.info(`Message from player ${playerId}: ${message}`)
           this.notifyMessage(playerId, message)
         })
 
         ws.on('close', () => {
+          logger.info(`Player disconnected: ${playerId}`)
           this.clients.delete(playerId)
           this.notifyDisconnect(playerId)
         })

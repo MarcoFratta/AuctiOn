@@ -1,5 +1,4 @@
 import { PlayerEventSource } from '../adapters/PlayerEventSource'
-import { AuctionServiceImpl } from '../services/AuctionServiceImpl'
 import { PlayerChannel } from '../adapters/PlayerChannel'
 import { validateSchema } from '../utils/Validator'
 import { BidMessage, BidMsgSchema, MessageType, MessageTypeSchema, SaleMessage, SaleMsgSchema } from '../schemas/AuctionMessages'
@@ -7,13 +6,14 @@ import { match } from 'ts-pattern'
 import { Auction } from '../schemas/Auction'
 import logger from '../utils/Logger'
 import { Bid, BidSchema } from '../schemas/Bid'
+import { AuctionService } from '../services/AuctionService'
 
 export class AuctionController {
-  private auctionService: AuctionServiceImpl
+  private auctionService: AuctionService
   private eventSource: PlayerEventSource
   private playerChannel: PlayerChannel
 
-  constructor(auctionService: AuctionServiceImpl, eventSource: PlayerEventSource, playerChannel: PlayerChannel) {
+  constructor(auctionService: AuctionService, eventSource: PlayerEventSource, playerChannel: PlayerChannel) {
     this.auctionService = auctionService
     this.eventSource = eventSource
     this.playerChannel = playerChannel
@@ -21,6 +21,8 @@ export class AuctionController {
     this.eventSource.onPlayerConnect(this.handlePlayerConnect)
     this.eventSource.onPlayerDisconnect(this.handlePlayerDisconnect)
     this.eventSource.onPlayerMessage(this.handlePlayerMessage)
+    this.auctionService.onAuctionEnd(this.handleAuctionEnd)
+    this.auctionService.onRoundEnd(this.handleRoundEnd)
   }
 
   private handlePlayerMessage = (playerId: string, message: string): void => {
@@ -36,12 +38,18 @@ export class AuctionController {
             round: msg.round,
             timestamp: new Date(),
           })
-          this.auctionService.playerBid(bid).then(this.sendUpdatedAuction)
+          this.auctionService
+            .playerBid(bid)
+            .then(a => this.sendUpdatedAuction(a, 'bid'))
+            .catch(this.handleErrors)
         })
         .with('sell', () => {
           const sale: SaleMessage = validateSchema(SaleMsgSchema, parsedMessage.sale)
           const itemsMap = new Map((sale.items ?? []).map(v => [v.item, v.quantity]))
-          this.auctionService.playerSale(playerId, itemsMap).then(this.sendUpdatedAuction)
+          this.auctionService
+            .playerSale(playerId, itemsMap)
+            .then(a => this.sendUpdatedAuction(a, 'sale'))
+            .catch(this.handleErrors)
         })
         .exhaustive()
     } catch (e) {
@@ -58,30 +66,52 @@ export class AuctionController {
           type: 'playerConnected',
           playerId,
         }),
-        this.sameLobby(playerId, auction)
+        this.allLobbyPlayersExcept(playerId, auction)
       )
     })
   }
 
   private handlePlayerDisconnect = (playerId: string): void => {
-    this.auctionService.setPlayerState(playerId, 'disconnected').then(auction => {
-      this.playerChannel.broadcast(
-        JSON.stringify({
-          type: 'playerDisconnected',
-          playerId,
-        }),
-        this.sameLobby(playerId, auction)
-      )
-    })
+    this.auctionService
+      .setPlayerState(playerId, 'disconnected')
+      .then(auction => {
+        this.playerChannel.broadcast(
+          JSON.stringify({
+            type: 'playerDisconnected',
+            playerId,
+          }),
+          this.allLobbyPlayersExcept(playerId, auction)
+        )
+      })
+      .catch(() => {
+        logger.info(`Player ${playerId} disconnected, auction is already over`)
+      })
   }
 
-  private sendUpdatedAuction = (auction: Auction): void => {
-    this.playerChannel.broadcast(JSON.stringify({ type: 'auction', auction }), id => auction.sellerQueue.includes(id))
+  private sendUpdatedAuction = (auction: Auction, type: string = 'auction'): void => {
+    logger.info(`Sending updated auction: ${JSON.stringify(auction)}`)
+    this.playerChannel.broadcast(JSON.stringify({ type: type, auction }), id => auction.sellerQueue.includes(id))
   }
 
-  private sameLobby = (playerId: string, auction: Auction): ((otherPlayerId: string) => boolean) => {
+  private allLobbyPlayersExcept = (playerId: string, auction: Auction): ((otherPlayerId: string) => boolean) => {
     return (otherPlayerId: string): boolean => {
       return auction.sellerQueue.includes(otherPlayerId) && playerId !== otherPlayerId
     }
+  }
+  private allLobbyPlayers = (auction: Auction): ((playerId: string) => boolean) => {
+    return (playerId: string): boolean => {
+      return auction.sellerQueue.includes(playerId)
+    }
+  }
+
+  private handleAuctionEnd = (auction: Auction): void => {
+    this.playerChannel.broadcast(JSON.stringify({ type: 'auctionEnd', auction }), this.allLobbyPlayers(auction))
+  }
+  private handleRoundEnd = (auction: Auction) => {
+    this.playerChannel.broadcast(JSON.stringify({ type: 'roundEnd', auction }), this.allLobbyPlayers(auction))
+  }
+
+  private handleErrors(error: Error): void {
+    logger.error(`Error handling message: ${error}`)
   }
 }
