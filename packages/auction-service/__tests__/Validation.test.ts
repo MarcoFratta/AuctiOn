@@ -1,4 +1,4 @@
-import { SaleMsgSchema } from '../src/schemas/AuctionMessages'
+import { InventoryInputSchema } from '../src/schemas/AuctionMessages'
 import { validateSchema, ValidationError } from '../src/utils/Validator'
 
 describe('SaleMsgSchema Validation', () => {
@@ -11,7 +11,7 @@ describe('SaleMsgSchema Validation', () => {
       ],
     }
 
-    expect(() => validateSchema(SaleMsgSchema, validMessage)).not.toThrow()
+    expect(() => validateSchema(InventoryInputSchema, validMessage)).not.toThrow()
   })
 
   it('should throw a ValidationError for a sale message with duplicate items', () => {
@@ -22,7 +22,7 @@ describe('SaleMsgSchema Validation', () => {
       ],
     }
 
-    expect(() => validateSchema(SaleMsgSchema, invalidMessage)).toThrow(ValidationError)
+    expect(() => validateSchema(InventoryInputSchema, invalidMessage)).toThrow(ValidationError)
   })
 
   it('should throw a ValidationError for a sale message with more than 3 items', () => {
@@ -35,7 +35,7 @@ describe('SaleMsgSchema Validation', () => {
       ],
     }
 
-    expect(() => validateSchema(SaleMsgSchema, invalidMessage)).toThrow(ValidationError)
+    expect(() => validateSchema(InventoryInputSchema, invalidMessage)).toThrow(ValidationError)
   })
 
   it('should throw a ValidationError for an item with quantity less than 1', () => {
@@ -43,6 +43,6 @@ describe('SaleMsgSchema Validation', () => {
       items: [{ item: 'circle', quantity: 0 }],
     }
 
-    expect(() => validateSchema(SaleMsgSchema, invalidMessage)).toThrow(ValidationError)
+    expect(() => validateSchema(InventoryInputSchema, invalidMessage)).toThrow(ValidationError)
   })
 })

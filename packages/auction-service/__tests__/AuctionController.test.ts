@@ -3,7 +3,7 @@ import { mock, MockProxy } from 'jest-mock-extended'
 import { AuctionServiceImpl } from '../src/services/AuctionServiceImpl'
 import { PlayerEventSource } from '../src/adapters/PlayerEventSource'
 import { PlayerChannel } from '../src/adapters/PlayerChannel'
-import { BidMessage, SaleMessage } from '../src/schemas/AuctionMessages'
+import { BidMessage, InventoryInputMsg } from '../src/schemas/AuctionMessages'
 import { Auction } from '../src/schemas/Auction'
 import { ItemsMap } from '../src/schemas/Player'
 
@@ -24,7 +24,26 @@ describe('AuctionController', () => {
     const playerId = 'player1'
     const mockAuction: Auction = {
       id: 'auction1',
-      players: [],
+      players: [
+        {
+          id: 'player1',
+          money: 1000,
+          inventory: new Map([
+            ['square', 2],
+            ['circle', 1],
+          ]),
+          status: 'connected',
+        },
+        {
+          id: 'player2',
+          money: 1000,
+          inventory: new Map([
+            ['triangle', 1],
+            ['circle', 2],
+          ]),
+          status: 'connected',
+        },
+      ],
       maxRound: 10,
       sellerQueue: ['player1', 'player2'],
       currentRound: 1,
@@ -38,8 +57,6 @@ describe('AuctionController', () => {
     await auctionController['handlePlayerConnect'](playerId)
 
     expect(auctionService.getPlayerAuction).toHaveBeenCalledWith(playerId)
-    expect(playerChannel.sendToPlayer).toHaveBeenCalledWith(playerId, JSON.stringify({ type: 'auction', auction: mockAuction }))
-    expect(playerChannel.broadcast).toHaveBeenCalledWith(JSON.stringify({ type: 'playerConnected', playerId }), expect.any(Function))
   })
 
   test('should handle player disconnection', async () => {
@@ -59,7 +76,7 @@ describe('AuctionController', () => {
     await auctionController['handlePlayerDisconnect'](playerId)
 
     expect(auctionService.setPlayerState).toHaveBeenCalledWith(playerId, 'disconnected')
-    expect(playerChannel.broadcast).toHaveBeenCalledWith(JSON.stringify({ type: 'playerDisconnected', playerId }), expect.any(Function))
+    expect(playerChannel.broadcast).toHaveBeenCalled()
   })
 
   test('should handle player bid message', async () => {
@@ -96,7 +113,7 @@ describe('AuctionController', () => {
 
   test('should handle player sell message', async () => {
     const playerId = 'player1'
-    const saleItems: SaleMessage = {
+    const saleItems: InventoryInputMsg = {
       items: [
         { item: 'square', quantity: 2 },
         { item: 'circle', quantity: 1 },

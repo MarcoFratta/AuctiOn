@@ -47,10 +47,10 @@ export class WebSocketAdapter implements PlayerEventSource, PlayerChannel {
     return this.wss
   }
 
-  broadcast(message: string, predicate: (id: string) => boolean): void {
+  broadcast(producer: (id: string) => string, predicate?: (id: string) => boolean): void {
     this.clients.forEach((client, id) => {
-      if (predicate(id) && client.readyState === WebSocket.OPEN) {
-        client.send(message)
+      if (predicate && predicate(id) && client.readyState === WebSocket.OPEN) {
+        client.send(producer(id))
       }
     })
   }

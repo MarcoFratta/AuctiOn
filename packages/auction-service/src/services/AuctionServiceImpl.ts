@@ -6,6 +6,7 @@ import { PlayOrderStrategy } from './PlayOrderStrategy'
 import { cloneDeep } from 'lodash'
 import logger from '../utils/Logger'
 import { validateSchema } from '../utils/Validator'
+import { SaleSchema } from '../schemas/Sale'
 
 export class AuctionServiceImpl implements AuctionService {
   private auctions: Map<string, Auction> = new Map()
@@ -61,9 +62,7 @@ export class AuctionServiceImpl implements AuctionService {
   async playerSale(playerId: string, saleItems: ItemsMap): Promise<Auction> {
     const auction: Auction = this.findPlayerAuction(playerId)
     const player: Player = this.getPlayer(auction, playerId)
-    logger.info(`player: ${playerId} is selling items: ${JSON.stringify(saleItems)}`)
     const sellerIndex = (auction.currentRound - 1) % auction.players.length
-    logger.info(`expected seller: ${sellerIndex} for round ${auction.currentRound}`)
     if (playerId !== auction.sellerQueue[sellerIndex]) {
       throw new Error(`Player with id ${playerId} is not the current seller`)
     }
@@ -72,10 +71,10 @@ export class AuctionServiceImpl implements AuctionService {
         throw new Error(`Player with id ${playerId} does not have item ${item}`)
       }
     }
-    auction.currentSale = {
+    auction.currentSale = validateSchema(SaleSchema, {
       sellerId: playerId,
       items: saleItems,
-    }
+    })
     auction.currentBid = undefined
     return cloneDeep(auction)
   }

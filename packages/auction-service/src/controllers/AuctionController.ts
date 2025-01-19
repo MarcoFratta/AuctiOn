@@ -1,12 +1,20 @@
 import { PlayerEventSource } from '../adapters/PlayerEventSource'
 import { PlayerChannel } from '../adapters/PlayerChannel'
 import { validateSchema } from '../utils/Validator'
-import { BidMessage, BidMsgSchema, MessageType, MessageTypeSchema, SaleMessage, SaleMsgSchema } from '../schemas/AuctionMessages'
+import {
+  BidMessage,
+  BidMsgSchema,
+  InventoryInputMsg,
+  InventoryInputSchema,
+  MessageType,
+  MessageTypeSchema,
+} from '../schemas/AuctionMessages'
 import { match } from 'ts-pattern'
 import { Auction } from '../schemas/Auction'
 import logger from '../utils/Logger'
 import { Bid, BidSchema } from '../schemas/Bid'
 import { AuctionService } from '../services/AuctionService'
+import { toPlayerAuction } from '../converters/AuctionConverter'
 
 export class AuctionController {
   private auctionService: AuctionService
@@ -44,8 +52,9 @@ export class AuctionController {
             .catch(this.handleErrors)
         })
         .with('sell', () => {
-          const sale: SaleMessage = validateSchema(SaleMsgSchema, parsedMessage.sale)
-          const itemsMap = new Map((sale.items ?? []).map(v => [v.item, v.quantity]))
+          const sale: InventoryInputMsg = validateSchema(InventoryInputSchema, parsedMessage.sale)
+          const itemsMap = new Map(sale.items.map(v => [v.item, v.quantity]))
+          logger.info(`[Controller] Player ${playerId} selling items: ${JSON.stringify(itemsMap.entries())}`)
           this.auctionService
             .playerSale(playerId, itemsMap)
             .then(a => this.sendUpdatedAuction(a, 'sale'))
@@ -60,12 +69,19 @@ export class AuctionController {
 
   private handlePlayerConnect = (playerId: string): void => {
     this.auctionService.getPlayerAuction(playerId).then(auction => {
-      this.playerChannel.sendToPlayer(playerId, JSON.stringify({ type: 'auction', auction }))
-      this.playerChannel.broadcast(
+      this.playerChannel.sendToPlayer(
+        playerId,
         JSON.stringify({
-          type: 'playerConnected',
-          playerId,
-        }),
+          type: 'auction',
+          auction: toPlayerAuction(playerId).convert(auction),
+        })
+      )
+      this.playerChannel.broadcast(
+        () =>
+          JSON.stringify({
+            type: 'playerConnected',
+            playerId,
+          }),
         this.allLobbyPlayersExcept(playerId, auction)
       )
     })
@@ -76,10 +92,12 @@ export class AuctionController {
       .setPlayerState(playerId, 'disconnected')
       .then(auction => {
         this.playerChannel.broadcast(
-          JSON.stringify({
-            type: 'playerDisconnected',
-            playerId,
-          }),
+          id => {
+            return JSON.stringify({
+              type: 'playerDisconnected',
+              playerId,
+            })
+          },
           this.allLobbyPlayersExcept(playerId, auction)
         )
       })
@@ -90,7 +108,14 @@ export class AuctionController {
 
   private sendUpdatedAuction = (auction: Auction, type: string = 'auction'): void => {
     logger.info(`Sending updated auction: ${JSON.stringify(auction)}`)
-    this.playerChannel.broadcast(JSON.stringify({ type: type, auction }), id => auction.sellerQueue.includes(id))
+    this.playerChannel.broadcast(
+      id =>
+        JSON.stringify({
+          type: type,
+          auction: toPlayerAuction(id).convert(auction),
+        }),
+      id => auction.sellerQueue.includes(id)
+    )
   }
 
   private allLobbyPlayersExcept = (playerId: string, auction: Auction): ((otherPlayerId: string) => boolean) => {
@@ -105,10 +130,16 @@ export class AuctionController {
   }
 
   private handleAuctionEnd = (auction: Auction): void => {
-    this.playerChannel.broadcast(JSON.stringify({ type: 'auctionEnd', auction }), this.allLobbyPlayers(auction))
+    this.playerChannel.broadcast(
+      id => JSON.stringify({ type: 'auctionEnd', auction: toPlayerAuction(id).convert(auction) }),
+      this.allLobbyPlayers(auction)
+    )
   }
   private handleRoundEnd = (auction: Auction) => {
-    this.playerChannel.broadcast(JSON.stringify({ type: 'roundEnd', auction }), this.allLobbyPlayers(auction))
+    this.playerChannel.broadcast(
+      id => JSON.stringify({ type: 'roundEnd', auction: toPlayerAuction(id).convert(auction) }),
+      this.allLobbyPlayers(auction)
+    )
   }
 
   private handleErrors(error: Error): void {
