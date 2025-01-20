@@ -36,6 +36,15 @@ export class WebSocketAdapter implements PlayerEventSource, PlayerChannel {
     })
   }
 
+  closeConnection(playerId: string, normal: boolean = true, reason: string = ''): void {
+    const ws = this.clients.get(playerId)
+    if (ws) {
+      const code = normal ? 1000 : 1011
+      ws.close(code, reason)
+      logger.info(`Closing connection for player ${playerId} with code ${code} and reason ${reason}`)
+    }
+  }
+
   sendToPlayer(playerId: string, message: string): void {
     const ws = this.clients.get(playerId)
     if (ws && ws.readyState === WebSocket.OPEN) {

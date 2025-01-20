@@ -8,6 +8,8 @@ export const createRoutes = (proxy: ProxyController): Router => {
 
   router.use('/lobby', AuthMiddleware, proxy.createProxy('lobby'))
 
+  router.use('/auctions', AuthMiddleware, proxy.createProxy('auction'))
+
   router.use('/auth', proxy.createProxy('auth'))
   return router
 }

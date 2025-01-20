@@ -21,5 +21,9 @@ export const config: GatewayConfig = {
       url: process.env.AUTH_SERVICE_URI || 'http://localhost:3003/auth',
       pathRewrite: { '^/auth': '/auth' },
     },
+    auction: {
+      url: process.env.AUCTION_SERVICE_URI || 'http://localhost:3004/auction',
+      pathRewrite: { '^/auction': '/' },
+    },
   },
 }

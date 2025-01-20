@@ -3,12 +3,16 @@
   "version": "1.0.0",
   "main": "Server.ts",
   "scripts": {
-    "test": "npx jest"
+    "test": "npx jest",
+    "build": "tsc",
+    "start": "node dist/src/Server.js",
+    "dev": "ts-node Server.ts"
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@types/express": "^5.0.0",
     "@types/jest": "^29.5.14",
     "@types/lodash": "^4.17.14",
     "@types/node": "^22.10.5",
@@ -20,6 +24,7 @@
   },
   "dependencies": {
     "@types/ws": "^8.5.13",
+    "express": "^4.21.2",
     "kafkajs": "^2.2.4",
     "ts-pattern": "^5.6.0",
     "winston": "^3.17.0",

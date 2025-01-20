@@ -1,9 +1,9 @@
 import { Auction } from '../schemas/Auction'
 import { Bid } from '../schemas/Bid'
 import { ItemsMap } from '../schemas/Player'
-import { AuctionEvents } from './AuctionEvents'
+import { AuctionEventsSource } from './AuctionEventsSource'
 
-export interface AuctionService extends AuctionEvents {
+export interface AuctionService extends AuctionEventsSource {
   createAuction: (auction: Auction) => Promise<Auction>
   getAuction: (auctionId: string) => Promise<Auction>
   getPlayerAuction: (playerId: string) => Promise<Auction>

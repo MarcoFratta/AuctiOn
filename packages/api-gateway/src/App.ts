@@ -2,7 +2,6 @@ import express from 'express'
 import cors from 'cors'
 import rateLimit from 'express-rate-limit'
 import { createRoutes } from './routes/Routes'
-//import { LoggingMiddleware } from './middlewares/logging.middleware';
 import { ErrorLoggerMiddleware, GatewayErrorsMiddleware, GenericErrorMiddleware } from './middlewares/ErrorsMiddleware'
 import { ProxyController } from './controllers/ProxyController'
 import { LoggingMiddleware } from './middlewares/LoggingMiddleware'

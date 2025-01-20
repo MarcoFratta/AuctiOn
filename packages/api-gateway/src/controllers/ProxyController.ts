@@ -14,6 +14,7 @@ export class ProxyController {
     return createProxyMiddleware<Request, Response>({
       target: service.url,
       changeOrigin: true,
+      ws: true,
       pathRewrite: service.pathRewrite,
       on: {
         proxyReq: fixRequestBody,

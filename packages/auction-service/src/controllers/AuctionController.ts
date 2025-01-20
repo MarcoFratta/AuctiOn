@@ -68,23 +68,29 @@ export class AuctionController {
   }
 
   private handlePlayerConnect = (playerId: string): void => {
-    this.auctionService.getPlayerAuction(playerId).then(auction => {
-      this.playerChannel.sendToPlayer(
-        playerId,
-        JSON.stringify({
-          type: 'auction',
-          auction: toPlayerAuction(playerId).convert(auction),
-        })
-      )
-      this.playerChannel.broadcast(
-        () =>
+    this.auctionService
+      .getPlayerAuction(playerId)
+      .then(auction => {
+        this.playerChannel.sendToPlayer(
+          playerId,
           JSON.stringify({
-            type: 'playerConnected',
-            playerId,
-          }),
-        this.allLobbyPlayersExcept(playerId, auction)
-      )
-    })
+            type: 'auction',
+            auction: toPlayerAuction(playerId).convert(auction),
+          })
+        )
+        this.playerChannel.broadcast(
+          () =>
+            JSON.stringify({
+              type: 'playerConnected',
+              playerId,
+            }),
+          this.allLobbyPlayersExcept(playerId, auction)
+        )
+      })
+      .catch(err => {
+        logger.error(`Error handling player connect: ${err}`)
+        this.playerChannel.closeConnection(playerId, false, 'Connection failed')
+      })
   }
 
   private handlePlayerDisconnect = (playerId: string): void => {
@@ -102,7 +108,7 @@ export class AuctionController {
         )
       })
       .catch(() => {
-        logger.info(`Player ${playerId} disconnected, auction is already over`)
+        logger.info(`Player ${playerId} disconnected`)
       })
   }
 
@@ -134,6 +140,9 @@ export class AuctionController {
       id => JSON.stringify({ type: 'auctionEnd', auction: toPlayerAuction(id).convert(auction) }),
       this.allLobbyPlayers(auction)
     )
+    auction.players.forEach(player => {
+      this.playerChannel.closeConnection(player.id, true, 'Auction ended')
+    })
   }
   private handleRoundEnd = (auction: Auction) => {
     this.playerChannel.broadcast(

@@ -56,27 +56,37 @@ export class KafkaController {
   }
 
   private handlePlayerConnect = (playerId: string): void => {
-    this.auctionService.getPlayerAuction(playerId).then(async auction => {
-      const payload = validateSchema<PlayerConnectedEvent>(PlayerConnectedEventSchema, {
-        type: 'player-connected',
-        playerId,
-        auctionId: auction.id,
-        timestamp: new Date(),
+    this.auctionService
+      .getPlayerAuction(playerId)
+      .then(async auction => {
+        const payload = validateSchema<PlayerConnectedEvent>(PlayerConnectedEventSchema, {
+          type: 'player-connected',
+          playerId,
+          auctionId: auction.id,
+          timestamp: new Date(),
+        })
+        await this.emitEvent('player-events', payload)
       })
-      await this.emitEvent('player-events', payload)
-    })
+      .catch(error => {
+        logger.error(`[KafkaController] Failed to get auction for player ${playerId}: ${error}`)
+      })
   }
 
   private handlePlayerDisconnect = (playerId: string): void => {
-    this.auctionService.getPlayerAuction(playerId).then(async auction => {
-      const payload = validateSchema<PlayerDisconnectedEvent>(PlayerDisconnectedEventSchema, {
-        type: 'player-disconnected',
-        playerId,
-        auctionId: auction.id,
-        timestamp: new Date(),
+    this.auctionService
+      .getPlayerAuction(playerId)
+      .then(async auction => {
+        const payload = validateSchema<PlayerDisconnectedEvent>(PlayerDisconnectedEventSchema, {
+          type: 'player-disconnected',
+          playerId,
+          auctionId: auction.id,
+          timestamp: new Date(),
+        })
+        await this.emitEvent('player-events', payload)
       })
-      await this.emitEvent('player-events', payload)
-    })
+      .catch(error => {
+        logger.error(`[KafkaController] Failed to get auction for player ${playerId}: ${error}`)
+      })
   }
 
   private handlePlayerMessage = async (playerId: string, message: string): Promise<void> => {
