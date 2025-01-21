@@ -27,6 +27,9 @@ export const AuthMiddleware = async (req: AuthenticatedRequest, res: Response, n
     }
     // Add user information to the request object
     req.user = response.user
+    // Optionally add user info to the headers for forwarding
+    req.headers['x-user'] = JSON.stringify(response.user)
+
     logger.info('User authenticated:', response.user.id)
     next()
   } catch (error) {
