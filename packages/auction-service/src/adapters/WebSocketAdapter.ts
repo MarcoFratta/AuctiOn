@@ -2,6 +2,8 @@ import WebSocket, { ServerOptions, WebSocketServer } from 'ws'
 import { PlayerEventSource } from './PlayerEventSource'
 import logger from '../utils/Logger'
 import { PlayerChannel } from './PlayerChannel'
+import { AuthenticatedRequest } from '../middlewares/AuthMiddleware'
+import { UserNotAuthenticatedError } from '../errors/Errors'
 
 export class WebSocketAdapter implements PlayerEventSource, PlayerChannel {
   private readonly wss: WebSocket.Server
@@ -15,25 +17,38 @@ export class WebSocketAdapter implements PlayerEventSource, PlayerChannel {
     this.wss = new WebSocketServer(config)
     logger.info('WebSocket server started')
 
-    this.wss.on('connection', (ws: WebSocket, req) => {
-      const playerId = req.url?.split('/').pop() // Assuming player ID is in the URL
-      logger.info(`Player connected: ${playerId}`)
-      if (playerId) {
-        this.clients.set(playerId, ws)
-        this.notifyConnect(playerId)
+    this.wss.on('connection', (ws: WebSocket, req: AuthenticatedRequest) => {
+      try {
+        const playerId = this.getPlayerId(req) // Assuming player ID is in the URL
+        logger.info(`Player connected: ${playerId}`)
+        if (playerId) {
+          this.clients.set(playerId, ws)
+          this.notifyConnect(playerId)
 
-        ws.on('message', (message: string) => {
-          logger.info(`Message from player ${playerId}: ${message}`)
-          this.notifyMessage(playerId, message)
-        })
+          ws.on('message', (message: string) => {
+            logger.info(`Message from player ${playerId}: ${message}`)
+            this.notifyMessage(playerId, message)
+          })
 
-        ws.on('close', () => {
-          logger.info(`Player disconnected: ${playerId}`)
-          this.clients.delete(playerId)
-          this.notifyDisconnect(playerId)
-        })
+          ws.on('close', () => {
+            logger.info(`Player disconnected: ${playerId}`)
+            this.clients.delete(playerId)
+            this.notifyDisconnect(playerId)
+          })
+        }
+      } catch (e) {
+        logger.error(`Error while connecting player: ${e}`)
+        ws.close(1008, 'Authentication required')
       }
     })
+  }
+
+  private getPlayerId(req: AuthenticatedRequest): string {
+    const player = req.user
+    if (!player) {
+      throw new UserNotAuthenticatedError()
+    }
+    return player.id
   }
 
   closeConnection(playerId: string, normal: boolean = true, reason: string = ''): void {
