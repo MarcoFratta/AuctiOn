@@ -1,42 +1,91 @@
-import WebSocket, { Server } from 'ws'
-import { createServer } from 'http'
-import { WebSocketAdapter } from '../src/adapters/WebSocketAdapter'
+import WebSocket from 'ws'
 import logger from '../src/utils/Logger'
-import { AuctionController } from '../src/controllers/AuctionController'
-import { AuctionServiceImpl } from '../src/services/AuctionServiceImpl'
 import { AuctionService } from '../src/services/AuctionService'
+import { App } from '../src/App'
+import { KafkaContainer, StartedKafkaContainer } from '@testcontainers/kafka'
+import { Kafka } from 'kafkajs'
 
+jest.setTimeout(70 * 1000)
 describe('Auction System Integration Test', () => {
-  let server: Server
-  let httpServer: any
-  let adapter: WebSocketAdapter
   let service: AuctionService
   let port: number
-  beforeEach(done => {
-    // Set up the HTTP server and WebSocket server before each test
-    httpServer = createServer()
-    adapter = new WebSocketAdapter({ server: httpServer })
-    service = new AuctionServiceImpl()
-    const controller = new AuctionController(service, adapter, adapter)
-    server = adapter.getServer()
+  let app: App
+  let kafka: StartedKafkaContainer
 
-    httpServer.listen(0, () => {
-      const address = httpServer.address()
-      if (address && typeof address === 'object') {
-        port = address.port // Use dynamic port
-        logger.info(`Test server started on port ${port}`)
-        done()
+  beforeAll(async () => {
+    kafka = await new KafkaContainer().withExposedPorts(9093).start()
+    await waitForKafkaToBeReady(kafka)
+  })
+
+  async function waitForKafkaToBeReady(kafkaContainer: StartedKafkaContainer,
+                                       retries: number = 10,
+                                       delay: number = 2000) {
+    const kafkaHost = `${kafkaContainer.getHost()}:${kafkaContainer.getMappedPort(9093)}`
+    const admin = new Kafka({
+      brokers: [kafkaHost],
+      clientId: 'test',
+    }).admin()
+
+    for (let i = 0; i < retries; i++) {
+      try {
+        // Attempt to connect to the Kafka admin client
+        await admin.connect()
+        console.log('Kafka is ready')
+
+        // Create necessary topics if not already present
+        await admin.createTopics({
+          topics: [
+            { topic: 'auction-events', numPartitions: 1 },
+            { topic: 'player-events', numPartitions: 1 },
+          ],
+          waitForLeaders: true, // Ensure leaders are assigned to partitions
+        })
+        console.log('Topics created successfully')
+        await admin.disconnect()
+        return
+      } catch (error) {
+        // Handle Kafka connection failure or other errors
+        console.error('Error while connecting or creating topics:', error)
+        console.log(`Kafka not ready, retrying... (${i + 1}/${retries})`)
+        await admin.disconnect()
+        await new Promise(resolve => setTimeout(resolve, delay)) // Wait before retrying
       }
-    })
+    }
+
+    // If Kafka is still not ready after retries, throw an error
+    throw new Error('Kafka did not become ready in time')
+  }
+
+  beforeAll(async () => {
+    kafka = await new KafkaContainer().withExposedPorts(9093).start()
+    await waitForKafkaToBeReady(kafka)
   })
 
-  afterEach(done => {
-    // Close WebSocket server and HTTP server after each test
-    server.close(() => {
-      httpServer.close(done)
-    })
+
+  afterAll(async () => {
+    await kafka.stop()
   })
-  const connectPlayer = (player: WebSocket, id: string, messages: Record<string, any[]>) => {
+
+  beforeEach((done) => {
+    const kafkaBrokers = [`${kafka.getHost()}:${kafka.getMappedPort(9093)}`]
+    app = new App(kafkaBrokers)
+    service = app.auctionService
+    app.start(0).then(() => {
+      const address = app.server.address()
+      if (address && typeof address === 'object') {
+        port = address.port
+      } else {
+        throw new Error('Failed to assign a dynamic port')
+      }
+      done()
+    }).catch(done)
+  });
+
+  afterEach(async () => {
+    await app.stop()
+  })
+  const connectPlayer = (player: WebSocket,
+                         id: string, messages: Record<string, any[]>) => {
     return new Promise<void>((resolve, reject) => {
       player.on('open', () => {
         logger.info(`${id} connected`)
