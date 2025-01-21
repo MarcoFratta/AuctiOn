@@ -7,6 +7,7 @@
     "test:lobby-service": "npm test --workspace=lobby-service",
     "test:user-service": "npm test --workspace=user-service",
     "test:auction-service": "npm test --workspace=auction-service",
+    "test:api-gateway": "npm test --workspace=api-gateway",
     "test": "npm-run-all --parallel test:*",
     "lint": "npx eslint --max-warnings=0 --fix --config eslint.config.mjs",
     "prettier": "npx prettier --write .",
