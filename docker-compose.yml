@@ -83,8 +83,6 @@ services:
     build:
       context: .
       dockerfile: packages/auction-service/Dockerfile
-    ports:
-      - '${AUCTION_S_H_PORT:-3000}:${AUCTION_S_C_PORT:-3000}' # Default to 3000 if PORT is not defined
     environment:
       - PORT=${AUCTION_S_C_PORT:-3000}
       - NODE_ENV=${AUCTION_S_NODE_ENV:-production}
