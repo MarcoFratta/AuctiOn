@@ -1,7 +1,7 @@
 import z from 'zod'
 import { AuctionSchema } from './Auction'
 import { PlayerSchema } from './Player'
-import { BidMsgSchema } from './AuctionMessages'
+import { BidMsgSchema, InventoryOutputSchema } from './AuctionMessages'
 import { SaleSchema } from './Sale'
 
 export const WithAuctionId = z.object({
@@ -44,11 +44,12 @@ export const BidEventSchema = z
   })
   .merge(WithAuctionId)
   .merge(WithPlayerId)
+  .merge(WithTimestamp)
 
 export const SaleEventSchema = z
   .object({
     type: z.literal('player-sale'),
-    sale: SaleSchema.omit({ endTimestamp: true }),
+    sale: SaleSchema.omit({ sellerId: true, endTimestamp: true }).merge(InventoryOutputSchema),
   })
   .merge(WithAuctionId)
   .merge(WithPlayerId)

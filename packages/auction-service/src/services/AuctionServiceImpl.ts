@@ -11,8 +11,16 @@ import { SaleSchema } from '../schemas/Sale'
 export class AuctionServiceImpl implements AuctionService {
   private auctions: Map<string, Auction> = new Map()
   private players: Map<string, string> = new Map()
-  private onRoundEndCallback: ((auction: Auction) => void)[] = []
-  private onAuctionEndCallback: ((auction: Auction) => void)[] = []
+  private callBacks = new Map<string, ((auction: Auction) => void)[]>()
+
+  constructor() {
+    this.initCallbacks()
+  }
+
+  initCallbacks = () => {
+    const types = ['onRoundEnd', 'onAuctionEnd', 'onNewBid', 'onNewSale']
+    types.forEach(t => this.callBacks.set(t, []))
+  }
 
   async createAuction(auction: Auction): Promise<Auction> {
     if (this.auctions.has(auction.id)) {
@@ -56,7 +64,9 @@ export class AuctionServiceImpl implements AuctionService {
 
     bid.timestamp = new Date()
     auction.currentBid = bid
-    return cloneDeep(auction)
+    const res = cloneDeep(auction)
+    this.notifyUpdate(res, 'onNewBid')
+    return res
   }
 
   async playerSale(playerId: string, saleItems: ItemsMap): Promise<Auction> {
@@ -76,7 +86,9 @@ export class AuctionServiceImpl implements AuctionService {
       items: saleItems,
     })
     auction.currentBid = undefined
-    return cloneDeep(auction)
+    const res = cloneDeep(auction)
+    this.notifyUpdate(res, 'onNewSale')
+    return res
   }
 
   async endRound(auctionId: string): Promise<Auction> {
@@ -103,7 +115,7 @@ export class AuctionServiceImpl implements AuctionService {
     auction.currentBid = undefined
     auction.currentSale = undefined
     const res = this.goToNextRound(auction, auctionId)
-    res.then(auction => this.onRoundEndCallback.forEach(callback => callback(auction)))
+    res.then(auction => this.notifyUpdate(auction, 'onRoundEnd'))
     return res
   }
 
@@ -120,8 +132,12 @@ export class AuctionServiceImpl implements AuctionService {
     this.auctions.delete(auction.id)
     // TODO: save auction results
     const res = cloneDeep(auction)
-    this.onAuctionEndCallback.forEach(callback => callback(res))
+    this.notifyUpdate(res, 'onAuctionEnd')
     return res
+  }
+
+  onRoundEnd(callback: (auction: Auction) => void): void {
+    this.callBacks.get('onRoundEnd')!.push(callback)
   }
 
   private getPlayer(auction: Auction, playerId: string) {
@@ -138,14 +154,6 @@ export class AuctionServiceImpl implements AuctionService {
 
   async getPlayerAuction(playerId: string): Promise<Auction> {
     return cloneDeep(this.findPlayerAuction(playerId))
-  }
-
-  onRoundEnd(callback: (auction: Auction) => void): void {
-    this.onRoundEndCallback.push(callback)
-  }
-
-  onAuctionEnd(callback: (auction: Auction) => void): void {
-    this.onAuctionEndCallback.push(callback)
   }
 
   private async goToNextRound(auction: Auction, auctionId: string): Promise<Auction> {
@@ -187,5 +195,22 @@ export class AuctionServiceImpl implements AuctionService {
     if (array.length === 0) return array // Handle empty array
     const [first, ...rest] = array
     return [...rest, first]
+  }
+
+  onAuctionEnd(callback: (auction: Auction) => void): void {
+    logger.info(this.callBacks)
+    this.callBacks.get('onAuctionEnd')!.push(callback)
+  }
+
+  onNewBid(callback: (auction: Auction) => void): void {
+    this.callBacks.get('onNewBid')!.push(callback)
+  }
+
+  onNewSale(callback: (auction: Auction) => void): void {
+    this.callBacks.get('onNewSale')!.push(callback)
+  }
+
+  private notifyUpdate(res: Auction, type: string) {
+    this.callBacks.get(type)!.forEach(callback => callback(res))
   }
 }

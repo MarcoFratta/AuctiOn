@@ -1,10 +1,12 @@
 import { Converter } from './Converter'
 import { Auction } from '../schemas/Auction'
-import { Player } from '../schemas/Player'
+import { ItemsMap, Player } from '../schemas/Player'
 import { validateSchema } from '../utils/Validator'
 import { Sale } from '../schemas/Sale'
 import { ItemWeights } from '../schemas/Item'
 import {
+  InventoryOutputMsg,
+  InventoryOutputSchema,
   PlayerAuction,
   PlayerAuctionSchema,
   PlayerInfoMessage,
@@ -19,22 +21,28 @@ export const saleWeight: Converter<Sale, number> = {
   },
 }
 
-export const toSaleInfo = {
+export const toSaleInfo: Converter<Sale, SaleInfo> = {
   convert: (sale: Sale): SaleInfo => {
     return validateSchema(SaleInfoSchema, {
       weight: saleWeight.convert(sale),
     })
   },
 }
+
+export const toInventory: Converter<ItemsMap, InventoryOutputMsg> = {
+  convert: (inventory: ItemsMap): InventoryOutputMsg => {
+    return validateSchema(InventoryOutputSchema, {
+      items: [...inventory.entries()].map(([item, quantity]) => ({
+        item: item,
+        quantity: quantity,
+      })),
+    })
+  },
+}
 export const toPlayerInfo: Converter<Player, PlayerInfoMessage> = {
   convert: (player: Player): PlayerInfoMessage => {
     return validateSchema(PlayerInfoSchema, {
-      inventory: {
-        items: [...player.inventory.entries()].map(([item, quantity]) => ({
-          item: item,
-          quantity: quantity,
-        })),
-      },
+      inventory: toInventory.convert(player.inventory),
       money: player.money,
     })
   },

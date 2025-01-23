@@ -3,24 +3,15 @@ import { AuctionService } from '../services/AuctionService'
 import { Kafka, Producer } from 'kafkajs'
 import logger from '../utils/Logger'
 import { Auction } from '../schemas/Auction'
-import { validateSchema } from '../utils/Validator'
+import { AuctionEvent } from '../schemas/Events'
 import {
-  AuctionEvent,
-  BidEvent,
-  BidEventSchema,
-  EndAuctionEvent,
-  EndAuctionEventSchema,
-  EndRoundEvent,
-  EndRoundEventSchema,
-  PlayerConnectedEvent,
-  PlayerConnectedEventSchema,
-  PlayerDisconnectedEvent,
-  PlayerDisconnectedEventSchema,
-  SaleEvent,
-  SaleEventSchema,
-} from '../schemas/Events'
-import { MessageType, MessageTypeSchema } from '../schemas/AuctionMessages'
-import { match } from 'ts-pattern'
+  toAuctionEndEvent,
+  toBidEvent,
+  toPlayerConnectedEvent,
+  toPlayerDisconnectedEvent,
+  toRoundEndEvent,
+  toSaleEvent,
+} from '../converters/EventConverter'
 
 export class KafkaController {
   private auctionService: AuctionService
@@ -34,9 +25,10 @@ export class KafkaController {
     this.kafkaProducer = client.producer()
     this.eventSource.onPlayerConnect(this.handlePlayerConnect)
     this.eventSource.onPlayerDisconnect(this.handlePlayerDisconnect)
-    this.eventSource.onPlayerMessage(this.handlePlayerMessage)
     this.auctionService.onAuctionEnd(this.handleAuctionEnd)
     this.auctionService.onRoundEnd(this.handleRoundEnd)
+    this.auctionService.onNewBid(this.handleNewBid)
+    this.auctionService.onNewSale(this.handleNewSale)
   }
 
   async connect(): Promise<void> {
@@ -59,13 +51,8 @@ export class KafkaController {
     this.auctionService
       .getPlayerAuction(playerId)
       .then(async auction => {
-        const payload = validateSchema<PlayerConnectedEvent>(PlayerConnectedEventSchema, {
-          type: 'player-connected',
-          playerId,
-          auctionId: auction.id,
-          timestamp: new Date(),
-        })
-        await this.emitEvent('player-events', payload)
+        const msg = toPlayerConnectedEvent(playerId).convert(auction)
+        await this.emitEvent('player-events', msg)
       })
       .catch(error => {
         logger.error(`[KafkaController] Failed to get auction for player ${playerId}: ${error}`)
@@ -76,59 +63,29 @@ export class KafkaController {
     this.auctionService
       .getPlayerAuction(playerId)
       .then(async auction => {
-        const payload = validateSchema<PlayerDisconnectedEvent>(PlayerDisconnectedEventSchema, {
-          type: 'player-disconnected',
-          playerId,
-          auctionId: auction.id,
-          timestamp: new Date(),
-        })
-        await this.emitEvent('player-events', payload)
+        const msg = toPlayerDisconnectedEvent(playerId).convert(auction)
+        await this.emitEvent('player-events', msg)
       })
       .catch(error => {
         logger.error(`[KafkaController] Failed to get auction for player ${playerId}: ${error}`)
       })
   }
 
-  private handlePlayerMessage = async (playerId: string, message: string): Promise<void> => {
-    try {
-      const parsedMessage = JSON.parse(message)
-      const msgType: MessageType = validateSchema(MessageTypeSchema, parsedMessage.type)
-      match(msgType)
-        .with('bid', () => async () => {
-          const msg = validateSchema<BidEvent>(BidEventSchema, {
-            type: 'player-bid',
-            bid: parsedMessage.bid,
-          })
-          await this.emitEvent('player-events', msg)
-        })
-        .with('sell', async () => {
-          const msg = validateSchema<SaleEvent>(SaleEventSchema, {
-            type: 'player-sale',
-            sale: parsedMessage.sale,
-          })
-          await this.emitEvent('player-events', msg)
-        })
-        .exhaustive()
-    } catch (error) {
-      logger.error(`Error processing player message from ${playerId}: ${error}`)
-    }
-  }
-
   private handleAuctionEnd = async (auction: Auction): Promise<void> => {
-    const msg = validateSchema<EndAuctionEvent>(EndAuctionEventSchema, {
-      type: 'end-auction',
-      auctionId: auction.id,
-      timestamp: new Date(),
-    })
+    const msg = toAuctionEndEvent.convert(auction)
     await this.emitEvent('auction-events', msg)
   }
 
   private handleRoundEnd = async (auction: Auction): Promise<void> => {
-    const msg = validateSchema<EndRoundEvent>(EndRoundEventSchema, {
-      type: 'end-round',
-      auctionId: auction.id,
-      timestamp: new Date(),
-    })
+    const msg = toRoundEndEvent.convert(auction)
+    await this.emitEvent('auction-events', msg)
+  }
+  private handleNewBid = async (auction: Auction) => {
+    const msg = toBidEvent.convert(auction)
+    await this.emitEvent('auction-events', msg)
+  }
+  private handleNewSale = async (auction: Auction) => {
+    const msg = toSaleEvent.convert(auction)
     await this.emitEvent('auction-events', msg)
   }
 }
