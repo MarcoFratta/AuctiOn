@@ -1,5 +1,5 @@
-import { InventoryInputSchema } from '../src/schemas/AuctionMessages'
 import { validateSchema, ValidationError } from '../src/utils/Validator'
+import { InventoryInputSchema } from '../src/schemas/Item'
 
 describe('SaleMsgSchema Validation', () => {
   it('should validate a valid sale message with unique items', () => {
@@ -45,4 +45,5 @@ describe('SaleMsgSchema Validation', () => {
 
     expect(() => validateSchema(InventoryInputSchema, invalidMessage)).toThrow(ValidationError)
   })
+
 })

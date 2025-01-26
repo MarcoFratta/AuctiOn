@@ -1,12 +1,14 @@
-import { Auction, AuctionSchema } from '../schemas/Auction'
+import { Auction, AuctionConfig } from '../schemas/Auction'
 import { Bid } from '../schemas/Bid'
-import { ItemsMap, Player } from '../schemas/Player'
+import { ItemsMap, Player, PlayerState } from '../schemas/Player'
 import { AuctionService } from './AuctionService'
-import { PlayOrderStrategy } from './PlayOrderStrategy'
 import { cloneDeep } from 'lodash'
 import logger from '../utils/Logger'
 import { validateSchema } from '../utils/Validator'
 import { SaleSchema } from '../schemas/Sale'
+import { createPlayer } from './PlayerFactory'
+import { PlayOrderStrategy } from './PlayOrderStrategy'
+import { createAuctionFromConfig } from '../domain/auctions/AuctionFactory'
 
 export class AuctionServiceImpl implements AuctionService {
   private auctions: Map<string, Auction> = new Map()
@@ -22,20 +24,12 @@ export class AuctionServiceImpl implements AuctionService {
     types.forEach(t => this.callBacks.set(t, []))
   }
 
-  async createAuction(auction: Auction): Promise<Auction> {
-    if (this.auctions.has(auction.id)) {
-      throw new Error(`Auction with id ${auction.id} already exists`)
+  async createAuction(config: AuctionConfig): Promise<Auction> {
+    if (this.auctions.has(config.id)) {
+      throw new Error(`Auction with id ${config.id} already exists`)
     }
-    logger.info(`creating auction: ${JSON.stringify(auction)}`)
-    const newAuction: Auction = validateSchema(AuctionSchema, auction)
-
-    newAuction.players = auction.players.map(player => cloneDeep(player))
-    newAuction.sellerQueue = PlayOrderStrategy.sameOrder(newAuction.players.map(player => player.id))
-    newAuction.players.forEach(player => this.players.set(player.id, auction.id))
-    newAuction.currentRound = 1
-    newAuction.currentBid = undefined
-    newAuction.currentSale = undefined
-    newAuction.startTimestamp = new Date()
+    logger.info(`creating auction: ${config.id}`)
+    const newAuction: Auction = createAuctionFromConfig(config)
     this.auctions.set(newAuction.id, newAuction)
     logger.info(`created auction: ${JSON.stringify(newAuction)}`)
     return cloneDeep(newAuction)
@@ -71,6 +65,9 @@ export class AuctionServiceImpl implements AuctionService {
 
   async playerSale(playerId: string, saleItems: ItemsMap): Promise<Auction> {
     const auction: Auction = this.findPlayerAuction(playerId)
+    if (!auction.startTimestamp) {
+      throw new Error(`Auction not started yet`)
+    }
     const player: Player = this.getPlayer(auction, playerId)
     const sellerIndex = (auction.currentRound - 1) % auction.players.length
     if (playerId !== auction.sellerQueue[sellerIndex]) {
@@ -93,6 +90,9 @@ export class AuctionServiceImpl implements AuctionService {
 
   async endRound(auctionId: string): Promise<Auction> {
     const auction: Auction = this.findAuctionById(auctionId)
+    if (!auction.startTimestamp) {
+      throw new Error(`Auction not started yet`)
+    }
     if (auction.currentSale && auction.currentBid) {
       const highestBid: Bid = auction.currentBid
       const winner: Player = this.getPlayer(auction, highestBid.playerId)
@@ -114,12 +114,10 @@ export class AuctionServiceImpl implements AuctionService {
     }
     auction.currentBid = undefined
     auction.currentSale = undefined
-    const res = this.goToNextRound(auction, auctionId)
-    res.then(auction => this.notifyUpdate(auction, 'onRoundEnd'))
-    return res
+    return this.goToNextRound(auction, auctionId)
   }
 
-  async setPlayerState(playerId: string, state: string): Promise<Auction> {
+  async setPlayerState(playerId: string, state: PlayerState): Promise<Auction> {
     const auction: Auction = this.findPlayerAuction(playerId)
     const player: Player = this.getPlayer(auction, playerId)
     player.status = state
@@ -156,18 +154,10 @@ export class AuctionServiceImpl implements AuctionService {
     return cloneDeep(this.findPlayerAuction(playerId))
   }
 
-  private async goToNextRound(auction: Auction, auctionId: string): Promise<Auction> {
-    auction.currentRound++
-    let disconnectedCounter = 0
-    while (this.getPlayer(auction, this.getCurrentSellerId(auction)).status === 'disconnected') {
-      logger.info(`Player ${this.getCurrentSellerId(auction)} disconnected, skipping round: ${auction.currentRound}`)
-      auction.sellerQueue = this.rotateLeft(auction.sellerQueue)
-      disconnectedCounter++
-      if (disconnectedCounter == auction.players.length - 1) {
-        logger.info(`Too many players disconnected, ending auction: ${auctionId}`)
-        return this.endAuction(auctionId)
-      }
-    }
+  async playerJoin(playerId: string, auctionId: string): Promise<Auction> {
+    const auction = this.findAuctionById(auctionId)
+    auction.players.push(createPlayer(playerId, auction))
+    this.players.set(playerId, auctionId)
     return cloneDeep(auction)
   }
 
@@ -212,5 +202,38 @@ export class AuctionServiceImpl implements AuctionService {
 
   private notifyUpdate(res: Auction, type: string) {
     this.callBacks.get(type)!.forEach(callback => callback(res))
+  }
+
+  async playerLeave(playerId: string, auctionId: string): Promise<Auction> {
+    const auction = this.findAuctionById(auctionId)
+    auction.players = auction.players.filter(player => player.id !== playerId)
+    this.players.delete(playerId)
+    return cloneDeep(auction)
+  }
+
+  async startAuction(auctionId: string): Promise<Auction> {
+    const auction: Auction = this.findAuctionById(auctionId)
+    auction.startTimestamp = new Date()
+    auction.sellerQueue = PlayOrderStrategy.sameOrder(auction.players.map(player => player.id))
+    return cloneDeep(auction)
+  }
+
+  private async goToNextRound(auction: Auction, auctionId: string): Promise<Auction> {
+    auction.currentRound++
+    let disconnectedCounter = 0
+    logger.info('going to next turn:')
+    logger.info(auction.players)
+    while (this.getPlayer(auction, this.getCurrentSellerId(auction)).status === 'not-connected') {
+      logger.info(`Player ${this.getCurrentSellerId(auction)} disconnected, skipping round: ${auction.currentRound}`)
+      auction.sellerQueue = this.rotateLeft(auction.sellerQueue)
+      disconnectedCounter++
+      if (disconnectedCounter == auction.players.length - 1) {
+        logger.info(`Too many players disconnected, ending auction: ${auctionId}`)
+        this.notifyUpdate(auction, 'onRoundEnd')
+        return this.endAuction(auctionId)
+      }
+    }
+    this.notifyUpdate(auction, 'onRoundEnd')
+    return cloneDeep(auction)
   }
 }

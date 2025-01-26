@@ -18,7 +18,7 @@ function validateSchema<T>(schema: ZodSchema<T>, object: unknown): T {
       logger.info(formattedError)
       throw new ValidationError(formattedError)
     }
-
+    logger.error(err)
     throw err // Re-throw unexpected errors
   }
 }

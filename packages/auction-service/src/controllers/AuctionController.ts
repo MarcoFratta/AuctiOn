@@ -1,20 +1,14 @@
 import { PlayerEventSource } from '../adapters/PlayerEventSource'
 import { PlayerChannel } from '../adapters/PlayerChannel'
 import { validateSchema } from '../utils/Validator'
-import {
-  BidMessage,
-  BidMsgSchema,
-  InventoryInputMsg,
-  InventoryInputSchema,
-  MessageType,
-  MessageTypeSchema,
-} from '../schemas/AuctionMessages'
+import { BidMessage, BidMsgSchema, MessageType, MessageTypeSchema } from '../schemas/AuctionMessages'
 import { match } from 'ts-pattern'
 import { Auction } from '../schemas/Auction'
 import logger from '../utils/Logger'
 import { Bid, BidSchema } from '../schemas/Bid'
 import { AuctionService } from '../services/AuctionService'
 import { toPlayerAuction } from '../converters/AuctionConverter'
+import { InventoryInputMsg, InventoryInputSchema } from '../schemas/Item'
 
 export class AuctionController {
   private auctionService: AuctionService
@@ -33,7 +27,7 @@ export class AuctionController {
     this.auctionService.onRoundEnd(this.handleRoundEnd)
   }
 
-  private handlePlayerMessage = (playerId: string, message: string): void => {
+  handlePlayerMessage = (playerId: string, message: string): void => {
     try {
       const parsedMessage = JSON.parse(message)
       const msgType: MessageType = validateSchema(MessageTypeSchema, parsedMessage.type)
@@ -67,9 +61,9 @@ export class AuctionController {
     }
   }
 
-  private handlePlayerConnect = (playerId: string): void => {
+  handlePlayerConnect = (playerId: string): void => {
     this.auctionService
-      .getPlayerAuction(playerId)
+      .setPlayerState(playerId, 'connected')
       .then(auction => {
         this.playerChannel.sendToPlayer(
           playerId,
@@ -93,9 +87,9 @@ export class AuctionController {
       })
   }
 
-  private handlePlayerDisconnect = (playerId: string): void => {
+  handlePlayerDisconnect = (playerId: string): void => {
     this.auctionService
-      .setPlayerState(playerId, 'disconnected')
+      .setPlayerState(playerId, 'not-connected')
       .then(auction => {
         this.playerChannel.broadcast(
           id => {

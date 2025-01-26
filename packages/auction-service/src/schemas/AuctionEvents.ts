@@ -1,8 +1,9 @@
 import z from 'zod'
 import { AuctionSchema } from './Auction'
 import { PlayerSchema } from './Player'
-import { BidMsgSchema, InventoryOutputSchema } from './AuctionMessages'
+import { BidMsgSchema } from './AuctionMessages'
 import { SaleSchema } from './Sale'
+import { InventoryOutputSchema } from './Item'
 
 export const WithAuctionId = z.object({
   auctionId: AuctionSchema.shape.id,

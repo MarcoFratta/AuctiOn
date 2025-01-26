@@ -13,7 +13,7 @@ import {
   PlayerDisconnectedEventSchema,
   SaleEvent,
   SaleEventSchema,
-} from '../schemas/Events'
+} from '../schemas/AuctionEvents'
 import { validateSchema } from '../utils/Validator'
 import { toInventory } from './AuctionConverter'
 

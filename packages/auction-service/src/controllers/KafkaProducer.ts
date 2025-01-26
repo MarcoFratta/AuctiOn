@@ -3,7 +3,7 @@ import { AuctionService } from '../services/AuctionService'
 import { Kafka, Producer } from 'kafkajs'
 import logger from '../utils/Logger'
 import { Auction } from '../schemas/Auction'
-import { AuctionEvent } from '../schemas/Events'
+import { AuctionEvent } from '../schemas/AuctionEvents'
 import {
   toAuctionEndEvent,
   toBidEvent,
@@ -13,7 +13,7 @@ import {
   toSaleEvent,
 } from '../converters/EventConverter'
 
-export class KafkaController {
+export class KafkaProducer {
   private auctionService: AuctionService
   private eventSource: PlayerEventSource
   private kafkaProducer: Producer

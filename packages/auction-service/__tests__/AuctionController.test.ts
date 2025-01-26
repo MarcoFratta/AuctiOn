@@ -1,82 +1,61 @@
 import { AuctionController } from '../src/controllers/AuctionController'
+import { AuctionService } from '../src/services/AuctionService'
+import { WebSocketAdapter } from '../src/adapters/WebSocketAdapter'
+import { AuctionConfig } from '../src/schemas/Auction'
 import { mock, MockProxy } from 'jest-mock-extended'
-import { AuctionServiceImpl } from '../src/services/AuctionServiceImpl'
-import { PlayerEventSource } from '../src/adapters/PlayerEventSource'
-import { PlayerChannel } from '../src/adapters/PlayerChannel'
-import { BidMessage, InventoryInputMsg } from '../src/schemas/AuctionMessages'
-import { Auction } from '../src/schemas/Auction'
+import { BidMessage } from '../src/schemas/AuctionMessages'
 import { ItemsMap } from '../src/schemas/Player'
+import { InventoryInputMsg } from '../src/schemas/Item'
+import { AuctionServiceImpl } from '../src/services/AuctionServiceImpl'
 
 describe('AuctionController', () => {
-  let auctionService: MockProxy<AuctionServiceImpl>
-  let eventSource: MockProxy<PlayerEventSource>
-  let playerChannel: MockProxy<PlayerChannel>
-  let auctionController: AuctionController
+  let controller: AuctionController
+  let mockAuctionService: MockProxy<AuctionService>
+  let mockWebSocketAdapter: MockProxy<WebSocketAdapter>
+
+  const defaultConfig: AuctionConfig = {
+    id: 'auction1',
+    maxPlayers: 4,
+    maxRound: 3,
+    startAmount: 100,
+    startInventory: { items: [{ item: 'square', quantity: 2 }] },
+    bidTime: 30,
+  }
 
   beforeEach(() => {
-    auctionService = mock<AuctionServiceImpl>()
-    eventSource = mock<PlayerEventSource>()
-    playerChannel = mock<PlayerChannel>()
-    auctionController = new AuctionController(auctionService, eventSource, playerChannel)
+    mockAuctionService = mock<AuctionServiceImpl>()
+
+    mockWebSocketAdapter = mock<WebSocketAdapter>()
+
+    controller = new AuctionController(mockAuctionService, mockWebSocketAdapter, mockWebSocketAdapter)
   })
 
-  test('should handle player connection', async () => {
+  it('should handle player connections', () => {
     const playerId = 'player1'
-    const mockAuction: Auction = {
-      id: 'auction1',
-      players: [
-        {
-          id: 'player1',
-          money: 1000,
-          inventory: new Map([
-            ['square', 2],
-            ['circle', 1],
-          ]),
-          status: 'connected',
-        },
-        {
-          id: 'player2',
-          money: 1000,
-          inventory: new Map([
-            ['triangle', 1],
-            ['circle', 2],
-          ]),
-          status: 'connected',
-        },
-      ],
-      maxRound: 10,
-      sellerQueue: ['player1', 'player2'],
+    mockAuctionService.setPlayerState.mockResolvedValue({
+      ...defaultConfig,
+      players: [{ id: playerId, status: 'connected', money: 100, inventory: new Map() }],
+      sellerQueue: [],
       currentRound: 1,
-      currentSale: undefined,
-      currentBid: undefined,
-      startTimestamp: new Date(),
-    }
-
-    auctionService.getPlayerAuction.mockResolvedValue(mockAuction)
-
-    await auctionController['handlePlayerConnect'](playerId)
-
-    expect(auctionService.getPlayerAuction).toHaveBeenCalledWith(playerId)
-  })
-
-  test('should handle player disconnection', async () => {
-    const playerId = 'player1'
-
-    auctionService.setPlayerState.mockResolvedValue({
-      id: 'auction1',
-      players: [],
-      maxRound: 10,
-      sellerQueue: ['player1', 'player2'],
-      currentRound: 1,
-      currentSale: undefined,
-      currentBid: undefined,
-      startTimestamp: new Date(),
     })
 
-    await auctionController['handlePlayerDisconnect'](playerId)
+    controller.handlePlayerConnect(playerId)
 
-    expect(auctionService.setPlayerState).toHaveBeenCalledWith(playerId, 'disconnected')
-    expect(playerChannel.broadcast).toHaveBeenCalled()
+    expect(mockAuctionService.setPlayerState).toHaveBeenCalledWith(playerId, 'connected')
+  })
+
+  it('should handle player disconnections', () => {
+    const playerId = 'player1'
+    mockAuctionService.setPlayerState.mockResolvedValue({
+      ...defaultConfig,
+      players: [{ id: playerId, status: 'not-connected', money: 100, inventory: new Map() }],
+      sellerQueue: [],
+      currentRound: 1,
+    })
+
+    controller.handlePlayerDisconnect(playerId)
+
+    expect(mockAuctionService.setPlayerState).toHaveBeenCalledWith(playerId, 'not-connected')
   })
 
   test('should handle player bid message', async () => {
@@ -90,10 +69,14 @@ describe('AuctionController', () => {
     })
     const bid: BidMessage = { amount: 100, round: 1 }
 
-    auctionService.playerBid.mockResolvedValue({
+    mockAuctionService.playerBid.mockResolvedValue({
       id: 'auction1',
       players: [],
       maxRound: 10,
+      maxPlayers: 4,
+      startAmount: 100,
+      startInventory: { items: [{ item: 'square', quantity: 2 }] },
+      bidTime: 30,
       sellerQueue: ['player1'],
       currentRound: 1,
       currentSale: undefined,
@@ -101,9 +84,9 @@ describe('AuctionController', () => {
       startTimestamp: new Date(),
     })
 
-    await auctionController['handlePlayerMessage'](playerId, message)
+    await controller.handlePlayerMessage(playerId, message)
 
-    expect(auctionService.playerBid).toHaveBeenCalledWith({
+    expect(mockAuctionService.playerBid).toHaveBeenCalledWith({
       playerId,
       amount: bid.amount,
       round: bid.round,
@@ -131,10 +114,14 @@ describe('AuctionController', () => {
       ['circle', 1],
     ])
 
-    auctionService.playerSale.mockResolvedValue({
+    mockAuctionService.playerSale.mockResolvedValue({
       id: 'auction1',
       players: [],
       maxRound: 10,
+      maxPlayers: 4,
+      startAmount: 100,
+      startInventory: { items: [{ item: 'square', quantity: 2 }] },
+      bidTime: 30,
       sellerQueue: ['player1'],
       currentRound: 1,
       currentSale: {
@@ -146,8 +133,8 @@ describe('AuctionController', () => {
       startTimestamp: new Date(),
     })
 
-    await auctionController['handlePlayerMessage'](playerId, message)
+    await controller.handlePlayerMessage(playerId, message)
 
-    expect(auctionService.playerSale).toHaveBeenCalledWith(playerId, itemsMap)
+    expect(mockAuctionService.playerSale).toHaveBeenCalledWith(playerId, itemsMap)
   })
 })

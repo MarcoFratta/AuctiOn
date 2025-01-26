@@ -1,4 +1,4 @@
-import { KafkaController } from '../src/controllers/KafkaController'
+import { KafkaProducer } from '../src/controllers/KafkaProducer'
 import { AuctionService } from '../src/services/AuctionService'
 import { PlayerEventSource } from '../src/adapters/PlayerEventSource'
 import { Kafka, Producer } from 'kafkajs'
@@ -15,7 +15,7 @@ describe('KafkaController', () => {
   let eventSource: MockProxy<PlayerEventSource>
   let kafkaProducer: MockProxy<Producer>
   let kafkaClient: Kafka
-  let kafkaController: KafkaController
+  let kafkaController: KafkaProducer
 
   beforeEach(() => {
     auctionService = mock<AuctionService>()
@@ -23,7 +23,7 @@ describe('KafkaController', () => {
     kafkaClient = mock<Kafka>() // Using mocked Kafka
     kafkaProducer = mock<Producer>()
     kafkaClient.producer = jest.fn().mockReturnValue(kafkaProducer)
-    kafkaController = new KafkaController(kafkaClient, auctionService, eventSource)
+    kafkaController = new KafkaProducer(kafkaClient, auctionService, eventSource)
   })
 
   test('should emit player-connected event on player connect', async () => {

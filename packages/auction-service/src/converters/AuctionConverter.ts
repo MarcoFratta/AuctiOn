@@ -3,10 +3,8 @@ import { Auction } from '../schemas/Auction'
 import { ItemsMap, Player } from '../schemas/Player'
 import { validateSchema } from '../utils/Validator'
 import { Sale } from '../schemas/Sale'
-import { ItemWeights } from '../schemas/Item'
+import { InventoryOutputMsg, InventoryOutputSchema, ItemWeights } from '../schemas/Item'
 import {
-  InventoryOutputMsg,
-  InventoryOutputSchema,
   PlayerAuction,
   PlayerAuctionSchema,
   PlayerInfoMessage,
@@ -28,7 +26,11 @@ export const toSaleInfo: Converter<Sale, SaleInfo> = {
     })
   },
 }
-
+export const toInventoryMap: Converter<InventoryOutputMsg, ItemsMap> = {
+  convert: (inventory: InventoryOutputMsg): ItemsMap => {
+    return new Map(inventory.items.map(({ item, quantity }) => [item, quantity]))
+  },
+}
 export const toInventory: Converter<ItemsMap, InventoryOutputMsg> = {
   convert: (inventory: ItemsMap): InventoryOutputMsg => {
     return validateSchema(InventoryOutputSchema, {
@@ -63,6 +65,10 @@ export const toPlayerAuction = (playerId: string): Converter<Auction, PlayerAuct
         sellerQueue: auction.sellerQueue,
         currentRound: auction.currentRound,
         currentBid: auction.currentBid,
+        maxPlayers: auction.maxPlayers,
+        bidTime: auction.bidTime,
+        startInventory: auction.startInventory,
+        startAmount: auction.startAmount,
         startTimestamp: auction.startTimestamp,
         playerInfo: toPlayerInfo.convert(player),
         saleInfo: auction.currentSale ? toSaleInfo.convert(auction.currentSale) : undefined,

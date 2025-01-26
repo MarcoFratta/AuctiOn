@@ -1,63 +1,142 @@
 import { AuctionServiceImpl } from '../src/services/AuctionServiceImpl'
-import { Auction } from '../src/schemas/Auction'
-import { ItemsMap, Player } from '../src/schemas/Player'
+import { AuctionService } from '../src/services/AuctionService'
+import { Auction, AuctionConfig } from '../src/schemas/Auction'
+import { ItemsMap } from '../src/schemas/Player'
 import { Bid } from '../src/schemas/Bid'
 
-describe('AuctionServiceImpl', () => {
-  let service: AuctionServiceImpl
+describe('AuctionService', () => {
+  let service: AuctionService
 
   beforeEach(() => {
     service = new AuctionServiceImpl()
   })
 
-  const mockPlayer = (id: string, money: number): Player => ({
-    id,
-    money,
-    inventory: new Map([
-      ['square', 0],
-      ['triangle', 0],
-      ['circle', 0],
-    ]),
-    status: 'active',
-  })
-
-  const createMockAuction = (): Auction => ({
+  const defaultConfig: AuctionConfig = {
     id: 'auction1',
-    players: [mockPlayer('player1', 100), mockPlayer('player2', 100)],
+    maxPlayers: 4,
     maxRound: 3,
-    sellerQueue: [],
-    currentRound: 0,
-    currentSale: undefined,
-    currentBid: undefined,
-    startTimestamp: new Date(),
+    startAmount: 100,
+    startInventory: { items: [{ item: 'square', quantity: 2 }] },
+    bidTime: 30,
+  }
+  const joinAndConnectPlayer =
+    async (id: string, auction: string): Promise<Auction> => {
+      await service.playerJoin(id, auction)
+      return service.setPlayerState(id, 'connected')
+    }
+
+  describe('Player Management', () => {
+    it('should allow a player to join an auction', async () => {
+      await service.createAuction(defaultConfig)
+      await service.playerJoin('player1', defaultConfig.id)
+
+      const auction = await service.getAuction(defaultConfig.id)
+      expect(auction.players).toContainEqual(
+        expect.objectContaining({
+          id: 'player1',
+          status: 'not-connected',
+          money: defaultConfig.startAmount,
+          inventory: expect.any(Map),
+        }),
+      )
+    })
+
+    it('should handle player leaving an auction', async () => {
+      await service.createAuction(defaultConfig)
+      await service.playerJoin('player1', defaultConfig.id)
+      await service.playerLeave('player1', defaultConfig.id)
+
+      const auction = await service.getAuction(defaultConfig.id)
+      expect(auction.players).toHaveLength(0)
+    })
+
+    it('should allow setting player state', async () => {
+      await service.createAuction(defaultConfig)
+      await service.playerJoin('player1', defaultConfig.id)
+      await service.setPlayerState('player1', 'not-connected')
+
+      const auction = await service.getAuction(defaultConfig.id)
+      const player = auction.players.find(p => p.id === 'player1')
+      expect(player?.status).toBe('not-connected')
+    })
   })
 
-  it('should create an auction', async () => {
-    const auction = createMockAuction()
-    const result = await service.createAuction(auction)
-    expect(result.id).toBe(auction.id)
-    expect(result.sellerQueue.length).toBe(2)
-    expect(result.currentRound).toBe(1)
-    expect(service['auctions'].has(auction.id)).toBe(true)
+  describe('Auction Start', () => {
+    it('should start an auction', async () => {
+      await service.createAuction(defaultConfig)
+      await service.playerJoin('player1', defaultConfig.id)
+      await service.playerJoin('player2', defaultConfig.id)
+
+      await service.startAuction(defaultConfig.id)
+
+      const auction = await service.getAuction(defaultConfig.id)
+      expect(auction.sellerQueue).toHaveLength(2)
+      expect(auction.currentRound).toBe(1)
+      expect(auction.startTimestamp).toBeDefined()
+    })
+
+    it('should set up seller queue on start', async () => {
+      await service.createAuction(defaultConfig)
+      await service.playerJoin('player1', defaultConfig.id)
+      await service.playerJoin('player2', defaultConfig.id)
+
+      await service.startAuction(defaultConfig.id)
+
+      const auction = await service.getAuction(defaultConfig.id)
+      expect(auction.sellerQueue).toContain('player1')
+      expect(auction.sellerQueue).toContain('player2')
+    })
   })
 
-  it('should throw an error if auction with the same ID already exists', async () => {
+  it('should create auction with config', async () => {
+    const auction = await service.createAuction(defaultConfig)
+
+    expect(auction.id).toBe(defaultConfig.id)
+    expect(auction.maxRound).toBe(defaultConfig.maxRound)
+    expect(auction.startAmount).toBe(defaultConfig.startAmount)
+    expect(auction.startInventory).toEqual(defaultConfig.startInventory)
+    expect(auction.bidTime).toBe(defaultConfig.bidTime)
+    expect(auction.players).toHaveLength(0)
+    expect(auction.currentRound).toBe(1)
+    expect(auction.startTimestamp).not.toBeDefined()
+  })
+
+  it('should not allow duplicate auction ids', async () => {
+    await service.createAuction(defaultConfig)
+    await expect(service.createAuction(defaultConfig)).rejects.toThrow(
+      `Auction with id ${defaultConfig.id} already exists`,
+    )
+  })
+  const createMockAuction = (): AuctionConfig => ({
+    id: 'auction1',
+    maxPlayers: 2,
+    maxRound: 3,
+    startAmount: 100,
+    startInventory: { items: [{ item: 'square', quantity: 2 }] },
+    bidTime: 30,
+  })
+
+  it('should throw an error if a player try to sell but the auction is not started yet', async () => {
     const auction = createMockAuction()
     await service.createAuction(auction)
-    await expect(service.createAuction(auction)).rejects.toThrow(`Auction with id ${auction.id} already exists`)
+    await joinAndConnectPlayer('player1', auction.id)
+    await expect(service.playerSale('player1', new Map([['square', 2]]))).rejects.toThrow(`Auction not started yet`)
   })
   it('should throw an error if a player bids but there is not a current sale', async () => {
     const auction = createMockAuction()
     await service.createAuction(auction)
-
+    await joinAndConnectPlayer('player1', auction.id)
     const bid: Bid = { playerId: 'player1', round: 1, amount: 50, timestamp: new Date() }
     await expect(service.playerBid(bid)).rejects.toThrow(`Cannot place bid without an active sale`)
   })
 
   it('should allow a player to bid higher than the current bid', async () => {
     const auction = createMockAuction()
-    auction.players[0].inventory = new Map([['square', 5]])
+    auction.startInventory.items[0].quantity = 5
     await service.createAuction(auction)
+    await joinAndConnectPlayer('player1', auction.id)
+    await joinAndConnectPlayer('player2', auction.id)
+    await service.startAuction(auction.id)
     await service.playerSale('player1', new Map([['square', 2]]))
     const bid: Bid = { playerId: 'player2', round: 1, amount: 50, timestamp: new Date() }
     const updatedAuction = await service.playerBid(bid)
@@ -67,9 +146,12 @@ describe('AuctionServiceImpl', () => {
 
   it('should throw an error if the player has insufficient funds to bid', async () => {
     const auction = createMockAuction()
-    auction.players[0].inventory = new Map([['square', 5]])
-    auction.players[1].money = 10
+    auction.startInventory.items[0].quantity = 5
+    auction.startAmount = 10
     await service.createAuction(auction)
+    await joinAndConnectPlayer('player1', auction.id)
+    await joinAndConnectPlayer('player2', auction.id)
+    await service.startAuction(auction.id)
     await service.playerSale('player1', new Map([['square', 2]]))
 
     const bid: Bid = { playerId: 'player2', round: 1, amount: 50, timestamp: new Date() }
@@ -78,8 +160,11 @@ describe('AuctionServiceImpl', () => {
 
   it('should throw an error if the bid round does not match the current round', async () => {
     const auction = createMockAuction()
-    auction.players[0].inventory = new Map([['square', 5]])
+    auction.startInventory.items[0].quantity = 5
     await service.createAuction(auction)
+    await joinAndConnectPlayer('player1', auction.id)
+    await joinAndConnectPlayer('player2', auction.id)
+    await service.startAuction(auction.id)
     await service.playerSale('player1', new Map([['square', 2]]))
 
     const bid: Bid = { playerId: 'player2', round: 2, amount: 50, timestamp: new Date() }
@@ -88,8 +173,11 @@ describe('AuctionServiceImpl', () => {
 
   it('should allow a player to sell items', async () => {
     const auction = createMockAuction()
-    auction.players[0].inventory.set('square', 5)
+    auction.startInventory.items[0].quantity = 5
     await service.createAuction(auction)
+    await joinAndConnectPlayer('player1', auction.id)
+    await joinAndConnectPlayer('player2', auction.id)
+    await service.startAuction(auction.id)
     const saleItems: ItemsMap = new Map([['square', 2]])
     let updatedAuction = await service.playerSale('player1', saleItems)
 
@@ -103,12 +191,15 @@ describe('AuctionServiceImpl', () => {
     expect(updatedAuction.players[1].money).toBe(50)
     expect(updatedAuction.players[0].money).toBe(150)
     expect(updatedAuction.players[0].inventory.get('square')).toBe(3)
-    expect(updatedAuction.players[1].inventory.get('square')).toBe(2)
+    expect(updatedAuction.players[1].inventory.get('square')).toBe(7)
   })
 
   it('should throw an error if the seller is not the current seller', async () => {
     const auction = createMockAuction()
     await service.createAuction(auction)
+    await joinAndConnectPlayer('player1', auction.id)
+    await joinAndConnectPlayer('player2', auction.id)
+    await service.startAuction(auction.id)
 
     const saleItems: ItemsMap = new Map([['square', 2]])
     await expect(service.playerSale('player2', saleItems)).rejects.toThrow(`Player with id player2 is not the current seller`)
@@ -116,8 +207,11 @@ describe('AuctionServiceImpl', () => {
 
   it('should end the round and transfer items and money', async () => {
     const auction = createMockAuction()
-    auction.players[0].inventory.set('square', 5)
+    auction.startInventory.items[0].quantity = 5
     await service.createAuction(auction)
+    await joinAndConnectPlayer('player1', auction.id)
+    await joinAndConnectPlayer('player2', auction.id)
+    await service.startAuction(auction.id)
     await service.playerSale('player1', new Map([['square', 2]]))
     await service.playerBid({ playerId: 'player2', round: 1, amount: 50, timestamp: new Date() })
 
@@ -128,33 +222,38 @@ describe('AuctionServiceImpl', () => {
     expect(player1.money).toBe(150) // Seller gains money
     expect(player1.inventory.get('square')).toBe(3) // Items reduced
     expect(player2.money).toBe(50) // Bidder loses money
-    expect(player2.inventory.get('square')).toBe(2) // Items transferred
+    expect(player2.inventory.get('square')).toBe(7) // Items increased
   })
 
   it('should end the auction when the last round is completed', async () => {
     const auction = createMockAuction()
     auction.maxRound = 1 // Set only one round
     await service.createAuction(auction)
+    await service.playerJoin('player1', auction.id)
+    await service.startAuction(auction.id)
 
     const endedAuction = await service.endRound('auction1')
-    expect(service['auctions'].has('auction1')).toBe(false) // Auction removed
     expect(endedAuction.id).toBe('auction1') // Auction data returned
   })
 
   it('should throw an error if trying to end a non-existent auction', async () => {
-    await expect(service.endRound('invalidAuction')).rejects.toThrow(`Auction with id invalidAuction not found`)
+    await expect(service.endRound('invalidAuction'))
+      .rejects.toThrow(`Auction with id invalidAuction not found`)
   })
   it('should correctly handle turns for multiple players', async () => {
     const auction = createMockAuction()
-    auction.players = [mockPlayer('player1', 100), mockPlayer('player2', 100), mockPlayer('player3', 100)]
+    auction.maxPlayers = 5
     auction.maxRound = 5
-    auction.players.map(player => player.inventory.set('square', 5))
+    auction.startInventory.items.map(item => item.quantity = 5)
     await service.createAuction(auction)
+    await joinAndConnectPlayer('player1', auction.id)
+    await joinAndConnectPlayer('player2', auction.id)
+    await joinAndConnectPlayer('player3', auction.id)
+    await service.startAuction(auction.id)
 
     // Round 1
     await service.playerSale('player1', new Map([['square', 2]]))
     const res = await service.endRound('auction1')
-    console.log(res)
 
     // Round 2
     await service.playerSale('player2', new Map([['square', 2]]))
@@ -177,8 +276,10 @@ describe('AuctionServiceImpl', () => {
 
   it('should not bid if the player is the seller', async () => {
     const auction = createMockAuction()
-    auction.players[0].inventory.set('square', 5)
+    auction.startInventory.items[0].quantity = 5
     await service.createAuction(auction)
+    await joinAndConnectPlayer('player1', auction.id)
+    await service.startAuction(auction.id)
 
     await service.playerSale('player1', new Map([['square', 2]]))
     await expect(
@@ -192,8 +293,11 @@ describe('AuctionServiceImpl', () => {
   })
   it('should not allow a player to bid lower or equal than the current bid', async () => {
     const auction = createMockAuction()
-    auction.players[0].inventory.set('square', 5)
+    auction.startInventory.items[0].quantity = 5
     await service.createAuction(auction)
+    await joinAndConnectPlayer('player1', auction.id)
+    await joinAndConnectPlayer('player2', auction.id)
+    await service.startAuction(auction.id)
 
     await service.playerSale('player1', new Map([['square', 2]]))
 
@@ -217,15 +321,21 @@ describe('AuctionServiceImpl', () => {
   })
   it('should not allow a player to bid if they do not have enough money', async () => {
     const auction = createMockAuction()
-    auction.players[1].money = 10
+    auction.startAmount = 10
     await service.createAuction(auction)
+    await joinAndConnectPlayer('player1', auction.id)
+    await joinAndConnectPlayer('player2', auction.id)
+    await service.startAuction(auction.id)
 
     await expect(service.playerBid({ playerId: 'player2', round: 1, amount: 50, timestamp: new Date() })).rejects.toThrow()
   })
   it('should not remove in sale items from the seller if no one bids', async () => {
     const auction = createMockAuction()
-    auction.players[0].inventory.set('square', 5)
+    auction.startInventory.items[0].quantity = 5
     await service.createAuction(auction)
+    await joinAndConnectPlayer('player1', auction.id)
+    await joinAndConnectPlayer('player2', auction.id)
+    await service.startAuction(auction.id)
 
     await service.playerSale('player1', new Map([['square', 2]]))
     await service.endRound('auction1')
@@ -234,58 +344,46 @@ describe('AuctionServiceImpl', () => {
   })
 
   it('should skip disconnected players and end the auction if only one player is connected', async () => {
-    const auction = {
-      id: 'auction1',
-      players: [
-        { id: 'player1', money: 100, inventory: new Map(), status: 'active' },
-        { id: 'player3', money: 200, inventory: new Map(), status: 'disconnected' },
-        { id: 'player2', money: 200, inventory: new Map(), status: 'disconnected' },
-      ],
-      maxRound: 10,
-      sellerQueue: ['player1', 'player2', 'player3'],
-      currentRound: 1,
-      currentSale: undefined,
-      currentBid: undefined,
-      startTimestamp: new Date(),
-    }
-    await service.createAuction(auction)
+    await service.createAuction(defaultConfig)
+    await service.playerJoin('player1', defaultConfig.id)
+    await service.playerJoin('player2', defaultConfig.id)
+    await service.playerJoin('player3', defaultConfig.id)
+
+
+    // Set players' states
+    await service.setPlayerState('player1', 'connected')
+    await service.startAuction(defaultConfig.id)
+
     const endAuction = jest.spyOn(service, 'endAuction')
-    const result = await service.endRound('auction1')
+    const result = await service.endRound(defaultConfig.id)
 
     expect(result.currentRound).toBe(2)
-    expect(result.maxRound).toBe(10)
+    expect(result.maxRound).toBe(defaultConfig.maxRound)
     expect(endAuction).toHaveBeenCalled()
-    expect(result.players.find(p => p.id === 'player1')?.status).toBe('active')
-    expect(result.players.find(p => p.id === 'player2')?.status).toBe('disconnected')
-    expect(result.players.find(p => p.id === 'player3')?.status).toBe('disconnected')
+    expect(result.players.find(p => p.id === 'player1')?.status).toBe('connected')
+    expect(result.players.find(p => p.id === 'player2')?.status).toBe('not-connected')
+    expect(result.players.find(p => p.id === 'player3')?.status).toBe('not-connected')
   })
 
   it('should skip a disconnected player when determining the next seller', async () => {
-    const auction = {
-      id: 'auction1',
-      players: [
-        { id: 'player1', money: 100, inventory: new Map(), status: 'active' },
-        { id: 'player2', money: 200, inventory: new Map(), status: 'disconnected' },
-        { id: 'player3', money: 150, inventory: new Map([['square', 2]]), status: 'active' },
-      ],
-      maxRound: 10,
-      sellerQueue: ['player1', 'player2', 'player3'],
-      currentRound: 1,
-      currentSale: undefined,
-      currentBid: undefined,
-      startTimestamp: new Date(),
-    }
-    await service.createAuction(auction)
+    await service.createAuction(defaultConfig)
+    await joinAndConnectPlayer('player1', defaultConfig.id)
+    await joinAndConnectPlayer('player3', defaultConfig.id)
+    await service.playerJoin('player2', defaultConfig.id)
+    await service.setPlayerState('player2', 'not-connected')
+    await service.startAuction(defaultConfig.id)
 
     const endAuction = jest.spyOn(service, 'endAuction')
-    const result = await service.endRound('auction1')
+    const result = await service.endRound(defaultConfig.id)
 
     expect(result.currentRound).toBe(2)
-    expect(result.players.find(p => p.id === 'player2')?.status).toBe('disconnected')
-    expect(result.players.find(p => p.id === 'player1')?.status).toBe('active')
-    expect(result.players.find(p => p.id === 'player3')?.status).toBe('active')
-    expect(result.maxRound).toBe(10)
+    expect(result.players.find(p => p.id === 'player2')?.status).toBe('not-connected')
+    expect(result.players.find(p => p.id === 'player1')?.status).toBe('connected')
+    expect(result.players.find(p => p.id === 'player3')?.status).toBe('connected')
+    expect(result.maxRound).toBe(defaultConfig.maxRound)
     expect(endAuction).not.toHaveBeenCalled()
-    await service.playerSale('player3', new Map([['square', 2]]))
+
+    // Player3 should be able to make a sale since player2 is skipped
+    await service.playerSale('player3', new Map([['square', 1]]))
   })
 })

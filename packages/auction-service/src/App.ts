@@ -2,7 +2,7 @@ import express from 'express'
 import http from 'http'
 import { Kafka } from 'kafkajs'
 import logger from './utils/Logger'
-import { KafkaController } from './controllers/KafkaController'
+import { KafkaProducer } from './controllers/KafkaProducer'
 import { AuctionService } from './services/AuctionService'
 import { AuctionServiceImpl } from './services/AuctionServiceImpl'
 import { WebSocketAdapter } from './adapters/WebSocketAdapter'
@@ -17,7 +17,7 @@ export class App {
   public server: http.Server
   public wsAdapter: WebSocketAdapter
   public auctionService: AuctionService & AuctionEventsSource
-  public kafkaController: KafkaController
+  public kafkaController: KafkaProducer
   public auctionController: AuctionController
 
   constructor(kafkaBrokers: string[]) {
@@ -35,7 +35,7 @@ export class App {
 
     this.auctionController = new AuctionController(this.auctionService, this.wsAdapter, this.wsAdapter)
 
-    this.kafkaController = new KafkaController(kafka, this.auctionService, this.wsAdapter)
+    this.kafkaController = new KafkaProducer(kafka, this.auctionService, this.wsAdapter)
   }
 
   public async start(port: number, kafka: boolean = true): Promise<void> {
