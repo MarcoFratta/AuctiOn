@@ -1,4 +1,5 @@
 import z from 'zod'
+import { AuctionConfigSchema } from './Auction'
 
 export const LobbySchema = z.object({
   lobbyId: z.string(),
@@ -7,7 +8,8 @@ export const LobbySchema = z.object({
 
 export const LobbyCreatedEvent = z.object({
   type: z.literal('lobby-created'),
-  lobby: LobbySchema,
+  lobby: AuctionConfigSchema,
+  creator: z.string(),
 })
 export const LobbyJoinedEvent = z.object({
   type: z.literal('lobby-joined'),
