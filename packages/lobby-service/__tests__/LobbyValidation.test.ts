@@ -1,5 +1,5 @@
-import { Lobby, lobbySchema } from '../src/schemas/Lobby';
-import { validateSchema, ValidationError } from '../src/utils/Validator';
+import { Lobby, lobbySchema } from '../src/schemas/Lobby'
+import { validateSchema, ValidationError } from '../src/utils/Validator'
 
 describe('Lobby Schema Validation', () => {
     test('should validate a correct lobby', () => {
@@ -13,6 +13,14 @@ describe('Lobby Schema Validation', () => {
             maxPlayers: 5,
             rounds: 3,
             status: 'waiting',
+            bidTime: 10,
+            startAmount: 100,
+            startInventory: {
+                items: [{
+                    item: 'triangle',
+                    quantity: 1,
+                }],
+            },
         }
 
         expect(() => validateSchema(lobbySchema, validLobby)).not.toThrow()
@@ -34,6 +42,14 @@ describe('Lobby Schema Validation', () => {
             maxPlayers: 0,
             rounds: 3,
             status: 'waiting',
+            bidTime: 10,
+            startAmount: 100,
+            startInventory: {
+                items: [{
+                    item: 'triangle',
+                    quantity: 1,
+                }],
+            },
         };
 
         expect(() => validateSchema(lobbySchema, invalidLobby)).toThrow(ValidationError);
@@ -46,6 +62,14 @@ describe('Lobby Schema Validation', () => {
             maxPlayers: 5,
             rounds: 0,
             status: 'waiting',
+            bidTime: 10,
+            startAmount: 100,
+            startInventory: {
+                items: [{
+                    item: 'triangle',
+                    quantity: 1,
+                }],
+            },
         };
 
           expect(() => validateSchema(lobbySchema, invalidLobby)).toThrow(ValidationError);
@@ -59,6 +83,14 @@ describe('Lobby Schema Validation', () => {
             maxPlayers: 5,
             rounds: 3,
             status: 'waiting',
+            bidTime: 10,
+            startAmount: 100,
+            startInventory: {
+                items: [{
+                    item: 'triangle',
+                    quantity: 1,
+                }],
+            },
         }
 
         expect(() => validateSchema(lobbySchema, invalidLobby)).toThrow(
@@ -74,6 +106,14 @@ describe('Lobby Schema Validation', () => {
             maxPlayers: 5,
             rounds: 3,
             status: 'invalid-status',
+            bidTime: 10,
+            startAmount: 100,
+            startInventory: {
+                items: [{
+                    item: 'triangle',
+                    quantity: 1,
+                }],
+            },
         }
 
         expect(() => validateSchema(lobbySchema, invalidLobby)).toThrow(
@@ -89,6 +129,14 @@ describe('Lobby Schema Validation', () => {
             maxPlayers: 5,
             rounds: 3,
             status: 'waiting',
+            bidTime: 10,
+            startAmount: 100,
+            startInventory: {
+                items: [{
+                    item: 'triangle',
+                    quantity: 1,
+                }],
+            },
         }
 
         expect(() => validateSchema(lobbySchema, invalidLobby)).toThrow(
@@ -104,6 +152,14 @@ describe('Lobby Schema Validation', () => {
             maxPlayers: 5,
             rounds: 3,
             status: 'waiting',
+            bidTime: 10,
+            startAmount: 100,
+            startInventory: {
+                items: [{
+                    item: 'triangle',
+                    quantity: 1,
+                }],
+            },
         }
 
         expect(() => validateSchema(lobbySchema, invalidLobby)).toThrow(
@@ -118,6 +174,40 @@ describe('Lobby Schema Validation', () => {
             maxPlayers: 5,
             rounds: 3,
             status: 'waiting',
+            bidTime: 10,
+            startAmount: 100,
+            startInventory: {
+                items: [{
+                    item: 'triangle',
+                    quantity: 1,
+                }],
+            },
+        }
+
+        expect(() => validateSchema(lobbySchema, invalidLobby)).toThrow(
+          ValidationError,
+        )
+    })
+
+    it('should throw error for invalid startInventory field', () => {
+        const invalidLobby = {
+            id: '123456789012345678901234',
+            creator: 'user1',
+            players: [],
+            maxPlayers: 5,
+            rounds: 3,
+            status: 'waiting',
+            bidTime: 10,
+            startAmount: 100,
+            startInventory: {
+                items: [{
+                    item: 'triangle',
+                    quantity: 1,
+                }, {
+                    item: 'triangle',
+                    quantity: 3,
+                }],
+            },
         }
 
         expect(() => validateSchema(lobbySchema, invalidLobby)).toThrow(

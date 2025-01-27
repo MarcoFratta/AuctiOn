@@ -1,17 +1,20 @@
-import { Lobby, PlayerStatus } from '../schemas/Lobby';
+import { Lobby, PlayerStatus } from '../schemas/Lobby'
+import { LobbyEventsSource } from './LobbyEventsSource'
 
-export interface LobbyService {
-  createLobby(lobbyData: Omit<Lobby, 'id'>): Promise<Lobby>;
+export interface LobbyService extends LobbyEventsSource {
+  createLobby(lobbyData: Omit<Lobby, 'id'>): Promise<Lobby>
 
-  deleteLobby(id: string): Promise<boolean>;
+  deleteLobby(id: string): Promise<boolean>
 
-  joinLobby(id: string, userId: string): Promise<Lobby>;
+  joinLobby(id: string, userId: string): Promise<Lobby>
 
-  leaveLobby(id: string, userId: string): Promise<Lobby | null>;
+  leaveLobby(id: string, userId: string): Promise<Lobby | null>
 
-  kickPlayer(id: string, creator: string, playerId: string): Promise<Lobby>;
+  kickPlayer(id: string, creator: string, playerId: string): Promise<Lobby>
 
-  setStatus(id: string, userId: string, status: PlayerStatus): Promise<Lobby>;
+  setStatus(id: string, userId: string, status: PlayerStatus): Promise<Lobby>
 
-  startMatch(id: string, creator: string): Promise<Lobby>;
+  startMatch(id: string, creator: string): Promise<Lobby>
+
+  terminateMatch(id: string): Promise<void>
 }

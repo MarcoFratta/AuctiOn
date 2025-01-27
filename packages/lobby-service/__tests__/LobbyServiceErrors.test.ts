@@ -50,6 +50,9 @@ describe('LobbyService Error Handling', () => {
             players: [{ userId: 'user1', status: 'waiting' }],
             maxPlayers: 4,
             status: 'waiting',
+          bidTime: 10,
+          startAmount: 100,
+          startInventory: { items: [{ item: 'triangle', quantity: 1 }] },
         };
 
       mockLobbyRepo.findById.mockResolvedValue(lobby);
@@ -76,6 +79,9 @@ describe('LobbyService Error Handling', () => {
             ],
             maxPlayers: 2,
             status: 'waiting',
+          bidTime: 10,
+          startAmount: 100,
+          startInventory: { items: [{ item: 'triangle', quantity: 1 }] },
         };
 
       mockLobbyRepo.findById.mockResolvedValue(fullLobby);
@@ -94,6 +100,9 @@ describe('LobbyService Error Handling', () => {
             players: [{ userId: 'user2', status: 'waiting' }],
             maxPlayers: 4,
             status: 'waiting',
+          bidTime: 10,
+          startAmount: 100,
+          startInventory: { items: [{ item: 'triangle', quantity: 1 }] },
         };
 
       mockLobbyRepo.findById.mockResolvedValue(lobby);
@@ -111,6 +120,9 @@ describe('LobbyService Error Handling', () => {
             players: [{ userId: 'user2', status: 'waiting' }],
             maxPlayers: 4,
             status: 'waiting',
+          bidTime: 10,
+          startAmount: 100,
+          startInventory: { items: [{ item: 'triangle', quantity: 1 }] },
         };
 
       mockLobbyRepo.findById.mockResolvedValue(lobby);
@@ -128,6 +140,9 @@ describe('LobbyService Error Handling', () => {
             players: [{ userId: 'user1', status: 'ready' }],
             maxPlayers: 4,
             status: 'waiting',
+          bidTime: 10,
+          startAmount: 100,
+          startInventory: { items: [{ item: 'triangle', quantity: 1 }] },
         };
 
       mockLobbyRepo.findById.mockResolvedValue(lobby);
@@ -148,6 +163,9 @@ describe('LobbyService Error Handling', () => {
             ],
             maxPlayers: 4,
             status: 'waiting',
+          bidTime: 10,
+          startAmount: 100,
+          startInventory: { items: [{ item: 'triangle', quantity: 1 }] },
         };
 
       mockLobbyRepo.findById.mockResolvedValue(lobby);
@@ -168,6 +186,9 @@ describe('LobbyService Error Handling', () => {
             ],
             maxPlayers: 4,
             status: 'in-progress',
+          bidTime: 10,
+          startAmount: 100,
+          startInventory: { items: [{ item: 'triangle', quantity: 1 }] },
         };
 
       mockLobbyRepo.findById.mockResolvedValue(lobby);
@@ -185,6 +206,9 @@ describe('LobbyService Error Handling', () => {
       players: [{ userId: 'user2', status: 'waiting' }],
       maxPlayers: 4,
       status: 'waiting',
+      bidTime: 10,
+      startAmount: 100,
+      startInventory: { items: [{ item: 'triangle', quantity: 1 }] },
     };
 
     mockLobbyRepo.findById.mockResolvedValue(lobby);

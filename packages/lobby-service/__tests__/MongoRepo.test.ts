@@ -1,10 +1,10 @@
 // MongoLobbyRepo.test.ts
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import mongoose from 'mongoose';
-import { MongoLobbyRepo } from '../src/repositories/MongoLobbyRepo';
-import { LobbyModel } from '../src/models/LobbyModel';
-import { Lobby } from '../src/schemas/Lobby';
-import { LobbyNotFoundError } from '../src/errors/LobbyErrors';
+import { MongoMemoryServer } from 'mongodb-memory-server'
+import mongoose from 'mongoose'
+import { MongoLobbyRepo } from '../src/repositories/MongoLobbyRepo'
+import { LobbyModel } from '../src/models/LobbyModel'
+import { Lobby } from '../src/schemas/Lobby'
+import { LobbyNotFoundError } from '../src/errors/LobbyErrors'
 
 let mongoServer: MongoMemoryServer;
 let repo: MongoLobbyRepo
@@ -32,6 +32,9 @@ describe('MongoLobbyRepo', () => {
             maxPlayers: 4,
             rounds: 5,
             status: 'waiting',
+          bidTime: 10,
+          startAmount: 100,
+          startInventory: { items: [{ item: 'triangle', quantity: 1 }] },
         }
 
         const createdLobby = await repo.create(lobbyData)
@@ -48,6 +51,9 @@ describe('MongoLobbyRepo', () => {
             maxPlayers: 4,
             rounds: 5,
             status: 'waiting',
+          bidTime: 10,
+          startAmount: 100,
+          startInventory: { items: [{ item: 'triangle', quantity: 1 }] },
         });
 
         const result = await repo.delete(lobby.id);
@@ -74,6 +80,9 @@ describe('MongoLobbyRepo', () => {
             maxPlayers: 4,
             rounds: 5,
             status: 'waiting',
+          bidTime: 10,
+          startAmount: 100,
+          startInventory: { items: [{ item: 'triangle', quantity: 1 }] },
         })
         await lobby.save()
 
@@ -95,6 +104,9 @@ describe('MongoLobbyRepo', () => {
             maxPlayers: 4,
             rounds: 5,
             status: 'waiting',
+          bidTime: 10,
+          startAmount: 100,
+          startInventory: { items: [{ item: 'triangle', quantity: 1 }] },
         })
         await lobby.save()
 

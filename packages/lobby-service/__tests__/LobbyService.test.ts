@@ -3,7 +3,7 @@ import { LobbyServiceImpl } from '../src/services/LobbyServiceImpl'
 import { MongoLobbyRepo } from '../src/repositories/MongoLobbyRepo'
 import { UserLobbyRepo } from '../src/repositories/UserLobbyRepo'
 import { mock, MockProxy } from 'jest-mock-extended'
-import { Lobby } from '../src/schemas/Lobby'
+import { Lobby, lobbySchema } from '../src/schemas/Lobby'
 
 jest.mock('../src/repositories/MongoLobbyRepo');
 jest.mock('../src/repositories/UserLobbyRepo');
@@ -21,13 +21,23 @@ describe('LobbyService', () => {
 
     describe('createLobby', () => {
         it('should create a lobby and add creator to it', async () => {
-            const lobbyData = {
+            const lobbyData: Lobby = {
+                id: 'lobbyId',
                 creator: 'userId',
                 maxPlayers: 4,
                 rounds: 3,
-                status: 'waiting' as const,
+                players: [{ userId: 'userId', status: 'waiting' }],
+                status: lobbySchema.shape.status.enum.waiting!,
+                startAmount: 1000,
+                startInventory: {
+                    items: [{
+                        item: 'triangle',
+                        quantity: 1,
+                    }],
+                },
+                bidTime: 30,
             };
-            const createdLobby: Lobby = { ...lobbyData, id: 'lobbyId', players: [] };
+            const createdLobby = { ...lobbyData }
 
             mockLobbyRepo.create.mockResolvedValue(createdLobby);
             mockUserLobbyRepo.addUserToLobby.mockResolvedValue({
@@ -51,12 +61,20 @@ describe('LobbyService', () => {
             const lobbyId = 'lobbyId';
             const userId = 'userId';
             const lobby: Lobby = {
-                id: lobbyId,
-                creator: 'creatorId',
-                players: [{ userId: 'creatorId', status: 'waiting' }],
+                id: 'lobbyId',
+                creator: 'userId',
                 maxPlayers: 4,
                 rounds: 3,
-                status: 'waiting',
+                players: [],
+                status: lobbySchema.shape.status.enum.waiting!,
+                startAmount: 1000,
+                startInventory: {
+                    items: [{
+                        item: 'triangle',
+                        quantity: 1,
+                    }],
+                },
+                bidTime: 30,
             };
             const updatedLobby = {
                 ...lobby,
@@ -85,17 +103,24 @@ describe('LobbyService', () => {
             const lobbyId = 'lobbyId';
             const userId = 'newUser';
             const lobby: Lobby = {
-                id: lobbyId,
-                creator: 'creatorId',
+                id: 'lobbyId',
+                creator: 'userId',
+                maxPlayers: 4,
+                rounds: 3,
                 players: Array(4).fill(null).map((_, i) => ({
                     userId: `user${i}`,
                     status: 'waiting',
                 })),
-                maxPlayers: 4,
-                rounds: 3,
-                status: 'waiting',
+                status: lobbySchema.shape.status.enum.waiting!,
+                startAmount: 1000,
+                startInventory: {
+                    items: [{
+                        item: 'triangle',
+                        quantity: 1,
+                    }],
+                },
+                bidTime: 30,
             };
-
             mockLobbyRepo.findById.mockResolvedValue(lobby);
 
             await expect(lobbyService.joinLobby(lobbyId, userId))
@@ -106,12 +131,20 @@ describe('LobbyService', () => {
             const lobbyId = 'lobbyId';
             const userId = 'newUser';
             const lobby: Lobby = {
-                id: lobbyId,
-                creator: 'creatorId',
-                players: [{ userId: 'creatorId', status: 'ready' }],
+                id: 'lobbyId',
+                creator: 'userId',
                 maxPlayers: 4,
                 rounds: 3,
+                players: [{ userId: 'userId', status: 'waiting' }],
                 status: 'in-progress',
+                startAmount: 1000,
+                startInventory: {
+                    items: [{
+                        item: 'triangle',
+                        quantity: 1,
+                    }],
+                },
+                bidTime: 30,
             };
 
             mockLobbyRepo.findById.mockResolvedValue(lobby);
@@ -126,15 +159,23 @@ describe('LobbyService', () => {
             const lobbyId = 'lobbyId';
             const userId = 'userId';
             const lobby: Lobby = {
-                id: lobbyId,
+                id: 'lobbyId',
                 creator: 'creatorId',
-                players: [
-                    { userId: 'creatorId', status: 'waiting' },
-                    { userId, status: 'waiting' },
-                ],
                 maxPlayers: 4,
                 rounds: 3,
-                status: 'waiting',
+                players: [
+                    { userId: 'userId', status: 'waiting' },
+                    { userId, status: 'waiting' },
+                ],
+                status: lobbySchema.shape.status.enum.waiting!,
+                startAmount: 1000,
+                startInventory: {
+                    items: [{
+                        item: 'triangle',
+                        quantity: 1,
+                    }],
+                },
+                bidTime: 30,
             };
             const updatedLobby = {
                 ...lobby,
@@ -156,12 +197,20 @@ describe('LobbyService', () => {
             const lobbyId = 'lobbyId';
             const creatorId = 'creatorId';
             const lobby: Lobby = {
-                id: lobbyId,
+                id: 'lobbyId',
                 creator: creatorId,
-                players: [{ userId: creatorId, status: 'waiting' }],
                 maxPlayers: 4,
                 rounds: 3,
-                status: 'waiting',
+                players: [{ userId: 'creatorId', status: 'waiting' }],
+                status: lobbySchema.shape.status.enum.waiting!,
+                startAmount: 1000,
+                startInventory: {
+                    items: [{
+                        item: 'triangle',
+                        quantity: 1,
+                    }],
+                },
+                bidTime: 30,
             };
 
             mockLobbyRepo.findById.mockResolvedValue(lobby);
@@ -181,15 +230,21 @@ describe('LobbyService', () => {
             const lobbyId = 'lobbyId';
             const creatorId = 'creatorId';
             const lobby: Lobby = {
-                id: lobbyId,
+                id: 'lobbyId',
                 creator: creatorId,
-                players: [
-                    { userId: creatorId, status: 'ready' },
-                    { userId: 'user2', status: 'ready' },
-                ],
                 maxPlayers: 4,
                 rounds: 3,
-                status: 'waiting',
+                players: [{ userId: 'userId', status: 'ready' },
+                    { userId: 'user2', status: 'ready' }],
+                status: lobbySchema.shape.status.enum.waiting!,
+                startAmount: 1000,
+                startInventory: {
+                    items: [{
+                        item: 'triangle',
+                        quantity: 1,
+                    }],
+                },
+                bidTime: 30,
             };
             const updatedLobby: Lobby = {
                 ...lobby,
@@ -220,6 +275,14 @@ describe('LobbyService', () => {
                 maxPlayers: 4,
                 rounds: 3,
                 status: 'waiting',
+                startAmount: 1000,
+                startInventory: {
+                    items: [{
+                        item: 'triangle',
+                        quantity: 1,
+                    }],
+                },
+                bidTime: 30,
             };
 
             mockLobbyRepo.findById.mockResolvedValue(lobby);
@@ -240,6 +303,14 @@ describe('LobbyService', () => {
                 maxPlayers: 4,
                 rounds: 3,
                 status: 'waiting',
+                startAmount: 1000,
+                startInventory: {
+                    items: [{
+                        item: 'triangle',
+                        quantity: 1,
+                    }],
+                },
+                bidTime: 30,
             };
 
             mockLobbyRepo.findById.mockResolvedValue(lobby);
@@ -261,6 +332,14 @@ describe('LobbyService', () => {
                 maxPlayers: 4,
                 rounds: 3,
                 status: 'waiting',
+                startAmount: 1000,
+                startInventory: {
+                    items: [{
+                        item: 'triangle',
+                        quantity: 1,
+                    }],
+                },
+                bidTime: 30,
             };
 
             mockLobbyRepo.findById.mockResolvedValue(lobby);
@@ -284,6 +363,14 @@ describe('LobbyService', () => {
                 maxPlayers: 4,
                 rounds: 3,
                 status: 'waiting',
+                startAmount: 1000,
+                startInventory: {
+                    items: [{
+                        item: 'triangle',
+                        quantity: 1,
+                    }],
+                },
+                bidTime: 30,
             };
             const updatedLobby: Lobby = {
                 ...lobby,
@@ -317,6 +404,14 @@ describe('LobbyService', () => {
                 maxPlayers: 4,
                 rounds: 3,
                 status: 'waiting',
+                startAmount: 1000,
+                startInventory: {
+                    items: [{
+                        item: 'triangle',
+                        quantity: 1,
+                    }],
+                },
+                bidTime: 30,
             };
             const updatedLobby = {
                 ...lobby,
@@ -349,6 +444,14 @@ describe('LobbyService', () => {
                 maxPlayers: 4,
                 rounds: 3,
                 status: 'waiting',
+                startAmount: 1000,
+                startInventory: {
+                    items: [{
+                        item: 'triangle',
+                        quantity: 1,
+                    }],
+                },
+                bidTime: 30,
             };
 
             mockLobbyRepo.findById.mockResolvedValue(lobby);
@@ -370,6 +473,14 @@ describe('LobbyService', () => {
                 maxPlayers: 4,
                 rounds: 3,
                 status: 'waiting',
+                startAmount: 1000,
+                startInventory: {
+                    items: [{
+                        item: 'triangle',
+                        quantity: 1,
+                    }],
+                },
+                bidTime: 30,
             };
 
             mockLobbyRepo.findById.mockResolvedValue(lobby);
@@ -378,4 +489,55 @@ describe('LobbyService', () => {
               .rejects.toThrow('Cannot kick the lobby creator');
         });
     });
+    describe('Complete a Lobby', () => {
+        it('should complete a lobby after the match is ended', async () => {
+            const lobbyId = 'lobbyId'
+            const lobby: Lobby = {
+                id: lobbyId,
+                creator: 'creatorId',
+                players: [
+                    { userId: 'creatorId', status: 'waiting' },
+                    { userId: 'player2', status: 'waiting' },
+                ],
+                maxPlayers: 4,
+                rounds: 3,
+                status: 'in-progress',
+                startAmount: 1000,
+                startInventory: {
+                    items: [{
+                        item: 'triangle',
+                        quantity: 1,
+                    }],
+                },
+                bidTime: 30,
+            }
+            mockLobbyRepo.findById.mockResolvedValue(lobby)
+            await expect(lobbyService.terminateMatch(lobbyId)).resolves.toBeUndefined()
+        })
+        it('should throw if the lobby is not in-progress', async () => {
+            const lobbyId = 'lobbyId'
+            const lobby: Lobby = {
+                id: lobbyId,
+                creator: 'creatorId',
+                players: [
+                    { userId: 'creatorId', status: 'waiting' },
+                    { userId: 'player2', status: 'waiting' },
+                ],
+                maxPlayers: 4,
+                rounds: 3,
+                status: 'waiting',
+                startAmount: 1000,
+                startInventory: {
+                    items: [{
+                        item: 'triangle',
+                        quantity: 1,
+                    }],
+                },
+                bidTime: 30,
+            }
+            mockLobbyRepo.findById.mockResolvedValue(lobby)
+            await expect(lobbyService.terminateMatch(lobbyId)).rejects.toThrow('Match is not in progress')
+        })
+    })
+
 });

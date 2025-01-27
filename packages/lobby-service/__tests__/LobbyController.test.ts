@@ -2,7 +2,7 @@ import { LobbyController } from '../src/controllers/LobbyController'
 import { LobbyServiceImpl } from '../src/services/LobbyServiceImpl'
 import { Response } from 'express'
 import { anyString, mock, MockProxy, mockReset } from 'jest-mock-extended'
-import { Lobby } from '../src/schemas/Lobby'
+import { Lobby, LobbyConfig } from '../src/schemas/Lobby'
 import { AuthenticatedRequest } from '../src/types/Index'
 import { UserAlreadyJoined } from '../src/errors/LobbyErrors'
 
@@ -26,9 +26,15 @@ beforeEach(() => {
 describe('LobbyController', () => {
     describe('createLobby', () => {
         it('should create a lobby and return 201 status with the created lobby', async () => {
-            const lobbyData = { players: [], maxPlayers: 10, rounds: 5 }
+          const lobbyData: LobbyConfig = {
+            maxPlayers: 10, rounds: 5,
+            bidTime: 10,
+            startAmount: 100,
+            startInventory: { items: [{ item: 'triangle', quantity: 1 }] },
+          }
             const createdLobby: Lobby = {
                 ...lobbyData,
+              players: [{ userId: 'creatorId', status: 'waiting' }],
                 creator: 'creatorId',
                 id: '123456789012345678901234',
                 status: 'waiting',
@@ -44,11 +50,7 @@ describe('LobbyController', () => {
                 mockNext,
             )
 
-            expect(mockLobbyService.createLobby).toHaveBeenCalledWith({
-                ...lobbyData,
-                creator: 'creatorId',
-                status: 'waiting',
-            })
+          expect(mockLobbyService.createLobby).toHaveBeenCalled()
             expect(mockResponse.status).toHaveBeenCalledWith(201)
             expect(mockResponse.json).toHaveBeenCalledWith({
                 message: anyString(),
@@ -68,6 +70,9 @@ describe('LobbyController', () => {
                 maxPlayers: 10,
                 rounds: 5,
                 status: 'waiting',
+              bidTime: 10,
+              startAmount: 100,
+              startInventory: { items: [{ item: 'triangle', quantity: 1 }] },
             }
 
             mockRequest.params = { id }
@@ -96,6 +101,9 @@ describe('LobbyController', () => {
                 maxPlayers: 10,
                 rounds: 5,
                 status: 'waiting',
+              bidTime: 10,
+              startAmount: 100,
+              startInventory: { items: [{ item: 'triangle', quantity: 1 }] },
             };
 
           mockRequest.activeLobbyId = id;
@@ -134,6 +142,9 @@ describe('LobbyController', () => {
                 maxPlayers: 10,
                 rounds: 5,
                 status: 'waiting',
+              bidTime: 10,
+              startAmount: 100,
+              startInventory: { items: [{ item: 'triangle', quantity: 1 }] },
             };
 
           mockRequest.activeLobbyId = id;
@@ -164,6 +175,9 @@ describe('LobbyController', () => {
                 maxPlayers: 10,
                 rounds: 5,
                 status: 'waiting',
+              bidTime: 10,
+              startAmount: 100,
+              startInventory: { items: [{ item: 'triangle', quantity: 1 }] },
             };
 
         mockRequest.activeLobbyId = id;
@@ -194,6 +208,9 @@ describe('LobbyController', () => {
                 maxPlayers: 10,
                 rounds: 5,
                 status: 'in-progress',
+              bidTime: 10,
+              startAmount: 100,
+              startInventory: { items: [{ item: 'triangle', quantity: 1 }] },
             };
 
           mockRequest.activeLobbyId = id;

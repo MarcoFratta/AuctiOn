@@ -1,4 +1,5 @@
 import { z } from '../utils/ZodWrapper'
+import { InventoryInputSchema } from './Item'
 
 export const idSchema = z.string().length(24)
 export const lobbyIdSchema = z.object({
@@ -17,6 +18,9 @@ export const playerSchema = z
 export const lobbyConfigSchema = z.object({
   maxPlayers: z.number().min(1).max(10),
   rounds: z.number().min(1).max(10),
+  startAmount: z.number().min(1),
+  startInventory: InventoryInputSchema,
+  bidTime: z.number().min(1),
 })
 export const lobbyStatusSchema = z.enum(['waiting', 'in-progress', 'completed'])
 export const lobbySchema = lobbyIdSchema

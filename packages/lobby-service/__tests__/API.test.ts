@@ -20,7 +20,14 @@ const user = {
   name: 'Test User',
 };
 
-async function createLobby(u: User, config: Partial<LobbyConfig> = { rounds: 3, maxPlayers: 4 }) {
+async function createLobby(u: User, config: Partial<LobbyConfig> =
+{
+  rounds: 3,
+  maxPlayers: 4,
+  bidTime: 10,
+  startAmount: 100,
+  startInventory: { items: [{ item: 'triangle', quantity: 1 }] },
+}) {
   return await request(app).post('/lobby/create')
     .set('Authorization', validToken)
     .send({ user: u, ...config })
@@ -69,7 +76,12 @@ describe('Lobby Service Integration Tests with Auth Service Mock', () => {
 
   describe('POST /lobby/create', () => {
     it('should create a lobby successfully with valid token', async () => {
-      const lobbyConfig = { rounds: 3, maxPlayers: 4 };
+      const lobbyConfig: LobbyConfig = {
+        rounds: 3, maxPlayers: 4,
+        bidTime: 10,
+        startAmount: 100,
+        startInventory: { items: [{ item: 'triangle', quantity: 1 }] },
+      }
 
       const response = await createLobby(user, lobbyConfig);
 
@@ -92,7 +104,12 @@ describe('Lobby Service Integration Tests with Auth Service Mock', () => {
       const response = await request(app)
         .post('/lobby/create')
         .set('Authorization', 'Bearer invalidToken')
-        .send({ name: 'Test Lobby', maxPlayers: 4 });
+        .send({
+          rounds: 3, maxPlayers: 4,
+          bidTime: 10,
+          startAmount: 100,
+          startInventory: { items: [{ item: 'triangle', quantity: 1 }] },
+        });
 
       expect(response.status).toBe(401);
     });

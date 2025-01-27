@@ -1,11 +1,14 @@
-import { Document, model, Schema } from 'mongoose';
+import { Document, model, Schema } from 'mongoose'
 
 export interface ILobby extends Document {
-  creator: string;
-  players: { userId: string; status: 'ready' | 'waiting' }[];
-  maxPlayers: number;
-  rounds: number;
-  status: 'waiting' | 'in-progress' | 'completed';
+  creator: string
+  players: { userId: string; status: 'ready' | 'waiting' }[]
+  maxPlayers: number
+  rounds: number
+  bidTime: number
+  startAmount: number
+  startInventory: { items: { item: string; quantity: number }[] }
+  status: 'waiting' | 'in-progress' | 'completed'
 }
 
 const LobbySchema = new Schema<ILobby>({
@@ -27,18 +30,23 @@ const LobbySchema = new Schema<ILobby>({
     enum: ['waiting', 'in-progress', 'completed'],
     default: 'waiting',
   },
-});
+  bidTime: Number,
+  startAmount: Number,
+  startInventory: {
+    items: [{ item: String, quantity: Number }],
+  },
+})
 
 LobbySchema.virtual('id').get(function () {
-  return this._id; // Expose _id as id in the app
-});
+  return this._id // Expose _id as id in the app
+})
 
 // Ensure virtual fields are included in JSON responses
 LobbySchema.set('toJSON', {
   virtuals: true,
-});
+})
 LobbySchema.set('toObject', {
   virtuals: true,
-});
+})
 
-export const LobbyModel = model<ILobby>('Lobby', LobbySchema);
+export const LobbyModel = model<ILobby>('Lobby', LobbySchema)
