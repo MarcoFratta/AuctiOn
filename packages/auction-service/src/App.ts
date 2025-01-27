@@ -11,14 +11,18 @@ import { AuctionEventsSource } from './services/AuctionEventsSource'
 import { AuthenticatedRequest, authMiddleware } from './middlewares/AuthMiddleware'
 import { UserNotAuthenticatedError } from './errors/Errors'
 import { Duplex } from 'stream'
+import { TimerController } from './controllers/TimerController'
+import { KafkaConsumer } from './controllers/KafkaConsumer'
 
 export class App {
   public app: express.Application
   public server: http.Server
   public wsAdapter: WebSocketAdapter
   public auctionService: AuctionService & AuctionEventsSource
-  public kafkaController: KafkaProducer
+  public kafkaProducer: KafkaProducer
+  public kafkaConsumer: KafkaConsumer
   public auctionController: AuctionController
+  public timerController: TimerController
 
   constructor(kafkaBrokers: string[]) {
     this.app = express()
@@ -34,14 +38,17 @@ export class App {
     })
 
     this.auctionController = new AuctionController(this.auctionService, this.wsAdapter, this.wsAdapter)
-
-    this.kafkaController = new KafkaProducer(kafka, this.auctionService, this.wsAdapter)
+    this.timerController = new TimerController(this.auctionService, this.wsAdapter, this.wsAdapter)
+    this.kafkaProducer = new KafkaProducer(kafka, this.auctionService, this.wsAdapter)
+    this.kafkaConsumer = new KafkaConsumer(kafka, this.auctionService, 'auction-events')
   }
 
   public async start(port: number, kafka: boolean = true): Promise<void> {
     if (kafka) {
-      await this.kafkaController.connect()
-      logger.info('Connected to Kafka')
+      await this.kafkaProducer.connect()
+      logger.info('Kafka producer connected')
+      await this.kafkaConsumer.connect()
+      logger.info('Kafka consumer connected')
     }
     return new Promise(resolve => {
       this.server.listen(port, () => {

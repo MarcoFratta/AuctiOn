@@ -139,6 +139,7 @@ export class AuctionController {
     })
   }
   private handleRoundEnd = (auction: Auction) => {
+    logger.info(`[Controller] sending updated auction after round end ${auction.id}`)
     this.playerChannel.broadcast(
       id => JSON.stringify({ type: 'roundEnd', auction: toPlayerAuction(id).convert(auction) }),
       this.allLobbyPlayers(auction)

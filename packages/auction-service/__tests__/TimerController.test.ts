@@ -2,18 +2,19 @@ import { TimerController } from '../src/controllers/TimerController'
 import { AuctionService } from '../src/services/AuctionService'
 import { Auction } from '../src/schemas/Auction'
 import { mock, MockProxy } from 'jest-mock-extended'
-import { PlayerChannel } from '../src/adapters/PlayerChannel'
 import { WebSocketAdapter } from '../src/adapters/WebSocketAdapter'
 
 describe('TimerController', () => {
   let timerController: TimerController
   let mockAuctionService: jest.Mocked<AuctionService>
   let callbacks: Map<string, ((auction: Auction) => void)[]>
-  let mockPlayerChannel: MockProxy<PlayerChannel>
+  let playerCallbacks: Map<string, ((playerId: string) => void)[]>
+  let mockPlayerChannel: MockProxy<WebSocketAdapter>
 
   beforeEach(() => {
     jest.useFakeTimers()
     callbacks = new Map()
+    playerCallbacks = new Map()
 
 
     mockAuctionService = {
@@ -36,12 +37,16 @@ describe('TimerController', () => {
       endRound: jest.fn(),
     } as unknown as jest.Mocked<AuctionService>
     mockPlayerChannel = mock<WebSocketAdapter>()
-    timerController = new TimerController(mockAuctionService, mockPlayerChannel)
+    mockPlayerChannel.onPlayerConnect.mockImplementation((cb) => {
+      if (!playerCallbacks.has('onPlayerConnect')) playerCallbacks.set('onPlayerConnect', [])
+      playerCallbacks.get('onPlayerConnect')!.push(cb)
+    })
+
+    timerController = new TimerController(mockAuctionService, mockPlayerChannel, mockPlayerChannel)
   })
 
   afterEach(() => {
     jest.useRealTimers()
-    timerController.stop()
   })
 
   it('should start timer on new sale', () => {
@@ -61,6 +66,7 @@ describe('TimerController', () => {
 
     jest.advanceTimersByTime(30000)
     expect(mockAuctionService.endRound).toHaveBeenCalledWith('auction1')
+    expect(mockPlayerChannel.broadcast).toHaveBeenCalledTimes(1)
   })
 
   it('should refresh timer on new bid', () => {
@@ -82,17 +88,20 @@ describe('TimerController', () => {
     // Advance time partially
     jest.advanceTimersByTime(15000)
     expect(mockAuctionService.endRound).not.toHaveBeenCalled()
+    expect(mockPlayerChannel.broadcast).toHaveBeenCalledTimes(1)
 
     // New bid comes in
+    // timer should reset
     callbacks.get('onNewBid')![0](mockAuction)
-
+    expect(mockAuctionService.endRound).not.toHaveBeenCalled()
+    expect(mockPlayerChannel.broadcast).toHaveBeenCalledTimes(2)
     // Advance time by less than full duration
     jest.advanceTimersByTime(29000)
     expect(mockAuctionService.endRound).not.toHaveBeenCalled()
-
     // Advance remaining time
     jest.advanceTimersByTime(1000)
     expect(mockAuctionService.endRound).toHaveBeenCalledWith('auction1')
+    expect(mockPlayerChannel.broadcast).toHaveBeenCalledTimes(2)
   })
 
   it('should clear timer on round end', () => {
@@ -111,8 +120,10 @@ describe('TimerController', () => {
     callbacks.get('onNewSale')![0](mockAuction)
     jest.advanceTimersByTime(30000)
     expect(mockAuctionService.endRound).toHaveBeenCalledTimes(1)
+    expect(mockPlayerChannel.broadcast).toHaveBeenCalledTimes(1)
     jest.advanceTimersByTime(70000)
     expect(mockAuctionService.endRound).toHaveBeenCalledTimes(1)
+    expect(mockPlayerChannel.broadcast).toHaveBeenCalledTimes(1)
 
   })
   it('should clear timer on auction end', () => {
@@ -132,8 +143,27 @@ describe('TimerController', () => {
     jest.advanceTimersByTime(10000)
     expect(mockAuctionService.endRound).toHaveBeenCalledWith('auction1')
     expect(mockAuctionService.endRound).toHaveBeenCalledTimes(1)
+    expect(mockPlayerChannel.broadcast).toHaveBeenCalledTimes(1)
     callbacks.get('onAuctionEnd')![0](mockAuction)
     jest.advanceTimersByTime(50000)
     expect(mockAuctionService.endRound).toHaveBeenCalledTimes(1)
+    expect(mockPlayerChannel.broadcast).toHaveBeenCalledTimes(1)
+  })
+  it('should send time update on new player connected', () => {
+    const auction: Auction = {
+      id: 'auction1',
+      bidTime: 10,
+      players: [],
+      maxRound: 3,
+      maxPlayers: 4,
+      startAmount: 100,
+      startInventory: { items: [{ item: 'square', quantity: 1 }] },
+      sellerQueue: [],
+      currentRound: 1,
+    }
+    mockAuctionService.getPlayerAuction = jest.fn()
+    mockAuctionService.getPlayerAuction.mockResolvedValue(auction)
+    playerCallbacks.get('onPlayerConnect')![0]('player1')
+    expect(mockAuctionService.getPlayerAuction).toHaveBeenCalledWith('player1')
   })
 }) 
