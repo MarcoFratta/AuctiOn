@@ -117,6 +117,16 @@ describe('KafkaConsumer', () => {
 
       expect(mockAuctionService.playerLeave).toHaveBeenCalledWith('player1', 'lobby1')
     })
+    it('should handle lobby-started event', async () => {
+      const event = {
+        type: 'lobby-started',
+        lobbyId: 'lobby1',
+      }
+
+      await sendMessage(event)
+
+      expect(mockAuctionService.startAuction).toHaveBeenCalledWith('lobby1')
+    })
 
     it('should handle invalid event type gracefully', async () => {
       const event = {
