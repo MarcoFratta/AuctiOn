@@ -35,6 +35,10 @@ export class WebSocketAdapter implements PlayerEventSource, PlayerChannel {
             this.clients.delete(playerId)
             this.notifyDisconnect(playerId)
           })
+
+          ws.on('error', error => {
+            logger.error(`[WSAdapter] Error for player ${playerId}: ${error}`)
+          })
         }
       } catch (e) {
         logger.error(`Error while connecting player: ${e}`)
