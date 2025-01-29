@@ -4,7 +4,7 @@ import { ServiceNotFoundError } from '../errors/LobbyErrors'
 import { Request, Response } from 'express'
 
 export class ProxyController {
-  createProxy(serviceName: string) {
+  createProxy(serviceName: string, ws = false) {
     const service = config.services[serviceName]
 
     if (!service) {
@@ -14,7 +14,7 @@ export class ProxyController {
     return createProxyMiddleware<Request, Response>({
       target: service.url,
       changeOrigin: true,
-      ws: true,
+      ws: ws,
       pathRewrite: service.pathRewrite,
       on: {
         proxyReq: fixRequestBody,

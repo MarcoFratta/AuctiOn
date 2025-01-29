@@ -2,14 +2,19 @@ import { Router } from 'express'
 import { ProxyController } from '../controllers/ProxyController'
 import { AuthMiddleware } from '../middlewares/AuthMiddleware'
 
-export const createRoutes = (proxy: ProxyController): Router => {
-  const router = Router()
-  router.use('/users', AuthMiddleware, proxy.createProxy('users'))
+export class Routes {
+  public auctionWsPros
 
-  router.use('/lobby', AuthMiddleware, proxy.createProxy('lobby'))
+  constructor(private proxy: ProxyController) {
+    this.auctionWsPros = this.proxy.createProxy('auction')
+  }
 
-  router.use('/auctions', AuthMiddleware, proxy.createProxy('auction'))
-
-  router.use('/auth', proxy.createProxy('auth'))
-  return router
+  createRoutes = (): Router => {
+    const router = Router()
+    router.use('/users', AuthMiddleware, this.proxy.createProxy('users'))
+    router.use('/lobby', AuthMiddleware, this.proxy.createProxy('lobby'))
+    router.use('/auction', AuthMiddleware, this.auctionWsPros)
+    router.use('/auth', this.proxy.createProxy('auth'))
+    return router
+  }
 }
