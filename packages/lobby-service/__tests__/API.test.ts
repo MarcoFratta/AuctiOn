@@ -1,6 +1,6 @@
 import request from 'supertest'
 import axios from 'axios'
-import app from '../src/App'
+import { App } from '../src/App'
 import { config } from '../src/configs/config'
 import { MongoMemoryServer } from 'mongodb-memory-server'
 import { closeLocalMongoConnection, localMongoConnection } from './common'
@@ -8,10 +8,11 @@ import { Lobby, LobbyConfig, PlayerStatus } from '../src/schemas/Lobby'
 import { User } from '../src/schemas/User'
 import { UserLobbyModel } from '../src/models/UserLobbyModel'
 import { LobbyModel } from '../src/models/LobbyModel'
+import { KafkaContainer, StartedKafkaContainer } from '@testcontainers/kafka'
+import { Kafka } from 'kafkajs'
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
-
 const authServiceUrl = config.authServiceUri;
 const validToken = 'Bearer validToken123';
 const user = {
@@ -20,34 +21,30 @@ const user = {
   name: 'Test User',
 };
 
-async function createLobby(u: User, config: Partial<LobbyConfig> =
-{
+async function createLobby(app: App, u: User, config: Partial<LobbyConfig> = {
   rounds: 3,
   maxPlayers: 4,
   bidTime: 10,
   startAmount: 100,
   startInventory: { items: [{ item: 'triangle', quantity: 1 }] },
 }) {
-  return await request(app).post('/lobby/create')
+  return await request(app.app).post('/lobby/create')
     .set('Authorization', validToken)
     .send({ user: u, ...config })
 }
 
-async function joinUser(
-  lobby: Lobby,
-  u: User = {
-    id: 'newUser',
-    email: 'newUser@email.com',
-    name: 'newUser',
-  },
-) {
-  return await request(app).post(`/lobby/${lobby.id}/join`)
+async function joinUser(app: App, lobby: Lobby, u: User = {
+  id: 'newUser',
+  email: 'newUser@email.com',
+  name: 'newUser',
+}) {
+  return await request(app.app).post(`/lobby/${lobby.id}/join`)
     .set('Authorization', validToken)
     .send({ user: u })
 }
 
-async function setPlayerStatus(u: User, status: PlayerStatus) {
-  return await request(app)
+async function setPlayerStatus(app: App, u: User, status: PlayerStatus) {
+  return await request(app.app)
     .put(`/lobby/status`)
     .set('Authorization', validToken)
     .send({ user: u, status });
@@ -55,12 +52,21 @@ async function setPlayerStatus(u: User, status: PlayerStatus) {
 
 describe('Lobby Service Integration Tests with Auth Service Mock', () => {
   let mongoServer: MongoMemoryServer;
+  let app: App
+  let kafkaContainer: StartedKafkaContainer
+  let kafka: Kafka
 
   beforeAll(async () => {
     mongoServer = await localMongoConnection();
+    kafkaContainer = await new KafkaContainer().start()
+    kafka = new Kafka({
+      clientId: 'lobby-service',
+      brokers: [`localhost:${kafkaContainer.getMappedPort(9093)}`],
+    })
   });
 
   beforeEach(async () => {
+    app = new App(kafka)
     await LobbyModel.deleteMany({});
     await UserLobbyModel.deleteMany({});
     jest.clearAllMocks();
@@ -68,6 +74,7 @@ describe('Lobby Service Integration Tests with Auth Service Mock', () => {
 
   afterAll(async () => {
     await closeLocalMongoConnection(mongoServer);
+    await kafkaContainer.stop()
   });
 
   afterEach(() => {
@@ -77,15 +84,15 @@ describe('Lobby Service Integration Tests with Auth Service Mock', () => {
   describe('POST /lobby/create', () => {
     it('should create a lobby successfully with valid token', async () => {
       const lobbyConfig: LobbyConfig = {
-        rounds: 3, maxPlayers: 4,
+        rounds: 3,
+        maxPlayers: 4,
         bidTime: 10,
         startAmount: 100,
         startInventory: { items: [{ item: 'triangle', quantity: 1 }] },
-      }
+      };
 
-      const response = await createLobby(user, lobbyConfig);
+      const response = await createLobby(app, user, lobbyConfig)
 
-      console.log(response.body);
       expect(response.status).toBe(201);
       expect(response.body).toHaveProperty('message', 'Lobby created successfully')
       expect(response.body).toHaveProperty('lobby')
@@ -100,12 +107,12 @@ describe('Lobby Service Integration Tests with Auth Service Mock', () => {
     });
 
     it('should return 401 if token is invalid', async () => {
-
-      const response = await request(app)
+      const response = await request(app.app)
         .post('/lobby/create')
         .set('Authorization', 'Bearer invalidToken')
         .send({
-          rounds: 3, maxPlayers: 4,
+          rounds: 3,
+          maxPlayers: 4,
           bidTime: 10,
           startAmount: 100,
           startInventory: { items: [{ item: 'triangle', quantity: 1 }] },
@@ -117,9 +124,9 @@ describe('Lobby Service Integration Tests with Auth Service Mock', () => {
 
   describe('POST /lobby/join', () => {
     it('should allow a user to join a lobby with valid token', async () => {
-      const lobby: Lobby = (await createLobby(user)).body.lobby;
+      const lobby: Lobby = (await createLobby(app, user)).body.lobby
       const id = lobby.id;
-      const response = await joinUser(lobby, {
+      const response = await joinUser(app, lobby, {
         id: 'newUser',
         email: 'newUser@email.com',
         name: 'newUser',
@@ -133,8 +140,9 @@ describe('Lobby Service Integration Tests with Auth Service Mock', () => {
         user.id,
       );
     });
+
     it('should return 404 if the lobby does not exist', async () => {
-      const response = await request(app)
+      const response = await request(app.app)
         .post('/lobby/123456789012345678901234/join')
         .set('Authorization', validToken)
         .send({ user: user });
@@ -143,10 +151,11 @@ describe('Lobby Service Integration Tests with Auth Service Mock', () => {
       expect(response.body).toHaveProperty('message');
     });
   });
+
   describe('PUT /lobby/status', () => {
     it('should update the player status', async () => {
-      const lobby = (await createLobby(user)).body.lobby;
-      const response = await setPlayerStatus(user, 'ready')
+      const lobby = (await createLobby(app, user)).body.lobby
+      const response = await setPlayerStatus(app, user, 'ready')
 
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('message', 'Player status updated');
@@ -157,17 +166,17 @@ describe('Lobby Service Integration Tests with Auth Service Mock', () => {
 
   describe('POST /lobby/start', () => {
     it('should start the match if the user is the host', async () => {
-      const lobby: Lobby = (await createLobby(user)).body.lobby;
+      const lobby: Lobby = (await createLobby(app, user)).body.lobby
       const newUser = {
         id: 'newUser',
         email: 'new@User.com',
         name: 'user',
       };
-      await joinUser(lobby, newUser);
-      await setPlayerStatus(user, 'ready')
-      await setPlayerStatus(newUser, 'ready')
+      await joinUser(app, lobby, newUser)
+      await setPlayerStatus(app, user, 'ready')
+      await setPlayerStatus(app, newUser, 'ready')
 
-      const response = await request(app)
+      const response = await request(app.app)
         .post(`/lobby/start`)
         .set('Authorization', validToken)
         .send({ user: user });
@@ -179,10 +188,10 @@ describe('Lobby Service Integration Tests with Auth Service Mock', () => {
     });
 
     it('should return 403 if user is not the creator', async () => {
-      const lobby = (await createLobby(user)).body.lobby;
+      const lobby = (await createLobby(app, user)).body.lobby
       const newUser = { id: 'newUser', email: 'new@user.com', name: 'newUserName' };
-      await joinUser(lobby, newUser);
-      const response = await request(app)
+      await joinUser(app, lobby, newUser)
+      const response = await request(app.app)
         .post(`/lobby/start/`)
         .set('Authorization', validToken)
         .send({ user: newUser });
@@ -191,21 +200,22 @@ describe('Lobby Service Integration Tests with Auth Service Mock', () => {
       expect(response.body).toHaveProperty('error', 'Forbidden')
       expect(response.body).toHaveProperty(
         'message',
-        'Only the lobby ' + 'creator can start the match',
+        'Only the lobby creator can start the match',
       );
     });
   });
+
   describe('POST /lobby/leave', () => {
     it('should allow a user to leave a lobby', async () => {
-      const lobby = (await createLobby(user)).body.lobby;
+      const lobby = (await createLobby(app, user)).body.lobby
       const newUser = {
         id: 'newUser',
         email: 'new@user.com',
         name: 'newUserName',
       };
-      await joinUser(lobby, newUser);
+      await joinUser(app, lobby, newUser)
 
-      const response = await request(app)
+      const response = await request(app.app)
         .post(`/lobby/leave/`)
         .set('Authorization', validToken)
         .send({ user: newUser });
@@ -213,9 +223,10 @@ describe('Lobby Service Integration Tests with Auth Service Mock', () => {
       expect(response.body).toHaveProperty('message', 'Successfully left the lobby');
       expect(response.body).toHaveProperty('lobby');
     });
+
     it('should delete the lobby if the creator leaves', async () => {
-      const lobby = (await createLobby(user)).body.lobby;
-      const response = await request(app)
+      const lobby = (await createLobby(app, user)).body.lobby
+      const response = await request(app.app)
         .post(`/lobby/leave/`)
         .set('Authorization', validToken)
         .send({ user: user });

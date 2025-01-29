@@ -153,7 +153,9 @@ export class LobbyServiceImpl implements LobbyService {
     if (playerIndex === -1) {
       throw new PlayerNotFoundError()
     }
-
+    if (lobby.status === 'in-progress') {
+      throw new MatchAlreadyInProgressError('Cannot set player status while match is in progress')
+    }
     lobby.players[playerIndex].status = status
     // Save the updated players array
     logger.info(`Setting status for player: ${userId} in lobby: ${id} to ${status}`)
@@ -175,6 +177,11 @@ export class LobbyServiceImpl implements LobbyService {
     await this.lobbyRepository.update(id, {
       status: 'completed',
     })
+    await Promise.all(
+      lobby.players.map(player => {
+        this.userLobbyRepo.removeUserFromLobby(player.userId, id)
+      })
+    )
   }
 
   onLobbyCreated(callback: (lobby: Lobby) => void): void {
