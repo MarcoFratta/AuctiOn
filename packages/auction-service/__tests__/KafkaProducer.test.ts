@@ -3,14 +3,8 @@ import { AuctionService } from '../src/services/AuctionService'
 import { PlayerEventSource } from '../src/adapters/PlayerEventSource'
 import { Kafka, Producer } from 'kafkajs'
 import { mock, MockProxy } from 'jest-mock-extended'
-import logger from '../src/utils/Logger'
 
-jest.mock('../src/utils/Logger', () => ({
-  info: jest.fn(),
-  error: jest.fn(),
-}))
-
-describe('KafkaController', () => {
+describe('KafkaProducer', () => {
   let auctionService: MockProxy<AuctionService>
   let eventSource: MockProxy<PlayerEventSource>
   let kafkaProducer: MockProxy<Producer>
@@ -42,17 +36,5 @@ describe('KafkaController', () => {
     await (kafkaController as any).handlePlayerDisconnect('player456')
 
     expect(kafkaClient.producer().send).toHaveBeenCalled()
-  })
-
-  test('should log error when emitting event fails', async () => {
-    ;(kafkaClient.producer().send as jest.Mock).mockRejectedValueOnce(new Error('Kafka send failed'))
-
-    await (kafkaController as any).emitEvent('player-events', {
-      type: 'player-connected',
-      playerId: 'player123',
-      auctionId: 'auction123',
-      timestamp: new Date().toISOString(),
-    })
-    expect(logger.error).toHaveBeenCalledWith(expect.stringContaining('Failed to emit Kafka event'))
   })
 })

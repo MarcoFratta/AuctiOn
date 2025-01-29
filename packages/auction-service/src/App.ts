@@ -13,6 +13,8 @@ import { UserNotAuthenticatedError } from './errors/Errors'
 import { Duplex } from 'stream'
 import { TimerController } from './controllers/TimerController'
 import { KafkaConsumer } from './controllers/KafkaConsumer'
+import { RedisAuctionRepo } from './repositories/RedisAuctionRepo'
+import Redis from 'ioredis'
 
 export class App {
   public app: express.Application
@@ -23,19 +25,16 @@ export class App {
   public kafkaConsumer: KafkaConsumer
   public auctionController: AuctionController
   public timerController: TimerController
+  public redis: Redis
 
-  constructor(kafkaBrokers: string[]) {
+  constructor(kafka: Kafka, redis: Redis) {
     this.app = express()
+    this.redis = redis
     this.server = http.createServer(this.app)
-    this.auctionService = new AuctionServiceImpl()
+    this.auctionService = new AuctionServiceImpl(new RedisAuctionRepo(redis))
     this.wsAdapter = new WebSocketAdapter({ noServer: true })
 
     this.setupWebSocket()
-
-    const kafka = new Kafka({
-      clientId: 'auction-service',
-      brokers: kafkaBrokers,
-    })
 
     this.auctionController = new AuctionController(this.auctionService, this.wsAdapter, this.wsAdapter)
     this.timerController = new TimerController(this.auctionService, this.wsAdapter, this.wsAdapter)
@@ -43,19 +42,18 @@ export class App {
     this.kafkaConsumer = new KafkaConsumer(kafka, this.auctionService, 'auction-events')
   }
 
-  public async start(port: number, kafka: boolean = true): Promise<void> {
-    if (kafka) {
-      await this.kafkaProducer.connect()
-      logger.info('Kafka producer connected')
-      await this.kafkaConsumer.connect()
-      logger.info('Kafka consumer connected')
-    }
-    return new Promise(resolve => {
+  public async start(port: number): Promise<void> {
+    try {
+      await Promise.all([
+        this.kafkaProducer.connect().then(() => logger.info('Kafka producer connected')),
+        this.kafkaConsumer.connect().then(() => logger.info('Kafka consumer connected')),
+      ])
       this.server.listen(port, () => {
         logger.info(`Server is running on port ${port}`)
-        resolve()
       })
-    })
+    } catch (err) {
+      logger.error('Failed to start server:', err)
+    }
   }
 
   public async stop(): Promise<void> {

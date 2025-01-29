@@ -23,7 +23,7 @@ export const toSaleEvent: Converter<Auction, SaleEvent> = {
       type: 'player-sale',
       auctionId: auction.id,
       playerId: auction.currentSale!.sellerId,
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
       sale: toInventory.convert(auction.currentSale!.items),
     })
   },
@@ -35,7 +35,7 @@ export const toBidEvent: Converter<Auction, BidEvent> = {
       type: 'player-bid',
       auctionId: auction.id,
       playerId: auction.currentBid!.playerId,
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
       bid: {
         amount: auction.currentBid!.amount,
         round: auction.currentBid!.round,
@@ -49,7 +49,7 @@ export const toRoundEndEvent: Converter<Auction, EndRoundEvent> = {
     return validateSchema(EndRoundEventSchema, {
       type: 'end-round',
       auctionId: auction.id,
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
     })
   },
 }
@@ -58,7 +58,7 @@ export const toAuctionEndEvent: Converter<Auction, EndAuctionEvent> = {
     return validateSchema(EndAuctionEventSchema, {
       type: 'end-auction',
       auctionId: auction.id,
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
     })
   },
 }
@@ -70,7 +70,7 @@ export const toPlayerConnectedEvent = (id: string): Converter<Auction, PlayerCon
         type: 'player-connected',
         auctionId: auction.id,
         playerId: id,
-        timestamp: new Date(),
+        timestamp: new Date().toISOString(),
       })
     },
   }
@@ -82,7 +82,7 @@ export const toPlayerDisconnectedEvent = (id: string): Converter<Auction, Player
         type: 'player-disconnected',
         auctionId: auction.id,
         playerId: id,
-        timestamp: new Date(),
+        timestamp: new Date().toISOString(),
       })
     },
   }

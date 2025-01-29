@@ -55,7 +55,7 @@ export class KafkaProducer {
         await this.emitEvent('player-events', msg)
       })
       .catch(error => {
-        logger.error(`[KafkaController] Failed to get auction for player ${playerId}: ${error}`)
+        logger.error(`[KafkaProducer] Failed to get auction for player ${playerId}: ${error}`)
       })
   }
 

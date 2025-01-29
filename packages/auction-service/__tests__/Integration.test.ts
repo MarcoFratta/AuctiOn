@@ -5,6 +5,7 @@ import { App } from '../src/App'
 import { KafkaContainer, StartedKafkaContainer } from '@testcontainers/kafka'
 import { Kafka } from 'kafkajs'
 import { AuctionConfig } from '../src/schemas/Auction'
+import Redis from 'ioredis-mock'
 
 jest.setTimeout(35 * 1000)
 describe('Auction System Integration Test', () => {
@@ -69,7 +70,8 @@ describe('Auction System Integration Test', () => {
 
   beforeEach((done) => {
     const kafkaBrokers = [`${kafka.getHost()}:${kafka.getMappedPort(9093)}`]
-    app = new App(kafkaBrokers)
+    app = new App(new Kafka({ brokers: kafkaBrokers }),
+      new Redis())
     service = app.auctionService
     app.start(0).then(() => {
       const address = app.server.address()

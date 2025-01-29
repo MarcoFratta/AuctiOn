@@ -1,5 +1,5 @@
 import { Converter } from './Converter'
-import { Auction } from '../schemas/Auction'
+import { Auction, AuctionSchema, StoredAuction, StoredAuctionSchema } from '../schemas/Auction'
 import { ItemsMap, Player } from '../schemas/Player'
 import { validateSchema } from '../utils/Validator'
 import { Sale } from '../schemas/Sale'
@@ -46,6 +46,28 @@ export const toPlayerInfo: Converter<Player, PlayerInfoMessage> = {
     return validateSchema(PlayerInfoSchema, {
       inventory: toInventory.convert(player.inventory),
       money: player.money,
+    })
+  },
+}
+export const toStoredAuction: Converter<Auction, StoredAuction> = {
+  convert: (auction: Auction): StoredAuction => {
+    return validateSchema(StoredAuctionSchema, {
+      ...auction,
+      players: auction.players.map(player => ({
+        ...player,
+        inventory: toInventory.convert(player.inventory),
+      })),
+    })
+  },
+}
+export const toAuction: Converter<StoredAuction, Auction> = {
+  convert: (storedAuction: StoredAuction): Auction => {
+    return validateSchema(AuctionSchema, {
+      ...storedAuction,
+      players: storedAuction.players.map(player => ({
+        ...player,
+        inventory: toInventoryMap.convert(player.inventory),
+      })),
     })
   },
 }

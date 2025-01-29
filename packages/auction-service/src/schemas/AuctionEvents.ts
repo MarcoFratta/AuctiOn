@@ -12,7 +12,7 @@ export const WithPlayerId = z.object({
   playerId: PlayerSchema.shape.id,
 })
 export const WithTimestamp = z.object({
-  timestamp: z.date(),
+  timestamp: z.string().datetime(),
 })
 export const PlayerConnectedEventSchema = z
   .object({

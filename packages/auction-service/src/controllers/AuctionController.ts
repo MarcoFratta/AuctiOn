@@ -38,7 +38,7 @@ export class AuctionController {
             playerId,
             amount: msg.amount,
             round: msg.round,
-            timestamp: new Date(),
+            timestamp: new Date().toISOString(),
           })
           this.auctionService
             .playerBid(bid)

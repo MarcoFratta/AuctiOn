@@ -80,8 +80,8 @@ describe('AuctionController', () => {
       sellerQueue: ['player1'],
       currentRound: 1,
       currentSale: undefined,
-      currentBid: { ...bid, playerId: 'player1', timestamp: new Date() },
-      startTimestamp: new Date(),
+      currentBid: { ...bid, playerId: 'player1', timestamp: new Date().toISOString() },
+      startTimestamp: new Date().toISOString(),
     })
 
     await controller.handlePlayerMessage(playerId, message)
@@ -90,7 +90,7 @@ describe('AuctionController', () => {
       playerId,
       amount: bid.amount,
       round: bid.round,
-      timestamp: expect.any(Date),
+      timestamp: expect.any(String),
     })
   })
 
@@ -127,10 +127,10 @@ describe('AuctionController', () => {
       currentSale: {
         items: itemsMap,
         sellerId: 'player1',
-        endTimestamp: new Date(),
+        endTimestamp: new Date().toISOString(),
       },
       currentBid: undefined,
-      startTimestamp: new Date(),
+      startTimestamp: new Date().toISOString(),
     })
 
     await controller.handlePlayerMessage(playerId, message)

@@ -9,14 +9,18 @@ import { SaleSchema } from '../schemas/Sale'
 import { createPlayer } from './PlayerFactory'
 import { PlayOrderStrategy } from './PlayOrderStrategy'
 import { createAuctionFromConfig } from '../domain/auctions/AuctionFactory'
+import { AuctionRepo } from '../repositories/AuctionRepo'
 
 export class AuctionServiceImpl implements AuctionService {
   private auctions: Map<string, Auction> = new Map()
   private players: Map<string, string> = new Map()
   private callBacks = new Map<string, ((auction: Auction) => void)[]>()
+  private repo: AuctionRepo
 
-  constructor() {
+  constructor(repo: AuctionRepo) {
+    this.repo = repo
     this.initCallbacks()
+    this.loadAuctions()
   }
 
   initCallbacks = () => {
@@ -32,6 +36,7 @@ export class AuctionServiceImpl implements AuctionService {
     const newAuction: Auction = createAuctionFromConfig(config)
     this.auctions.set(newAuction.id, newAuction)
     logger.info(`created auction: ${JSON.stringify(newAuction)}`)
+    await this.repo.saveAuction(newAuction)
     return cloneDeep(newAuction)
   }
 
@@ -56,10 +61,11 @@ export class AuctionServiceImpl implements AuctionService {
       throw new Error(`Bid amount must be higher than current bid amount`)
     }
 
-    bid.timestamp = new Date()
+    bid.timestamp = new Date().toISOString()
     auction.currentBid = bid
     const res = cloneDeep(auction)
     this.notifyUpdate(res, 'onNewBid')
+    this.saveAuction(auction)
     return res
   }
 
@@ -85,6 +91,7 @@ export class AuctionServiceImpl implements AuctionService {
     auction.currentBid = undefined
     const res = cloneDeep(auction)
     this.notifyUpdate(res, 'onNewSale')
+    this.saveAuction(auction)
     return res
   }
 
@@ -105,7 +112,7 @@ export class AuctionServiceImpl implements AuctionService {
       seller.inventory = new Map(
         [...seller.inventory].map(([item, quantity]) => [item, quantity - (auction.currentSale?.items.get(item) ?? 0)])
       )
-      auction.currentSale.endTimestamp = new Date()
+      auction.currentSale.endTimestamp = new Date().toISOString()
       // TODO: save auction sale results
     }
     if (auction.currentRound == auction.maxRound) {
@@ -114,13 +121,16 @@ export class AuctionServiceImpl implements AuctionService {
     }
     auction.currentBid = undefined
     auction.currentSale = undefined
-    return this.goToNextRound(auction, auctionId)
+    const res = this.goToNextRound(auction, auctionId)
+    res.then(this.saveAuction)
+    return res
   }
 
   async setPlayerState(playerId: string, state: PlayerState): Promise<Auction> {
     const auction: Auction = this.findPlayerAuction(playerId)
     const player: Player = this.getPlayer(auction, playerId)
     player.status = state
+    this.saveAuction(auction)
     return cloneDeep(auction)
   }
 
@@ -131,7 +141,19 @@ export class AuctionServiceImpl implements AuctionService {
     // TODO: save auction results
     const res = cloneDeep(auction)
     this.notifyUpdate(res, 'onAuctionEnd')
+    this.repo
+      .deleteAuction(auctionId)
+      .then(() => logger.info(`deleted auction: ${auctionId}`))
+      .catch(error => logger.error(`failed to delete auction: ${auctionId}`, error))
     return res
+  }
+
+  async playerJoin(playerId: string, auctionId: string): Promise<Auction> {
+    const auction = this.findAuctionById(auctionId)
+    auction.players.push(createPlayer(playerId, auction))
+    this.players.set(playerId, auctionId)
+    this.saveAuction(auction)
+    return cloneDeep(auction)
   }
 
   onRoundEnd(callback: (auction: Auction) => void): void {
@@ -154,10 +176,11 @@ export class AuctionServiceImpl implements AuctionService {
     return cloneDeep(this.findPlayerAuction(playerId))
   }
 
-  async playerJoin(playerId: string, auctionId: string): Promise<Auction> {
+  async playerLeave(playerId: string, auctionId: string): Promise<Auction> {
     const auction = this.findAuctionById(auctionId)
-    auction.players.push(createPlayer(playerId, auction))
-    this.players.set(playerId, auctionId)
+    auction.players = auction.players.filter(player => player.id !== playerId)
+    this.players.delete(playerId)
+    this.saveAuction(auction)
     return cloneDeep(auction)
   }
 
@@ -204,18 +227,19 @@ export class AuctionServiceImpl implements AuctionService {
     this.callBacks.get(type)!.forEach(callback => callback(res))
   }
 
-  async playerLeave(playerId: string, auctionId: string): Promise<Auction> {
-    const auction = this.findAuctionById(auctionId)
-    auction.players = auction.players.filter(player => player.id !== playerId)
-    this.players.delete(playerId)
+  async startAuction(auctionId: string): Promise<Auction> {
+    const auction: Auction = this.findAuctionById(auctionId)
+    auction.startTimestamp = new Date().toISOString()
+    auction.sellerQueue = PlayOrderStrategy.sameOrder(auction.players.map(player => player.id))
+    this.saveAuction(auction)
     return cloneDeep(auction)
   }
 
-  async startAuction(auctionId: string): Promise<Auction> {
-    const auction: Auction = this.findAuctionById(auctionId)
-    auction.startTimestamp = new Date()
-    auction.sellerQueue = PlayOrderStrategy.sameOrder(auction.players.map(player => player.id))
-    return cloneDeep(auction)
+  private saveAuction = (res: Auction) => {
+    this.repo
+      .saveAuction(res)
+      .then(() => logger.info(`saved auction: ${res.id}`))
+      .catch(error => logger.error(`failed to save auction: ${res.id}`, error))
   }
 
   private async goToNextRound(auction: Auction, auctionId: string): Promise<Auction> {
@@ -235,5 +259,17 @@ export class AuctionServiceImpl implements AuctionService {
     }
     this.notifyUpdate(auction, 'onRoundEnd')
     return cloneDeep(auction)
+  }
+
+  private loadAuctions = () => {
+    this.repo.getAuctions().then(auctions => {
+      auctions.forEach(auction => {
+        logger.info(`loading auction: ${auction.id}`)
+        this.auctions.set(auction.id, auction)
+        auction.players.forEach(player => {
+          this.players.set(player.id, auction.id)
+        })
+      })
+    })
   }
 }

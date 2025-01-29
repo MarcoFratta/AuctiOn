@@ -3,12 +3,22 @@ import { AuctionService } from '../src/services/AuctionService'
 import { Auction, AuctionConfig } from '../src/schemas/Auction'
 import { ItemsMap } from '../src/schemas/Player'
 import { Bid } from '../src/schemas/Bid'
+import { RedisAuctionRepo } from '../src/repositories/RedisAuctionRepo'
+import MockRedis from 'ioredis-mock'
+import Redis from 'ioredis'
 
 describe('AuctionService', () => {
   let service: AuctionService
+  let redis: Redis
 
-  beforeEach(() => {
-    service = new AuctionServiceImpl()
+  beforeEach(async () => {
+    redis = new MockRedis()
+    await redis.flushall()
+    service = new AuctionServiceImpl(new RedisAuctionRepo(redis))
+
+  })
+  afterAll(async () => {
+    redis.disconnect()
   })
 
   const defaultConfig: AuctionConfig = {
@@ -126,7 +136,7 @@ describe('AuctionService', () => {
     const auction = createMockAuction()
     await service.createAuction(auction)
     await joinAndConnectPlayer('player1', auction.id)
-    const bid: Bid = { playerId: 'player1', round: 1, amount: 50, timestamp: new Date() }
+    const bid: Bid = { playerId: 'player1', round: 1, amount: 50, timestamp: new Date().toISOString() }
     await expect(service.playerBid(bid)).rejects.toThrow(`Cannot place bid without an active sale`)
   })
 
@@ -138,7 +148,7 @@ describe('AuctionService', () => {
     await joinAndConnectPlayer('player2', auction.id)
     await service.startAuction(auction.id)
     await service.playerSale('player1', new Map([['square', 2]]))
-    const bid: Bid = { playerId: 'player2', round: 1, amount: 50, timestamp: new Date() }
+    const bid: Bid = { playerId: 'player2', round: 1, amount: 50, timestamp: new Date().toISOString() }
     const updatedAuction = await service.playerBid(bid)
 
     expect(updatedAuction.currentBid).toEqual(bid)
@@ -154,7 +164,7 @@ describe('AuctionService', () => {
     await service.startAuction(auction.id)
     await service.playerSale('player1', new Map([['square', 2]]))
 
-    const bid: Bid = { playerId: 'player2', round: 1, amount: 50, timestamp: new Date() }
+    const bid: Bid = { playerId: 'player2', round: 1, amount: 50, timestamp: new Date().toISOString() }
     await expect(service.playerBid(bid)).rejects.toThrow(`Player with id player2 does not have enough money to place bid`)
   })
 
@@ -167,7 +177,7 @@ describe('AuctionService', () => {
     await service.startAuction(auction.id)
     await service.playerSale('player1', new Map([['square', 2]]))
 
-    const bid: Bid = { playerId: 'player2', round: 2, amount: 50, timestamp: new Date() }
+    const bid: Bid = { playerId: 'player2', round: 2, amount: 50, timestamp: new Date().toISOString() }
     await expect(service.playerBid(bid)).rejects.toThrow(`Bid round must match current round`)
   })
 
@@ -186,7 +196,7 @@ describe('AuctionService', () => {
       sellerId: 'player1',
       endTimestamp: undefined,
     })
-    await service.playerBid({ playerId: 'player2', round: 1, amount: 50, timestamp: new Date() })
+    await service.playerBid({ playerId: 'player2', round: 1, amount: 50, timestamp: new Date().toISOString() })
     updatedAuction = await service.endRound('auction1')
     expect(updatedAuction.players[1].money).toBe(50)
     expect(updatedAuction.players[0].money).toBe(150)
@@ -213,7 +223,7 @@ describe('AuctionService', () => {
     await joinAndConnectPlayer('player2', auction.id)
     await service.startAuction(auction.id)
     await service.playerSale('player1', new Map([['square', 2]]))
-    await service.playerBid({ playerId: 'player2', round: 1, amount: 50, timestamp: new Date() })
+    await service.playerBid({ playerId: 'player2', round: 1, amount: 50, timestamp: new Date().toISOString() })
 
     const updatedAuction = await service.endRound('auction1')
     const player1 = updatedAuction.players[0]
@@ -287,7 +297,7 @@ describe('AuctionService', () => {
         playerId: 'player1',
         round: 1,
         amount: 50,
-        timestamp: new Date(),
+        timestamp: new Date().toISOString(),
       })
     ).rejects.toThrow()
   })
@@ -301,13 +311,13 @@ describe('AuctionService', () => {
 
     await service.playerSale('player1', new Map([['square', 2]]))
 
-    await service.playerBid({ playerId: 'player2', round: 1, amount: 50, timestamp: new Date() })
+    await service.playerBid({ playerId: 'player2', round: 1, amount: 50, timestamp: new Date().toISOString() })
     await expect(
       service.playerBid({
         playerId: 'player2',
         round: 1,
         amount: 40,
-        timestamp: new Date(),
+        timestamp: new Date().toISOString(),
       })
     ).rejects.toThrow()
     await expect(
@@ -315,7 +325,7 @@ describe('AuctionService', () => {
         playerId: 'player2',
         round: 1,
         amount: 50,
-        timestamp: new Date(),
+        timestamp: new Date().toISOString(),
       })
     ).rejects.toThrow()
   })
@@ -327,7 +337,12 @@ describe('AuctionService', () => {
     await joinAndConnectPlayer('player2', auction.id)
     await service.startAuction(auction.id)
 
-    await expect(service.playerBid({ playerId: 'player2', round: 1, amount: 50, timestamp: new Date() })).rejects.toThrow()
+    await expect(service.playerBid({
+      playerId: 'player2',
+      round: 1,
+      amount: 50,
+      timestamp: new Date().toISOString(),
+    })).rejects.toThrow()
   })
   it('should not remove in sale items from the seller if no one bids', async () => {
     const auction = createMockAuction()
