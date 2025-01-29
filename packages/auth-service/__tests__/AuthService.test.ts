@@ -3,13 +3,14 @@ import {
   UserAlreadyExistsError,
   UserNotFoundError,
   WrongPasswordError,
-} from '../src/errors/AuthErrors';
-import { AuthServiceImpl } from '../src/services/AuthServiceImpl';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import axios from 'axios';
-import { AccountRepository } from '../src/repositories/AccountRepository';
-import { LoginInputData, RegisterInputData, Token, User } from '../src/schemas/AuthSchema';
+} from '../src/errors/AuthErrors'
+import { AuthServiceImpl } from '../src/services/AuthServiceImpl'
+import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
+import axios from 'axios'
+import { AccountRepository } from '../src/repositories/AccountRepository'
+import { LoginInputData, RegisterInputData, Token, User } from '../src/schemas/AuthSchema'
+import { JWTTokenGenerator } from '../src/utils/JWT'
 
 jest.mock('bcrypt');
 jest.mock('jsonwebtoken');
@@ -31,7 +32,8 @@ describe('AuthService', () => {
     };
 
     // Initialize AuthService with mocked dependencies
-    authService = new AuthServiceImpl(userServiceURL, jwtSecret, mockAccountRepository);
+    authService = new AuthServiceImpl(new JWTTokenGenerator('testSecret'),
+      mockAccountRepository, userServiceURL)
   });
 
   afterEach(() => {

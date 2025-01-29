@@ -1,8 +1,9 @@
-import { AuthController } from '../src/controllers/AuthController';
-import { AuthService } from '../src/services/AuthService';
-import { NextFunction, Request, Response } from 'express';
-import { AuthServiceImpl } from '../src/services/AuthServiceImpl';
-import { AccountRepository } from '../src/repositories/AccountRepository';
+import { AuthController } from '../src/controllers/AuthController'
+import { AuthService } from '../src/services/AuthService'
+import { NextFunction, Request, Response } from 'express'
+import { AuthServiceImpl } from '../src/services/AuthServiceImpl'
+import { AccountRepository } from '../src/repositories/AccountRepository'
+import { JWTTokenGenerator } from '../src/utils/JWT'
 
 // Mock dependencies
 jest.mock('../src/services/AuthServiceImpl');
@@ -17,9 +18,9 @@ describe('AuthController', () => {
   beforeEach(() => {
     // Create mocked service
     authService = new AuthServiceImpl(
-      '',
-      '',
+      new JWTTokenGenerator(''),
       {} as AccountRepository,
+      '',
     ) as jest.Mocked<AuthServiceImpl>;
 
     // Instantiate controller with mocked service

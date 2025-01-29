@@ -1,12 +1,14 @@
-import jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken'
+import { TokenGenerator } from '../domain/TokenGenerator'
 
-const secret = process.env.JWT_SECRET!;
-const expiresIn = process.env.JWT_EXPIRES_IN ?? '1h';
+export class JWTTokenGenerator implements TokenGenerator {
+  constructor(private secret: string) {}
 
-export const generateToken = (payload: object) => {
-  return jwt.sign(payload, secret, { expiresIn });
-};
+  generateToken = (payload: object): string => {
+    return jwt.sign(payload, this.secret, { expiresIn: '1h' })
+  }
 
-export const verifyToken = (token: string) => {
-  return jwt.verify(token, secret);
-};
+  verifyToken = (token: string): any => {
+    return jwt.verify(token, this.secret)
+  }
+}
