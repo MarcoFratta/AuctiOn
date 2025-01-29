@@ -12,11 +12,12 @@ export const authMiddleware = async (req: AuthenticatedRequest, res: Response, n
     return next()
   }
   try {
-    const userId = validateSchema(userSchema, req.user?.id)
-    if (!userId) {
+    const v = JSON.parse(req.headers['x-user'] as string)
+    const user = validateSchema(userSchema, v)
+    if (!user) {
       throw new UserNotAuthenticatedError()
     }
-
+    req.user = user
     next()
   } catch (error) {
     next(new UserNotAuthenticatedError())
