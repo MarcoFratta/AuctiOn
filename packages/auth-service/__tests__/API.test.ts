@@ -1,23 +1,28 @@
-import request from 'supertest';
-import axios from 'axios';
+import request from 'supertest'
+import axios from 'axios'
 
-import * as console from 'node:console';
-import { config } from '../src/configs/config';
-import app from '../src/App';
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import { closeLocalMongoConnection, localMongoConnection } from './common';
-import { RegisterInputData } from '../src/schemas/AuthSchema';
-import { UserNotFoundError, UserServiceUnavailableError } from '../src/errors/AuthErrors';
+import * as console from 'node:console'
+import { config } from '../src/configs/config'
+import { App } from '../src/App'
+import { MongoMemoryServer } from 'mongodb-memory-server'
+import { closeLocalMongoConnection, localMongoConnection } from './common'
+import { RegisterInputData } from '../src/schemas/AuthSchema'
+import { UserNotFoundError, UserServiceUnavailableError } from '../src/errors/AuthErrors'
+import mockRedis from 'ioredis-mock'
+import { Express } from 'express'
 
 // Mock Axios
-jest.mock('axios');
-const mockedAxios = axios as jest.Mocked<typeof axios>;
-const userServiceUrl = config.userServiceUrl;
+jest.mock('axios')
+const mockedAxios = axios as jest.Mocked<typeof axios>
+const userServiceUrl = config.userServiceUrl
 
 describe('Auth Service Integration Tests with Axios Mock', () => {
-  let mongoServer: MongoMemoryServer;
+  let mongoServer: MongoMemoryServer
+  let app: Express
   beforeAll(async () => {
     mongoServer = await localMongoConnection();
+    const server = new App(new mockRedis())
+    app = server.app
   });
   afterAll(async () => {
     await closeLocalMongoConnection(mongoServer);

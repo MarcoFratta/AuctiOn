@@ -1,16 +1,19 @@
-import request from 'supertest';
-import app from '../src/App'; // Assuming `app` is your Express app
-import axios from 'axios';
-import { UserNotFoundError, UserServiceUnavailableError } from '../src/errors/AuthErrors';
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import { closeLocalMongoConnection, localMongoConnection } from './common';
+import request from 'supertest'
+import App from '../src/App' // Assuming `app` is your Express app
+import axios from 'axios'
+import { UserNotFoundError, UserServiceUnavailableError } from '../src/errors/AuthErrors'
+import { MongoMemoryServer } from 'mongodb-memory-server'
+import { closeLocalMongoConnection, localMongoConnection } from './common'
+import mockRedis from 'ioredis-mock'
 
 jest.mock('axios')
 
 describe('Error Use Cases', () => {
     let mongoServer: MongoMemoryServer
+  let app: App
     beforeAll(async () => {
         mongoServer = await localMongoConnection()
+      app = new App(new mockRedis())
     })
     afterAll(async () => {
         await closeLocalMongoConnection(mongoServer)
@@ -30,7 +33,7 @@ describe('Error Use Cases', () => {
             },
           });
 
-          const response = await request(app).post('/auth/register').send({
+          const response = await request(app.app).post('/auth/register').send({
             email: 'test@example.com',
             password: 'Password1',
             name: 'Test User',
@@ -52,7 +55,7 @@ describe('Error Use Cases', () => {
           )
 
 
-          const response = await request(app).post('/auth/register').send({
+          const response = await request(app.app).post('/auth/register').send({
                 email: 'test@example.com',
                 password: 'Password1',
                 name: 'Test User',
@@ -71,7 +74,7 @@ describe('Error Use Cases', () => {
             // Mock the user service to return null or empty data
           ;(axios.get as jest.Mock).mockRejectedValueOnce(new UserNotFoundError('nonexistent@example.com'));
 
-            const response = await request(app).post('/auth/login').send({
+          const response = await request(app.app).post('/auth/login').send({
                 email: 'nonexistent@example.com',
                 password: 'Password1',
             })
@@ -95,7 +98,7 @@ describe('Error Use Cases', () => {
                 },
             })
             const id = (
-                await request(app)
+              await request(app.app)
                     .post('/auth/register')
                   .send({ ...userData, password: 'Password1' })
             ).body.user.id
@@ -106,7 +109,7 @@ describe('Error Use Cases', () => {
             ;(axios.get as jest.Mock).mockResolvedValueOnce({
             data: { ...userData, id: id },
             })
-            const response = await request(app).post('/auth/login').send({
+          const response = await request(app.app).post('/auth/login').send({
                 email: 'test@example.com',
                 password: 'wrongPassword',
             })
@@ -126,7 +129,7 @@ describe('Error Use Cases', () => {
                 )
             )
 
-            const response = await request(app).post('/auth/login').send({
+          const response = await request(app.app).post('/auth/login').send({
                 email: 'test@example.com',
                 password: 'Password1',
             })
@@ -141,7 +144,7 @@ describe('Error Use Cases', () => {
 
     describe('Token Validation Error Cases', () => {
         it('should return 400 for an invalid token', async () => {
-            const response = await request(app).post('/auth/validate').send({
+          const response = await request(app.app).post('/auth/validate').send({
                 token: 'invalidToken',
             })
 
@@ -160,7 +163,7 @@ describe('Error Use Cases', () => {
                 )
             )
 
-            const response = await request(app).post('/auth/validate').send({
+          const response = await request(app.app).post('/auth/validate').send({
                 token: 'validToken',
             })
 

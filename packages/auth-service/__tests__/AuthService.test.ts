@@ -9,8 +9,11 @@ import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import axios from 'axios'
 import { AccountRepository } from '../src/repositories/AccountRepository'
-import { LoginInputData, RegisterInputData, Token, User } from '../src/schemas/AuthSchema'
-import { JWTTokenGenerator } from '../src/utils/JWT'
+import { LoginInputData, RegisterInputData, User } from '../src/schemas/AuthSchema'
+import { TokenGenerator } from '../src/domain/TokenGenerator'
+import { mock } from 'jest-mock-extended'
+import { RedisTokenRepo } from '../src/repositories/RedisTokenRepo'
+import mockRedis from 'ioredis-mock'
 
 jest.mock('bcrypt');
 jest.mock('jsonwebtoken');
@@ -19,21 +22,17 @@ jest.mock('axios');
 describe('AuthService', () => {
   let authService: AuthServiceImpl;
   let mockAccountRepository: jest.Mocked<AccountRepository>;
+  let mockTokenGenerator: jest.Mocked<TokenGenerator>
+  let mockTokenRepo: RedisTokenRepo
   const userServiceURL = 'http://user-service:3000/users';
-  const jwtSecret = 'testSecret';
-
   beforeEach(() => {
-    // Mock repository
-    mockAccountRepository = {
-      findById: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
-    };
-
-    // Initialize AuthService with mocked dependencies
-    authService = new AuthServiceImpl(new JWTTokenGenerator('testSecret'),
-      mockAccountRepository, userServiceURL)
+    // Create a mock for AccountRepository
+    mockAccountRepository = mock<AccountRepository>()
+    // Create a mock for TokenGenerator
+    mockTokenRepo = new RedisTokenRepo(new mockRedis(), 7)
+    mockTokenGenerator = mock<TokenGenerator>()
+    authService = new AuthServiceImpl(mockTokenGenerator,
+      mockAccountRepository, mockTokenRepo, userServiceURL)
   });
 
   afterEach(() => {
@@ -64,7 +63,8 @@ describe('AuthService', () => {
           name: userData.name,
         },
       });
-    (jwt.sign as jest.Mock).mockReturnValue('jsonwebtoken');
+    mockTokenGenerator.generateAccessToken.mockReturnValue('accessToken')
+    mockTokenGenerator.generateRefreshToken.mockReturnValue('refreshToken')
 
     const result = await authService.register(userData);
 
@@ -78,12 +78,14 @@ describe('AuthService', () => {
       email: userData.email,
       name: userData.name,
     });
-    expect(jwt.sign).toHaveBeenCalledWith(
+    expect(mockTokenGenerator.generateAccessToken).toHaveBeenCalledWith(
       { id: accountId, email: userData.email, name: userData.name },
-      jwtSecret,
-      { expiresIn: '1h' },
     );
-    expect(result).toHaveProperty('token', 'jsonwebtoken');
+    expect(mockTokenGenerator.generateRefreshToken).toHaveBeenCalledWith({
+      id: accountId,
+    })
+    expect(result).toHaveProperty('accessToken', 'accessToken')
+    expect(result).toHaveProperty('refreshToken', 'refreshToken')
     expect(result).toHaveProperty('id', accountId);
     expect(result).toHaveProperty('email', userData.email);
     expect(result).toHaveProperty('name', userData.name);
@@ -123,26 +125,23 @@ describe('AuthService', () => {
       id: '123456789012345678901234',
       pHash: 'hashedPassword',
     };
-    const token = 'jsonwebtoken';
 
     (axios.get as jest.Mock).mockResolvedValue({
       data: { id: account.id, email: userData.email, name: 'Test User' },
     });
     mockAccountRepository.findById.mockResolvedValue(account);
     (bcrypt.compare as jest.Mock).mockResolvedValue(true);
-    (jwt.sign as jest.Mock).mockReturnValue(token);
+    mockTokenGenerator.generateAccessToken.mockReturnValue('accessToken')
+    mockTokenGenerator.generateRefreshToken.mockReturnValue('refreshToken')
 
     const result = await authService.login(userData);
 
     expect(axios.get).toHaveBeenCalledWith(`${userServiceURL}/email/${userData.email}`);
     expect(mockAccountRepository.findById).toHaveBeenCalledWith(account.id);
     expect(bcrypt.compare).toHaveBeenCalledWith(userData.password, account.pHash);
-    expect(jwt.sign).toHaveBeenCalledWith(
-      { id: account.id, email: userData.email, name: 'Test User' },
-      jwtSecret,
-      { expiresIn: '1h' },
-    );
-    expect(result).toHaveProperty('token', token);
+
+    expect(result).toHaveProperty('accessToken', 'accessToken')
+    expect(result).toHaveProperty('refreshToken', 'refreshToken')
     expect(result).toHaveProperty('id', account.id);
     expect(result).toHaveProperty('email', userData.email);
     expect(result).toHaveProperty('name', 'Test User');
@@ -192,29 +191,69 @@ describe('AuthService', () => {
 
   // Test for validateToken
   it('should validate a valid JWT', async () => {
-    const token: Token = { token: 'validToken' };
+    const token = { accessToken: 'validToken' }
     const decoded: User = {
       id: '000000000000000000000000',
       email: 'test@example.com',
       name: 'Test User',
     };
 
-    (jwt.verify as jest.Mock).mockReturnValue(decoded);
+    mockTokenGenerator.verifyAccessToken.mockReturnValue(decoded)
 
     const result = authService.validateToken(token);
 
-    expect(jwt.verify).toHaveBeenCalledWith(token.token, jwtSecret);
+    expect(mockTokenGenerator.verifyAccessToken).toHaveBeenCalledWith(token.accessToken)
     expect(result).toEqual(decoded);
   });
 
   it('should throw an error for an invalid JWT', async () => {
-    const token: Token = { token: 'invalidToken' };
+    const token = { accessToken: 'invalidToken' };
 
-    (jwt.verify as jest.Mock).mockImplementation(() => {
+    (mockTokenGenerator.verifyAccessToken).mockImplementation(() => {
       throw new Error('Invalid token');
     });
 
     expect(() => authService.validateToken(token)).toThrow(new InvalidTokenError());
-    expect(jwt.verify).toHaveBeenCalledWith(token.token, jwtSecret);
+    expect(mockTokenGenerator.verifyAccessToken).toHaveBeenCalledWith(token.accessToken)
   });
+  // Test for refresh token
+  it('should refresh a token successfully', async () => {
+    const refreshToken = 'validRefreshToken'
+    const accessToken = 'validAccessToken'
+    const user = {
+      id: '000000000000000000000000',
+      email: 'test@email.com',
+      name: 'test',
+    }
+    const decoded = { id: '000000000000000000000000' }
+    await mockTokenRepo.saveRefreshToken(refreshToken, user.id)
+    // Mock the behavior of the token generator
+    mockTokenGenerator.verifyRefreshToken.mockReturnValue(decoded)
+    mockTokenGenerator.generateAccessToken.mockReturnValue(accessToken)
+    mockTokenGenerator.generateRefreshToken.mockReturnValue('newRefreshToken');
+    (axios.get as jest.Mock).mockResolvedValue({ data: user })
+    // Mock the stored refresh token
+
+    const result = await authService.refreshToken({ refreshToken })
+
+    expect(mockTokenGenerator.verifyRefreshToken).toHaveBeenCalledWith(refreshToken)
+    expect(mockTokenGenerator.generateAccessToken).toHaveBeenCalledWith(user)
+    expect(mockTokenGenerator.generateRefreshToken).toHaveBeenCalledWith(decoded)
+    expect(result).toEqual({
+      accessToken: accessToken,
+      refreshToken: 'newRefreshToken',
+    })
+  })
+
+  it('should throw an error for an invalid refresh token', async () => {
+    const refreshToken = 'invalidRefreshToken'
+
+    // Mock the behavior of the token generator to throw an error
+    mockTokenGenerator.verifyRefreshToken.mockImplementation(() => {
+      throw new InvalidTokenError()
+    })
+
+    await expect(authService.refreshToken({ refreshToken })).rejects.toThrow(InvalidTokenError)
+    expect(mockTokenGenerator.verifyRefreshToken).toHaveBeenCalledWith(refreshToken)
+  })
 });

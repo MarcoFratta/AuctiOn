@@ -3,7 +3,9 @@ import { AuthService } from '../src/services/AuthService'
 import { NextFunction, Request, Response } from 'express'
 import { AuthServiceImpl } from '../src/services/AuthServiceImpl'
 import { AccountRepository } from '../src/repositories/AccountRepository'
-import { JWTTokenGenerator } from '../src/utils/JWT'
+import { JWTTokenGenerator } from '../src/domain/JWTTokenGenerator'
+import mockRedis from 'ioredis-mock'
+import { RedisTokenRepo } from '../src/repositories/RedisTokenRepo'
 
 // Mock dependencies
 jest.mock('../src/services/AuthServiceImpl');
@@ -18,8 +20,9 @@ describe('AuthController', () => {
   beforeEach(() => {
     // Create mocked service
     authService = new AuthServiceImpl(
-      new JWTTokenGenerator(''),
+      new JWTTokenGenerator('', 'test'),
       {} as AccountRepository,
+      new RedisTokenRepo(new mockRedis(), 7),
       '',
     ) as jest.Mocked<AuthServiceImpl>;
 
@@ -31,6 +34,7 @@ describe('AuthController', () => {
     res = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
+      cookie: jest.fn(),
     };
     next = jest.fn();
   });
@@ -49,7 +53,8 @@ describe('AuthController', () => {
       const token = { token: 'mocked-token' };
       req.body = { email: 'test@example.com', password: 'password123' };
       authService.login.mockResolvedValueOnce({
-      ...token,
+        refreshToken: 'test-token',
+        accessToken: token.token,
       ...user
     })
 
@@ -58,6 +63,7 @@ describe('AuthController', () => {
       expect(authService.login).toHaveBeenCalledWith(req.body);
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
+        message: 'User logged in successfully',
         user: { ...token, ...user },
       });
       expect(next).not.toHaveBeenCalled();
@@ -90,7 +96,11 @@ describe('AuthController', () => {
         password: 'Password123',
       };
 
-      authService.register.mockResolvedValue({ ...token, ...user });
+      authService.register.mockResolvedValue({
+        accessToken: token.token,
+        refreshToken: 'test-token',
+        ...user,
+      })
 
       await authController.register(req as Request, res as Response, next);
 
@@ -102,6 +112,28 @@ describe('AuthController', () => {
       });
       expect(next).not.toHaveBeenCalled();
     });
+    it('should refresh token', async () => {
+      const token = { token: 'mocked-token' }
+      const newToken = {
+        accessToken: 'new-accessToken',
+        refreshToken: 'new-refreshToken',
+      }
+      req.cookies = []
+      req.cookies['refreshToken'] = 'refresh-token'
+      req.body = token
+      authService.refreshToken.mockResolvedValue(newToken)
+      await authController.refreshToken(req as Request, res as Response, next)
+
+      expect(authService.refreshToken).toHaveBeenCalledWith({
+        refreshToken: 'refresh-token',
+      })
+      expect(res.status).toHaveBeenCalledWith(200)
+      expect(res.json).toHaveBeenCalledWith({
+        token: newToken.accessToken,
+      })
+      expect(res.cookie).toHaveBeenCalled()
+    })
+
 
     it('should call next with an error if registration fails', async () => {
       const error = new Error('Registration failed');

@@ -7,34 +7,64 @@ import { AuthController } from './controllers/AuthController'
 import createRouter from './routes/Routes'
 import { config } from './configs/config'
 import { MongoAccountRepo } from './repositories/MongoAccountRepo'
-import { JWTTokenGenerator } from './utils/JWT'
+import { JWTTokenGenerator } from './domain/JWTTokenGenerator'
+import cookieParser from 'cookie-parser'
+import logger from './utils/Logger'
+import { RedisTokenRepo } from './repositories/RedisTokenRepo'
+import Redis from 'ioredis'
 
-const app = express()
+export class App {
+  public app: express.Express
+  private readonly redis: Redis
 
-// Check if swagger.json exists
-const swaggerPath = path.join(__dirname, '..', 'docs', 'swagger.json')
-if (fs.existsSync(swaggerPath)) {
-  const doc: JsonObject = JSON.parse(fs.readFileSync(swaggerPath, 'utf-8'))
-  app.use(
-    '/docs',
-    swaggerUi.serve,
-    swaggerUi.setup(doc, {
-      // customCssUrl: path.join(__dirname, "..", "css", "swaggerTheme.css"),
-      // customfavIcon: path.join(__dirname, "..", "public", "logo.css"),
-      customSiteTitle: 'Auth Service API Documentation',
+  constructor(redis: Redis) {
+    this.redis = redis
+    this.app = express()
+    this.initializeMiddleware()
+    this.initializeRoutes()
+    this.initializeSwagger()
+  }
+
+  public start(port: number) {
+    this.app.listen(port, () => {
+      logger.info(`Auth Service running on port ${port}`)
     })
-  )
+  }
+
+  private initializeMiddleware() {
+    this.app.use(express.json())
+    this.app.use(cookieParser())
+  }
+
+  private initializeRoutes() {
+    logger.info(`loading configs secrets ${config.jwtAccessSecret} -
+     ${config.jwtRefreshSecret}`)
+
+    const accountRepo = new MongoAccountRepo()
+    const expireDays = config.refreshTokenExpireDays
+    const tokensRepo = new RedisTokenRepo(this.redis, expireDays)
+    const tokenGenerator = new JWTTokenGenerator(config.jwtAccessSecret, config.jwtRefreshSecret, expireDays)
+
+    const service = new AuthServiceImpl(tokenGenerator, accountRepo, tokensRepo, config.userServiceUrl)
+    const controller = new AuthController(service) // Use the router
+    const router = createRouter(controller)
+    this.app.use('/auth', router)
+  }
+
+  private initializeSwagger() {
+    // Check if swagger.json exists
+    const swaggerPath = path.join(__dirname, '..', 'docs', 'swagger.json')
+    if (fs.existsSync(swaggerPath)) {
+      const doc: JsonObject = JSON.parse(fs.readFileSync(swaggerPath, 'utf-8'))
+      this.app.use(
+        '/docs',
+        swaggerUi.serve,
+        swaggerUi.setup(doc, {
+          customSiteTitle: 'Auth Service API Documentation',
+        })
+      )
+    }
+  }
 }
-const repo = new MongoAccountRepo()
-const service = new AuthServiceImpl(new JWTTokenGenerator(config.jwtSecret), repo, config.userServiceUrl)
-const controller = new AuthController(service)
 
-// Use the router
-const router = createRouter(controller)
-// Middleware
-app.use(express.json())
-
-// Routes
-app.use('/auth', router)
-
-export default app
+export default App

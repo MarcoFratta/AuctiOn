@@ -7,8 +7,8 @@ import {
   tokenSchema,
   User,
   userSchema,
-} from '../src/schemas/AuthSchema';
-import { validateSchema, ValidationError } from '../src/utils/Validator'; // Adjust the import path
+} from '../src/schemas/AuthSchema'
+import { validateSchema, ValidationError } from '../src/utils/Validator' // Adjust the import path
 
 describe('AuthSchema Validation with Helper', () => {
   describe('registerSchema', () => {
@@ -121,7 +121,7 @@ describe('AuthSchema Validation with Helper', () => {
 
   describe('tokenSchema', () => {
     it('should validate a correct token', () => {
-      const input: Token = { token: 'valid-token' };
+      const input: Token = { accessToken: 'valid-token', refreshToken: 'valid-token' }
 
       const result = validateSchema(tokenSchema, input);
 

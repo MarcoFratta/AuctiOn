@@ -1,5 +1,9 @@
 export interface TokenGenerator {
-  generateToken(payload: any): string
+  generateAccessToken(payload: any): string
 
-  verifyToken(token: string): any
+  generateRefreshToken(payload: any): string
+
+  verifyAccessToken(token: string): any
+
+  verifyRefreshToken(token: string): any
 }

@@ -1,7 +1,7 @@
-import request from 'supertest';
-import express, { Application } from 'express';
-import { createRouter } from '../src/routes/Routes';
-import { AuthController } from '../src/controllers/AuthController';
+import request from 'supertest'
+import express, { Application } from 'express'
+import { createRouter } from '../src/routes/Routes'
+import { AuthController } from '../src/controllers/AuthController'
 
 jest.mock('../src/controllers/AuthController');
 
@@ -15,6 +15,7 @@ describe('Auth Router', () => {
       login: jest.fn(),
       register: jest.fn(),
       validateToken: jest.fn(),
+      refreshToken: jest.fn(),
     } as unknown as jest.Mocked<AuthController>;
 
     // Initialize an Express app with the router
