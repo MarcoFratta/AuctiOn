@@ -177,11 +177,7 @@ export class LobbyServiceImpl implements LobbyService {
     await this.lobbyRepository.update(id, {
       status: 'completed',
     })
-    await Promise.all(
-      lobby.players.map(player => {
-        this.userLobbyRepo.removeUserFromLobby(player.userId, id)
-      })
-    )
+    await this.userLobbyRepo.terminateMatch(id)
   }
 
   onLobbyCreated(callback: (lobby: Lobby) => void): void {
