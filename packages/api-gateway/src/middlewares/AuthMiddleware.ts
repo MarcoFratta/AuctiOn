@@ -61,7 +61,7 @@ export const AuthMiddleware = async (req: AuthenticatedRequest, res: Response, n
   } catch (error) {
     logger.error('AuthMiddleware error ', error)
     if (axios.isAxiosError(error)) {
-      if (error.response?.status === 400) {
+      if (error.response?.status === 400 || error.response?.status === 401) {
         return next(new UserNotAuthenticatedError())
       }
       return next(new ServiceUnavailableError())
