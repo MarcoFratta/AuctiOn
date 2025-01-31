@@ -43,7 +43,9 @@ export class AuctionController {
           this.auctionService
             .playerBid(bid)
             .then(a => this.sendUpdatedAuction(a, 'bid'))
-            .catch(this.handleErrors)
+            .catch(err => {
+              this.handleErrors(err, playerId)
+            })
         })
         .with('sell', () => {
           const sale: InventoryInputMsg = validateSchema(InventoryInputSchema, parsedMessage.sale)
@@ -52,7 +54,9 @@ export class AuctionController {
           this.auctionService
             .playerSale(playerId, itemsMap)
             .then(a => this.sendUpdatedAuction(a, 'sale'))
-            .catch(this.handleErrors)
+            .catch(err => {
+              this.handleErrors(err, playerId)
+            })
         })
         .exhaustive()
     } catch (e) {
@@ -146,7 +150,8 @@ export class AuctionController {
     )
   }
 
-  private handleErrors(error: Error): void {
+  private handleErrors(error: Error, playerId: string): void {
+    this.playerChannel.sendToPlayer(playerId, JSON.stringify({ type: 'error', message: error.message }))
     logger.error(`Error handling message: ${error}`)
   }
 }

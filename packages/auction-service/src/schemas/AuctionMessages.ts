@@ -21,11 +21,14 @@ export const PlayerAuctionSchema = AuctionSchema.extend({
   saleInfo: SaleInfoSchema.optional(),
 }).omit({ players: true, currentSale: true })
 
+export const ErrorSchema = z.object({
+  message: z.string(),
+})
+
 export const MessageTypeSchema = z.enum(['sell', 'bid'])
 
 export type SaleInfo = z.infer<typeof SaleInfoSchema>
 export type PlayerAuction = z.infer<typeof PlayerAuctionSchema>
 export type MessageType = z.infer<typeof MessageTypeSchema>
-
 export type BidMessage = z.infer<typeof BidMsgSchema>
 export type PlayerInfoMessage = z.infer<typeof PlayerInfoSchema>
