@@ -14,6 +14,7 @@ import { KafkaProducer } from './controllers/KafkaProducer'
 import { Kafka } from 'kafkajs'
 import { KafkaConsumer } from './controllers/KafkaConsumer'
 import { LobbyService } from './services/LobbyService'
+import logger from './utils/Logger'
 
 export class App {
   public app: Application
@@ -69,6 +70,7 @@ export class App {
   private setupSwagger(): void {
     const swaggerPath = path.join(__dirname, '..', 'docs', 'swagger.json')
     if (fs.existsSync(swaggerPath)) {
+      logger.info('Swagger documentation found. Setting up Swagger UI...')
       const doc = JSON.parse(fs.readFileSync(swaggerPath, 'utf-8'))
       this.app.use(
         '/docs',
@@ -81,7 +83,7 @@ export class App {
   }
 
   private setupRoutes(): void {
-    this.app.use('/lobby', createLobbyRouter(this.controller))
+    this.app.use('/lobbies', createLobbyRouter(this.controller))
   }
 
   private setupErrorHandling(): void {
