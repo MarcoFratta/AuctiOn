@@ -15,7 +15,7 @@ export const config: GatewayConfig = {
     },
     lobby: {
       url: process.env.LOBBY_SERVICE_URI || 'http://localhost:3002/lobby',
-      pathRewrite: { '^/lobby': '/lobby' },
+      pathRewrite: { '^/lobbies': '/lobbies' },
     },
     auth: {
       url: process.env.AUTH_SERVICE_URI || 'http://localhost:3003/auth',
@@ -23,7 +23,7 @@ export const config: GatewayConfig = {
     },
     auction: {
       url: process.env.AUCTION_SERVICE_URI || 'http://localhost:3004/auction',
-      pathRewrite: { '^/auction': '/' },
+      pathRewrite: { '^/auctions': '/' },
     },
   },
 }
