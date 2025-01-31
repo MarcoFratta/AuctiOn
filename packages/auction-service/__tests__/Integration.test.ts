@@ -5,7 +5,8 @@ import { App } from '../src/App'
 import { KafkaContainer, StartedKafkaContainer } from '@testcontainers/kafka'
 import { Kafka } from 'kafkajs'
 import { AuctionConfig } from '../src/schemas/Auction'
-import Redis from 'ioredis-mock'
+import redisMock from 'ioredis-mock'
+import Redis from 'ioredis'
 
 jest.setTimeout(35 * 1000)
 describe('Auction System Integration Test', () => {
@@ -13,9 +14,11 @@ describe('Auction System Integration Test', () => {
   let port: number
   let app: App
   let kafka: StartedKafkaContainer
+  let redis: Redis
 
   beforeAll(async () => {
     kafka = await new KafkaContainer().withExposedPorts(9093).start()
+    redis = new redisMock()
     await waitForKafkaToBeReady(kafka)
   })
 
@@ -58,20 +61,16 @@ describe('Auction System Integration Test', () => {
     throw new Error('Kafka did not become ready in time')
   }
 
-  beforeAll(async () => {
-    kafka = await new KafkaContainer().withExposedPorts(9093).start()
-    await waitForKafkaToBeReady(kafka)
-  })
-
-
   afterAll(async () => {
     await kafka.stop()
   })
 
   beforeEach((done) => {
     const kafkaBrokers = [`${kafka.getHost()}:${kafka.getMappedPort(9093)}`]
+
+
     app = new App(new Kafka({ brokers: kafkaBrokers }),
-      new Redis())
+      redis)
     service = app.auctionService
     app.start(0).then(() => {
       const address = app.server.address()
@@ -80,12 +79,14 @@ describe('Auction System Integration Test', () => {
       } else {
         throw new Error('Failed to assign a dynamic port')
       }
+    }).then(() => {
       done()
     }).catch(done)
   });
 
   afterEach(async () => {
     await app.stop()
+    await redis.flushall()
   })
   const connectPlayer = (player: WebSocket,
                          id: string, messages: Record<string, any[]>) => {
