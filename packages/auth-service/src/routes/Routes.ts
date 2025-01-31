@@ -10,6 +10,8 @@ export const createRouter = (c: AuthController) => {
   router.post('/register', validateRequestBody(registerSchema), c.register)
   router.post('/refresh', c.refreshToken)
   router.post('/validate', c.validateToken)
+  router.post('/forgot/:email', c.forgotPassword)
+  router.post('/reset', c.resetPassword)
   router.use(ErrorLoggerMiddleware)
   router.use(AuthErrorMiddleware)
   router.use(GenericErrorMiddleware)

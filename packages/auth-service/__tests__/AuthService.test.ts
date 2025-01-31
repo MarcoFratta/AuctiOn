@@ -29,10 +29,12 @@ describe('AuthService', () => {
     // Create a mock for AccountRepository
     mockAccountRepository = mock<AccountRepository>()
     // Create a mock for TokenGenerator
-    mockTokenRepo = new RedisTokenRepo(new mockRedis(), 7)
+    mockTokenRepo = new RedisTokenRepo(new mockRedis(), 7, 10)
     mockTokenGenerator = mock<TokenGenerator>()
     authService = new AuthServiceImpl(mockTokenGenerator,
-      mockAccountRepository, mockTokenRepo, userServiceURL)
+      mockAccountRepository,
+      mockTokenRepo,
+      userServiceURL)
   });
 
   afterEach(() => {
@@ -256,4 +258,45 @@ describe('AuthService', () => {
     await expect(authService.refreshToken({ refreshToken })).rejects.toThrow(InvalidTokenError)
     expect(mockTokenGenerator.verifyRefreshToken).toHaveBeenCalledWith(refreshToken)
   })
+  it('should reset a password successfully', async () => {
+    const email = 'uesr@email.com'
+    const newPassword = 'newPassword'
+    const user: User = {
+      id: '000000000000000000000000',
+      email: email,
+      name: 'test',
+    };
+
+    (axios.get as jest.Mock).mockResolvedValue({ data: user })
+    mockTokenGenerator.generateResetToken.mockReturnValue('resetToken')
+    const res = await authService.forgotPassword(email)
+    expect(res).toEqual('resetToken')
+    expect(mockTokenGenerator.generateResetToken).toHaveBeenCalledWith({ id: user.id })
+
+    mockTokenGenerator.verifyResetToken.mockReturnValue({ id: user.id })
+    mockAccountRepository.findById.mockResolvedValue({ id: user.id, pHash: 'oldHash' })
+    const result = authService.resetPassword('resetToken', newPassword)
+    await expect(result).resolves.toBeUndefined()
+    expect(mockAccountRepository.update).toHaveBeenCalled()
+  })
+  it('should throw an error for an invalid reset token', async () => {
+    const email = 'email@c.com'
+    const newPassword = 'newPassword'
+    const user: User = {
+      id: '000000000000000000000000',
+      email: email,
+      name: 'test',
+    };
+
+    (axios.get as jest.Mock).mockResolvedValue({ data: user })
+    mockTokenGenerator.generateResetToken.mockReturnValue('resetToken')
+    const res = await authService.forgotPassword(email)
+    expect(res).toEqual('resetToken')
+    mockTokenGenerator.verifyResetToken.mockReturnValue({ id: user.id })
+    mockAccountRepository.findById.mockResolvedValue({ id: user.id, pHash: 'oldHash' })
+    const result = authService.resetPassword('wrongToken', newPassword)
+    await expect(result).rejects.toThrow(InvalidTokenError)
+  })
+
+
 });

@@ -175,4 +175,37 @@ export class AuthServiceImpl implements AuthService {
       throw e
     }
   }
+
+  async forgotPassword(email: string): Promise<string> {
+    const user = await this.getUserByEmail(email)
+    if (!user) {
+      throw new UserNotFoundError(email)
+    }
+    const resetToken = this.generator.generateResetToken({ id: user.id })
+    await this.tokenRepo.saveResetToken(resetToken, user.id)
+    // send email
+    return resetToken
+  }
+
+  async resetPassword(token: string, password: string): Promise<void> {
+    // verify token
+    const decoded = this.generator.verifyResetToken(token)
+    if (!decoded) {
+      throw new InvalidTokenError()
+    }
+    const user = await this.accountRepo.findById(decoded.id)
+    if (!user) {
+      throw new UserNotFoundError('')
+    }
+    const storedToken = await this.tokenRepo.findResetToken(decoded.id)
+    if (!storedToken || storedToken !== token) {
+      throw new InvalidTokenError()
+    }
+
+    const newPasswordHash = await bcrypt.hash(password, 10)
+    // update password
+    await this.accountRepo.update(decoded.id, { pHash: newPasswordHash })
+    // delete token
+    await this.tokenRepo.deleteResetToken(decoded.id)
+  }
 }

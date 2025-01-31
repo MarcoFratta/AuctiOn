@@ -12,6 +12,8 @@ import cookieParser from 'cookie-parser'
 import logger from './utils/Logger'
 import { RedisTokenRepo } from './repositories/RedisTokenRepo'
 import Redis from 'ioredis'
+import { MailClientImpl } from './services/MailClientImpl'
+import nodemailer from 'nodemailer'
 
 export class App {
   public app: express.Express
@@ -37,16 +39,37 @@ export class App {
   }
 
   private initializeRoutes() {
-    logger.info(`loading configs secrets ${config.jwtAccessSecret} -
-     ${config.jwtRefreshSecret}`)
+    logger.info(`loading configs secrets ${config.accessTokenSecret} -
+     ${config.refreshTokenSecret}`)
 
     const accountRepo = new MongoAccountRepo()
-    const expireDays = config.refreshTokenExpireDays
-    const tokensRepo = new RedisTokenRepo(this.redis, expireDays)
-    const tokenGenerator = new JWTTokenGenerator(config.jwtAccessSecret, config.jwtRefreshSecret, expireDays)
+    const refreshExpire = config.refreshTokenExpireDays
+    const accessExpire = config.accessTokenExpireMinutes
+    const resetExpire = config.resetTokenExpireMinutes
+    const tokensRepo = new RedisTokenRepo(this.redis, refreshExpire, resetExpire)
+    const tokenGenerator = new JWTTokenGenerator(
+      config.accessTokenSecret,
+      config.refreshTokenSecret,
+      config.resetTokenSecret,
+      refreshExpire,
+      accessExpire,
+      resetExpire
+    )
 
     const service = new AuthServiceImpl(tokenGenerator, accountRepo, tokensRepo, config.userServiceUrl)
-    const controller = new AuthController(service) // Use the router
+
+    const mailer = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: config.emailUser,
+        pass: config.emailPass,
+      },
+    })
+
+    logger.info(`loading mailer with ${config.emailUser} - ${config.emailPass}`)
+
+    const mailService = new MailClientImpl(mailer)
+    const controller = new AuthController(service, mailService) // Use the router
     const router = createRouter(controller)
     this.app.use('/auth', router)
   }

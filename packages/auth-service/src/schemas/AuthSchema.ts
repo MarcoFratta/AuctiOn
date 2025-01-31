@@ -29,6 +29,13 @@ export const tokenSchema = z.object({
   accessToken: z.string().min(0),
   refreshToken: z.string().min(0),
 })
+export const forgotPasswordSchema = z.object({
+  email: userSchema.shape.email,
+})
+export const resetPasswordSchema = z.object({
+  token: z.string().min(0),
+  password: z.string().min(8),
+})
 
 export const registerOutput = tokenSchema.merge(userSchema)
 

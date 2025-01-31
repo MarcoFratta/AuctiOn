@@ -5,15 +5,26 @@ export class JWTTokenGenerator implements TokenGenerator {
   constructor(
     private accessTokenSecret: string,
     private refreshTokenSecret: string,
-    private readonly expDays: number = 7
+    private resetTokenSecret: string,
+    private readonly refreshExpireDays: number = 7,
+    private readonly accessExpireMinutes: number = 15,
+    private readonly resetExpireMinutes: number = 15
   ) {}
 
+  generateResetToken(payload: any): string {
+    return jwt.sign(payload, this.resetTokenSecret, { expiresIn: `${this.resetExpireMinutes}m` })
+  }
+
+  verifyResetToken(token: string) {
+    return jwt.verify(token, this.resetTokenSecret)
+  }
+
   generateAccessToken(payload: any): string {
-    return jwt.sign(payload, this.accessTokenSecret, { expiresIn: '15m' })
+    return jwt.sign(payload, this.accessTokenSecret, { expiresIn: `${this.accessExpireMinutes}m` })
   }
 
   generateRefreshToken(payload: any): string {
-    return jwt.sign(payload, this.refreshTokenSecret, { expiresIn: `${this.expDays}d` })
+    return jwt.sign(payload, this.refreshTokenSecret, { expiresIn: `${this.refreshExpireDays}d` })
   }
 
   verifyAccessToken(token: string): any {

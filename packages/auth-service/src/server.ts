@@ -4,7 +4,7 @@ import { config } from './configs/config'
 import logger from './utils/Logger'
 import { connectToDatabase } from './utils/MongoDB'
 
-const redis = new Redis('redis://localhost:6379') //Adjust the Redis connection string as needed
+const redis = new Redis(config.redisPort, config.redisHost)
 const app = new App(redis)
 const port = config.port || 3000
 

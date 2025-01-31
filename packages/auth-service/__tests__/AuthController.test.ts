@@ -20,14 +20,14 @@ describe('AuthController', () => {
   beforeEach(() => {
     // Create mocked service
     authService = new AuthServiceImpl(
-      new JWTTokenGenerator('', 'test'),
+      new JWTTokenGenerator('', 'test', ''),
       {} as AccountRepository,
-      new RedisTokenRepo(new mockRedis(), 7),
+      new RedisTokenRepo(new mockRedis(), 7, 5),
       '',
     ) as jest.Mocked<AuthServiceImpl>;
 
     // Instantiate controller with mocked service
-    authController = new AuthController(authService);
+    authController = new AuthController(authService, {} as any)
 
     // Mock request, response, and next
     req = {};
@@ -154,4 +154,22 @@ describe('AuthController', () => {
       expect(next).toHaveBeenCalledWith(error);
     });
   });
+  it('should reset password', async () => {
+    const email = 'emai@l.com'
+    const password = 'password'
+    req.params = { email }
+    authService.forgotPassword.mockResolvedValue('token')
+    await authController.forgotPassword(req as Request, res as Response, next)
+    expect(authService.forgotPassword).toHaveBeenCalledWith(email)
+    expect(res.status).toHaveBeenCalledWith(200)
+    expect(res.json).toHaveBeenCalledWith({
+      message: 'Password reset link sent to user\'s email',
+    })
+    authService.resetPassword.mockResolvedValue()
+    req.body = { token: 'token', password }
+    await authController.resetPassword(req as Request, res as Response, next)
+    expect(authService.resetPassword).toHaveBeenCalledWith('token', password)
+    expect(res.status).toHaveBeenCalledWith(200)
+    expect(res.json).toHaveBeenCalledWith({ message: 'Password reset successfully' })
+  })
 });

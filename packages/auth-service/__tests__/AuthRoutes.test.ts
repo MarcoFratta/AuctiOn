@@ -16,6 +16,8 @@ describe('Auth Router', () => {
       register: jest.fn(),
       validateToken: jest.fn(),
       refreshToken: jest.fn(),
+      forgotPassword: jest.fn(),
+      resetPassword: jest.fn(),
     } as unknown as jest.Mocked<AuthController>;
 
     // Initialize an Express app with the router
@@ -90,4 +92,50 @@ describe('Auth Router', () => {
       expect(authController.validateToken).toHaveBeenCalledTimes(1);
     });
   });
+  describe('POST /auth/refresh', () => {
+    it('should call the refreshToken method of AuthController', async () => {
+      const refreshTokenResponse = {
+        token: 'mocked-token',
+      };
+      (authController.refreshToken as jest.Mock).mockImplementationOnce((req, res) =>
+        res.status(200).json(refreshTokenResponse),
+      )
+      await request(app)
+        .post('/auth/refresh')
+        .send({ refreshToken: 'mocked-refresh-token' })
+        .expect(200)
+        .expect(refreshTokenResponse)
+      expect(authController.refreshToken).toHaveBeenCalledTimes(1)
+    })
+  })
+  describe('POST /auth/forgot', () => {
+    it('should call the forgotPassword method of AuthController', async () => {
+      const forgotPasswordResponse = {
+        message: 'Password reset link sent to user\'s email',
+      };
+      (authController.forgotPassword as jest.Mock).mockImplementationOnce((req, res) =>
+        res.status(200).json(forgotPasswordResponse),
+      )
+      await request(app)
+        .post(`/auth/forgot/test@gmail.com`)
+        .send()
+        .expect(200)
+        .expect(forgotPasswordResponse)
+    })
+  })
+  describe('POST /auth/reset', () => {
+    it('should call the resetPassword method of AuthController', async () => {
+      const resetPasswordResponse = {
+        message: 'Password reset successfully',
+      };
+      (authController.resetPassword as jest.Mock).mockImplementationOnce((req, res) =>
+        res.status(200).json(resetPasswordResponse),
+      )
+      await request(app)
+        .post(`/auth/reset`)
+        .send({ token: 'mocked-token', password: 'new-password' })
+        .expect(200)
+        .expect(resetPasswordResponse)
+    })
+  })
 });
