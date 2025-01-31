@@ -4,7 +4,6 @@ FROM node:18
 # Set the working directory
 WORKDIR /app
 
-
 # Copy the shared tsconfig.base.json from the root context
 COPY tsconfig.base.json ./
 COPY package*.json ./
@@ -18,6 +17,7 @@ WORKDIR /app/packages/lobby-service
 COPY packages/lobby-service/package*.json ./
 COPY packages/lobby-service/tsconfig.json ./
 COPY packages/lobby-service/src ./src
+COPY packages/lobby-service/docs ./docs
 
 # Install dependencies
 RUN npm install
@@ -27,6 +27,7 @@ EXPOSE 3000
 
 # Build the application
 RUN npm run build
+RUN npm run doc
 
 # Start the application
 CMD ["npm", "start"]
