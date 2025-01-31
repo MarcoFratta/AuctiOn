@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { AuthController } from '../controllers/AuthController'
-import { validateRequestBody } from '../middlewares/ValidationMiddleware'
-import { loginSchema, registerSchema } from '../schemas/AuthSchema'
+import { validateRequestBody, validateRequestParams } from '../middlewares/ValidationMiddleware'
+import { forgotPasswordSchema, loginSchema, registerSchema, resetPasswordSchema } from '../schemas/AuthSchema'
 import { AuthErrorMiddleware, ErrorLoggerMiddleware, GenericErrorMiddleware } from '../middlewares/ErrorsMiddleware'
 
 export const createRouter = (c: AuthController) => {
@@ -10,8 +10,8 @@ export const createRouter = (c: AuthController) => {
   router.post('/register', validateRequestBody(registerSchema), c.register)
   router.post('/refresh', c.refreshToken)
   router.post('/validate', c.validateToken)
-  router.post('/forgot/:email', c.forgotPassword)
-  router.post('/reset', c.resetPassword)
+  router.post('/forgot/:email', validateRequestParams(forgotPasswordSchema), c.forgotPassword)
+  router.post('/reset', validateRequestBody(resetPasswordSchema), c.resetPassword)
   router.use(ErrorLoggerMiddleware)
   router.use(AuthErrorMiddleware)
   router.use(GenericErrorMiddleware)

@@ -39,9 +39,6 @@ export class App {
   }
 
   private initializeRoutes() {
-    logger.info(`loading configs secrets ${config.accessTokenSecret} -
-     ${config.refreshTokenSecret}`)
-
     const accountRepo = new MongoAccountRepo()
     const refreshExpire = config.refreshTokenExpireDays
     const accessExpire = config.accessTokenExpireMinutes
@@ -66,8 +63,6 @@ export class App {
       },
     })
 
-    logger.info(`loading mailer with ${config.emailUser} - ${config.emailPass}`)
-
     const mailService = new MailClientImpl(mailer)
     const controller = new AuthController(service, mailService) // Use the router
     const router = createRouter(controller)
@@ -78,6 +73,7 @@ export class App {
     // Check if swagger.json exists
     const swaggerPath = path.join(__dirname, '..', 'docs', 'swagger.json')
     if (fs.existsSync(swaggerPath)) {
+      logger.info('Swagger documentation found, initializing...')
       const doc: JsonObject = JSON.parse(fs.readFileSync(swaggerPath, 'utf-8'))
       this.app.use(
         '/docs',

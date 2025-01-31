@@ -38,7 +38,6 @@ export const resetPasswordSchema = z.object({
 })
 
 export const registerOutput = tokenSchema.merge(userSchema)
-
 export type Account = z.infer<typeof accountSchema>
 export type RegisterInputData = z.infer<typeof registerSchema>
 export type LoginInputData = z.infer<typeof loginSchema>

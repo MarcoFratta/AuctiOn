@@ -6,7 +6,6 @@
     "build": "tsc",
     "start": "node dist/src/server.js",
     "dev": "ts-node src/server.ts",
-    "docdev": "ts-node docs/Index.ts",
     "test": "npx jest",
     "doc": "node dist/docs/Index.js"
   },
