@@ -34,7 +34,7 @@ export const forgotPasswordSchema = z.object({
 })
 export const resetPasswordSchema = z.object({
   token: z.string().min(0),
-  password: z.string().min(8),
+  password: registerSchema.shape.password,
 })
 
 export const registerOutput = tokenSchema.merge(userSchema)

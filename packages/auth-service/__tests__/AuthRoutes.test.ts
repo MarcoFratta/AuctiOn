@@ -133,7 +133,7 @@ describe('Auth Router', () => {
       )
       await request(app)
         .post(`/auth/reset`)
-        .send({ token: 'mocked-token', password: 'new-password' })
+        .send({ token: 'mocked-token', password: 'Password1' })
         .expect(200)
         .expect(resetPasswordResponse)
     })
