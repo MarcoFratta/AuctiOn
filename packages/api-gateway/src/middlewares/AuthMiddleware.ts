@@ -5,7 +5,7 @@ import { config } from '../configs/Config'
 import { ServiceUnavailableError, UserNotAuthenticatedError } from '../errors/LobbyErrors'
 import { IncomingMessage } from 'node:http'
 
-const AUTH_SERVICE_URL = config.services['auth'].url
+const AUTH_SERVICE_URL = config.services['auth'].url + '/auth'
 
 export interface AuthenticatedRequest extends Request {
   user?: {

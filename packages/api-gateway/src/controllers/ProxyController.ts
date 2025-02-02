@@ -2,6 +2,7 @@ import { createProxyMiddleware, fixRequestBody } from 'http-proxy-middleware'
 import { config } from '../configs/Config'
 import { ServiceNotFoundError } from '../errors/LobbyErrors'
 import { Request, Response } from 'express'
+import logger from '../utils/Logger'
 
 export class ProxyController {
   createProxy(serviceName: string, ws = false) {
@@ -18,6 +19,9 @@ export class ProxyController {
       pathRewrite: service.pathRewrite,
       on: {
         proxyReq: fixRequestBody,
+        error: (err, req, res) => {
+          logger.error(`Error proxying request: ${err}, request url: ${req.url}`)
+        },
       },
     })
   }

@@ -5,6 +5,8 @@ import { Routes } from './routes/Routes'
 import { ErrorLoggerMiddleware, GatewayErrorsMiddleware, GenericErrorMiddleware } from './middlewares/ErrorsMiddleware'
 import { ProxyController } from './controllers/ProxyController'
 import { LoggingMiddleware } from './middlewares/LoggingMiddleware'
+import { healthChecker } from './controllers/HealthChecker'
+import { config } from './configs/Config'
 
 const app = express()
 app.use(cors())
@@ -17,9 +19,10 @@ const limiter = rateLimit({
 })
 app.use(limiter)
 
-app.get('/health', (req, res) => {
-  res.json({ status: 'healthy' })
-})
+app.head(
+  '/health',
+  healthChecker([config.services['users'].url, config.services['lobby'].url, config.services['auth'].url, config.services['auction'].url])
+)
 const proxyController = new ProxyController()
 export const routes = new Routes(proxyController)
 

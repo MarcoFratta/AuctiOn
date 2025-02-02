@@ -9,7 +9,7 @@ import { UserNotAuthenticatedError } from '../src/errors/LobbyErrors'
 jest.mock('axios')
 const mockAxios = axios as jest.Mocked<typeof axios>
 
-const AUTH_SERVICE_URL = config.services['auth'].url
+const AUTH_SERVICE_URL = config.services['auth'].url + '/auth'
 
 describe('AuthMiddleware', () => {
   let mockRequest: MockProxy<AuthenticatedRequest>
