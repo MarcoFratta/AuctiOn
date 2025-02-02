@@ -36,6 +36,10 @@ export class App {
   private initializeMiddleware() {
     this.app.use(express.json())
     this.app.use(cookieParser())
+    this.app.head('/health', (req, res) => {
+      logger.info('Health check requested')
+      res.status(200).send('OK')
+    })
   }
 
   private initializeRoutes() {
