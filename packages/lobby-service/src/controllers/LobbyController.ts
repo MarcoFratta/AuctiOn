@@ -55,7 +55,9 @@ export class LobbyController {
       const userId = req.user!.id
       const updatedLobby: Lobby | null = await this.lobbyService.leaveLobby(lobbyId, userId)
       if (!updatedLobby) {
-        res.status(204).send()
+        res.status(204).json({
+          message: 'Successfully deleted the lobby',
+        })
         return
       }
       res.status(200).json({
@@ -72,7 +74,7 @@ export class LobbyController {
     try {
       const lobbyId = req.activeLobbyId!
       const creatorId = req.user!.id
-      const playerId = req.body.playerId
+      const playerId = req.params.userId
       const updatedLobby: Lobby = await this.lobbyService.kickPlayer(lobbyId, creatorId, playerId)
       res.status(200).json({
         message: 'Player kicked',

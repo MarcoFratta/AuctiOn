@@ -148,7 +148,7 @@ describe('LobbyController', () => {
             };
 
           mockRequest.activeLobbyId = id;
-          mockRequest.body = { playerId };
+          mockRequest.params = { userId: playerId }
           mockLobbyService.kickPlayer.mockResolvedValue(updatedLobby);
           mockResponse.status.mockReturnThis();
           mockResponse.json.mockReturnThis();
