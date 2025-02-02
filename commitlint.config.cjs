@@ -6,6 +6,7 @@ module.exports = {
       'auth-service',
       'api-gateway',
       'lobby-service',
+      'integration-tests',
       'auction-service']],
     'type-enum': [
       2,

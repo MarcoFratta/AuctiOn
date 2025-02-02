@@ -1,0 +1,182 @@
+services:
+  lobby-service:
+    build:
+      context: .
+      dockerfile: packages/lobby-service/Dockerfile
+    restart: always
+    environment:
+      - DB_URI=${LOBBY_S_DB_URI:-mongodb://test:27017/lobby}
+      - PORT=${LOBBY_S_C_PORT:-3000}
+      - NODE_ENV=${LOBBY_S_NODE_ENV:-production}
+      - AUTH_SERVICE_URI=${LOBBY_S_AUTH_SERVICE_URI:-http://auth-service:3000/auth}
+      - KAFKA_BROKERS=${LOBBY_S_KAFKA_BROKERS:-kafka:9092}
+    networks:
+      - lobby-network
+      - microservices-network
+      - kafka-network
+    depends_on:
+      - lobby-mongodb
+      - kafka-broker
+  lobby-mongodb:
+    image: 'mongo:${MONGO_VERSION:-6.0}' # Default to MongoDB 6.0
+    ports:
+      - '27018:27017'
+    volumes:
+      - test_lobby_data:/data/db
+    networks:
+      - lobby-network
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: packages/auth-service/Dockerfile
+    restart: always
+    environment:
+      - DB_URI=${AUTH_S_DB_URI:-mongodb://test:27017/auth}
+      - PORT=${AUTH_S_C_PORT:-3000}
+      - JWT_ACCESS_SECRET=${AUTH_S_ACCESS_SECRET}
+      - JWT_REFRESH_SECRET=${AUTH_S_REFRESH_SECRET}
+      - ACCESS_EXPIRATION_MINUTES=${AUTH_S_ACCESS_EXPIRATION_MINUTES:-15m}
+      - REFRESH_EXPIRATION_DAYS=${AUTH_S_REFRESH_EXPIRATION_DAYS:-7d}
+      - REDIS_URL=${AUTH_S_REDIS_URI:-redis://redis:6379}
+      - REDIS_PORT=${AUTH_S_REDIS_PORT:-6379}
+      - NODE_ENV=${AUTH_S_NODE_ENV:-production}
+      - EMAIL_USER=${AUTH_S_EMAIL_USER}
+      - EMAIL_PASS=${AUTH_S_EMAIL_PASS}
+      - USER_SERVICE_URI=${AUTH_S_USER_SERVICE_URI:-http://user-service:3000/users}
+    networks:
+      - auth-network
+      - redis-network
+      - microservices-network
+    depends_on:
+      - auth-mongodb
+      - redis
+  auth-mongodb:
+    image: 'mongo:${MONGO_VERSION:-6.0}' # Default to MongoDB 6.0
+    volumes:
+      - test_auth_data:/data/auth-db
+    networks:
+      - auth-network
+
+  user-service:
+    build:
+      context: .
+      dockerfile: packages/user-service/Dockerfile
+    depends_on:
+      - user-mongodb
+    restart: always
+    environment:
+      - PORT=${USER_S_C_PORT:-3000}
+      - NODE_ENV=${USER_S_NODE_ENV:-production}
+      - DB_URI=${USER_S_DB_URI:-mongodb://localhost:27017/users}
+    networks:
+      - user-network
+      - microservices-network
+  user-mongodb:
+    image: 'mongo:${MONGO_VERSION:-6.0}' # Default to MongoDB 6.0
+    volumes:
+      - test_user_data:/data/db
+    networks:
+      - user-network
+  api-gateway:
+    build:
+      context: .
+      dockerfile: packages/api-gateway/Dockerfile
+    restart: always
+    ports:
+      - '${GATEWAY_S_H_PORT:-3000}:${GATEWAY_S_C_PORT:-3000}' # Default to 3000 if PORT is not defined
+    environment:
+      - PORT=${GATEWAY_S_C_PORT:-3000}
+      - NODE_ENV=${GATEWAY_S_NODE_ENV:-production}
+      - LOBBY_SERVICE_URI=${GATEWAY_S_LOBBY_SERVICE_URI:-http://lobby-service:3000/lobby}
+      - USER_SERVICE_URI=${GATEWAY_S_USER_SERVICE_URI:-http://user-service:3000/users}
+      - AUTH_SERVICE_URI=${GATEWAY_S_AUTH_SERVICE_URI:-http://auth-service:3000/auth}
+      - AUCTION_SERVICE_URI=${GATEWAY_S_AUCTION_SERVICE_URI:-http://auction-service:3000/auctions}
+    networks:
+      - microservices-network
+
+  auction-service:
+    build:
+      context: .
+      dockerfile: packages/auction-service/Dockerfile
+    restart: always
+    ports:
+      - '${AUCTION_S_H_PORT:-3000}:${AUCTION_S_C_PORT:-3000}' # Default to 3000 if PORT is not defined
+    environment:
+      - PORT=${AUCTION_S_C_PORT:-3000}
+      - NODE_ENV=${AUCTION_S_NODE_ENV:-production}
+      - KAFKA_BROKERS=${AUCTION_S_KAFKA_BROKERS:-kafka:9092}
+      - REDIS_URL=${AUCTION_S_REDIS_URI:-redis://redis:6379}
+      - REDIS_PORT=${AUCTION_S_REDIS_PORT:-6379}
+    networks:
+      - microservices-network
+      - kafka-network
+      - redis-network
+    depends_on:
+      - kafka-broker
+      - redis
+  redis:
+    image: redis
+    container_name: redis
+    restart: always
+    volumes:
+      - test_redis_data:/data
+    networks:
+      - redis-network
+  kafka-broker:
+    image: apache/kafka:latest
+    ports:
+      - '9092:9092'
+    restart: always
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-broker:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_NUM_PARTITIONS: 3
+    networks:
+      - kafka-network
+
+
+
+networks:
+  kafka-network:
+    driver: bridge
+  lobby-network:
+    driver: bridge
+  auth-network:
+    driver: bridge
+  user-network:
+    driver: bridge
+  redis-network:
+    driver: bridge
+  microservices-network:
+    external: true
+volumes:
+  test_user_data:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+  test_auth_data:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+  test_lobby_data:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+  test_redis_data:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
