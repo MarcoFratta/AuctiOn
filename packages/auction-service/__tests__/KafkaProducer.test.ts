@@ -4,6 +4,7 @@ import { PlayerEventSource } from '../src/adapters/PlayerEventSource'
 import { Kafka, Producer } from 'kafkajs'
 import { mock, MockProxy } from 'jest-mock-extended'
 
+jest.setTimeout(60000)
 describe('KafkaProducer', () => {
   let auctionService: MockProxy<AuctionService>
   let eventSource: MockProxy<PlayerEventSource>

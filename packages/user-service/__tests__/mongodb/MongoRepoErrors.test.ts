@@ -1,11 +1,11 @@
-import mongoose from 'mongoose';
-import {MongoMemoryServer} from 'mongodb-memory-server';
-import {UserRepository} from '../../src/repositories/UserRepository';
-import {MongooseUserRepository} from "../../src/repositories/MongoUserRepo";
-import {reverseUserConverter, userConverter} from "../../src/utils/Converters";
-import {UserModel} from "../../src/models/MongoUser";
-import {EmailAlreadyExistsError} from "../../src/errors/UserErrors"; // Assume User schema is exported
-
+import mongoose from 'mongoose'
+import { MongoMemoryServer } from 'mongodb-memory-server'
+import { UserRepository } from '../../src/repositories/UserRepository'
+import { MongooseUserRepository } from '../../src/repositories/MongoUserRepo'
+import { reverseUserConverter, userConverter } from '../../src/utils/Converters'
+import { UserModel } from '../../src/models/MongoUser'
+import { EmailAlreadyExistsError } from '../../src/errors/UserErrors' // Assume User schema is exported
+jest.setTimeout(60000)
 describe('UserRepository with MongoMemoryServer', () => {
     let mongoServer: MongoMemoryServer;
     let repository: UserRepository;

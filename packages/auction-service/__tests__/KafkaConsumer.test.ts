@@ -7,7 +7,7 @@ import { AuctionConfig } from '../src/schemas/Auction'
 import { AuctionServiceImpl } from '../src/services/AuctionServiceImpl'
 import { LobbyCreatedEvent, LobbyJoinedEvent, LobbyLeftEvent } from '../src/schemas/LobbyEvents'
 
-jest.setTimeout(30 * 1000)
+jest.setTimeout(60 * 1000)
 describe('KafkaConsumer', () => {
   let kafkaConsumer: KafkaConsumer
   let mockAuctionService: MockProxy<AuctionService>
@@ -48,7 +48,7 @@ describe('KafkaConsumer', () => {
     })
     producer = kafkaClient.producer()
     await producer.connect()
-  }, 60000)
+  }, 120000)
 
   afterAll(async () => {
     await producer.disconnect()

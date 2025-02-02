@@ -8,7 +8,7 @@ import { AuctionConfig } from '../src/schemas/Auction'
 import redisMock from 'ioredis-mock'
 import Redis from 'ioredis'
 
-jest.setTimeout(35 * 1000)
+jest.setTimeout(120 * 1000)
 describe('Auction System Integration Test', () => {
   let service: AuctionService
   let port: number

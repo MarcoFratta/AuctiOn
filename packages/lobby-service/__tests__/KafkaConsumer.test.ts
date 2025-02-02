@@ -5,6 +5,7 @@ import { LobbyService } from '../src/services/LobbyService'
 import { mock } from 'jest-mock-extended'
 import { Lobby } from '../src/schemas/Lobby'
 
+jest.setTimeout(90000)
 describe('KafkaConsumer', () => {
   let kafka: StartedKafkaContainer
   let kafkaConsumer: KafkaConsumer
@@ -60,7 +61,7 @@ describe('KafkaConsumer', () => {
     // Create KafkaConsumer instance
     kafkaConsumer = new KafkaConsumer(kafkaClient, mockLobbyService, 'test-group')
     await kafkaConsumer.connect()
-  }, 60000)
+  }, 120000)
 
   afterAll(async () => {
     await producer.disconnect()

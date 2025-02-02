@@ -8,17 +8,17 @@ import { LobbyNotFoundError } from '../src/errors/LobbyErrors'
 
 let mongoServer: MongoMemoryServer;
 let repo: MongoLobbyRepo
-
+jest.setTimeout(60000)
 beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create()
     await mongoose.connect(mongoServer.getUri(), { dbName: 'test' })
     repo = new MongoLobbyRepo()
-})
+}, 90000)
 
 afterAll(async () => {
     await mongoose.disconnect()
     await mongoServer.stop()
-})
+}, 90000)
 
 describe('MongoLobbyRepo', () => {
     beforeEach(async () => {

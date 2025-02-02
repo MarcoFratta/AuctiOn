@@ -1,8 +1,9 @@
-import { UserLobbyRepo } from '../src/repositories/UserLobbyRepo';
-import { UserLobbyModel } from '../src/models/UserLobbyModel';
-import mongoose from 'mongoose';
-import { MongoMemoryServer } from 'mongodb-memory-server';
+import { UserLobbyRepo } from '../src/repositories/UserLobbyRepo'
+import { UserLobbyModel } from '../src/models/UserLobbyModel'
+import mongoose from 'mongoose'
+import { MongoMemoryServer } from 'mongodb-memory-server'
 
+jest.setTimeout(60000)
 describe('UserLobbyRepo', () => {
   let mongoServer: MongoMemoryServer;
   let repo: UserLobbyRepo;
@@ -11,12 +12,12 @@ describe('UserLobbyRepo', () => {
     mongoServer = await MongoMemoryServer.create();
     const mongoUri = mongoServer.getUri();
     await mongoose.connect(mongoUri);
-  });
+  }, 90000);
 
   afterAll(async () => {
     await mongoose.disconnect();
     await mongoServer.stop();
-  });
+  }, 90000);
 
   beforeEach(async () => {
     await UserLobbyModel.deleteMany({});

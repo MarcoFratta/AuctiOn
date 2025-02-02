@@ -1,11 +1,12 @@
 // auth-service/tests/MongoRepo.test.ts
-import mongoose from 'mongoose';
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import { AccountRepository } from '../src/repositories/AccountRepository';
-import { MongoAccountRepo } from '../src/repositories/MongoAccountRepo';
-import { AccountModel } from '../src/models/MongoAccount';
-import { ValidationError } from '../src/utils/Validator';
+import mongoose from 'mongoose'
+import { MongoMemoryServer } from 'mongodb-memory-server'
+import { AccountRepository } from '../src/repositories/AccountRepository'
+import { MongoAccountRepo } from '../src/repositories/MongoAccountRepo'
+import { AccountModel } from '../src/models/MongoAccount'
+import { ValidationError } from '../src/utils/Validator'
 
+jest.setTimeout(60000)
 describe('AccountRepository with MongoMemoryServer', () => {
   let mongoServer: MongoMemoryServer;
   let repository: AccountRepository;

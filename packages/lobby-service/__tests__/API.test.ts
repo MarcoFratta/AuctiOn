@@ -11,6 +11,7 @@ import { LobbyModel } from '../src/models/LobbyModel'
 import { KafkaContainer, StartedKafkaContainer } from '@testcontainers/kafka'
 import { Kafka } from 'kafkajs'
 
+jest.setTimeout(90000)
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 const authServiceUrl = config.authServiceUri;
@@ -63,7 +64,7 @@ describe('Lobby Service Integration Tests with Auth Service Mock', () => {
       clientId: 'lobby-service',
       brokers: [`localhost:${kafkaContainer.getMappedPort(9093)}`],
     })
-  });
+  }, 120000);
 
   beforeEach(async () => {
     app = new App(kafka)
@@ -75,7 +76,7 @@ describe('Lobby Service Integration Tests with Auth Service Mock', () => {
   afterAll(async () => {
     await closeLocalMongoConnection(mongoServer);
     await kafkaContainer.stop()
-  });
+  }, 120000);
 
   afterEach(() => {
     jest.clearAllMocks();
