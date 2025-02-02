@@ -15,6 +15,7 @@ import { TimerController } from './controllers/TimerController'
 import { KafkaConsumer } from './controllers/KafkaConsumer'
 import { RedisAuctionRepo } from './repositories/RedisAuctionRepo'
 import Redis from 'ioredis'
+import * as process from 'node:process'
 
 export class App {
   public app: express.Application
@@ -33,7 +34,7 @@ export class App {
     this.server = http.createServer(this.app)
     this.auctionService = new AuctionServiceImpl(new RedisAuctionRepo(redis))
     this.wsAdapter = new WebSocketAdapter({ noServer: true })
-
+    this.setupMiddlewares()
     this.setupWebSocket()
 
     this.auctionController = new AuctionController(this.auctionService, this.wsAdapter, this.wsAdapter)
@@ -53,6 +54,8 @@ export class App {
       })
     } catch (err) {
       logger.error('Failed to start server:', err)
+      await this.stop()
+      process.exit(1)
     }
   }
 
@@ -80,6 +83,13 @@ export class App {
         socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n')
         socket.destroy()
       }
+    })
+  }
+
+  private setupMiddlewares = () => {
+    this.app.head('/health', (req, res) => {
+      logger.info('Health check requested')
+      res.status(200).send('OK')
     })
   }
 }
