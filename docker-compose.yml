@@ -119,6 +119,8 @@ services:
     image: redis
     container_name: redis
     restart: always
+    volumes:
+      - redis-data:/data
     networks:
       - redis-network
   kafka-broker:
@@ -161,3 +163,4 @@ volumes:
   mongo_user_data:
   mongo_auth_data:
   mongo_lobby_data:
+  redis-data:
