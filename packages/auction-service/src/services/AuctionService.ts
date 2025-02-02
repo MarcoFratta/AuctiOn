@@ -15,4 +15,5 @@ export interface AuctionService extends AuctionEventsSource {
   endRound: (auctionId: string) => Promise<Auction>
   endAuction: (auctionId: string) => Promise<Auction>
   startAuction: (auctionId: string) => Promise<Auction>
+  removeAuction: (auctionId: string) => Promise<void>
 }

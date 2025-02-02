@@ -14,7 +14,8 @@ import { AuctionRepo } from '../repositories/AuctionRepo'
 export class AuctionServiceImpl implements AuctionService {
   private auctions: Map<string, Auction> = new Map()
   private players: Map<string, string> = new Map()
-  private callBacks = new Map<string, ((auction: Auction) => void)[]>()
+  private auctionsCallbacks = new Map<string, ((auction: Auction) => void)[]>()
+  private playersCallbacks = new Map<string, ((id: string) => void)[]>()
   private repo: AuctionRepo
 
   constructor(repo: AuctionRepo) {
@@ -24,8 +25,10 @@ export class AuctionServiceImpl implements AuctionService {
   }
 
   initCallbacks = () => {
-    const types = ['onRoundEnd', 'onAuctionEnd', 'onNewBid', 'onNewSale']
-    types.forEach(t => this.callBacks.set(t, []))
+    const auctionTypes = ['onRoundEnd', 'onAuctionEnd', 'onNewBid', 'onNewSale', 'onAuctionDeleted']
+    const playerTypes = ['onPlayerJoin', 'onPlayerLeave']
+    auctionTypes.forEach(t => this.auctionsCallbacks.set(t, []))
+    playerTypes.forEach(t => this.playersCallbacks.set(t, []))
   }
 
   async createAuction(config: AuctionConfig): Promise<Auction> {
@@ -64,7 +67,7 @@ export class AuctionServiceImpl implements AuctionService {
     bid.timestamp = new Date().toISOString()
     auction.currentBid = bid
     const res = cloneDeep(auction)
-    this.notifyUpdate(res, 'onNewBid')
+    this.notifyAuctionUpdate(res, 'onNewBid')
     this.saveAuction(auction)
     return res
   }
@@ -90,7 +93,7 @@ export class AuctionServiceImpl implements AuctionService {
     })
     auction.currentBid = undefined
     const res = cloneDeep(auction)
-    this.notifyUpdate(res, 'onNewSale')
+    this.notifyAuctionUpdate(res, 'onNewSale')
     this.saveAuction(auction)
     return res
   }
@@ -140,7 +143,7 @@ export class AuctionServiceImpl implements AuctionService {
     this.auctions.delete(auction.id)
     // TODO: save auction results
     const res = cloneDeep(auction)
-    this.notifyUpdate(res, 'onAuctionEnd')
+    this.notifyAuctionUpdate(res, 'onAuctionEnd')
     this.repo
       .deleteAuction(auctionId)
       .then(() => logger.info(`deleted auction: ${auctionId}`))
@@ -153,11 +156,12 @@ export class AuctionServiceImpl implements AuctionService {
     auction.players.push(createPlayer(playerId, auction))
     this.players.set(playerId, auctionId)
     this.saveAuction(auction)
+    this.notifyPlayerUpdate(playerId, 'onPlayerJoin')
     return cloneDeep(auction)
   }
 
   onRoundEnd(callback: (auction: Auction) => void): void {
-    this.callBacks.get('onRoundEnd')!.push(callback)
+    this.auctionsCallbacks.get('onRoundEnd')!.push(callback)
   }
 
   private getPlayer(auction: Auction, playerId: string) {
@@ -181,6 +185,7 @@ export class AuctionServiceImpl implements AuctionService {
     auction.players = auction.players.filter(player => player.id !== playerId)
     this.players.delete(playerId)
     this.saveAuction(auction)
+    this.notifyPlayerUpdate(playerId, 'onPlayerLeave')
     return cloneDeep(auction)
   }
 
@@ -211,20 +216,39 @@ export class AuctionServiceImpl implements AuctionService {
   }
 
   onAuctionEnd(callback: (auction: Auction) => void): void {
-    logger.info(this.callBacks)
-    this.callBacks.get('onAuctionEnd')!.push(callback)
+    this.auctionsCallbacks.get('onAuctionEnd')!.push(callback)
+  }
+
+  onPlayerJoin(callback: (auction: string) => void): void {
+    this.playersCallbacks.get('onPlayerJoin')!.push(callback)
+  }
+
+  onPlayerLeave(callback: (auction: string) => void): void {
+    this.playersCallbacks.get('onPlayerLeave')!.push(callback)
+  }
+
+  onAuctionDeleted(callback: (auction: Auction) => void): void {
+    this.auctionsCallbacks.get('onAuctionDeleted')!.push(callback)
   }
 
   onNewBid(callback: (auction: Auction) => void): void {
-    this.callBacks.get('onNewBid')!.push(callback)
+    this.auctionsCallbacks.get('onNewBid')!.push(callback)
   }
 
   onNewSale(callback: (auction: Auction) => void): void {
-    this.callBacks.get('onNewSale')!.push(callback)
+    this.auctionsCallbacks.get('onNewSale')!.push(callback)
   }
 
-  private notifyUpdate(res: Auction, type: string) {
-    this.callBacks.get(type)!.forEach(callback => callback(res))
+  async removeAuction(auctionId: string): Promise<void> {
+    const auction = this.findAuctionById(auctionId)
+    this.auctions.delete(auctionId)
+    await this.repo.deleteAuction(auctionId)
+    this.notifyAuctionUpdate(auction, 'onAuctionDeleted')
+    logger.info(`deleted auction: ${auctionId}`)
+  }
+
+  private notifyAuctionUpdate(res: Auction, type: string) {
+    this.auctionsCallbacks.get(type)!.forEach(callback => callback(res))
   }
 
   async startAuction(auctionId: string): Promise<Auction> {
@@ -233,6 +257,10 @@ export class AuctionServiceImpl implements AuctionService {
     auction.sellerQueue = PlayOrderStrategy.sameOrder(auction.players.map(player => player.id))
     this.saveAuction(auction)
     return cloneDeep(auction)
+  }
+
+  private notifyPlayerUpdate(id: string, type: string) {
+    this.playersCallbacks.get(type)!.forEach(callback => callback(id))
   }
 
   private saveAuction = (res: Auction) => {
@@ -253,11 +281,11 @@ export class AuctionServiceImpl implements AuctionService {
       disconnectedCounter++
       if (disconnectedCounter == auction.players.length - 1) {
         logger.info(`Too many players disconnected, ending auction: ${auctionId}`)
-        this.notifyUpdate(auction, 'onRoundEnd')
+        this.notifyAuctionUpdate(auction, 'onRoundEnd')
         return this.endAuction(auctionId)
       }
     }
-    this.notifyUpdate(auction, 'onRoundEnd')
+    this.notifyAuctionUpdate(auction, 'onRoundEnd')
     return cloneDeep(auction)
   }
 

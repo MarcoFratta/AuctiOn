@@ -4,6 +4,7 @@ import { validateSchema } from '../utils/Validator'
 import logger from '../utils/Logger'
 import {
   lobbyCreatedEvent,
+  lobbyDeletedEvent,
   LobbyEventType,
   lobbyEventTypeSchema,
   lobbyJoinedEvent,
@@ -65,6 +66,10 @@ export class KafkaConsumer {
         .with('lobby-left', async () => {
           const event = validateSchema(lobbyLeftEvent, msg)
           await this.auctionService.playerLeave(event.playerId, event.lobbyId)
+        })
+        .with('lobby-deleted', async () => {
+          const event = validateSchema(lobbyDeletedEvent, msg)
+          await this.auctionService.removeAuction(event.lobbyId)
         })
         .otherwise(() => {
           logger.info(`Unknown lobby event type: ${type}`)

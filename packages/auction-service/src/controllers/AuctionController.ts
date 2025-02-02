@@ -25,6 +25,8 @@ export class AuctionController {
     this.eventSource.onPlayerMessage(this.handlePlayerMessage)
     this.auctionService.onAuctionEnd(this.handleAuctionEnd)
     this.auctionService.onRoundEnd(this.handleRoundEnd)
+    this.auctionService.onAuctionDeleted(this.handleAuctionDeleted)
+    this.auctionService.onPlayerLeave(this.handlePlayerLeave)
   }
 
   handlePlayerMessage = (playerId: string, message: string): void => {
@@ -153,5 +155,23 @@ export class AuctionController {
   private handleErrors(error: Error, playerId: string): void {
     this.playerChannel.sendToPlayer(playerId, JSON.stringify({ type: 'error', message: error.message }))
     logger.error(`Error handling message: ${error}`)
+  }
+
+  private handleAuctionDeleted = (auction: Auction) => {
+    this.playerChannel.broadcast(
+      id =>
+        JSON.stringify({
+          type: 'auctionDeleted',
+          auction: toPlayerAuction(id).convert(auction),
+        }),
+      this.allLobbyPlayers(auction)
+    )
+    auction.players.forEach(player => {
+      logger.info(`[Controller] Closing connection for player ${player.id}`)
+      this.playerChannel.closeConnection(player.id, true, 'Auction ended')
+    })
+  }
+  private handlePlayerLeave = (playerId: string) => {
+    this.playerChannel.closeConnection(playerId, true, 'Player left the auction')
   }
 }
