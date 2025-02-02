@@ -134,7 +134,7 @@ export class AuthController {
     }
   }
 
-  validateToken = (req: Request, res: Response, next: NextFunction): void => {
+  validateToken = (req: Request, res: Response, next: NextFunction) => {
     try {
       const token: string = req.body.token
       if (!token) {

@@ -1,5 +1,6 @@
 import { MailClient } from './MailClient'
 import { Transporter } from 'nodemailer'
+import logger from '../utils/Logger'
 
 export class MailClientImpl implements MailClient {
   constructor(private readonly client: Transporter) {}
@@ -14,9 +15,9 @@ export class MailClientImpl implements MailClient {
 
     try {
       const info = await this.client.sendMail(mailOptions)
-      console.log(`Email sent: ${info.response}`)
+      logger.info(`Email sent: ${info.response}`)
     } catch (error) {
-      console.error(`Error sending email: ${error}`)
+      logger.error(`Error sending email: ${error}`)
     }
   }
 
@@ -30,9 +31,9 @@ export class MailClientImpl implements MailClient {
     }
     try {
       const info = await this.client.sendMail(mailOptions)
-      console.log(`Email sent: ${info.response}`)
+      logger.info(`Email sent: ${info.response}`)
     } catch (error) {
-      console.error(`Error sending email: ${error}`)
+      logger.error(`Error sending email: ${error}`)
     }
   }
 }

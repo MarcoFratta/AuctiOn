@@ -34,8 +34,7 @@ export const AuthErrorMiddleware = (err: unknown, _req: Request, res: Response, 
       error: 'Token is not valid',
       message: err.message,
     })
-  }
-  if (axios.isAxiosError(err)) {
+  } else if (axios.isAxiosError(err)) {
     res.status(503).json({
       error: 'Service Temporary Unavailable',
       message: 'Service is not responding',
