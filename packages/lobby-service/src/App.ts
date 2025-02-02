@@ -64,6 +64,10 @@ export class App {
   private setupMiddlewares(): void {
     this.app.use(express.json())
     this.app.use(cors())
+    this.app.head('/health', (req, res) => {
+      logger.info('Health check requested')
+      res.status(200).send('OK')
+    })
     this.app.use(authMiddleware)
   }
 
