@@ -1,4 +1,3 @@
-// MongoLobbyRepo.test.ts
 import { MongoMemoryServer } from 'mongodb-memory-server'
 import mongoose from 'mongoose'
 import { MongoLobbyRepo } from '../src/repositories/MongoLobbyRepo'

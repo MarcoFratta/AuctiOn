@@ -1,5 +1,5 @@
 import { Lobby, lobbySchema } from '../src/schemas/Lobby'
-import { validateSchema, ValidationError } from '../src/utils/Validator'
+import { validateSchema, ValidationError } from '@auction/common/validation'
 
 describe('Lobby Schema Validation', () => {
     test('should validate a correct lobby', () => {

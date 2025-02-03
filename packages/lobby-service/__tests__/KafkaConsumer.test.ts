@@ -33,7 +33,6 @@ describe('KafkaConsumer', () => {
   beforeAll(async () => {
     // Start Kafka container
     kafka = await new KafkaContainer().withExposedPorts(9093).start()
-
     // Create Kafka client
     const kafkaClient = new Kafka({
       brokers: [`localhost:${kafka.getMappedPort(9093)}`],
@@ -67,7 +66,7 @@ describe('KafkaConsumer', () => {
     await producer.disconnect()
     await kafkaConsumer.disconnect()
     await kafka.stop()
-  })
+  }, 120000)
 
   beforeEach(() => {
     jest.clearAllMocks()

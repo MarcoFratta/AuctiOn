@@ -1,4 +1,5 @@
-import z, { ZodSchema } from 'zod'
+import { z } from '@auction/common/zod'
+import { ZodSchema } from 'zod'
 
 export const ItemSchema = z.enum(['square', 'triangle', 'circle'])
 

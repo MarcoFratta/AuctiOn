@@ -14,7 +14,7 @@ import { KafkaProducer } from './controllers/KafkaProducer'
 import { Kafka } from 'kafkajs'
 import { KafkaConsumer } from './controllers/KafkaConsumer'
 import { LobbyService } from './services/LobbyService'
-import logger from './utils/Logger'
+import logger from '@auction/common/logger'
 
 export class App {
   public app: Application

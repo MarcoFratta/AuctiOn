@@ -1,4 +1,4 @@
-import { Lobby, PlayerStatus } from '../schemas/Lobby'
+import { Lobby, Player, PlayerStatus } from '../schemas/Lobby'
 import { LobbyRepository } from '../repositories/LobbyRepository'
 import {
   ForbiddenError,
@@ -10,9 +10,9 @@ import {
   PlayersNotReadyError,
   UserAlreadyJoined,
 } from '../errors/LobbyErrors'
-import logger from '../utils/Logger'
 import { LobbyService } from './LobbyService'
 import { UserLobbyRepo } from '../repositories/UserLobbyRepo'
+import logger from '@auction/common/logger'
 
 export class LobbyServiceImpl implements LobbyService {
   private readonly lobbyRepository: LobbyRepository
@@ -30,7 +30,7 @@ export class LobbyServiceImpl implements LobbyService {
 
   async createLobby(lobbyData: Omit<Lobby, 'id'>): Promise<Lobby> {
     const lobby: Lobby = await this.lobbyRepository.create(lobbyData)
-    logger.info(`created lobby with id: ${lobby.id}`)
+    logger.debug(`created lobby with id: ${lobby.id}`)
     if (!lobby) {
       throw new Error('Failed to create lobby')
     }
@@ -52,8 +52,8 @@ export class LobbyServiceImpl implements LobbyService {
 
   async joinLobby(id: string, userId: string): Promise<Lobby> {
     const res: Lobby | null = await this.lobbyRepository.findById(id)
-    const lobby = this.checkLobbyExists(res, id)
-    if (lobby.players.find(player => player.userId === userId)) {
+    const lobby: Lobby = this.checkLobbyExists(res, id)
+    if (lobby.players.find((player: Player) => player.userId === userId)) {
       throw new UserAlreadyJoined()
     }
     if (lobby.players.length >= lobby.maxPlayers) {
@@ -77,7 +77,7 @@ export class LobbyServiceImpl implements LobbyService {
   async leaveLobby(id: string, userId: string): Promise<Lobby | null> {
     const res = await this.lobbyRepository.findById(id)
     const lobby = this.checkLobbyExists(res, id)
-    if (!lobby.players.find(player => player.userId === userId)) {
+    if (!lobby.players.find((player: Player) => player.userId === userId)) {
       throw new PlayerNotFoundError()
     }
     if (lobby.status === 'in-progress') {
@@ -87,7 +87,7 @@ export class LobbyServiceImpl implements LobbyService {
       await this.deleteLobby(id)
       return null
     }
-    lobby.players = lobby.players.filter(player => player.userId !== userId)
+    lobby.players = lobby.players.filter((player: Player) => player.userId !== userId)
     const update = await this.lobbyRepository.update(id, {
       players: lobby.players,
     })
@@ -111,7 +111,7 @@ export class LobbyServiceImpl implements LobbyService {
     if (lobby.status === 'in-progress') {
       throw new MatchAlreadyInProgressError('Match is already in progress')
     }
-    if (lobby.players.some(player => player.status !== 'ready')) {
+    if (lobby.players.some((player: Player) => player.status !== 'ready')) {
       throw new PlayersNotReadyError()
     }
     const newStatus = 'in-progress'
@@ -149,7 +149,7 @@ export class LobbyServiceImpl implements LobbyService {
     const res = await this.lobbyRepository.findById(id)
     const lobby = this.checkLobbyExists(res, id)
 
-    const playerIndex = lobby.players.findIndex(player => player.userId === userId)
+    const playerIndex = lobby.players.findIndex((player: Player) => player.userId === userId)
     if (playerIndex === -1) {
       throw new PlayerNotFoundError()
     }
@@ -158,7 +158,7 @@ export class LobbyServiceImpl implements LobbyService {
     }
     lobby.players[playerIndex].status = status
     // Save the updated players array
-    logger.info(`Setting status for player: ${userId} in lobby: ${id} to ${status}`)
+    logger.debug(`Setting status for player: ${userId} in lobby: ${id} to ${status}`)
     const update = await this.lobbyRepository.update(id, {
       players: lobby.players,
     })
@@ -210,7 +210,6 @@ export class LobbyServiceImpl implements LobbyService {
     this.lobbyCallbacks.set('lobby-created', [])
     this.lobbyCallbacks.set('lobby-started', [])
     this.lobbyCallbacks.set('lobby-deleted', [])
-
     this.playerCallbacks.set('lobby-joined', [])
     this.playerCallbacks.set('lobby-left', [])
   }

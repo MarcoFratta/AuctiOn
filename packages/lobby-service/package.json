@@ -34,9 +34,9 @@
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^7.2.0",
+    "@auction/common": "^1.0.0",
     "axios": "^1.7.9",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
     "express": "^4.21.1",
     "kafkajs": "^2.2.4",
     "mongoose": "^8.8.3",

@@ -1,4 +1,4 @@
-import z from 'zod'
+import { z } from '@auction/common/zod'
 
 export const WithAuctionId = z.object({
   auctionId: z.string(),

@@ -1,13 +1,11 @@
 import { App } from './App'
-import dotenv from 'dotenv'
 import { Kafka } from 'kafkajs'
-import logger from './utils/Logger'
-import { connectToDatabase } from './utils/MongoDB'
+import logger from '@auction/common/logger'
+import { connectMongo } from '@auction/common/mongo'
+import { config } from './configs/config'
 
-dotenv.config()
-
-const port = process.env.PORT ? parseInt(process.env.PORT) : 3000
-const kafkaBrokers = process.env.KAFKA_BROKERS ? process.env.KAFKA_BROKERS.split(',') : ['localhost:9092']
+const port = config.port
+const kafkaBrokers = config.kafkaBrokers
 
 async function startServer() {
   try {
@@ -31,7 +29,7 @@ async function startServer() {
       process.exit(0)
     })
 
-    await connectToDatabase().then(() => {
+    await connectMongo(config.dbUri).then(() => {
       logger.info('Connected to database successfully')
     })
   } catch (error) {

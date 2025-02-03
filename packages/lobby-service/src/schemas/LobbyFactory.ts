@@ -1,5 +1,5 @@
 import { Lobby, LobbyConfig, lobbySchema, Player } from './Lobby'
-import { validateSchema } from '../utils/Validator'
+import { validateSchema } from '@auction/common/validation'
 
 export const createNewPlayer = (userId: string): Player => {
   return {

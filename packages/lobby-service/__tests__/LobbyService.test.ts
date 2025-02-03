@@ -1,4 +1,3 @@
-// lobbyService.test.ts
 import { LobbyServiceImpl } from '../src/services/LobbyServiceImpl'
 import { MongoLobbyRepo } from '../src/repositories/MongoLobbyRepo'
 import { UserLobbyRepo } from '../src/repositories/UserLobbyRepo'

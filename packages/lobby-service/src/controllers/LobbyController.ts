@@ -1,10 +1,9 @@
-// LobbyController.ts
 import { NextFunction, Response } from 'express'
-import { validateSchema } from '../utils/Validator'
+import { validateSchema } from '@auction/common/validation'
 import { AuthenticatedRequest } from '../types/Index'
 import { Lobby, LobbyConfig, LobbyId, lobbyIdSchema, PlayerStatus, playerStatusSchema } from '../schemas/Lobby'
 import { createNewLobby } from '../schemas/LobbyFactory'
-import logger from '../utils/Logger'
+import logger from '@auction/common/logger'
 import { LobbyService } from '../services/LobbyService'
 
 export class LobbyController {

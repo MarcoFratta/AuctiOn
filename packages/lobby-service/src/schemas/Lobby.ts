@@ -1,4 +1,4 @@
-import { z } from '../utils/ZodWrapper'
+import { z } from '@auction/common/zod'
 import { InventoryInputSchema } from './Item'
 
 export const idSchema = z.string().length(24)

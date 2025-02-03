@@ -1,5 +1,5 @@
 import express from 'express'
-import { validateRequestBody, validateRequestParams } from '../middlewares/ValidationMiddleware'
+import { validateRequestBody, validateRequestParams } from '@auction/common/middlewares'
 import { lobbyConfigSchema, lobbyIdSchema, playerStatusSchema } from '../schemas/Lobby'
 import { LobbyController } from '../controllers/LobbyController'
 import { UserLobbyRepo } from '../repositories/UserLobbyRepo'

@@ -1,5 +1,5 @@
 import { Kafka, Producer } from 'kafkajs'
-import logger from '../utils/Logger'
+import logger from '@auction/common/logger'
 import { LobbyService } from '../services/LobbyService'
 import { Lobby } from '../schemas/Lobby'
 import { LobbyEvent } from '../schemas/LobbyEvents'

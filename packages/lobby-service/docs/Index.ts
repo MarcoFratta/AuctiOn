@@ -1,6 +1,6 @@
 import { lobbyConfigSchema, lobbyIdSchema, playerSchema, playerStatusSchema } from '../src/schemas/Lobby'
 import { generateOpenAPI, registry } from './Generator'
-import { z } from '../src/utils/ZodWrapper'
+import { z } from '@auction/common/zod'
 import * as fs from 'node:fs'
 import path from 'node:path'
 

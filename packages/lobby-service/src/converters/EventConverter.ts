@@ -1,5 +1,5 @@
 import { Converter } from './Converter'
-import { validateSchema } from '../utils/Validator'
+import { validateSchema } from '@auction/common/validation'
 import { Lobby } from '../schemas/Lobby'
 import {
   LobbyCreatedEvent,

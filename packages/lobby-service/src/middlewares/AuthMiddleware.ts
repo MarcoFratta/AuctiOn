@@ -2,7 +2,7 @@ import { AuthenticatedRequest } from '../types/Index'
 import { NextFunction, Response } from 'express'
 import { UserNotAuthenticatedError } from '../errors/LobbyErrors'
 import { config } from '../configs/config'
-import { validateSchema } from '../utils/Validator'
+import { validateSchema } from '@auction/common/validation'
 import { userSchema } from '../schemas/User'
 
 export const authMiddleware = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
