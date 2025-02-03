@@ -4,8 +4,7 @@
     "composite": true,
     "declaration": true,
     "declarationMap": true,
-    "moduleResolution": "node16",
-    // or "nodenext"
+    "esModuleInterop": true,
     "incremental": true,
     "outDir": "./dist",
     "rootDir": ".",

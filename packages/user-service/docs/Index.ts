@@ -1,8 +1,8 @@
-import { userEmail, userId, userSchema } from '../src/schemas/User';
-import { generateOpenAPI, registry } from './Generator';
-import * as path from 'node:path';
-import * as fs from 'node:fs';
-import { z } from '../src/utils/ZodWrapper';
+import { userEmail, userId, userSchema } from '../src/schemas/User'
+import { generateOpenAPI, registry } from './Generator'
+import * as path from 'node:path'
+import * as fs from 'node:fs'
+import { z } from '@auction/common/zod'
 
 // Register all paths for the User API
 
