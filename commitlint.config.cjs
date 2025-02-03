@@ -7,7 +7,8 @@ module.exports = {
       'api-gateway',
       'lobby-service',
       'integration-tests',
-      'auction-service']],
+      'auction-service',
+      'common']],
     'type-enum': [
       2,
       'always',
@@ -22,7 +23,6 @@ module.exports = {
         'test',
         'revert',
         'perf',
-        'vercel',
       ],
     ],
   },
