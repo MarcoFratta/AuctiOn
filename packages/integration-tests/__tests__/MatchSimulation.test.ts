@@ -1,91 +1,120 @@
 import { connectToServer } from './Connection'
-import request from 'supertest'
+import { Client } from './Client'
 import logger from './Logger'
 
+
 const API_GATEWAY_URL = 'http://localhost:8080'
+const c = new Client(API_GATEWAY_URL)
 beforeAll(async () => {
   await connectToServer(API_GATEWAY_URL)
 })
 
-async function registerUser(email: string, password: string, name: string) {
-  const res = await request(API_GATEWAY_URL)
-    .post('/auth/register')
-    .send({
-      email,
-      password,
-      name,
-    })
-
-  return res.body.user
-}
-
-async function createLobby(creatorToken: string, options: any) {
-  const res = await request(API_GATEWAY_URL)
-    .post('/lobbies/create')
-    .set('Authorization', `Bearer ${creatorToken}`)
-    .send(options)
-  logger.info(`Lobby created: ${JSON.stringify(res)}`)
-  return res.body.lobby
-}
-
-async function joinLobby(token: string, lobbyId: string) {
-  const res = await request(API_GATEWAY_URL)
-    .post(`/lobbies/${lobbyId}/join`)
-    .set('Authorization', `Bearer ${token}`)
-  logger.info(res.body)
-  return res.body.lobby
-}
-
-async function startMatch(token: string) {
-  const res = await request(API_GATEWAY_URL)
-    .post(`/lobbies/start`)
-    .set('Authorization', `Bearer ${token}`)
-
-  return res.body.lobby
-}
-
-async function setReady(token: string, status: string) {
-  const res = await request(API_GATEWAY_URL)
-    .put(`/lobbies/status`)
-    .set('Authorization', `Bearer ${token}`)
-    .send({ status })
-  return res.body.lobby
-}
-
 
 describe('Match simulation', () => {
   it('should simulate a match with 4 players', async () => {
-    const creator = await registerUser('player1@email.com', 'Password123', 'Player 1')
-    const player2 = await registerUser('player2@email.com', 'Password123', 'Player 2')
-    const player3 = await registerUser('player3@email.com', 'Password123', 'Player 3')
-    const player4 = await registerUser('player4@email.com', 'Password123', 'Player 4')
-
+    const creator = await c.registerUser('player1@email.com', 'Password123', 'Player 1')
+    const player2 = await c.registerUser('player2@email.com', 'Password123', 'Player 2')
+    const player3 = await c.registerUser('player3@email.com', 'Password123', 'Player 3')
+    const player4 = await c.registerUser('player4@email.com', 'Password123', 'Player 4')
+    const bidTime = 5
+    const bidMs = 2 * (bidTime * 1000)
     // Create a lobby
-    const lobby = await createLobby(creator.token, {
+    const lobby = await c.createLobby(creator.token, {
       rounds: 3,
       maxPlayers: 4,
-      bidTime: 20,
+      bidTime: bidTime,
       startAmount: 500,
       startInventory: {
         items: [
-          { item: 'triangle', quantity: 1 },
+          { item: 'triangle', quantity: 3 },
           { item: 'square', quantity: 3 },
-          { item: 'circle', quantity: 4 },
+          { item: 'circle', quantity: 3 },
         ],
       },
     })
 
-    await joinLobby(player2.token, lobby.id)
-    await joinLobby(player3.token, lobby.id)
-    await joinLobby(player4.token, lobby.id)
-    await startMatch(creator.token)
+    await c.joinLobby(player2.token, lobby.id)
+    await c.joinLobby(player3.token, lobby.id)
+    await c.joinLobby(player4.token, lobby.id)
+    await c.createMatch(creator.token)
 
-    await setReady(creator.token, 'ready')
-    await setReady(player2.token, 'ready')
-    await setReady(player3.token, 'ready')
-    await setReady(player4.token, 'ready')
+    await c.setReady(creator.token, 'ready')
+    await c.setReady(player2.token, 'ready')
+    await c.setReady(player3.token, 'ready')
+    await c.setReady(player4.token, 'ready')
 
+    await c.startMatch(creator.token)
+
+    const messages: Record<string, any[]> = { creator: [], player2: [], player3: [], player4: [] }
+    // Connect players
+    const wsCreator = await c.connectPlayer(creator.token, 'creator', messages)
+    const wsPlayer2 = await c.connectPlayer(player2.token, 'player2', messages)
+    const wsPlayer3 = await c.connectPlayer(player3.token, 'player3', messages)
+    const wsPlayer4 = await c.connectPlayer(player4.token, 'player4', messages)
+    // Start a sale
+    await c.saleItem(wsCreator, [
+      { item: 'triangle', quantity: 1 },
+      { item: 'square', quantity: 1 },
+    ])
+    await c.placeBid(wsPlayer2, 100, 1)
+    await c.placeBid(wsPlayer3, 200, 1)
+    await c.placeBid(wsPlayer4, 300, 1)
+    // wait for the round to end
+    await c.waitFor(bidMs)
+
+    // Start a sale
+    await c.saleItem(wsPlayer2, [
+      { item: 'triangle', quantity: 1 },
+    ])
+    await c.placeBid(wsCreator, 100, 2)
+    await c.placeBid(wsPlayer3, 200, 2)
+    // wait for the round to end
+    await c.waitFor(bidMs)
+
+    //last round
+    await c.saleItem(wsPlayer3, [
+      { item: 'circle', quantity: 1 },
+    ])
+    await c.placeBid(wsCreator, 100, 3)
+    // wait for the round to end
+    await c.waitFor(bidMs)
+
+    logger.info(`creatorMessages: ${JSON.stringify(messages.creator[messages.creator.length - 1])}`)
+    expect(messages.creator.pop().auction.playerInfo).toEqual({
+      money: 700,
+      inventory: {
+        items: [
+          { item: 'triangle', quantity: 2 },
+          { item: 'square', quantity: 2 },
+          { item: 'circle', quantity: 4 }],
+      },
+    })
+    expect(messages.player2.pop().auction.playerInfo).toEqual({
+      money: 700,
+      inventory: {
+        items: [
+          { item: 'triangle', quantity: 2 },
+          { item: 'square', quantity: 3 },
+          { item: 'circle', quantity: 3 }],
+      },
+    })
+    expect(messages.player3.pop().auction.playerInfo).toEqual({
+      money: 400,
+      inventory: {
+        items: [
+          { item: 'triangle', quantity: 4 },
+          { item: 'square', quantity: 3 },
+          { item: 'circle', quantity: 2 }],
+      },
+    })
+    expect(messages.player4.pop().auction.playerInfo).toEqual({
+      money: 200,
+      inventory: {
+        items: [
+          { item: 'triangle', quantity: 4 },
+          { item: 'square', quantity: 4 },
+          { item: 'circle', quantity: 3 }],
+      },
+    })
   })
-
-
 })
