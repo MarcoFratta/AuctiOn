@@ -1,5 +1,5 @@
-import { ParseError, validateSchema } from '../src/utils/Validator';
-import { userSchema } from '../src/schemas/User';
+import { userSchema } from '../src/schemas/User'
+import { validateSchema, ValidationError } from '@auction/common/validation'
 
 describe('validateSchema', () => {
   it('should validate the object successfully if the input is valid', () => {
@@ -20,12 +20,12 @@ describe('validateSchema', () => {
       email: 'not-an-email',
     };
 
-    expect(() => validateSchema(userSchema, invalidInput)).toThrow(ParseError);
+    expect(() => validateSchema(userSchema, invalidInput)).toThrow(ValidationError)
 
     try {
       validateSchema(userSchema, invalidInput);
     } catch (error) {
-      if (error instanceof ParseError) {
+      if (error instanceof ValidationError) {
         expect(error.message).toEqual(
           'Validation error: ' +
             'Required at "id";' +
@@ -43,6 +43,6 @@ describe('validateSchema', () => {
       email: 'john.doe@example.com',
     };
 
-    expect(() => validateSchema(userSchema, missingFieldInput)).toThrow(ParseError);
+    expect(() => validateSchema(userSchema, missingFieldInput)).toThrow(ValidationError)
   });
 });

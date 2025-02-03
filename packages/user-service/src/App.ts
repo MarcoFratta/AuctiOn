@@ -7,7 +7,7 @@ import { reverseUserConverter, userConverter } from './utils/Converters'
 import swaggerUi from 'swagger-ui-express'
 import * as fs from 'node:fs'
 import path from 'node:path'
-import logger from './utils/Logger'
+import logger from '@auction/common/logger'
 
 const app = express()
 // Initialize dependencies
