@@ -54,7 +54,7 @@ services:
   auth-mongodb:
     image: 'mongo:${MONGO_VERSION:-6.0}' # Default to MongoDB 6.0
     volumes:
-      - mongo_auth_data:/data/auth-db
+      - mongo_auth_data:/data/db
     networks:
       - auth-network
 

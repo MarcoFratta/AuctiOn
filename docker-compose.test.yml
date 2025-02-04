@@ -22,7 +22,7 @@ services:
     ports:
       - '27018:27017'
     volumes:
-      - test_lobby_data:/data/db
+      - test_data:/data/lobby-db
     networks:
       - lobby-network
 
@@ -54,7 +54,7 @@ services:
   auth-mongodb:
     image: 'mongo:${MONGO_VERSION:-6.0}' # Default to MongoDB 6.0
     volumes:
-      - test_auth_data:/data/auth-db
+      - test_data:/data/auth-db
     networks:
       - auth-network
 
@@ -75,7 +75,7 @@ services:
   user-mongodb:
     image: 'mongo:${MONGO_VERSION:-6.0}' # Default to MongoDB 6.0
     volumes:
-      - test_user_data:/data/db
+      - test_data:/data/user-db
     networks:
       - user-network
   api-gateway:
@@ -120,7 +120,7 @@ services:
     container_name: redis
     restart: always
     volumes:
-      - test_redis_data:/data
+      - test_data:/redis-data
     networks:
       - redis-network
   kafka-broker:
@@ -160,22 +160,7 @@ networks:
   microservices-network:
     external: true
 volumes:
-  test_user_data:
-    driver: local
-    driver_opts:
-      type: tmpfs
-      device: tmpfs
-  test_auth_data:
-    driver: local
-    driver_opts:
-      type: tmpfs
-      device: tmpfs
-  test_lobby_data:
-    driver: local
-    driver_opts:
-      type: tmpfs
-      device: tmpfs
-  test_redis_data:
+  test_data:
     driver: local
     driver_opts:
       type: tmpfs
