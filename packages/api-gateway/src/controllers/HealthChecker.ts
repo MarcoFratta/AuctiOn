@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { NextFunction, Request, RequestHandler, Response } from 'express'
-import logger from '../utils/Logger'
+import logger from '@auction/common/logger'
 
 export const healthChecker = (services: string[]): RequestHandler => {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {

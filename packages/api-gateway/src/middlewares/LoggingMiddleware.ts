@@ -1,4 +1,4 @@
-import logger from '../utils/Logger'
+import logger from '@auction/common/logger'
 import { NextFunction, Request, Response } from 'express'
 
 export class LoggingMiddleware {

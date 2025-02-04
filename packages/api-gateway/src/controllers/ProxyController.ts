@@ -2,7 +2,7 @@ import { createProxyMiddleware, fixRequestBody } from 'http-proxy-middleware'
 import { config } from '../configs/Config'
 import { ServiceNotFoundError } from '../errors/LobbyErrors'
 import { Request, Response } from 'express'
-import logger from '../utils/Logger'
+import logger from '@auction/common/logger'
 
 export class ProxyController {
   createProxy(serviceName: string, ws = false) {

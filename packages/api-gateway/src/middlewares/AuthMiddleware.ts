@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import axios from 'axios'
-import logger from '../utils/Logger'
+import logger from '@auction/common/logger'
 import { config } from '../configs/Config'
 import { ServiceUnavailableError, UserNotAuthenticatedError } from '../errors/LobbyErrors'
 import { IncomingMessage } from 'node:http'

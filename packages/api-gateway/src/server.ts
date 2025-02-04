@@ -1,6 +1,6 @@
 import app, { routes } from './App'
 import { config } from './configs/Config'
-import logger from './utils/Logger'
+import logger from '@auction/common/logger'
 import * as net from 'node:net'
 import { WSAuthMiddleware } from './middlewares/AuthMiddleware'
 
