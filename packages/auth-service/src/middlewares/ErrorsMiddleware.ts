@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import * as errors from '../errors/AuthErrors'
-import logger from '../utils/Logger'
+import logger from '@auction/common/logger'
 import axios from 'axios'
 
 export const ErrorLoggerMiddleware = (err: unknown, _req: Request, _res: Response, next: NextFunction): void => {

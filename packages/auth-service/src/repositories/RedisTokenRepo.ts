@@ -1,6 +1,6 @@
 import { TokensRepo } from './TokensRepo'
 import Redis from 'ioredis'
-import logger from '../utils/Logger'
+import logger from '@auction/common/logger'
 
 export class RedisTokenRepo implements TokensRepo {
   private redisClient: Redis

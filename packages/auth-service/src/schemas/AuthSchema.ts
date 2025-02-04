@@ -1,4 +1,4 @@
-import { z } from '../utils/ZodWrapper'
+import { z } from '@auction/common/zod'
 
 const passwordMinLength = 8
 const passwordRegex = new RegExp('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{' + passwordMinLength + ',}$')

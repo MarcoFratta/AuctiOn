@@ -8,7 +8,7 @@ import {
   User,
   userSchema,
 } from '../src/schemas/AuthSchema'
-import { validateSchema, ValidationError } from '../src/utils/Validator' // Adjust the import path
+import { validateSchema, ValidationError } from '@auction/common/validation' // Adjust the import path
 
 describe('AuthSchema Validation with Helper', () => {
   describe('registerSchema', () => {

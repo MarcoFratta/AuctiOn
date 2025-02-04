@@ -1,6 +1,5 @@
 import request from 'supertest'
 import axios from 'axios'
-
 import * as console from 'node:console'
 import { config } from '../src/configs/config'
 import { App } from '../src/App'

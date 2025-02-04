@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import { AuthService } from '../services/AuthService'
 import { LoginInputData, RegisterInputData, User } from '../schemas/AuthSchema'
-import logger from '../utils/Logger'
+import logger from '@auction/common/logger'
 import { TokenExpiredError } from '../errors/AuthErrors'
 import { MailClient } from '../services/MailClient'
 import { config } from '../configs/config'

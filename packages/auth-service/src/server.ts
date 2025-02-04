@@ -1,14 +1,14 @@
-import { Redis } from 'ioredis'
 import App from './App'
 import { config } from './configs/config'
-import logger from './utils/Logger'
-import { connectToDatabase } from './utils/MongoDB'
+import logger from '@auction/common/logger'
+import { connectMongo } from '@auction/common/mongo'
+import { connectRedis, createRedisInstance } from '@auction/common/redis'
 
-const redis = new Redis(config.redisPort, config.redisHost)
+const redis = createRedisInstance(config.redisHost, config.redisPort)
 const app = new App(redis)
 const port = config.port || 3000
 
-connectToDatabase()
+Promise.all([connectMongo(config.dbUri), connectRedis(redis)])
   .then(() => {
     app.start(port)
   })

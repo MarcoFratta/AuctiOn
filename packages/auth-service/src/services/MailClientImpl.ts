@@ -1,6 +1,6 @@
 import { MailClient } from './MailClient'
 import { Transporter } from 'nodemailer'
-import logger from '../utils/Logger'
+import logger from '@auction/common/logger'
 
 export class MailClientImpl implements MailClient {
   constructor(private readonly client: Transporter) {}

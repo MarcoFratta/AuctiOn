@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { AuthController } from '../controllers/AuthController'
-import { validateRequestBody, validateRequestParams } from '../middlewares/ValidationMiddleware'
+import { validateRequestBody, validateRequestParams } from '@auction/common/middlewares'
 import { forgotPasswordSchema, loginSchema, registerSchema, resetPasswordSchema } from '../schemas/AuthSchema'
 import { AuthErrorMiddleware, ErrorLoggerMiddleware, GenericErrorMiddleware } from '../middlewares/ErrorsMiddleware'
 

@@ -11,8 +11,8 @@ import {
 } from '../errors/AuthErrors'
 import { AuthService } from './AuthService'
 import { LoginInputData, RegisterInputData, RegisterOutput, Token, User, userSchema } from '../schemas/AuthSchema'
-import logger from '../utils/Logger'
-import { validateSchema } from '../utils/Validator'
+import logger from '@auction/common/logger'
+import { validateSchema } from '@auction/common/validation'
 import { AccountRepository } from '../repositories/AccountRepository'
 import { TokenGenerator } from '../domain/TokenGenerator'
 import { TokensRepo } from '../repositories/TokensRepo'
@@ -63,7 +63,7 @@ export class AuthServiceImpl implements AuthService {
   async login(data: LoginInputData): Promise<RegisterOutput> {
     const existingUser = await this.getUserByEmail(data.email)
     if (!existingUser) throw new UserNotFoundError(data.email)
-    const user = validateSchema(userSchema, existingUser)
+    const user: User = validateSchema(userSchema, existingUser)
     logger.info(`logging in user: ${data.email} with id ${user.id}`)
     const account = await this.accountRepo.findById(user.id)
     if (!account) {

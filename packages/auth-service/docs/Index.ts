@@ -9,7 +9,7 @@ import {
 import { generateOpenAPI, registry } from './Generator'
 import path from 'path'
 import * as fs from 'fs'
-import { z } from '../src/utils/ZodWrapper'
+import { z } from '@auction/common/zod'
 
 // Register all paths for the Auth API
 
