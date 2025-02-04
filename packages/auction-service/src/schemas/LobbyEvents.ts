@@ -1,4 +1,4 @@
-import z from 'zod'
+import { z } from '@auction/common/zod'
 import { AuctionConfigSchema } from './Auction'
 
 export const LobbySchema = z.object({

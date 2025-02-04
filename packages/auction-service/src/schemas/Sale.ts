@@ -1,4 +1,4 @@
-import z from 'zod'
+import { z } from '@auction/common/zod'
 import { ItemsMapSchema } from './Player'
 
 export const SaleSchema = z.object({

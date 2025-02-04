@@ -1,4 +1,4 @@
-import z from 'zod'
+import { z } from '@auction/common/zod'
 import { PlayerSchema } from './Player'
 import { BidSchema } from './Bid'
 import { SaleSchema } from './Sale'

@@ -5,7 +5,7 @@ import { AuctionConfig } from '../src/schemas/Auction'
 import { mock, MockProxy } from 'jest-mock-extended'
 import { BidMessage } from '../src/schemas/AuctionMessages'
 import { ItemsMap } from '../src/schemas/Player'
-import { InventoryInputMsg } from '../src/schemas/Item'
+import { InventoryInput } from '../src/schemas/Item'
 import { AuctionServiceImpl } from '../src/services/AuctionServiceImpl'
 
 describe('AuctionController', () => {
@@ -96,7 +96,7 @@ describe('AuctionController', () => {
 
   test('should handle player sell message', async () => {
     const playerId = 'player1'
-    const saleItems: InventoryInputMsg = {
+    const saleItems: InventoryInput = {
       items: [
         { item: 'square', quantity: 2 },
         { item: 'circle', quantity: 1 },

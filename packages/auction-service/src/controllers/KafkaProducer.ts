@@ -1,7 +1,7 @@
 import { PlayerEventSource } from '../adapters/PlayerEventSource'
 import { AuctionService } from '../services/AuctionService'
 import { Kafka, Producer } from 'kafkajs'
-import logger from '../utils/Logger'
+import logger from '@auction/common/logger'
 import { Auction } from '../schemas/Auction'
 import { AuctionEvent } from '../schemas/AuctionEvents'
 import {

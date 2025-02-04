@@ -1,5 +1,5 @@
 import WebSocket from 'ws'
-import logger from '../src/utils/Logger'
+import logger from '@auction/common/logger'
 import { AuctionService } from '../src/services/AuctionService'
 import { App } from '../src/App'
 import { KafkaContainer, StartedKafkaContainer } from '@testcontainers/kafka'

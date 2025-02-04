@@ -1,4 +1,4 @@
-import z from 'zod'
+import { z } from '@auction/common/zod'
 import { ItemSchema } from './Item'
 
 export const ItemsMapSchema = z.map(ItemSchema, z.number().min(0))

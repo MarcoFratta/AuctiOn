@@ -1,7 +1,7 @@
 import { config } from '../configs/config'
 import { Request } from 'express'
-import logger from '../utils/Logger'
-import { validateSchema } from '../utils/Validator'
+import logger from '@auction/common/logger'
+import { validateSchema } from '@auction/common/validation'
 import { userSchema } from '../schemas/User'
 
 export interface AuthenticatedRequest extends Request {

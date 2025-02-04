@@ -1,4 +1,4 @@
-import z from 'zod'
+import { z } from '@auction/common/zod'
 
 export const BidSchema = z.object({
   playerId: z.string(),

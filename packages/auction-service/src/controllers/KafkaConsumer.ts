@@ -1,7 +1,7 @@
 import { Consumer, EachMessagePayload, Kafka } from 'kafkajs'
 import { AuctionService } from '../services/AuctionService'
-import { validateSchema } from '../utils/Validator'
-import logger from '../utils/Logger'
+import { validateSchema } from '@auction/common/validation'
+import logger from '@auction/common/logger'
 import {
   lobbyCreatedEvent,
   lobbyDeletedEvent,

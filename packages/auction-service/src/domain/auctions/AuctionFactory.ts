@@ -1,4 +1,4 @@
-import { validateSchema } from '../../utils/Validator'
+import { validateSchema } from '@auction/common/validation'
 import { Auction, AuctionConfig, AuctionSchema } from '../../schemas/Auction'
 
 export const createAuctionFromConfig = (config: AuctionConfig): Auction => {

@@ -1,14 +1,14 @@
 import { PlayerEventSource } from '../adapters/PlayerEventSource'
 import { PlayerChannel } from '../adapters/PlayerChannel'
-import { validateSchema } from '../utils/Validator'
+import { validateSchema } from '@auction/common/validation'
 import { BidMessage, BidMsgSchema, MessageType, MessageTypeSchema } from '../schemas/AuctionMessages'
 import { match } from 'ts-pattern'
 import { Auction } from '../schemas/Auction'
-import logger from '../utils/Logger'
+import logger from '@auction/common/logger'
 import { Bid, BidSchema } from '../schemas/Bid'
 import { AuctionService } from '../services/AuctionService'
 import { toPlayerAuction } from '../converters/AuctionConverter'
-import { InventoryInputMsg, InventoryInputSchema } from '../schemas/Item'
+import { InventoryInput, InventoryInputSchema } from '../schemas/Item'
 
 export class AuctionController {
   private auctionService: AuctionService
@@ -50,7 +50,7 @@ export class AuctionController {
             })
         })
         .with('sell', () => {
-          const sale: InventoryInputMsg = validateSchema(InventoryInputSchema, parsedMessage.sale)
+          const sale: InventoryInput = validateSchema(InventoryInputSchema, parsedMessage.sale)
           const itemsMap = new Map(sale.items.map(v => [v.item, v.quantity]))
           logger.info(`[Controller] Player ${playerId} selling items: ${JSON.stringify(itemsMap.entries())}`)
           this.auctionService

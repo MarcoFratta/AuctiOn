@@ -1,4 +1,4 @@
-import { validateSchema, ValidationError } from '../src/utils/Validator'
+import { validateSchema, ValidationError } from '@auction/common/validation'
 import { InventoryInputSchema } from '../src/schemas/Item'
 
 describe('SaleMsgSchema Validation', () => {

@@ -1,6 +1,6 @@
 import WebSocket, { ServerOptions, WebSocketServer } from 'ws'
 import { PlayerEventSource } from './PlayerEventSource'
-import logger from '../utils/Logger'
+import logger from '@auction/common/logger'
 import { PlayerChannel } from './PlayerChannel'
 import { AuthenticatedRequest } from '../middlewares/AuthMiddleware'
 import { UserNotAuthenticatedError } from '../errors/Errors'

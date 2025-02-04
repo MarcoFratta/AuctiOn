@@ -1,7 +1,7 @@
 import { Auction } from '../schemas/Auction'
 import { AuctionRepo } from './AuctionRepo'
 import Redis from 'ioredis'
-import logger from '../utils/Logger'
+import logger from '@auction/common/logger'
 import { toAuction, toStoredAuction } from '../converters/AuctionConverter'
 
 export class RedisAuctionRepo implements AuctionRepo {

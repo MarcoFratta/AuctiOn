@@ -1,7 +1,7 @@
-import { validateSchema } from '../utils/Validator'
-import { PlayerSchema } from '../schemas/Player'
-import { AuctionConfig } from '../schemas/Auction'
-import { toInventoryMap } from '../converters/AuctionConverter'
+import { validateSchema } from '@auction/common/validation'
+import { PlayerSchema } from '../../schemas/Player'
+import { AuctionConfig } from '../../schemas/Auction'
+import { toInventoryMap } from '../../converters/AuctionConverter'
 
 export const createPlayer = (id: string, auction: AuctionConfig) => {
   return validateSchema(PlayerSchema, {

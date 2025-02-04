@@ -1,13 +1,12 @@
 import express from 'express'
 import http from 'http'
 import { Kafka } from 'kafkajs'
-import logger from './utils/Logger'
+import logger from '@auction/common/logger'
 import { KafkaProducer } from './controllers/KafkaProducer'
 import { AuctionService } from './services/AuctionService'
 import { AuctionServiceImpl } from './services/AuctionServiceImpl'
 import { WebSocketAdapter } from './adapters/WebSocketAdapter'
 import { AuctionController } from './controllers/AuctionController'
-import { AuctionEventsSource } from './services/AuctionEventsSource'
 import { AuthenticatedRequest, authMiddleware } from './middlewares/AuthMiddleware'
 import { UserNotAuthenticatedError } from './errors/Errors'
 import { Duplex } from 'stream'
@@ -21,7 +20,7 @@ export class App {
   public app: express.Application
   public server: http.Server
   public wsAdapter: WebSocketAdapter
-  public auctionService: AuctionService & AuctionEventsSource
+  public auctionService: AuctionService
   public kafkaProducer: KafkaProducer
   public kafkaConsumer: KafkaConsumer
   public auctionController: AuctionController

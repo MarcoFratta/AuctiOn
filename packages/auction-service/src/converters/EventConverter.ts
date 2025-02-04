@@ -14,7 +14,7 @@ import {
   SaleEvent,
   SaleEventSchema,
 } from '../schemas/AuctionEvents'
-import { validateSchema } from '../utils/Validator'
+import { validateSchema } from '@auction/common/validation'
 import { toInventory } from './AuctionConverter'
 
 export const toSaleEvent: Converter<Auction, SaleEvent> = {

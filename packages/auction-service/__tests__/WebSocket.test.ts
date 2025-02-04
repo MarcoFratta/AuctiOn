@@ -1,7 +1,7 @@
 import WebSocket, { Server } from 'ws'
 import { createServer } from 'http'
 import { WebSocketAdapter } from '../src/adapters/WebSocketAdapter'
-import logger from '../src/utils/Logger'
+import logger from '@auction/common/logger'
 import { AuthenticatedRequest, authMiddleware } from '../src/middlewares/AuthMiddleware'
 import { UserNotAuthenticatedError } from '../src/errors/Errors'
 import { Duplex } from 'stream'
