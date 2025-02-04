@@ -2,7 +2,7 @@ import z, { ZodSchema } from 'zod'
 
 export const ItemSchema = z.enum(['square', 'triangle', 'circle'])
 
-export const ItemWeights: Record<Item, number> = {
+export const ItemWeights: Record<string, number> = {
   [ItemSchema.enum.square]: 1,
   [ItemSchema.enum.triangle]: 2,
   [ItemSchema.enum.circle]: 3,
@@ -40,5 +40,5 @@ export const InventoryOutputSchema = InventoryFactory(
   })
 )
 export type Item = z.infer<typeof ItemSchema>
-export type InventoryInputMsg = z.infer<typeof InventoryInputSchema>
-export type InventoryOutputMsg = z.infer<typeof InventoryOutputSchema>
+export type InventoryInput = z.infer<typeof InventoryInputSchema>
+export type InventoryOutput = z.infer<typeof InventoryOutputSchema>

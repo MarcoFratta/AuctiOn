@@ -1,9 +1,9 @@
 import { Converter } from './Converter'
 import { Auction, AuctionSchema, StoredAuction, StoredAuctionSchema } from '../schemas/Auction'
 import { ItemsMap, Player } from '../schemas/Player'
-import { validateSchema } from '../utils/Validator'
+import { validateSchema } from '@auction/common/validation'
 import { Sale } from '../schemas/Sale'
-import { InventoryOutputMsg, InventoryOutputSchema, ItemWeights } from '../schemas/Item'
+import { InventoryOutput, InventoryOutputSchema, ItemWeights } from '../schemas/Item'
 import {
   PlayerAuction,
   PlayerAuctionSchema,
@@ -13,9 +13,15 @@ import {
   SaleInfoSchema,
 } from '../schemas/AuctionMessages'
 
+export const toWeight: Converter<InventoryOutput, number> = {
+  convert: (inventory: InventoryOutput): number => {
+    return inventory.items.map(({ quantity, item }) => quantity * ItemWeights[item]).reduce((acc, curr) => acc + curr, 0)
+  },
+}
+
 export const saleWeight: Converter<Sale, number> = {
   convert: (sale: Sale): number => {
-    return [...sale.items.entries()].map(([item, quantity]) => quantity * ItemWeights[item]).reduce((acc, curr) => acc + curr, 0)
+    return toWeight.convert(toInventory.convert(sale.items))
   },
 }
 
@@ -26,13 +32,13 @@ export const toSaleInfo: Converter<Sale, SaleInfo> = {
     })
   },
 }
-export const toInventoryMap: Converter<InventoryOutputMsg, ItemsMap> = {
-  convert: (inventory: InventoryOutputMsg): ItemsMap => {
+export const toInventoryMap: Converter<InventoryOutput, ItemsMap> = {
+  convert: (inventory: InventoryOutput): ItemsMap => {
     return new Map(inventory.items.map(({ item, quantity }) => [item, quantity]))
   },
 }
-export const toInventory: Converter<ItemsMap, InventoryOutputMsg> = {
-  convert: (inventory: ItemsMap): InventoryOutputMsg => {
+export const toInventory: Converter<ItemsMap, InventoryOutput> = {
+  convert: (inventory: ItemsMap): InventoryOutput => {
     return validateSchema(InventoryOutputSchema, {
       items: [...inventory.entries()].map(([item, quantity]) => ({
         item: item,
