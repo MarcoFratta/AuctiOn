@@ -1,33 +1,33 @@
 import { z } from '@auction/common/zod'
-import { AuctionConfigSchema } from './Auction'
+import { auctionConfigSchema, playerSchema } from './Auction'
 
-export const LobbySchema = z.object({
+export const lobbySchema = z.object({
   lobbyId: z.string(),
-  creatorId: z.string(),
+  creatorId: playerSchema.shape.id,
 })
 
 export const lobbyCreatedEvent = z.object({
   type: z.literal('lobby-created'),
-  lobby: AuctionConfigSchema,
-  creator: z.string(),
+  lobby: auctionConfigSchema,
+  creator: playerSchema.shape.id,
 })
 export const lobbyJoinedEvent = z.object({
   type: z.literal('lobby-joined'),
-  lobbyId: z.string(),
-  playerId: z.string(),
+  lobbyId: lobbySchema.shape.lobbyId,
+  playerId: playerSchema.shape.id,
 })
 export const lobbyLeftEvent = z.object({
   type: z.literal('lobby-left'),
-  lobbyId: z.string(),
-  playerId: z.string(),
+  lobbyId: lobbySchema.shape.lobbyId,
+  playerId: playerSchema.shape.id,
 })
 export const lobbyStartedEvent = z.object({
   type: z.literal('lobby-started'),
-  lobbyId: z.string(),
+  lobbyId: lobbySchema.shape.lobbyId,
 })
 export const lobbyDeletedEvent = z.object({
   type: z.literal('lobby-deleted'),
-  lobbyId: z.string(),
+  lobbyId: lobbySchema.shape.lobbyId,
 })
 export const lobbyEventTypeSchema = z.object({
   type: z.enum(['lobby-created', 'lobby-joined', 'lobby-left', 'lobby-started', 'lobby-deleted']),

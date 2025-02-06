@@ -8,6 +8,9 @@
   "exports": {
     ".": "./dist/index.js",
     "./logger": "./dist/src/logger/Logger.js",
+    "./events/auction": "./dist/src/events/AuctionEvents.js",
+    "./events/lobby": "./dist/src/events/LobbyEvents.js",
+    "./messages": "./dist/src/messages/AuctionMessages.js",
     "./mongo": "./dist/src/connections/MongoDB.js",
     "./redis": "./dist/src/connections/RedisDB.js",
     "./validation": "./dist/src/validation/Validator.js",
