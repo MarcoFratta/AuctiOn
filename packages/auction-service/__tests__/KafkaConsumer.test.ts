@@ -5,7 +5,7 @@ import { Kafka } from 'kafkajs'
 import { mock, MockProxy } from 'jest-mock-extended'
 import { AuctionConfig } from '../src/schemas/Auction'
 import { AuctionServiceImpl } from '../src/services/AuctionServiceImpl'
-import { LobbyCreatedEvent, LobbyJoinedEvent, LobbyLeftEvent } from '../src/schemas/LobbyEvents'
+import { LobbyCreatedEvent, LobbyJoinedEvent, LobbyLeftEvent } from '@auction/common/events/lobby'
 
 jest.setTimeout(60 * 1000)
 describe('KafkaConsumer', () => {

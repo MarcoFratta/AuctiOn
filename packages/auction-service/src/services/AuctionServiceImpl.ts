@@ -10,16 +10,22 @@ import { createPlayer } from '../domain/auctions/PlayerFactory'
 import { PlayOrderStrategy } from '../domain/auctions/PlayOrderStrategy'
 import { createAuctionFromConfig } from '../domain/auctions/AuctionFactory'
 import { AuctionRepo } from '../repositories/AuctionRepo'
+import { WinStrategyFactory } from '../domain/auctions/WinStrategyFactory'
+import { LeaderboardModifier, Modifiers } from '../domain/auctions/Modifier'
+import { Leaderboard, leaderboardSchema } from '../schemas/Leaderboard'
 
 export class AuctionServiceImpl implements AuctionService {
   private auctions: Map<string, Auction> = new Map()
   private players: Map<string, string> = new Map()
   private auctionsCallbacks = new Map<string, ((auction: Auction) => void)[]>()
+  private leaderBoardCallbacks: ((leaderboard: Leaderboard, auctionId: string) => void)[] = []
   private playersCallbacks = new Map<string, ((id: string) => void)[]>()
   private repo: AuctionRepo
+  private readonly modifiers: LeaderboardModifier[]
 
   constructor(repo: AuctionRepo) {
     this.repo = repo
+    this.modifiers = [Modifiers.noMostItems(), Modifiers.noZeroItems()]
     this.initCallbacks()
     this.loadAuctions()
   }
@@ -98,7 +104,7 @@ export class AuctionServiceImpl implements AuctionService {
     return res
   }
 
-  async endRound(auctionId: string): Promise<Auction> {
+  async endRound(auctionId: string): Promise<Auction | Leaderboard> {
     const auction: Auction = this.findAuctionById(auctionId)
     if (!auction.startTimestamp) {
       throw new Error(`Auction not started yet`)
@@ -124,8 +130,10 @@ export class AuctionServiceImpl implements AuctionService {
     }
     auction.currentBid = undefined
     auction.currentSale = undefined
-    const res = this.goToNextRound(auction, auctionId)
-    res.then(this.saveAuction)
+    const res: Auction | Leaderboard = await this.goToNextRound(auction, auctionId)
+    if (!this.isLeaderboard(res)) {
+      this.saveAuction(res as Auction)
+    }
     return res
   }
 
@@ -134,21 +142,20 @@ export class AuctionServiceImpl implements AuctionService {
     const player: Player = this.getPlayer(auction, playerId)
     player.status = state
     this.saveAuction(auction)
+    logger.debug(`player ${playerId} state set to ${state}`)
     return cloneDeep(auction)
   }
 
-  async endAuction(auctionId: string): Promise<Auction> {
+  async endAuction(auctionId: string): Promise<Leaderboard> {
     const auction: Auction = this.findAuctionById(auctionId)
     logger.info(`ending auction: ${auctionId}`)
     this.auctions.delete(auction.id)
     // TODO: save auction results
-    const res = cloneDeep(auction)
-    this.notifyAuctionUpdate(res, 'onAuctionEnd')
-    this.repo
-      .deleteAuction(auctionId)
-      .then(() => logger.info(`deleted auction: ${auctionId}`))
-      .catch(error => logger.error(`failed to delete auction: ${auctionId}`, error))
-    return res
+    let leaderBoard = WinStrategyFactory.byMoney().computeLeaderboard(auction)
+    leaderBoard = Modifiers.modify(this.modifiers, leaderBoard)
+    await this.repo.deleteAuction(auctionId)
+    this.leaderBoardCallbacks.forEach(c => c(leaderBoard, auctionId)) // change
+    return cloneDeep(leaderBoard)
   }
 
   async playerJoin(playerId: string, auctionId: string): Promise<Auction> {
@@ -215,8 +222,8 @@ export class AuctionServiceImpl implements AuctionService {
     return [...rest, first]
   }
 
-  onAuctionEnd(callback: (auction: Auction) => void): void {
-    this.auctionsCallbacks.get('onAuctionEnd')!.push(callback)
+  onAuctionEnd(callback: (auction: Leaderboard, auctionId: string) => void): void {
+    this.leaderBoardCallbacks.push(callback)
   }
 
   onPlayerJoin(callback: (auction: string) => void): void {
@@ -270,7 +277,7 @@ export class AuctionServiceImpl implements AuctionService {
       .catch(error => logger.error(`failed to save auction: ${res.id}`, error))
   }
 
-  private async goToNextRound(auction: Auction, auctionId: string): Promise<Auction> {
+  private async goToNextRound(auction: Auction, auctionId: string): Promise<Auction | Leaderboard> {
     auction.currentRound++
     let disconnectedCounter = 0
     logger.info('going to next turn:')
@@ -287,6 +294,15 @@ export class AuctionServiceImpl implements AuctionService {
     }
     this.notifyAuctionUpdate(auction, 'onRoundEnd')
     return cloneDeep(auction)
+  }
+
+  private isLeaderboard(value: any): boolean {
+    try {
+      validateSchema(leaderboardSchema, value)
+      return true
+    } catch (e) {
+      return false
+    }
   }
 
   private loadAuctions = () => {

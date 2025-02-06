@@ -10,8 +10,9 @@ import {
   lobbyJoinedEvent,
   lobbyLeftEvent,
   lobbyStartedEvent,
-} from '../schemas/LobbyEvents'
+} from '@auction/common/events/lobby'
 import { match } from 'ts-pattern'
+import { auctionConfigSchema } from '../schemas/Auction'
 
 export class KafkaConsumer {
   private consumer: Consumer
@@ -60,7 +61,8 @@ export class KafkaConsumer {
         })
         .with('lobby-created', async () => {
           const event = validateSchema(lobbyCreatedEvent, msg)
-          await this.auctionService.createAuction(event.lobby)
+          const lobby = validateSchema(auctionConfigSchema, event.lobby)
+          await this.auctionService.createAuction(lobby)
           await this.auctionService.playerJoin(event.creator, event.lobby.id)
         })
         .with('lobby-left', async () => {
@@ -72,7 +74,7 @@ export class KafkaConsumer {
           await this.auctionService.removeAuction(event.lobbyId)
         })
         .otherwise(() => {
-          logger.info(`Unknown lobby event type: ${type}`)
+          logger.debug(`[KafkaConsumer] Unknown lobby event type: ${type}`)
         })
     } catch (e) {
       logger.error(`[KafkaConsumer] Error handling message: ${e}`)

@@ -3,15 +3,16 @@ import { AuctionService } from '../services/AuctionService'
 import { Kafka, Producer } from 'kafkajs'
 import logger from '@auction/common/logger'
 import { Auction } from '../schemas/Auction'
-import { AuctionEvent } from '../schemas/AuctionEvents'
+import { AuctionEvent } from '@auction/common/events/auction'
+import { Leaderboard } from '../schemas/Leaderboard'
 import {
-  toAuctionEndEvent,
-  toBidEvent,
-  toPlayerConnectedEvent,
-  toPlayerDisconnectedEvent,
-  toRoundEndEvent,
-  toSaleEvent,
-} from '../converters/EventConverter'
+  auctionEndEvent,
+  bidEvent,
+  playerConnectedEvent,
+  playerDisconnectedEvent,
+  roundEndEvent,
+  saleEvent,
+} from '../domain/events/EventsFactory'
 
 export class KafkaProducer {
   private auctionService: AuctionService
@@ -51,7 +52,7 @@ export class KafkaProducer {
     this.auctionService
       .getPlayerAuction(playerId)
       .then(async auction => {
-        const msg = toPlayerConnectedEvent(playerId).convert(auction)
+        const msg = playerConnectedEvent(auction.id, playerId)
         await this.emitEvent('player-events', msg)
       })
       .catch(error => {
@@ -63,7 +64,7 @@ export class KafkaProducer {
     this.auctionService
       .getPlayerAuction(playerId)
       .then(async auction => {
-        const msg = toPlayerDisconnectedEvent(playerId).convert(auction)
+        const msg = playerDisconnectedEvent(auction.id, playerId)
         await this.emitEvent('player-events', msg)
       })
       .catch(error => {
@@ -71,21 +72,21 @@ export class KafkaProducer {
       })
   }
 
-  private handleAuctionEnd = async (auction: Auction): Promise<void> => {
-    const msg = toAuctionEndEvent.convert(auction)
+  private handleAuctionEnd = async (leaderboard: Leaderboard, auctionId: string): Promise<void> => {
+    const msg = auctionEndEvent(auctionId, leaderboard)
     await this.emitEvent('auction-events', msg)
   }
 
   private handleRoundEnd = async (auction: Auction): Promise<void> => {
-    const msg = toRoundEndEvent.convert(auction)
+    const msg = roundEndEvent(auction.id)
     await this.emitEvent('auction-events', msg)
   }
   private handleNewBid = async (auction: Auction) => {
-    const msg = toBidEvent.convert(auction)
+    const msg = bidEvent(auction)
     await this.emitEvent('auction-events', msg)
   }
   private handleNewSale = async (auction: Auction) => {
-    const msg = toSaleEvent.convert(auction)
+    const msg = saleEvent(auction)
     await this.emitEvent('auction-events', msg)
   }
 }

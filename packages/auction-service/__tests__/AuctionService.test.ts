@@ -6,6 +6,7 @@ import { Bid } from '../src/schemas/Bid'
 import { RedisAuctionRepo } from '../src/repositories/RedisAuctionRepo'
 import MockRedis from 'ioredis-mock'
 import Redis from 'ioredis'
+import { Leaderboard } from '../src/schemas/Leaderboard'
 
 describe('AuctionService', () => {
   let service: AuctionService
@@ -196,8 +197,13 @@ describe('AuctionService', () => {
       sellerId: 'player1',
       endTimestamp: undefined,
     })
-    await service.playerBid({ playerId: 'player2', round: 1, amount: 50, timestamp: new Date().toISOString() })
-    updatedAuction = await service.endRound('auction1')
+    updatedAuction = await service.playerBid({
+      playerId: 'player2',
+      round: 1,
+      amount: 50,
+      timestamp: new Date().toISOString(),
+    })
+    updatedAuction = (await service.endRound('auction1')) as Auction
     expect(updatedAuction.players[1].money).toBe(50)
     expect(updatedAuction.players[0].money).toBe(150)
     expect(updatedAuction.players[0].inventory.get('square')).toBe(3)
@@ -225,7 +231,7 @@ describe('AuctionService', () => {
     await service.playerSale('player1', new Map([['square', 2]]))
     await service.playerBid({ playerId: 'player2', round: 1, amount: 50, timestamp: new Date().toISOString() })
 
-    const updatedAuction = await service.endRound('auction1')
+    const updatedAuction = (await service.endRound('auction1')) as Auction
     const player1 = updatedAuction.players[0]
     const player2 = updatedAuction.players[1]
 
@@ -242,8 +248,8 @@ describe('AuctionService', () => {
     await service.playerJoin('player1', auction.id)
     await service.startAuction(auction.id)
 
-    const endedAuction = await service.endRound('auction1')
-    expect(endedAuction.id).toBe('auction1') // Auction data returned
+    const endedAuction = (await service.endRound('auction1')) as Leaderboard
+    expect(endedAuction).toHaveProperty('leaderboard') // Auction data returned
   })
 
   it('should throw an error if trying to end a non-existent auction', async () => {
@@ -370,14 +376,14 @@ describe('AuctionService', () => {
     await service.startAuction(defaultConfig.id)
 
     const endAuction = jest.spyOn(service, 'endAuction')
-    const result = await service.endRound(defaultConfig.id)
-
-    expect(result.currentRound).toBe(2)
-    expect(result.maxRound).toBe(defaultConfig.maxRound)
+    const result: Leaderboard = (await service.endRound(defaultConfig.id)) as Leaderboard
+    expect(result.removed).toEqual([
+        { id: 'player1', money: 100, inventory: { items: [{ item: 'square', quantity: 2 }] } },
+        { id: 'player2', money: 100, inventory: { items: [{ item: 'square', quantity: 2 }] } },
+        { id: 'player3', money: 100, inventory: { items: [{ item: 'square', quantity: 2 }] } },
+      ],
+    )
     expect(endAuction).toHaveBeenCalled()
-    expect(result.players.find(p => p.id === 'player1')?.status).toBe('connected')
-    expect(result.players.find(p => p.id === 'player2')?.status).toBe('not-connected')
-    expect(result.players.find(p => p.id === 'player3')?.status).toBe('not-connected')
   })
 
   it('should skip a disconnected player when determining the next seller', async () => {
@@ -389,7 +395,7 @@ describe('AuctionService', () => {
     await service.startAuction(defaultConfig.id)
 
     const endAuction = jest.spyOn(service, 'endAuction')
-    const result = await service.endRound(defaultConfig.id)
+    const result = (await service.endRound(defaultConfig.id)) as Auction
 
     expect(result.currentRound).toBe(2)
     expect(result.players.find(p => p.id === 'player2')?.status).toBe('not-connected')

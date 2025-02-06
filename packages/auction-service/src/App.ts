@@ -59,7 +59,8 @@ export class App {
   }
 
   public async stop(): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
+      await this.kafkaConsumer.disconnect()
       this.server.close(err => {
         if (err) reject(err)
         else resolve()

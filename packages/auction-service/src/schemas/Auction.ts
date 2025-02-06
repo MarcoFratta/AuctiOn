@@ -4,7 +4,7 @@ import { BidSchema } from './Bid'
 import { SaleSchema } from './Sale'
 import { InventoryOutputSchema } from './Item'
 
-export const AuctionConfigSchema = z.object({
+export const auctionConfigSchema = z.object({
   id: z.string(),
   maxPlayers: z.number(),
   maxRound: z.number(),
@@ -23,7 +23,7 @@ export const AuctionSchema = z
     currentBid: BidSchema.optional(),
     startTimestamp: z.string().datetime().optional(),
   })
-  .merge(AuctionConfigSchema)
+  .merge(auctionConfigSchema)
 export const AuctionReportSchema = z.object({
   id: z.string(),
   leaderboard: z.array(PlayerSchema.omit({ status: true })),
@@ -45,5 +45,5 @@ export const StoredAuctionSchema = AuctionSchema.merge(
 )
 
 export type Auction = z.infer<typeof AuctionSchema>
-export type AuctionConfig = z.infer<typeof AuctionConfigSchema>
+export type AuctionConfig = z.infer<typeof auctionConfigSchema>
 export type StoredAuction = z.infer<typeof StoredAuctionSchema>

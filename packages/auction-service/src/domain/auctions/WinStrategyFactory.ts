@@ -1,5 +1,5 @@
 import { WinStrategy } from './WinStrategy'
-import { Leaderboard, leaderboardEntry, leaderBoardSchema } from '../../schemas/Leaderboard'
+import { Leaderboard, leaderboardEntry, leaderboardSchema } from '../../schemas/Leaderboard'
 import { Auction } from '../../schemas/Auction'
 import { validateSchema } from '@auction/common/validation'
 import { toInventory, toWeight } from '../../converters/AuctionConverter'
@@ -9,7 +9,7 @@ export class WinStrategyFactory {
   static byMoney(): WinStrategy {
     return {
       computeLeaderboard: (auction: Auction): Leaderboard => {
-        return validateSchema(leaderBoardSchema, {
+        return validateSchema(leaderboardSchema, {
           leaderboard: auction.players
             .sort((a, b) => b.money - a.money) // Highest money first
             .map((player, index) =>
@@ -29,7 +29,7 @@ export class WinStrategyFactory {
   static byWeight(): WinStrategy {
     return {
       computeLeaderboard: (auction: Auction): Leaderboard => {
-        return validateSchema(leaderBoardSchema, {
+        return validateSchema(leaderboardSchema, {
           leaderboard: auction.players
             .sort(
               (a: Player, b: Player) =>

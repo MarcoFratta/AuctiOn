@@ -2,10 +2,9 @@ import { AuctionService } from '../services/AuctionService'
 import logger from '@auction/common/logger'
 import { PlayerChannel } from '../adapters/PlayerChannel'
 import { AuctionTimer } from '../domain/auctions/Timer'
-import { validateSchema } from '@auction/common/validation'
-import { TimerMessageSchema } from '../schemas/TimeMessages'
 import { Auction } from '../schemas/Auction'
 import { PlayerEventSource } from '../adapters/PlayerEventSource'
+import { timerStartMessage } from '../domain/messages/MessageFactory'
 
 export class TimerController {
   private timers: Map<string, AuctionTimer> = new Map()
@@ -39,7 +38,13 @@ export class TimerController {
       this.auctionService
         .getPlayerAuction(playerId)
         .then(auction => {
-          this.playerChannel.sendToPlayer(playerId, JSON.stringify({ type: 'auction', auction }))
+          const timer = this.timers.get(auction.id)
+          if (!timer) {
+            throw new Error(`Timer not found for auction ${auction.id}`)
+          }
+          if (this.timers.get(auction.id)!.isRunning) {
+            this.playerChannel.sendToPlayer(playerId, JSON.stringify(timerStartMessage(timer.startTime!)))
+          }
         })
         .catch(error => {
           logger.error(`[TimerController] Failed to get auction for player ${playerId}: ${error}`)
@@ -56,10 +61,7 @@ export class TimerController {
   }
 
   private createMessage(auction: Auction) {
-    return validateSchema(TimerMessageSchema, {
-      type: 'timer-start',
-      timestamp: this.timers.get(auction.id)!.startTime!,
-    })
+    return timerStartMessage(this.timers.get(auction.id)!.startTime!)
   }
 
   private startTimer(auctionId: string, duration: number): void {

@@ -1,11 +1,15 @@
-import { Leaderboard, LeaderboardEntry } from '../../schemas/Leaderboard'
+import { Leaderboard, LeaderboardEntry, leaderboardSchema } from '../../schemas/Leaderboard'
 import { InventoryOutput } from '../../schemas/Item'
+import { validateSchema } from '@auction/common/validation'
 
 export interface LeaderboardModifier {
   apply: (leaderboard: Leaderboard) => Leaderboard
 }
 
 export class Modifiers {
+  static modify(modifiers: LeaderboardModifier[], leaderboard: Leaderboard): Leaderboard {
+    return modifiers.reduce((leaderboard, modifier) => modifier.apply(leaderboard), leaderboard)
+  }
   static noMostItems(): LeaderboardModifier {
     return {
       apply: (leaderboard: Leaderboard) => {
@@ -52,9 +56,18 @@ export class Modifiers {
         ...player,
         position: this.updatePosition(player.position, positionToRemove),
       }))
-    return {
+    return validateSchema(leaderboardSchema, {
       leaderboard: updatedLeaderboard,
-      removed: [...leaderboard.removed, ...playersToRemove],
-    }
+      removed: [
+        ...leaderboard.removed,
+        ...playersToRemove.map(player => {
+          return {
+            ...player,
+
+            position: undefined,
+          }
+        }),
+      ],
+    })
   }
 }

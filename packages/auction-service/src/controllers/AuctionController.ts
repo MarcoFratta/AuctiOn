@@ -1,14 +1,35 @@
 import { PlayerEventSource } from '../adapters/PlayerEventSource'
 import { PlayerChannel } from '../adapters/PlayerChannel'
 import { validateSchema } from '@auction/common/validation'
-import { BidMessage, BidMsgSchema, MessageType, MessageTypeSchema } from '../schemas/AuctionMessages'
 import { match } from 'ts-pattern'
 import { Auction } from '../schemas/Auction'
 import logger from '@auction/common/logger'
 import { Bid, BidSchema } from '../schemas/Bid'
 import { AuctionService } from '../services/AuctionService'
-import { toPlayerAuction } from '../converters/AuctionConverter'
-import { InventoryInput, InventoryInputSchema } from '../schemas/Item'
+import { ItemSchema } from '../schemas/Item'
+import { Leaderboard } from '../schemas/Leaderboard'
+import {
+  errorMsgSchema,
+  NewBidMsg,
+  newBidMsgSchema,
+  NewSaleMsg,
+  newSaleMsgSchema,
+  PlayerActionsType,
+  playerActionsTypeSchema,
+} from '@auction/common/messages'
+import { Player } from 'schemas/Player'
+import {
+  auctionDeletedMessage,
+  auctionEndMessage,
+  auctionMessage,
+  bidUpdateMessage,
+  errorMessage,
+  playerConnectedMessage,
+  playerDisconnectedMessage,
+  roundEndMessage,
+  saleUpdateMessage,
+} from '../domain/messages/MessageFactory'
+import { Sale, SaleSchema } from '../schemas/Sale'
 
 export class AuctionController {
   private auctionService: AuctionService
@@ -32,38 +53,46 @@ export class AuctionController {
   handlePlayerMessage = (playerId: string, message: string): void => {
     try {
       const parsedMessage = JSON.parse(message)
-      const msgType: MessageType = validateSchema(MessageTypeSchema, parsedMessage.type)
+      const msgType: PlayerActionsType = validateSchema(playerActionsTypeSchema, parsedMessage.type)
       match(msgType)
         .with('bid', () => {
-          const msg: BidMessage = validateSchema(BidMsgSchema, parsedMessage.bid)
+          const msg: NewBidMsg = validateSchema(newBidMsgSchema, parsedMessage)
           const bid: Bid = validateSchema(BidSchema, {
             playerId,
-            amount: msg.amount,
-            round: msg.round,
+            amount: msg.bid.amount,
+            round: msg.bid.round,
             timestamp: new Date().toISOString(),
           })
           this.auctionService
             .playerBid(bid)
-            .then(a => this.sendUpdatedAuction(a, 'bid'))
-            .catch(err => {
-              this.handleErrors(err, playerId)
-            })
+            .then(a => this.lobbyBroadcast(a.players, bidUpdateMessage(bid)))
+            .catch(err => this.handleErrors(err, playerId))
         })
         .with('sell', () => {
-          const sale: InventoryInput = validateSchema(InventoryInputSchema, parsedMessage.sale)
-          const itemsMap = new Map(sale.items.map(v => [v.item, v.quantity]))
-          logger.info(`[Controller] Player ${playerId} selling items: ${JSON.stringify(itemsMap.entries())}`)
+          const msg: NewSaleMsg = validateSchema(newSaleMsgSchema, parsedMessage)
+          const itemsMap = new Map(msg.sale.items.map(({ item, quantity }) => [ItemSchema.parse(item), quantity]))
+          const sale: Sale = validateSchema(SaleSchema, {
+            sellerId: playerId,
+            items: itemsMap,
+            endTimestamp: undefined,
+          })
           this.auctionService
             .playerSale(playerId, itemsMap)
-            .then(a => this.sendUpdatedAuction(a, 'sale'))
-            .catch(err => {
-              this.handleErrors(err, playerId)
-            })
+            .then(a => this.lobbyBroadcast(a.players, saleUpdateMessage(sale)))
+            .catch(err => this.handleErrors(err, playerId))
         })
         .exhaustive()
     } catch (e) {
       logger.error(`Error handling message from player ${playerId}: ${e}`)
-      this.playerChannel.sendToPlayer(playerId, JSON.stringify({ type: 'error', message: 'Invalid message format' }))
+      this.playerChannel.sendToPlayer(
+        playerId,
+        JSON.stringify(
+          validateSchema(errorMsgSchema, {
+            type: 'error',
+            message: 'Invalid message format',
+          })
+        )
+      )
     }
   }
 
@@ -71,20 +100,12 @@ export class AuctionController {
     this.auctionService
       .setPlayerState(playerId, 'connected')
       .then(auction => {
-        this.playerChannel.sendToPlayer(
-          playerId,
-          JSON.stringify({
-            type: 'auction',
-            auction: toPlayerAuction(playerId).convert(auction),
-          })
-        )
-        this.playerChannel.broadcast(
-          () =>
-            JSON.stringify({
-              type: 'playerConnected',
-              playerId,
-            }),
-          this.allLobbyPlayersExcept(playerId, auction)
+        logger.debug(`Sending auction message to player ${playerId}`)
+        this.playerChannel.sendToPlayer(playerId, JSON.stringify(auctionMessage(auction, playerId)))
+        logger.debug(`Broadcasting player connected message to auction players`)
+        this.lobbyBroadcast(
+          auction.players.filter(p => p.id !== playerId),
+          playerConnectedMessage(playerId)
         )
       })
       .catch(err => {
@@ -97,77 +118,42 @@ export class AuctionController {
     this.auctionService
       .setPlayerState(playerId, 'not-connected')
       .then(auction => {
-        this.playerChannel.broadcast(
-          id => {
-            return JSON.stringify({
-              type: 'playerDisconnected',
-              playerId,
-            })
-          },
-          this.allLobbyPlayersExcept(playerId, auction)
-        )
+        this.lobbyBroadcast(auction.players, playerDisconnectedMessage(playerId))
       })
       .catch(() => {
-        logger.info(`Player ${playerId} disconnected`)
+        logger.debug(`Player ${playerId} disconnected`)
       })
   }
 
-  private sendUpdatedAuction = (auction: Auction, type: string = 'auction'): void => {
-    logger.info(`Sending updated auction: ${JSON.stringify(auction)}`)
-    this.playerChannel.broadcast(
-      id =>
-        JSON.stringify({
-          type: type,
-          auction: toPlayerAuction(id).convert(auction),
-        }),
-      id => auction.sellerQueue.includes(id)
-    )
+  private lobbyBroadcast = (players: Player[], msg: any): void => {
+    players.forEach(player => {
+      this.playerChannel.sendToPlayer(player.id, JSON.stringify(msg))
+    })
   }
 
-  private allLobbyPlayersExcept = (playerId: string, auction: Auction): ((otherPlayerId: string) => boolean) => {
-    return (otherPlayerId: string): boolean => {
-      return auction.sellerQueue.includes(otherPlayerId) && playerId !== otherPlayerId
-    }
-  }
-  private allLobbyPlayers = (auction: Auction): ((playerId: string) => boolean) => {
-    return (playerId: string): boolean => {
-      return auction.sellerQueue.includes(playerId)
-    }
-  }
-
-  private handleAuctionEnd = (auction: Auction): void => {
-    this.playerChannel.broadcast(
-      id => JSON.stringify({ type: 'auctionEnd', auction: toPlayerAuction(id).convert(auction) }),
-      this.allLobbyPlayers(auction)
-    )
-    auction.players.forEach(player => {
+  private handleAuctionEnd = (leaderboard: Leaderboard, _: string): void => {
+    const players = [...leaderboard.leaderboard, ...leaderboard.removed]
+    players.forEach(player => {
+      this.playerChannel.sendToPlayer(player.id, JSON.stringify(auctionEndMessage(leaderboard)))
       this.playerChannel.closeConnection(player.id, true, 'Auction ended')
     })
   }
   private handleRoundEnd = (auction: Auction) => {
-    logger.info(`[Controller] sending updated auction after round end ${auction.id}`)
-    this.playerChannel.broadcast(
-      id => JSON.stringify({ type: 'roundEnd', auction: toPlayerAuction(id).convert(auction) }),
-      this.allLobbyPlayers(auction)
-    )
+    auction.players.forEach(player => {
+      this.playerChannel.sendToPlayer(player.id, JSON.stringify(roundEndMessage(auction, player.id)))
+    })
   }
 
   private handleErrors(error: Error, playerId: string): void {
-    this.playerChannel.sendToPlayer(playerId, JSON.stringify({ type: 'error', message: error.message }))
-    logger.error(`Error handling message: ${error}`)
+    this.playerChannel.sendToPlayer(playerId, JSON.stringify(errorMessage(error.message)))
+    logger.warn(`Error handling message: ${error}`)
   }
 
   private handleAuctionDeleted = (auction: Auction) => {
-    this.playerChannel.broadcast(
-      id =>
-        JSON.stringify({
-          type: 'auctionDeleted',
-          auction: toPlayerAuction(id).convert(auction),
-        }),
-      this.allLobbyPlayers(auction)
-    )
+    this.lobbyBroadcast(auction.players, auctionDeletedMessage())
+
     auction.players.forEach(player => {
-      logger.info(`[Controller] Closing connection for player ${player.id}`)
+      logger.debug(`[Controller] Closing connection for player ${player.id} after auction deletion`)
       this.playerChannel.closeConnection(player.id, true, 'Auction ended')
     })
   }

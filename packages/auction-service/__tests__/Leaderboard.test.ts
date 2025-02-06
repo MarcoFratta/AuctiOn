@@ -2,19 +2,19 @@ import { Modifiers } from '../src/domain/auctions/Modifier'
 import { Leaderboard } from '../src/schemas/Leaderboard'
 
 describe('Modifiers tests', () => {
-  describe('Modifiers.noMostItems', () => {
-    function createPlayer(id: string, position: number, items: number,
-                          money: number = 10): any {
-      return {
-        id,
-        position,
-        inventory: {
-          items: [{ quantity: items }],
-        },
-        money: money,
-      }
+  function createPlayer(id: string, position: number, items: number,
+                        money: number = 10): any {
+    return {
+      id,
+      position,
+      inventory: {
+        items: [{ item: 'square', quantity: items }],
+      },
+      money: money,
     }
+  }
 
+  describe('Modifiers.noMostItems', () => {
     it('removes a single player with the most items', () => {
       const leaderboard: Leaderboard = {
         leaderboard: [
@@ -121,17 +121,6 @@ describe('Modifiers tests', () => {
     })
   })
   describe('Modifiers.noZeroItems', () => {
-    function createPlayer(id: string, position: number, items: number, money: number): any {
-      return {
-        id,
-        position,
-        inventory: {
-          items: [{ quantity: items }],
-        },
-        money,
-      }
-    }
-
     it('removes a single player with zero items', () => {
       const leaderboard: Leaderboard = {
         leaderboard: [

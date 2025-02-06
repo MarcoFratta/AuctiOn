@@ -3,7 +3,6 @@ import { AuctionService } from '../src/services/AuctionService'
 import { WebSocketAdapter } from '../src/adapters/WebSocketAdapter'
 import { AuctionConfig } from '../src/schemas/Auction'
 import { mock, MockProxy } from 'jest-mock-extended'
-import { BidMessage } from '../src/schemas/AuctionMessages'
 import { ItemsMap } from '../src/schemas/Player'
 import { InventoryInput } from '../src/schemas/Item'
 import { AuctionServiceImpl } from '../src/services/AuctionServiceImpl'
@@ -67,7 +66,7 @@ describe('AuctionController', () => {
         round: 1,
       },
     })
-    const bid: BidMessage = { amount: 100, round: 1 }
+    const bid = { amount: 100, round: 1 }
 
     mockAuctionService.playerBid.mockResolvedValue({
       id: 'auction1',
