@@ -1,5 +1,5 @@
 import { WinStrategyFactory } from '../src/domain/auctions/WinStrategyFactory'
-import { Auction } from '../src/schemas/Auction'
+import { AuctionInfo } from '../src/schemas/Auction'
 import { Player } from '../src/schemas/Player'
 
 
@@ -13,7 +13,7 @@ describe('WinStrategyFactory', () => {
     } as Player
   }
 
-  function createAuction(players: Player[]): Auction {
+  function createAuction(players: Player[]): AuctionInfo {
     return {
       id: 'auction-1',
       maxPlayers: 4,
@@ -27,7 +27,7 @@ describe('WinStrategyFactory', () => {
       currentSale: undefined,
       currentBid: undefined,
       startTimestamp: new Date().toISOString(),
-    } as Auction
+    } as AuctionInfo
   }
 
   describe('byMoney', () => {
@@ -43,19 +43,6 @@ describe('WinStrategyFactory', () => {
       expect(leaderboard.leaderboard.map(p => p.position)).toEqual([1, 2, 3])
     })
 
-    it('maintains order for players with equal money', () => {
-      const auction = createAuction([
-        createPlayer('p1', 500, new Map([['triangle', 10], ['square', 20]])),
-        createPlayer('p2', 500, new Map([['square', 5]])),
-        createPlayer('p3', 300, new Map([['circle', 3]])),
-      ])
-
-      const strategy = WinStrategyFactory.byMoney()
-      const leaderboard = strategy.computeLeaderboard(auction)
-
-      expect(leaderboard.leaderboard.map(p => p.id)).toEqual(['p1', 'p2', 'p3']) // p1 before p2 as in input
-      expect(leaderboard.leaderboard.map(p => p.position)).toEqual([1, 2, 3])
-    })
 
     it('handles an empty auction without errors', () => {
       const auction = createAuction([])
@@ -76,6 +63,19 @@ describe('WinStrategyFactory', () => {
       expect(leaderboard.leaderboard).toHaveLength(1)
       expect(leaderboard.leaderboard[0].id).toBe('p1')
       expect(leaderboard.leaderboard[0].position).toBe(1)
+    })
+    it('handles a tie correctly with two players having the same amount of money', () => {
+      const auction = createAuction([
+        createPlayer('p1', 500, new Map([['triangle', 10], ['square', 20]])),
+        createPlayer('p2', 500, new Map([['square', 5]])),
+        createPlayer('p3', 300, new Map([['circle', 3]])),
+      ])
+
+      const strategy = WinStrategyFactory.byMoney()
+      const leaderboard = strategy.computeLeaderboard(auction)
+
+      expect(leaderboard.leaderboard.map(p => p.id)).toEqual(['p1', 'p2', 'p3']) // Order should remain the same
+      expect(leaderboard.leaderboard.map(p => p.position)).toEqual([1, 1, 3]) // p1 and p2 tied for first place
     })
   })
 
@@ -129,6 +129,19 @@ describe('WinStrategyFactory', () => {
       expect(leaderboard.leaderboard).toHaveLength(1)
       expect(leaderboard.leaderboard[0].id).toBe('p1')
       expect(leaderboard.leaderboard[0].position).toBe(1)
+    })
+    it('handles a tie correctly with two players having the same inventory weight', () => {
+      const auction = createAuction([
+        createPlayer('p1', 500, new Map([['triangle', 10], ['square', 20]])), // Weight = (10 * 2) + (20 * 1) = 60
+        createPlayer('p2', 700, new Map([['triangle', 10], ['square', 20]])), // Same weight = 60
+        createPlayer('p3', 300, new Map([['circle', 3]])), // Weight = 3 * 3 = 9
+      ])
+
+      const strategy = WinStrategyFactory.byWeight()
+      const leaderboard = strategy.computeLeaderboard(auction)
+
+      expect(leaderboard.leaderboard.map(p => p.id)).toEqual(['p1', 'p2', 'p3']) // Order should remain the same
+      expect(leaderboard.leaderboard.map(p => p.position)).toEqual([1, 1, 3]) // p1 and p2 tied for first place
     })
   })
 })
