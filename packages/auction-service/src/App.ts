@@ -3,7 +3,6 @@ import http from 'http'
 import { Kafka } from 'kafkajs'
 import logger from '@auction/common/logger'
 import { KafkaProducer } from './controllers/KafkaProducer'
-import { AuctionService } from './services/AuctionService'
 import { AuctionServiceImpl } from './services/AuctionServiceImpl'
 import { WebSocketAdapter } from './adapters/WebSocketAdapter'
 import { AuctionController } from './controllers/AuctionController'
@@ -20,7 +19,7 @@ export class App {
   public app: express.Application
   public server: http.Server
   public wsAdapter: WebSocketAdapter
-  public auctionService: AuctionService
+  public auctionService: AuctionServiceImpl
   public kafkaProducer: KafkaProducer
   public kafkaConsumer: KafkaConsumer
   public auctionController: AuctionController
@@ -47,6 +46,7 @@ export class App {
       await Promise.all([
         this.kafkaProducer.connect().then(() => logger.info('Kafka producer connected')),
         this.kafkaConsumer.connect().then(() => logger.info('Kafka consumer connected')),
+        this.auctionService.loadAuctions().then(() => logger.info('Auctions loaded')),
       ])
       this.server.listen(port, () => {
         logger.info(`Server is running on port ${port}`)

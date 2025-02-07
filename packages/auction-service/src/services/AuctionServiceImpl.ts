@@ -27,7 +27,6 @@ export class AuctionServiceImpl implements AuctionService {
     this.repo = repo
     this.modifiers = [Modifiers.noMostItems(), Modifiers.noZeroItems()]
     this.initCallbacks()
-    this.loadAuctions()
   }
 
   initCallbacks = () => {
@@ -305,14 +304,13 @@ export class AuctionServiceImpl implements AuctionService {
     }
   }
 
-  private loadAuctions = () => {
-    this.repo.getAuctions().then(auctions => {
-      auctions.forEach(auction => {
-        logger.info(`loading auction: ${auction.id}`)
-        this.auctions.set(auction.id, auction)
-        auction.players.forEach(player => {
-          this.players.set(player.id, auction.id)
-        })
+  loadAuctions = async () => {
+    const auctions = await this.repo.getAuctions()
+    auctions.forEach(auction => {
+      logger.info(`loading auction: ${auction.id}`)
+      this.auctions.set(auction.id, auction)
+      auction.players.forEach(player => {
+        this.players.set(player.id, auction.id)
       })
     })
   }

@@ -3,13 +3,13 @@ import { AuctionService } from '../services/AuctionService'
 import { validateSchema } from '@auction/common/validation'
 import logger from '@auction/common/logger'
 import {
-  lobbyCreatedEvent,
-  lobbyDeletedEvent,
+  lobbyCreatedEventSchema,
+  lobbyDeletedEventSchema,
   LobbyEventType,
   lobbyEventTypeSchema,
-  lobbyJoinedEvent,
-  lobbyLeftEvent,
-  lobbyStartedEvent,
+  lobbyJoinedEventSchema,
+  lobbyLeftEventSchema,
+  lobbyStartedEventSchema,
 } from '@auction/common/events/lobby'
 import { match } from 'ts-pattern'
 import { auctionConfigSchema } from '../schemas/Auction'
@@ -52,25 +52,25 @@ export class KafkaConsumer {
     try {
       match(type.type)
         .with('lobby-started', async () => {
-          const event = validateSchema(lobbyStartedEvent, msg)
+          const event = validateSchema(lobbyStartedEventSchema, msg)
           await this.auctionService.startAuction(event.lobbyId)
         })
         .with('lobby-joined', async () => {
-          const event = validateSchema(lobbyJoinedEvent, msg)
+          const event = validateSchema(lobbyJoinedEventSchema, msg)
           await this.auctionService.playerJoin(event.playerId, event.lobbyId)
         })
         .with('lobby-created', async () => {
-          const event = validateSchema(lobbyCreatedEvent, msg)
+          const event = validateSchema(lobbyCreatedEventSchema, msg)
           const lobby = validateSchema(auctionConfigSchema, event.lobby)
           await this.auctionService.createAuction(lobby)
           await this.auctionService.playerJoin(event.creator, event.lobby.id)
         })
         .with('lobby-left', async () => {
-          const event = validateSchema(lobbyLeftEvent, msg)
+          const event = validateSchema(lobbyLeftEventSchema, msg)
           await this.auctionService.playerLeave(event.playerId, event.lobbyId)
         })
         .with('lobby-deleted', async () => {
-          const event = validateSchema(lobbyDeletedEvent, msg)
+          const event = validateSchema(lobbyDeletedEventSchema, msg)
           await this.auctionService.removeAuction(event.lobbyId)
         })
         .otherwise(() => {
