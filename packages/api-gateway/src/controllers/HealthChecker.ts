@@ -5,7 +5,7 @@ import logger from '@auction/common/logger'
 export const healthChecker = (services: string[]): RequestHandler => {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      logger.info('Health check requested')
+      logger.debug('Health check requested')
 
       // Check health of each service
       const results = await Promise.allSettled(services.map(service => axios.head(`${service}/health`)))
@@ -24,7 +24,7 @@ export const healthChecker = (services: string[]): RequestHandler => {
 
       res.status(200).json({ status: 'healthy' })
     } catch (error) {
-      logger.error(`Failed to check health: ${error}`)
+      logger.warn(`Failed to check health: ${error}`)
       res.status(503).json({ status: 'unhealthy', error: 'Unexpected error' })
     }
   }
