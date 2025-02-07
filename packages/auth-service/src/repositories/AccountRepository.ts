@@ -1,11 +1,10 @@
-import { Account } from '../schemas/AuthSchema';
+import { Account } from '../schemas/AuthSchema'
 
 export interface AccountRepository {
-  findById(id: string): Promise<Account | null>;
+  findById(id: Account['id']): Promise<Account | null>
+  create(userData: Omit<Account, 'id'>): Promise<Account>
 
-  create(userData: Omit<Account, 'id'>): Promise<Account>;
+  update(id: Account['id'], updateData: Partial<Account>): Promise<Account | null>
 
-  update(id: string, updateData: Partial<Account>): Promise<Account | null>;
-
-  delete(id: string): Promise<boolean>;
+  delete(id: Account['id']): Promise<boolean>
 }

@@ -3,11 +3,10 @@ import { AccountRepository } from './AccountRepository'
 import { Error } from 'mongoose'
 import { Account } from '../schemas/AuthSchema'
 import { ValidationError } from '@auction/common/validation'
-import logger from '@auction/common/logger'
 
 export class MongoAccountRepo implements AccountRepository {
   // Find an account by ID
-  async findById(id: string): Promise<Account | null> {
+  async findById(id: Account['id']): Promise<Account | null> {
     const acc = (await AccountModel.findById(id).lean()) as IAccount | null
     return acc ? this.toAccount(acc) : null
   }
@@ -15,7 +14,6 @@ export class MongoAccountRepo implements AccountRepository {
   // Create a new account
   async create(userData: Omit<Account, 'id'>): Promise<Account> {
     try {
-      logger.info(`Mongo creating account`)
       const createdAccount = await AccountModel.create(userData)
       return this.toAccount(createdAccount.toObject())
     } catch (error) {
@@ -28,14 +26,14 @@ export class MongoAccountRepo implements AccountRepository {
   }
 
   // Update an account by ID
-  async update(id: string, updateData: Partial<Account>): Promise<Account | null> {
+  async update(id: Account['id'], updateData: Partial<Account>): Promise<Account | null> {
     const updatedAccount = await AccountModel.findByIdAndUpdate(id, updateData, { new: true })
     const plainObject = updatedAccount?.toObject()
     return plainObject ? this.toAccount(plainObject) : null
   }
 
   // Delete an account by ID
-  async delete(id: string): Promise<boolean> {
+  async delete(id: Account['id']): Promise<boolean> {
     const result = await AccountModel.findByIdAndDelete(id)
     return result !== null // Return true if an account was deleted
   }

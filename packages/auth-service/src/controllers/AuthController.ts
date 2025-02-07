@@ -25,7 +25,7 @@ export class AuthController {
       const refreshedToken = await this.authService.refreshToken({
         refreshToken,
       })
-      logger.info(`Token refreshed successfully ${refreshedToken}`)
+      logger.debug(`Token refreshed successfully`)
       res.cookie('refreshToken', refreshedToken.refreshToken, {
         httpOnly: true,
         secure: true,
@@ -33,7 +33,7 @@ export class AuthController {
       })
       res.status(200).json({ token: refreshedToken.accessToken })
     } catch (error) {
-      logger.error(`Error refreshing token: ${error}`)
+      logger.debug(`Error refreshing token: ${error}`)
       if (error instanceof TokenExpiredError) {
         res.status(401).json({ message: 'Login required' })
       } else {
@@ -45,8 +45,6 @@ export class AuthController {
   login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const inputData: LoginInputData = req.body
     try {
-      logger.info(`Logging in user with email: ${inputData.email}`)
-
       const user = await this.authService.login(inputData)
 
       res.cookie('refreshToken', user.refreshToken, {
@@ -55,7 +53,7 @@ export class AuthController {
         sameSite: 'strict',
       })
 
-      logger.info(`User logged in successfully with email: ${inputData.email}`)
+      logger.debug(`User ${inputData.email} logged in successfully `)
 
       res.status(200).json({
         message: 'User logged in successfully',
@@ -67,23 +65,21 @@ export class AuthController {
         },
       })
     } catch (error) {
-      logger.error(`error logging in user: ${error}`)
+      logger.debug(`error logging in user: ${error}`)
       next(error)
     }
   }
   register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const inputData: RegisterInputData = req.body
     try {
-      logger.info(`Registering user with email: ${inputData.email}`)
-
       const user = await this.authService.register(inputData)
       if (config.env == 'production') {
         this.mailService.sendRegisterMail(user.email).then(() => {
-          logger.info(`Welcome email sent to user's email`)
+          logger.debug(`Welcome email sent to user's email`)
         })
       }
 
-      logger.info(`User registered successfully with email: ${inputData.email}`)
+      logger.debug(`User ${inputData.email} registered successfully`)
       res.cookie('refreshToken', user.refreshToken, {
         httpOnly: true,
         secure: true,
@@ -110,7 +106,7 @@ export class AuthController {
         this.mailService
           .sendResetMail(email, token)
           .then(() => {
-            logger.info(`Password reset link sent to user's email`)
+            logger.debug(`Password reset link sent to user's email`)
           })
           .catch(error => {
             logger.error(`Error sending password reset email: ${error}`)
@@ -128,6 +124,7 @@ export class AuthController {
       const token: string = req.body.token
       const password: string = req.body.password
       await this.authService.resetPassword(token, password)
+      logger.debug(`Password reset successfully`)
       res.status(200).json({ message: 'Password reset successfully' })
     } catch (error) {
       next(error)
@@ -146,7 +143,7 @@ export class AuthController {
       }
 
       const decoded: User = this.authService.validateToken(tokens)
-      logger.info(`Token validated successfully ${decoded}`)
+      logger.debug(`Token validated successfully for user ${decoded.email}`)
       res.status(200).json({ user: decoded })
     } catch (error) {
       next(error)

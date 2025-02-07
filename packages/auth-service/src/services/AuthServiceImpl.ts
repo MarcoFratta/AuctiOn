@@ -27,29 +27,24 @@ export class AuthServiceImpl implements AuthService {
 
   // Register a new user
   async register(data: RegisterInputData): Promise<RegisterOutput> {
-    logger.info(`registering user: ${data.email}`)
     const userExists = await this.getUserByEmail(data.email)
     if (userExists) throw new UserAlreadyExistsError(data.email)
 
     const hashedPassword = await bcrypt.hash(data.password, 10)
-    logger.info(`creating account for user: ${data.email}`)
 
     const account = await this.accountRepo.create({ pHash: hashedPassword })
     const userInfo: User = validateSchema(userSchema, {
       ...data,
       id: account.id,
     })
-    logger.info(`created account with id : ${account.id}`)
     try {
       const newUser: User | null = await this.saveUser(userInfo)
       newUser.id = account.id
-      logger.info(`created user: ${newUser}`)
       const finalUser: User = validateSchema(userSchema, newUser)
 
       // Generate both access and refresh tokens
       const accessToken = this.generator.generateAccessToken(finalUser)
       const refreshToken = this.generator.generateRefreshToken({ id: finalUser.id })
-      logger.info(`generated access token ${accessToken} and refresh token ${refreshToken}`)
       await this.tokenRepo.saveRefreshToken(refreshToken, account.id)
 
       return { accessToken, refreshToken, ...finalUser }
@@ -64,14 +59,12 @@ export class AuthServiceImpl implements AuthService {
     const existingUser = await this.getUserByEmail(data.email)
     if (!existingUser) throw new UserNotFoundError(data.email)
     const user: User = validateSchema(userSchema, existingUser)
-    logger.info(`logging in user: ${data.email} with id ${user.id}`)
     const account = await this.accountRepo.findById(user.id)
     if (!account) {
       throw new UserNotFoundError(data.email)
     }
     const isPasswordValid = await bcrypt.compare(data.password, account.pHash)
     if (!isPasswordValid) throw new WrongPasswordError()
-    logger.info(`password is valid for user: ${data.email}`)
 
     // Generate both access and refresh tokens
     const accessToken = this.generator.generateAccessToken(user)
@@ -83,13 +76,10 @@ export class AuthServiceImpl implements AuthService {
 
   async refreshToken(token: Omit<Token, 'accessToken'>): Promise<Token> {
     try {
-      logger.info(`service refreshing token: ${token.refreshToken}`)
       const decoded = this.generator.verifyRefreshToken(token.refreshToken)
-      logger.info(`decoded token: ${JSON.stringify(decoded)}`)
       const storedToken = await this.tokenRepo.findRefreshToken(decoded.id)
 
       if (!storedToken || storedToken !== token.refreshToken) {
-        logger.info(`stored token: ${storedToken} different from given token ${token.refreshToken}`)
         throw new InvalidTokenError()
       }
       const user: User | null = await this.getUserById(decoded.id)
@@ -105,7 +95,6 @@ export class AuthServiceImpl implements AuthService {
 
       return { accessToken: newAccessToken, refreshToken: newRefreshToken }
     } catch (error) {
-      logger.error(`Error refreshing token: ${error}`)
       throw new InvalidTokenError()
     }
   }
@@ -114,22 +103,18 @@ export class AuthServiceImpl implements AuthService {
   validateToken(token: Omit<Token, 'refreshToken'>): User {
     try {
       // Decode and verify the token
-      const decoded: jwt.JwtPayload | string = this.generator.verifyAccessToken(token.accessToken)
-      logger.info(`decoded token: ${JSON.stringify(decoded)}`)
+      const decoded = this.generator.verifyAccessToken(token.accessToken)
       if (!decoded) {
         throw new InvalidTokenError()
       }
       return validateSchema(userSchema, decoded)
     } catch (error) {
-      // Handle token expiry error
       if (error instanceof jwt.TokenExpiredError) {
         throw new TokenExpiredError()
       }
-      // Handle invalid token error
       if (error instanceof jwt.JsonWebTokenError) {
         throw new InvalidTokenError()
       }
-      // Rethrow any other errors
       throw error
     }
   }
