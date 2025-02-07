@@ -12,6 +12,7 @@ export class UserController {
 
   getUsers = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
+      logger.debug(`Getting all users: ${this}`)
       const users = await this.userService.getUsers()
       res.status(200).json(users)
     } catch (error) {
@@ -27,7 +28,7 @@ export class UserController {
       next(error)
     }
   }
-  // Other methods as arrow functions
+
   getUserById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { id } = req.params
     try {
@@ -40,9 +41,9 @@ export class UserController {
 
   createUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      logger.debug(`Creating new user: ${this}`)
       const userData: User = req.body
       const newUser = await this.userService.createUser(userData)
+      logger.debug(`Creating new user: ${newUser.id}`)
       res.status(201).json(newUser)
     } catch (error) {
       next(error)
@@ -54,6 +55,7 @@ export class UserController {
     const updateData: Partial<User> = req.body
     delete updateData.id
     try {
+      logger.debug(`Updating user: ${id}`)
       const updatedUser = await this.userService.updateUser(id, updateData)
       res.status(200).json(updatedUser)
     } catch (error) {
@@ -65,6 +67,7 @@ export class UserController {
     const { id } = req.params
     try {
       await this.userService.deleteUser(id)
+      logger.debug(`Deleting user: ${id}`)
       res.status(204).send()
     } catch (error) {
       next(error)

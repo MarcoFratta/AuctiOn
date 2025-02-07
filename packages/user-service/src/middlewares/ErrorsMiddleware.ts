@@ -3,8 +3,7 @@ import { DeleteUserError, EmailAlreadyExistsError, UpdateUserError, UserNotFound
 import logger from '@auction/common/logger'
 
 export const ErrorLoggerMiddleware = (err: unknown, _req: Request, _res: Response, next: NextFunction): void => {
-  logger.error(err)
-  logger.error(typeof err)
+  logger.error(JSON.stringify(err))
   next(err)
 }
 // Error handler middleware

@@ -6,6 +6,7 @@ node_modules
 *.js
 *.cjs
 *.mjs
+*.test.ts
 coverage
 build
 package.json
