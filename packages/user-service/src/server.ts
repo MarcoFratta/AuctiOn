@@ -1,7 +1,7 @@
 import { config } from './configs/config'
 import { connectMongo } from '@auction/common/mongo'
 import { App } from './App'
-import logger from '@auction/common/dist/src/logger/Logger'
+import logger from '@auction/common/logger'
 
 const port = config.port
 const app = new App().app
