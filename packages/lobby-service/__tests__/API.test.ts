@@ -63,6 +63,7 @@ describe('Lobby Service Integration Tests with Auth Service Mock', () => {
     kafka = new Kafka({
       clientId: 'lobby-service',
       brokers: [`localhost:${kafkaContainer.getMappedPort(9093)}`],
+      logLevel: 0,
     })
   }, 120000);
 

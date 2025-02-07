@@ -6,26 +6,26 @@ export const lobbySchema = z.object({
   creatorId: playerSchema.shape.id,
 })
 
-export const lobbyCreatedEvent = z.object({
+export const lobbyCreatedEventSchema = z.object({
   type: z.literal('lobby-created'),
   lobby: auctionConfigSchema,
   creator: playerSchema.shape.id,
 })
-export const lobbyJoinedEvent = z.object({
+export const lobbyJoinedEventSchema = z.object({
   type: z.literal('lobby-joined'),
   lobbyId: lobbySchema.shape.lobbyId,
   playerId: playerSchema.shape.id,
 })
-export const lobbyLeftEvent = z.object({
+export const lobbyLeftEventSchema = z.object({
   type: z.literal('lobby-left'),
   lobbyId: lobbySchema.shape.lobbyId,
   playerId: playerSchema.shape.id,
 })
-export const lobbyStartedEvent = z.object({
+export const lobbyStartedEventSchema = z.object({
   type: z.literal('lobby-started'),
   lobbyId: lobbySchema.shape.lobbyId,
 })
-export const lobbyDeletedEvent = z.object({
+export const lobbyDeletedEventSchema = z.object({
   type: z.literal('lobby-deleted'),
   lobbyId: lobbySchema.shape.lobbyId,
 })
@@ -34,9 +34,9 @@ export const lobbyEventTypeSchema = z.object({
 })
 
 export type LobbyEventType = z.infer<typeof lobbyEventTypeSchema>
-export type LobbyCreatedEvent = z.infer<typeof lobbyCreatedEvent>
-export type LobbyJoinedEvent = z.infer<typeof lobbyJoinedEvent>
-export type LobbyLeftEvent = z.infer<typeof lobbyLeftEvent>
-export type LobbyStartedEvent = z.infer<typeof lobbyStartedEvent>
-export type LobbyDeletedEvent = z.infer<typeof lobbyDeletedEvent>
+export type LobbyCreatedEvent = z.infer<typeof lobbyCreatedEventSchema>
+export type LobbyJoinedEvent = z.infer<typeof lobbyJoinedEventSchema>
+export type LobbyLeftEvent = z.infer<typeof lobbyLeftEventSchema>
+export type LobbyStartedEvent = z.infer<typeof lobbyStartedEventSchema>
+export type LobbyDeletedEvent = z.infer<typeof lobbyDeletedEventSchema>
 export type LobbyEvent = LobbyCreatedEvent | LobbyJoinedEvent | LobbyLeftEvent | LobbyStartedEvent | LobbyDeletedEvent

@@ -2,14 +2,8 @@ import { Kafka, Producer } from 'kafkajs'
 import logger from '@auction/common/logger'
 import { LobbyService } from '../services/LobbyService'
 import { Lobby } from '../schemas/Lobby'
-import { LobbyEvent } from '../schemas/LobbyEvents'
-import {
-  toLobbyCreatedEvent,
-  toLobbyDeletedEvent,
-  toLobbyJoinedEvent,
-  toLobbyLeftEvent,
-  toLobbyStartedEvent,
-} from '../converters/EventConverter'
+import { LobbyEvent } from '@auction/common/events/lobby'
+import { lobbyCreatedEvent, lobbyDeletedEvent, lobbyJoinedEvent, lobbyLeftEvent, lobbyStartedEvent } from '../domain/events/EventFactory'
 
 export class KafkaProducer {
   private readonly service: LobbyService
@@ -64,7 +58,7 @@ export class KafkaProducer {
 
   private handleLobbyJoined = async (lobby: Lobby, playerId: string): Promise<void> => {
     try {
-      const event = toLobbyJoinedEvent(playerId).convert(lobby)
+      const event = lobbyJoinedEvent(playerId, lobby)
       await this.emitEvent('lobby-events', event)
     } catch (error) {
       logger.error(`Failed to handle lobby joined event for player ${playerId}:`, error)
@@ -73,7 +67,7 @@ export class KafkaProducer {
 
   private handleLobbyLeft = async (lobby: Lobby, playerId: string): Promise<void> => {
     try {
-      const event = toLobbyLeftEvent(playerId).convert(lobby)
+      const event = lobbyLeftEvent(playerId, lobby)
       await this.emitEvent('lobby-events', event)
     } catch (error) {
       logger.error(`Failed to handle lobby left event for player ${playerId}:`, error)
@@ -82,7 +76,7 @@ export class KafkaProducer {
 
   private handleLobbyCreated = async (lobby: Lobby): Promise<void> => {
     try {
-      const event = toLobbyCreatedEvent.convert(lobby)
+      const event = lobbyCreatedEvent(lobby)
       await this.emitEvent('lobby-events', event)
     } catch (error) {
       logger.error(`Failed to handle lobby created event for lobby ${lobby.id}:`, error)
@@ -91,7 +85,7 @@ export class KafkaProducer {
 
   private handleLobbyDeleted = async (lobby: Lobby): Promise<void> => {
     try {
-      const event = toLobbyDeletedEvent.convert(lobby)
+      const event = lobbyDeletedEvent(lobby)
       await this.emitEvent('lobby-events', event)
     } catch (error) {
       logger.error(`Failed to handle lobby deleted event for lobby ${lobby.id}:`, error)
@@ -100,7 +94,7 @@ export class KafkaProducer {
 
   private handleLobbyStarted = async (lobby: Lobby): Promise<void> => {
     try {
-      const event = toLobbyStartedEvent.convert(lobby)
+      const event = lobbyStartedEvent(lobby)
       await this.emitEvent('lobby-events', event)
     } catch (error) {
       logger.error(`Failed to handle lobby started event for lobby ${lobby.id}:`, error)

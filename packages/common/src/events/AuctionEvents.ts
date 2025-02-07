@@ -66,7 +66,16 @@ export const bidEventSchema = z
   .merge(withAuctionId)
   .merge(withPlayerId)
   .merge(withTimestamp)
-
+export const auctionEventTypeSchema = z.enum([
+  'player-connected',
+  'player-disconnected',
+  'player-status-change',
+  'end-round',
+  'end-auction',
+  'sale',
+  'bid',
+])
+export type AuctionEventType = z.infer<typeof auctionEventTypeSchema>
 export type PlayerConnectedEvent = z.infer<typeof playerConnectedEventSchema>
 export type PlayerDisconnectedEvent = z.infer<typeof playerDisconnectedEventSchema>
 export type PlayerStatusChangeEvent = z.infer<typeof PlayerStatusChangeEventSchema>

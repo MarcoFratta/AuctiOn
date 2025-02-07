@@ -34,6 +34,7 @@ describe('KafkaProducer', () => {
     const kafkaClient = new Kafka({
       brokers: [`localhost:${kafka.getMappedPort(9093)}`],
       clientId: 'test-client',
+      logLevel: 0,
     })
 
     // Set up consumer to verify produced messages

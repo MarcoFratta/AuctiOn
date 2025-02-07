@@ -37,6 +37,7 @@ describe('KafkaConsumer', () => {
     const kafkaClient = new Kafka({
       brokers: [`localhost:${kafka.getMappedPort(9093)}`],
       clientId: 'test-client',
+      logLevel: 0,
     })
 
     // Set up producer for sending test messages
@@ -87,6 +88,10 @@ describe('KafkaConsumer', () => {
         type: 'end-auction',
         auctionId: defaultLobby.id,
         timestamp: new Date().toISOString(),
+        leaderboard: {
+          leaderboard: [],
+          removed: [],
+        },
       }
 
       await sendMessage(event)
