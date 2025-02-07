@@ -20,18 +20,18 @@ export class WebSocketAdapter implements PlayerEventSource, PlayerChannel {
     this.wss.on('connection', (ws: WebSocket, req: AuthenticatedRequest) => {
       try {
         const playerId = this.getPlayerId(req) // Assuming player ID is in the URL
-        logger.info(`Player connected: ${playerId}`)
+        logger.debug(`[WSAdapter] Player connected: ${playerId}`)
         if (playerId) {
           this.clients.set(playerId, ws)
           this.notifyConnect(playerId)
 
           ws.on('message', (message: string) => {
-            logger.info(`Message from player ${playerId}: ${message}`)
+            logger.debug(`[WSAdapter] Message from player ${playerId}`)
             this.notifyMessage(playerId, message)
           })
 
           ws.on('close', () => {
-            logger.info(`Player disconnected: ${playerId}`)
+            logger.debug(`[WSAdapter] Player disconnected: ${playerId}`)
             this.clients.delete(playerId)
             this.notifyDisconnect(playerId)
           })
@@ -41,7 +41,7 @@ export class WebSocketAdapter implements PlayerEventSource, PlayerChannel {
           })
         }
       } catch (e) {
-        logger.error(`Error while connecting player: ${e}`)
+        logger.debug(`Error while connecting player: ${e}`)
         ws.close(1008, 'Authentication required')
       }
     })
@@ -60,7 +60,7 @@ export class WebSocketAdapter implements PlayerEventSource, PlayerChannel {
     if (ws) {
       const code = normal ? 1000 : 1011
       ws.close(code, reason)
-      logger.info(`Closing connection for player ${playerId} with code ${code} and reason ${reason}`)
+      logger.debug(`Closing connection for player ${playerId} with code ${code} and reason ${reason}`)
     }
   }
 

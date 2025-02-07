@@ -83,7 +83,7 @@ export class AuctionController {
         })
         .exhaustive()
     } catch (e) {
-      logger.error(`Error handling message from player ${playerId}: ${e}`)
+      logger.debug(`Error handling message from player ${playerId}: ${e}`)
       this.playerChannel.sendToPlayer(
         playerId,
         JSON.stringify(

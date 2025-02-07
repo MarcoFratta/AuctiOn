@@ -40,19 +40,16 @@ export class AuctionServiceImpl implements AuctionService {
     if (this.auctions.has(config.id)) {
       throw new Error(`Auction with id ${config.id} already exists`)
     }
-    logger.info(`creating auction: ${config.id}`)
     const newAuction: Auction = createAuctionFromConfig(config)
     this.auctions.set(newAuction.id, newAuction)
-    logger.info(`created auction: ${JSON.stringify(newAuction)}`)
     await this.repo.saveAuction(newAuction)
     return cloneDeep(newAuction)
   }
 
   async playerBid(bid: Bid): Promise<Auction> {
-    const playerId: string = bid.playerId
+    const playerId: Player['id'] = bid.playerId
     const auction: Auction = this.findPlayerAuction(playerId)
     if (!auction.currentSale) {
-      logger.error(bid)
       throw new Error(`Cannot place bid without an active sale`)
     }
     const player: Player = this.getPlayer(auction, playerId)
@@ -77,7 +74,7 @@ export class AuctionServiceImpl implements AuctionService {
     return res
   }
 
-  async playerSale(playerId: string, saleItems: ItemsMap): Promise<Auction> {
+  async playerSale(playerId: Player['id'], saleItems: ItemsMap): Promise<Auction> {
     const auction: Auction = this.findPlayerAuction(playerId)
     if (!auction.startTimestamp) {
       throw new Error(`Auction not started yet`)
@@ -103,7 +100,7 @@ export class AuctionServiceImpl implements AuctionService {
     return res
   }
 
-  async endRound(auctionId: string): Promise<Auction | Leaderboard> {
+  async endRound(auctionId: Auction['id']): Promise<Auction | Leaderboard> {
     const auction: Auction = this.findAuctionById(auctionId)
     if (!auction.startTimestamp) {
       throw new Error(`Auction not started yet`)
@@ -121,10 +118,9 @@ export class AuctionServiceImpl implements AuctionService {
         [...seller.inventory].map(([item, quantity]) => [item, quantity - (auction.currentSale?.items.get(item) ?? 0)])
       )
       auction.currentSale.endTimestamp = new Date().toISOString()
-      // TODO: save auction sale results
     }
     if (auction.currentRound == auction.maxRound) {
-      logger.info(`Reached max round: ${auction.maxRound}, ending auction: ${auctionId}`)
+      logger.debug(`Reached max round: ${auction.maxRound}, ending auction: ${auctionId}`)
       return this.endAuction(auctionId)
     }
     auction.currentBid = undefined
@@ -136,28 +132,27 @@ export class AuctionServiceImpl implements AuctionService {
     return res
   }
 
-  async setPlayerState(playerId: string, state: PlayerState): Promise<Auction> {
+  async setPlayerState(playerId: Player['id'], state: PlayerState): Promise<Auction> {
     const auction: Auction = this.findPlayerAuction(playerId)
     const player: Player = this.getPlayer(auction, playerId)
     player.status = state
     this.saveAuction(auction)
-    logger.debug(`player ${playerId} state set to ${state}`)
     return cloneDeep(auction)
   }
 
-  async endAuction(auctionId: string): Promise<Leaderboard> {
+  async endAuction(auctionId: Auction['id']): Promise<Leaderboard> {
     const auction: Auction = this.findAuctionById(auctionId)
-    logger.info(`ending auction: ${auctionId}`)
+    logger.debug(`ending auction: ${auctionId}`)
     this.auctions.delete(auction.id)
-    // TODO: save auction results
     let leaderBoard = WinStrategyFactory.byMoney().computeLeaderboard(auction)
     leaderBoard = Modifiers.modify(this.modifiers, leaderBoard)
     await this.repo.deleteAuction(auctionId)
-    this.leaderBoardCallbacks.forEach(c => c(leaderBoard, auctionId)) // change
-    return cloneDeep(leaderBoard)
+    const res = cloneDeep(leaderBoard)
+    this.leaderBoardCallbacks.forEach(c => c(res, auctionId)) // change
+    return res
   }
 
-  async playerJoin(playerId: string, auctionId: string): Promise<Auction> {
+  async playerJoin(playerId: Player['id'], auctionId: Auction['id']): Promise<Auction> {
     const auction = this.findAuctionById(auctionId)
     auction.players.push(createPlayer(playerId, auction))
     this.players.set(playerId, auctionId)
@@ -166,27 +161,15 @@ export class AuctionServiceImpl implements AuctionService {
     return cloneDeep(auction)
   }
 
-  onRoundEnd(callback: (auction: Auction) => void): void {
-    this.auctionsCallbacks.get('onRoundEnd')!.push(callback)
-  }
-
-  private getPlayer(auction: Auction, playerId: string) {
-    const player = auction.players.find(player => player.id == playerId)
-    if (!player) {
-      throw new Error(`Player with id ${playerId} not found in auction`)
-    }
-    return player
-  }
-
-  async getAuction(auctionId: string): Promise<Auction> {
+  async getAuction(auctionId: Auction['id']): Promise<Auction> {
     return cloneDeep(this.findAuctionById(auctionId))
   }
 
-  async getPlayerAuction(playerId: string): Promise<Auction> {
+  async getPlayerAuction(playerId: Player['id']): Promise<Auction> {
     return cloneDeep(this.findPlayerAuction(playerId))
   }
 
-  async playerLeave(playerId: string, auctionId: string): Promise<Auction> {
+  async playerLeave(playerId: Player['id'], auctionId: Auction['id']): Promise<Auction> {
     const auction = this.findAuctionById(auctionId)
     auction.players = auction.players.filter(player => player.id !== playerId)
     this.players.delete(playerId)
@@ -195,20 +178,12 @@ export class AuctionServiceImpl implements AuctionService {
     return cloneDeep(auction)
   }
 
-  private findAuctionById(auctionId: string): Auction {
-    const auction: Auction | undefined = this.auctions.get(auctionId)
-    if (!auction) {
-      throw new Error(`Auction with id ${auctionId} not found`)
-    }
-    return auction
+  onAuctionEnd(callback: (auction: Leaderboard, auctionId: Auction['id']) => void): void {
+    this.leaderBoardCallbacks.push(callback)
   }
 
-  private findPlayerAuction(playerId: string): Auction {
-    const playerAuctionId = this.players.get(playerId)
-    if (!playerAuctionId) {
-      throw new Error(`Player with id ${playerId} not found`)
-    }
-    return this.findAuctionById(playerAuctionId)
+  onRoundEnd(callback: (auction: Auction) => void): void {
+    this.auctionsCallbacks.get('onRoundEnd')!.push(callback)
   }
 
   private getCurrentSellerId(auction: Auction): string {
@@ -221,8 +196,12 @@ export class AuctionServiceImpl implements AuctionService {
     return [...rest, first]
   }
 
-  onAuctionEnd(callback: (auction: Leaderboard, auctionId: string) => void): void {
-    this.leaderBoardCallbacks.push(callback)
+  async removeAuction(auctionId: Auction['id']): Promise<void> {
+    const auction = this.findAuctionById(auctionId)
+    this.auctions.delete(auctionId)
+    await this.repo.deleteAuction(auctionId)
+    this.notifyAuctionUpdate(auction, 'onAuctionDeleted')
+    logger.debug(`deleted auction: ${auctionId}`)
   }
 
   onPlayerJoin(callback: (auction: string) => void): void {
@@ -245,19 +224,7 @@ export class AuctionServiceImpl implements AuctionService {
     this.auctionsCallbacks.get('onNewSale')!.push(callback)
   }
 
-  async removeAuction(auctionId: string): Promise<void> {
-    const auction = this.findAuctionById(auctionId)
-    this.auctions.delete(auctionId)
-    await this.repo.deleteAuction(auctionId)
-    this.notifyAuctionUpdate(auction, 'onAuctionDeleted')
-    logger.info(`deleted auction: ${auctionId}`)
-  }
-
-  private notifyAuctionUpdate(res: Auction, type: string) {
-    this.auctionsCallbacks.get(type)!.forEach(callback => callback(res))
-  }
-
-  async startAuction(auctionId: string): Promise<Auction> {
+  async startAuction(auctionId: Auction['id']): Promise<Auction> {
     const auction: Auction = this.findAuctionById(auctionId)
     auction.startTimestamp = new Date().toISOString()
     auction.sellerQueue = PlayOrderStrategy.sameOrder(auction.players.map(player => player.id))
@@ -265,34 +232,46 @@ export class AuctionServiceImpl implements AuctionService {
     return cloneDeep(auction)
   }
 
+  loadAuctions = async () => {
+    const auctions = await this.repo.getAuctions()
+    auctions.forEach(auction => {
+      logger.info(`Restoring auction: ${auction.id} from db`)
+      this.auctions.set(auction.id, auction)
+      auction.players.forEach(player => {
+        this.players.set(player.id, auction.id)
+      })
+    })
+  }
+
+  private notifyAuctionUpdate(res: Auction, type: string) {
+    this.auctionsCallbacks.get(type)!.forEach(callback => callback(res))
+  }
+
+  private findAuctionById(auctionId: Auction['id']): Auction {
+    const auction: Auction | undefined = this.auctions.get(auctionId)
+    if (!auction) {
+      throw new Error(`Auction with id ${auctionId} not found`)
+    }
+    return auction
+  }
+
   private notifyPlayerUpdate(id: string, type: string) {
     this.playersCallbacks.get(type)!.forEach(callback => callback(id))
+  }
+
+  private findPlayerAuction(playerId: Player['id']): Auction {
+    const playerAuctionId = this.players.get(playerId)
+    if (!playerAuctionId) {
+      throw new Error(`Player with id ${playerId} not found`)
+    }
+    return this.findAuctionById(playerAuctionId)
   }
 
   private saveAuction = (res: Auction) => {
     this.repo
       .saveAuction(res)
-      .then(() => logger.info(`saved auction: ${res.id}`))
+      .then(() => logger.debug(`saved auction: ${res.id}`))
       .catch(error => logger.error(`failed to save auction: ${res.id}`, error))
-  }
-
-  private async goToNextRound(auction: Auction, auctionId: string): Promise<Auction | Leaderboard> {
-    auction.currentRound++
-    let disconnectedCounter = 0
-    logger.info('going to next turn:')
-    logger.info(auction.players)
-    while (this.getPlayer(auction, this.getCurrentSellerId(auction)).status === 'not-connected') {
-      logger.info(`Player ${this.getCurrentSellerId(auction)} disconnected, skipping round: ${auction.currentRound}`)
-      auction.sellerQueue = this.rotateLeft(auction.sellerQueue)
-      disconnectedCounter++
-      if (disconnectedCounter == auction.players.length - 1) {
-        logger.info(`Too many players disconnected, ending auction: ${auctionId}`)
-        this.notifyAuctionUpdate(auction, 'onRoundEnd')
-        return this.endAuction(auctionId)
-      }
-    }
-    this.notifyAuctionUpdate(auction, 'onRoundEnd')
-    return cloneDeep(auction)
   }
 
   private isLeaderboard(value: any): boolean {
@@ -304,14 +283,28 @@ export class AuctionServiceImpl implements AuctionService {
     }
   }
 
-  loadAuctions = async () => {
-    const auctions = await this.repo.getAuctions()
-    auctions.forEach(auction => {
-      logger.info(`loading auction: ${auction.id}`)
-      this.auctions.set(auction.id, auction)
-      auction.players.forEach(player => {
-        this.players.set(player.id, auction.id)
-      })
-    })
+  private async goToNextRound(auction: Auction, auctionId: Auction['id']): Promise<Auction | Leaderboard> {
+    auction.currentRound++
+    let disconnectedCounter = 0
+    while (this.getPlayer(auction, this.getCurrentSellerId(auction)).status === 'not-connected') {
+      logger.debug(`Player ${this.getCurrentSellerId(auction)} disconnected, skipping round: ${auction.currentRound}`)
+      auction.sellerQueue = this.rotateLeft(auction.sellerQueue)
+      disconnectedCounter++
+      if (disconnectedCounter == auction.players.length - 1) {
+        logger.debug(`Too many players disconnected, ending auction: ${auctionId}`)
+        this.notifyAuctionUpdate(cloneDeep(auction), 'onRoundEnd')
+        return this.endAuction(auctionId)
+      }
+    }
+    this.notifyAuctionUpdate(cloneDeep(auction), 'onRoundEnd')
+    return cloneDeep(auction)
+  }
+
+  private getPlayer(auction: Auction, playerId: Player['id']) {
+    const player = auction.players.find(player => player.id == playerId)
+    if (!player) {
+      throw new Error(`Player with id ${playerId} not found in auction`)
+    }
+    return player
   }
 }

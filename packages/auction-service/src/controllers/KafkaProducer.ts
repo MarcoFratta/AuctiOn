@@ -42,9 +42,9 @@ export class KafkaProducer {
         topic,
         messages: [{ value: JSON.stringify(payload) }],
       })
-      logger.info(`Emitted event to Kafka - Topic: ${topic}, Payload: ${JSON.stringify(payload)}`)
+      logger.debug(`Emitted event to Kafka - Topic: ${topic}, Payload: ${JSON.stringify(payload)}`)
     } catch (error) {
-      logger.error(`Failed to emit Kafka event: ${error}`)
+      logger.debug(`Failed to emit Kafka event: ${error}`)
     }
   }
 
@@ -56,7 +56,8 @@ export class KafkaProducer {
         await this.emitEvent('player-events', msg)
       })
       .catch(error => {
-        logger.error(`[KafkaProducer] Failed to get auction for player ${playerId}: ${error}`)
+        logger.debug(`[KafkaProducer] Failed to get auction for player ${playerId}: ${error}, 
+        the auction might have ended`)
       })
   }
 
@@ -68,7 +69,8 @@ export class KafkaProducer {
         await this.emitEvent('player-events', msg)
       })
       .catch(error => {
-        logger.error(`[KafkaController] Failed to get auction for player ${playerId}: ${error}`)
+        logger.error(`[KafkaProducer] Failed to get auction for player ${playerId}: ${error}, 
+        the auction might have ended`)
       })
   }
 

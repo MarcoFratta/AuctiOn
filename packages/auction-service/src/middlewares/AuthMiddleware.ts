@@ -13,7 +13,7 @@ export interface AuthenticatedRequest extends Request {
 }
 
 export const authMiddleware = (req: AuthenticatedRequest): boolean => {
-  logger.info(`Authenticating request: ${JSON.stringify(req)}`)
+  logger.debug(`Authenticating request: ${JSON.stringify(req)}`)
   if (config.env == 'test') {
     logger.info('Running in test mode...')
     req.user = {
@@ -25,7 +25,6 @@ export const authMiddleware = (req: AuthenticatedRequest): boolean => {
     return true
   }
   try {
-    logger.info(`Request headers: ${JSON.stringify(req.headers)}`)
     const user = validateSchema(userSchema, JSON.parse(req.headers['x-user'] as string))
     logger.info(user)
     req.user = user

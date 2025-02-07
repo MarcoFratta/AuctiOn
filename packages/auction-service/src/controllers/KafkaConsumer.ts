@@ -48,7 +48,7 @@ export class KafkaConsumer {
   }
 
   private async handleLobbyEvent(msg: any, type: LobbyEventType): Promise<void> {
-    logger.info(`Processing lobby event: ${JSON.stringify(type)}`)
+    logger.debug(`Processing lobby event: ${JSON.stringify(type)}`)
     try {
       match(type.type)
         .with('lobby-started', async () => {
@@ -77,7 +77,7 @@ export class KafkaConsumer {
           logger.debug(`[KafkaConsumer] Unknown lobby event type: ${type}`)
         })
     } catch (e) {
-      logger.error(`[KafkaConsumer] Error handling message: ${e}`)
+      logger.warn(`[KafkaConsumer] Error handling message: ${e}`)
     }
   }
 }
