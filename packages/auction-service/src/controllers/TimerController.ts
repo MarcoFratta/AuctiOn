@@ -2,7 +2,7 @@ import { AuctionService } from '../services/AuctionService'
 import logger from '@auction/common/logger'
 import { PlayerChannel } from '../adapters/PlayerChannel'
 import { AuctionTimer } from '../domain/auctions/Timer'
-import { Auction } from '../schemas/Auction'
+import { AuctionInfo } from '../schemas/Auction'
 import { PlayerEventSource } from '../adapters/PlayerEventSource'
 import { timerStartMessage } from '../domain/messages/MessageFactory'
 
@@ -52,7 +52,7 @@ export class TimerController {
     })
   }
 
-  private sendTimeUpdate(auction: Auction) {
+  private sendTimeUpdate(auction: AuctionInfo) {
     const msg = this.createMessage(auction)
     this.playerChannel.broadcast(
       () => JSON.stringify(msg),
@@ -60,7 +60,7 @@ export class TimerController {
     )
   }
 
-  private createMessage(auction: Auction) {
+  private createMessage(auction: AuctionInfo) {
     return timerStartMessage(this.timers.get(auction.id)!.startTime!)
   }
 

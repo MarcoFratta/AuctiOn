@@ -24,14 +24,13 @@ export const AuctionSchema = z
     startTimestamp: z.string().datetime().optional(),
   })
   .merge(auctionConfigSchema)
-export const AuctionReportSchema = z.object({
+z.object({
   id: z.string(),
   leaderboard: z.array(PlayerSchema.omit({ status: true })),
   rounds: z.number(),
   startTimeStamp: z.string().datetime(),
   endTimeStamp: z.string().datetime(),
 })
-
 export const StoredAuctionSchema = AuctionSchema.merge(
   z.object({
     players: z.array(
@@ -43,7 +42,6 @@ export const StoredAuctionSchema = AuctionSchema.merge(
     ),
   })
 )
-
-export type Auction = z.infer<typeof AuctionSchema>
+export type AuctionInfo = z.infer<typeof AuctionSchema>
 export type AuctionConfig = z.infer<typeof auctionConfigSchema>
 export type StoredAuction = z.infer<typeof StoredAuctionSchema>

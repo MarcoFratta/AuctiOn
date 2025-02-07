@@ -1,18 +1,17 @@
-import { validateSchema } from '@auction/common/validation'
-import { Auction, AuctionConfig, AuctionSchema } from '../../schemas/Auction'
+import { AuctionConfig, AuctionInfo } from '../../schemas/Auction'
+import { Auction, AuctionImpl } from './Auction'
 
 export const createAuctionFromConfig = (config: AuctionConfig): Auction => {
-  const auction: Auction = {
-    id: config.id,
-    players: [],
-    maxRound: config.maxRound,
-    maxPlayers: config.maxPlayers,
-    startAmount: config.startAmount,
-    startInventory: config.startInventory,
-    bidTime: config.bidTime,
-    sellerQueue: [],
+  return new AuctionImpl({
+    ...config,
     currentRound: 1,
-    startTimestamp: undefined,
-  }
-  return validateSchema(AuctionSchema, auction)
+    players: [],
+    sellerQueue: [],
+    currentSale: undefined,
+    currentBid: undefined,
+  })
+}
+
+export const createFromInfo = (info: AuctionInfo): Auction => {
+  return new AuctionImpl(info)
 }

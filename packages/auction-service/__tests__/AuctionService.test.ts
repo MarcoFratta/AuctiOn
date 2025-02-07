@@ -1,12 +1,13 @@
 import { AuctionServiceImpl } from '../src/services/AuctionServiceImpl'
 import { AuctionService } from '../src/services/AuctionService'
-import { Auction, AuctionConfig } from '../src/schemas/Auction'
+import { AuctionConfig, AuctionInfo } from '../src/schemas/Auction'
 import { ItemsMap } from '../src/schemas/Player'
 import { Bid } from '../src/schemas/Bid'
 import { RedisAuctionRepo } from '../src/repositories/RedisAuctionRepo'
 import MockRedis from 'ioredis-mock'
 import Redis from 'ioredis'
 import { Leaderboard } from '../src/schemas/Leaderboard'
+import { Sale } from '../src/schemas/Sale'
 
 describe('AuctionService', () => {
   let service: AuctionService
@@ -31,7 +32,7 @@ describe('AuctionService', () => {
     bidTime: 30,
   }
   const joinAndConnectPlayer =
-    async (id: string, auction: string): Promise<Auction> => {
+    async (id: string, auction: string): Promise<AuctionInfo> => {
       await service.playerJoin(id, auction)
       return service.setPlayerState(id, 'connected')
     }
@@ -131,7 +132,11 @@ describe('AuctionService', () => {
     const auction = createMockAuction()
     await service.createAuction(auction)
     await joinAndConnectPlayer('player1', auction.id)
-    await expect(service.playerSale('player1', new Map([['square', 2]]))).rejects.toThrow(`Auction not started yet`)
+    const sale: Sale = {
+      sellerId: 'player1',
+      items: new Map([['square', 2]]),
+    }
+    await expect(service.playerSale(sale)).rejects.toThrow(`Auction not started yet`)
   })
   it('should throw an error if a player bids but there is not a current sale', async () => {
     const auction = createMockAuction()
@@ -148,7 +153,11 @@ describe('AuctionService', () => {
     await joinAndConnectPlayer('player1', auction.id)
     await joinAndConnectPlayer('player2', auction.id)
     await service.startAuction(auction.id)
-    await service.playerSale('player1', new Map([['square', 2]]))
+    const sale: Sale = {
+      sellerId: 'player1',
+      items: new Map([['square', 2]]),
+    }
+    await service.playerSale(sale)
     const bid: Bid = { playerId: 'player2', round: 1, amount: 50, timestamp: new Date().toISOString() }
     const updatedAuction = await service.playerBid(bid)
 
@@ -163,7 +172,11 @@ describe('AuctionService', () => {
     await joinAndConnectPlayer('player1', auction.id)
     await joinAndConnectPlayer('player2', auction.id)
     await service.startAuction(auction.id)
-    await service.playerSale('player1', new Map([['square', 2]]))
+    const sale: Sale = {
+      sellerId: 'player1',
+      items: new Map([['square', 2]]),
+    }
+    await service.playerSale(sale)
 
     const bid: Bid = { playerId: 'player2', round: 1, amount: 50, timestamp: new Date().toISOString() }
     await expect(service.playerBid(bid)).rejects.toThrow(`Player with id player2 does not have enough money to place bid`)
@@ -176,7 +189,11 @@ describe('AuctionService', () => {
     await joinAndConnectPlayer('player1', auction.id)
     await joinAndConnectPlayer('player2', auction.id)
     await service.startAuction(auction.id)
-    await service.playerSale('player1', new Map([['square', 2]]))
+    const sale: Sale = {
+      sellerId: 'player1',
+      items: new Map([['square', 2]]),
+    }
+    await service.playerSale(sale)
 
     const bid: Bid = { playerId: 'player2', round: 2, amount: 50, timestamp: new Date().toISOString() }
     await expect(service.playerBid(bid)).rejects.toThrow(`Bid round must match current round`)
@@ -190,7 +207,11 @@ describe('AuctionService', () => {
     await joinAndConnectPlayer('player2', auction.id)
     await service.startAuction(auction.id)
     const saleItems: ItemsMap = new Map([['square', 2]])
-    let updatedAuction = await service.playerSale('player1', saleItems)
+    const sale: Sale = {
+      sellerId: 'player1',
+      items: saleItems,
+    }
+    let updatedAuction = await service.playerSale(sale)
 
     expect(updatedAuction.currentSale).toEqual({
       items: saleItems,
@@ -203,7 +224,7 @@ describe('AuctionService', () => {
       amount: 50,
       timestamp: new Date().toISOString(),
     })
-    updatedAuction = (await service.endRound('auction1')) as Auction
+    updatedAuction = (await service.endRound('auction1')) as AuctionInfo
     expect(updatedAuction.players[1].money).toBe(50)
     expect(updatedAuction.players[0].money).toBe(150)
     expect(updatedAuction.players[0].inventory.get('square')).toBe(3)
@@ -218,7 +239,11 @@ describe('AuctionService', () => {
     await service.startAuction(auction.id)
 
     const saleItems: ItemsMap = new Map([['square', 2]])
-    await expect(service.playerSale('player2', saleItems)).rejects.toThrow(`Player with id player2 is not the current seller`)
+    const sale: Sale = {
+      sellerId: 'player2',
+      items: saleItems,
+    }
+    await expect(service.playerSale(sale)).rejects.toThrow(`Player with id player2 is not the current seller`)
   })
 
   it('should end the round and transfer items and money', async () => {
@@ -228,10 +253,14 @@ describe('AuctionService', () => {
     await joinAndConnectPlayer('player1', auction.id)
     await joinAndConnectPlayer('player2', auction.id)
     await service.startAuction(auction.id)
-    await service.playerSale('player1', new Map([['square', 2]]))
+    const sale: Sale = {
+      sellerId: 'player1',
+      items: new Map([['square', 2]]),
+    }
+    await service.playerSale(sale)
     await service.playerBid({ playerId: 'player2', round: 1, amount: 50, timestamp: new Date().toISOString() })
 
-    const updatedAuction = (await service.endRound('auction1')) as Auction
+    const updatedAuction = (await service.endRound('auction1')) as AuctionInfo
     const player1 = updatedAuction.players[0]
     const player2 = updatedAuction.players[1]
 
@@ -268,26 +297,30 @@ describe('AuctionService', () => {
     await service.startAuction(auction.id)
 
     // Round 1
-    await service.playerSale('player1', new Map([['square', 2]]))
+
+    await service.playerSale({ sellerId: 'player1', items: new Map([['square', 2]]) })
     const res = await service.endRound('auction1')
 
     // Round 2
-    await service.playerSale('player2', new Map([['square', 2]]))
+    await service.playerSale({ sellerId: 'player2', items: new Map([['square', 2]]) })
     await service.endRound('auction1')
 
     // Round 3
-    await service.playerSale('player3', new Map([['square', 2]]))
+    await service.playerSale({ sellerId: 'player3', items: new Map([['square', 2]]) })
     await service.endRound('auction1')
 
     // Round 4
-    await service.playerSale('player1', new Map([['square', 2]]))
+    await service.playerSale({ sellerId: 'player1', items: new Map([['square', 2]]) })
     await service.endRound('auction1')
 
     // Round 5
-    await service.playerSale('player2', new Map([['square', 2]]))
+    await service.playerSale({ sellerId: 'player2', items: new Map([['square', 2]]) })
     await service.endRound('auction1')
 
-    await expect(service.playerSale('player3', new Map([['square', 2]]))).rejects.toThrow()
+    await expect(service.playerSale({
+      sellerId: 'player3',
+      items: new Map([['square', 2]]),
+    })).rejects.toThrow()
   })
 
   it('should not bid if the player is the seller', async () => {
@@ -296,8 +329,11 @@ describe('AuctionService', () => {
     await service.createAuction(auction)
     await joinAndConnectPlayer('player1', auction.id)
     await service.startAuction(auction.id)
-
-    await service.playerSale('player1', new Map([['square', 2]]))
+    const sale: Sale = {
+      sellerId: 'player1',
+      items: new Map([['square', 2]]),
+    }
+    await service.playerSale(sale)
     await expect(
       service.playerBid({
         playerId: 'player1',
@@ -314,8 +350,11 @@ describe('AuctionService', () => {
     await joinAndConnectPlayer('player1', auction.id)
     await joinAndConnectPlayer('player2', auction.id)
     await service.startAuction(auction.id)
-
-    await service.playerSale('player1', new Map([['square', 2]]))
+    const sale: Sale = {
+      sellerId: 'player1',
+      items: new Map([['square', 2]]),
+    }
+    await service.playerSale(sale)
 
     await service.playerBid({ playerId: 'player2', round: 1, amount: 50, timestamp: new Date().toISOString() })
     await expect(
@@ -357,8 +396,11 @@ describe('AuctionService', () => {
     await joinAndConnectPlayer('player1', auction.id)
     await joinAndConnectPlayer('player2', auction.id)
     await service.startAuction(auction.id)
-
-    await service.playerSale('player1', new Map([['square', 2]]))
+    const sale: Sale = {
+      sellerId: 'player1',
+      items: new Map([['square', 2]]),
+    }
+    await service.playerSale(sale)
     await service.endRound('auction1')
     const updatedAuction = await service.getAuction('auction1')
     expect(updatedAuction.players[0].inventory.get('square')).toBe(5)
@@ -375,7 +417,6 @@ describe('AuctionService', () => {
     await service.setPlayerState('player1', 'connected')
     await service.startAuction(defaultConfig.id)
 
-    const endAuction = jest.spyOn(service, 'endAuction')
     const result: Leaderboard = (await service.endRound(defaultConfig.id)) as Leaderboard
     expect(result.removed).toEqual([
         { id: 'player1', money: 100, inventory: { items: [{ item: 'square', quantity: 2 }] } },
@@ -383,7 +424,6 @@ describe('AuctionService', () => {
         { id: 'player3', money: 100, inventory: { items: [{ item: 'square', quantity: 2 }] } },
       ],
     )
-    expect(endAuction).toHaveBeenCalled()
   })
 
   it('should skip a disconnected player when determining the next seller', async () => {
@@ -394,17 +434,19 @@ describe('AuctionService', () => {
     await service.setPlayerState('player2', 'not-connected')
     await service.startAuction(defaultConfig.id)
 
-    const endAuction = jest.spyOn(service, 'endAuction')
-    const result = (await service.endRound(defaultConfig.id)) as Auction
+    const result = (await service.endRound(defaultConfig.id)) as AuctionInfo
 
     expect(result.currentRound).toBe(2)
     expect(result.players.find(p => p.id === 'player2')?.status).toBe('not-connected')
     expect(result.players.find(p => p.id === 'player1')?.status).toBe('connected')
     expect(result.players.find(p => p.id === 'player3')?.status).toBe('connected')
     expect(result.maxRound).toBe(defaultConfig.maxRound)
-    expect(endAuction).not.toHaveBeenCalled()
 
     // Player3 should be able to make a sale since player2 is skipped
-    await service.playerSale('player3', new Map([['square', 1]]))
+    const sale: Sale = {
+      sellerId: 'player3',
+      items: new Map([['square', 1]]),
+    }
+    await service.playerSale(sale)
   })
 })

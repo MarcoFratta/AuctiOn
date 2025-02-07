@@ -1,9 +1,9 @@
-import { Auction } from '../schemas/Auction'
+import { AuctionInfo } from '../schemas/Auction'
 
 export interface AuctionRepo {
-  saveAuction(auction: Auction): Promise<void>
+  saveAuction(auction: AuctionInfo): Promise<void>
 
-  getAuctions(): Promise<Auction[]>
+  getAuctions(): Promise<AuctionInfo[]>
 
   deleteAuction(auctionId: string): Promise<void>
 }

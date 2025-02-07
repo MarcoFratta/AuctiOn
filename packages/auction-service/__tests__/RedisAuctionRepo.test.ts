@@ -1,6 +1,6 @@
 import Redis from 'ioredis'
 import { RedisAuctionRepo } from '../src/repositories/RedisAuctionRepo'
-import { Auction } from '../src/schemas/Auction'
+import { AuctionInfo } from '../src/schemas/Auction'
 import redisMock from 'ioredis-mock'
 
 describe('RedisAuctionRepo', () => {
@@ -20,7 +20,7 @@ describe('RedisAuctionRepo', () => {
 
   describe('saveAuction', () => {
     it('should save an auction to Redis', async () => {
-      const auction: Auction = {
+      const auction: AuctionInfo = {
         id: '123456789012345678901234',
         players: [],
         maxRound: 3,
@@ -48,7 +48,7 @@ describe('RedisAuctionRepo', () => {
 
   describe('getAuctions', () => {
     it('should retrieve all auctions from Redis', async () => {
-      const auction1: Auction = {
+      const auction1: AuctionInfo = {
         id: '123456789012345678901234',
         players: [],
         maxRound: 3,
@@ -67,7 +67,7 @@ describe('RedisAuctionRepo', () => {
         bidTime: 10,
       }
 
-      const auction2: Auction = {
+      const auction2: AuctionInfo = {
         id: '123456789012345678901235',
         players: [],
         maxRound: 5,

@@ -1,4 +1,4 @@
-import { Auction } from '../schemas/Auction'
+import { AuctionInfo } from '../schemas/Auction'
 import { AuctionRepo } from './AuctionRepo'
 import Redis from 'ioredis'
 import logger from '@auction/common/logger'
@@ -11,7 +11,7 @@ export class RedisAuctionRepo implements AuctionRepo {
     this.redisClient = redis
   }
 
-  async saveAuction(auction: Auction): Promise<void> {
+  async saveAuction(auction: AuctionInfo): Promise<void> {
     try {
       const key = `auction:${auction.id}`
       const storedAuction = toStoredAuction.convert(auction)
@@ -21,7 +21,7 @@ export class RedisAuctionRepo implements AuctionRepo {
     }
   }
 
-  async getAuctions(): Promise<Auction[]> {
+  async getAuctions(): Promise<AuctionInfo[]> {
     const keys = await this.redisClient.keys('auction:*')
     return await Promise.all(
       keys.map(async key => {

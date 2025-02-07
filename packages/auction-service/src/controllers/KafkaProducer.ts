@@ -2,7 +2,7 @@ import { PlayerEventSource } from '../adapters/PlayerEventSource'
 import { AuctionService } from '../services/AuctionService'
 import { Kafka, Producer } from 'kafkajs'
 import logger from '@auction/common/logger'
-import { Auction } from '../schemas/Auction'
+import { AuctionInfo } from '../schemas/Auction'
 import { AuctionEvent } from '@auction/common/events/auction'
 import { Leaderboard } from '../schemas/Leaderboard'
 import {
@@ -79,15 +79,15 @@ export class KafkaProducer {
     await this.emitEvent('auction-events', msg)
   }
 
-  private handleRoundEnd = async (auction: Auction): Promise<void> => {
+  private handleRoundEnd = async (auction: AuctionInfo): Promise<void> => {
     const msg = roundEndEvent(auction.id)
     await this.emitEvent('auction-events', msg)
   }
-  private handleNewBid = async (auction: Auction) => {
+  private handleNewBid = async (auction: AuctionInfo) => {
     const msg = bidEvent(auction)
     await this.emitEvent('auction-events', msg)
   }
-  private handleNewSale = async (auction: Auction) => {
+  private handleNewSale = async (auction: AuctionInfo) => {
     const msg = saleEvent(auction)
     await this.emitEvent('auction-events', msg)
   }

@@ -1,13 +1,13 @@
 import { TimerController } from '../src/controllers/TimerController'
 import { AuctionService } from '../src/services/AuctionService'
-import { Auction } from '../src/schemas/Auction'
+import { AuctionInfo } from '../src/schemas/Auction'
 import { mock, MockProxy } from 'jest-mock-extended'
 import { WebSocketAdapter } from '../src/adapters/WebSocketAdapter'
 
 describe('TimerController', () => {
   let timerController: TimerController
   let mockAuctionService: jest.Mocked<AuctionService>
-  let callbacks: Map<string, ((auction: Auction) => void)[]>
+  let callbacks: Map<string, ((auction: AuctionInfo) => void)[]>
   let playerCallbacks: Map<string, ((playerId: string) => void)[]>
   let mockPlayerChannel: MockProxy<WebSocketAdapter>
 
@@ -50,7 +50,7 @@ describe('TimerController', () => {
   })
 
   it('should start timer on new sale', () => {
-    const mockAuction: Auction = {
+    const mockAuction: AuctionInfo = {
       id: 'auction1',
       bidTime: 30,
       players: [],
@@ -70,7 +70,7 @@ describe('TimerController', () => {
   })
 
   it('should refresh timer on new bid', () => {
-    const mockAuction: Auction = {
+    const mockAuction: AuctionInfo = {
       id: 'auction1',
       bidTime: 30,
       players: [],
@@ -105,7 +105,7 @@ describe('TimerController', () => {
   })
 
   it('should clear timer on round end', () => {
-    const mockAuction: Auction = {
+    const mockAuction: AuctionInfo = {
       id: 'auction1',
       bidTime: 30,
       players: [],
@@ -127,7 +127,7 @@ describe('TimerController', () => {
 
   })
   it('should clear timer on auction end', () => {
-    const mockAuction: Auction = {
+    const mockAuction: AuctionInfo = {
       id: 'auction1',
       bidTime: 10,
       players: [],
@@ -150,7 +150,7 @@ describe('TimerController', () => {
     expect(mockPlayerChannel.broadcast).toHaveBeenCalledTimes(1)
   })
   it('should send time update on new player connected', () => {
-    const auction: Auction = {
+    const auction: AuctionInfo = {
       id: 'auction1',
       bidTime: 10,
       players: [],

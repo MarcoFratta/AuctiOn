@@ -32,6 +32,7 @@ describe('KafkaConsumer', () => {
     const adminClient = new Kafka({
       brokers: [`localhost:${kafka.getMappedPort(9093)}`],
       clientId: 'admin-client',
+      logLevel: 0,
     }).admin()
 
     await adminClient.connect()
@@ -45,6 +46,7 @@ describe('KafkaConsumer', () => {
     const kafkaClient = new Kafka({
       brokers: [`localhost:${kafka.getMappedPort(9093)}`],
       clientId: 'test-producer',
+      logLevel: 0,
     })
     producer = kafkaClient.producer()
     await producer.connect()

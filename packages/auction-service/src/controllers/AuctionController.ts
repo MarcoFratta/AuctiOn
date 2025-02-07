@@ -2,7 +2,6 @@ import { PlayerEventSource } from '../adapters/PlayerEventSource'
 import { PlayerChannel } from '../adapters/PlayerChannel'
 import { validateSchema } from '@auction/common/validation'
 import { match } from 'ts-pattern'
-import { Auction } from '../schemas/Auction'
 import logger from '@auction/common/logger'
 import { Bid, BidSchema } from '../schemas/Bid'
 import { AuctionService } from '../services/AuctionService'
@@ -30,6 +29,7 @@ import {
   saleUpdateMessage,
 } from '../domain/messages/MessageFactory'
 import { Sale, SaleSchema } from '../schemas/Sale'
+import { AuctionInfo } from '../schemas/Auction'
 
 export class AuctionController {
   private auctionService: AuctionService
@@ -77,7 +77,7 @@ export class AuctionController {
             endTimestamp: undefined,
           })
           this.auctionService
-            .playerSale(playerId, itemsMap)
+            .playerSale(sale)
             .then(a => this.lobbyBroadcast(a.players, saleUpdateMessage(sale)))
             .catch(err => this.handleErrors(err, playerId))
         })
@@ -138,7 +138,7 @@ export class AuctionController {
       this.playerChannel.closeConnection(player.id, true, 'Auction ended')
     })
   }
-  private handleRoundEnd = (auction: Auction) => {
+  private handleRoundEnd = (auction: AuctionInfo) => {
     auction.players.forEach(player => {
       this.playerChannel.sendToPlayer(player.id, JSON.stringify(roundEndMessage(auction, player.id)))
     })
@@ -149,7 +149,7 @@ export class AuctionController {
     logger.warn(`Error handling message: ${error}`)
   }
 
-  private handleAuctionDeleted = (auction: Auction) => {
+  private handleAuctionDeleted = (auction: AuctionInfo) => {
     this.lobbyBroadcast(auction.players, auctionDeletedMessage())
 
     auction.players.forEach(player => {

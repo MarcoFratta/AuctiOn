@@ -134,6 +134,6 @@ describe('AuctionController', () => {
 
     await controller.handlePlayerMessage(playerId, message)
 
-    expect(mockAuctionService.playerSale).toHaveBeenCalledWith(playerId, itemsMap)
+    expect(mockAuctionService.playerSale).toHaveBeenCalledWith({ sellerId: playerId, items: itemsMap })
   })
 })

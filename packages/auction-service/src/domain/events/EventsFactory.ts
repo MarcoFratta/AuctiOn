@@ -1,5 +1,5 @@
 import { validateSchema } from '@auction/common/validation'
-import { Auction } from '../../schemas/Auction'
+import { AuctionInfo } from '../../schemas/Auction'
 import { Leaderboard } from '../../schemas/Leaderboard'
 import {
   BidEvent,
@@ -18,7 +18,7 @@ import {
 import { toInventory } from '../../converters/AuctionConverter'
 import { Player } from '../../schemas/Player'
 
-export const saleEvent = (auction: Auction): SaleEvent => {
+export const saleEvent = (auction: AuctionInfo): SaleEvent => {
   return validateSchema(saleEventSchema, {
     type: 'sale',
     auctionId: auction.id,
@@ -28,7 +28,7 @@ export const saleEvent = (auction: Auction): SaleEvent => {
   })
 }
 
-export const bidEvent = (auction: Auction): BidEvent => {
+export const bidEvent = (auction: AuctionInfo): BidEvent => {
   return validateSchema(bidEventSchema, {
     type: 'bid',
     auctionId: auction.id,
@@ -41,14 +41,14 @@ export const bidEvent = (auction: Auction): BidEvent => {
   })
 }
 
-export const roundEndEvent = (auctionId: Auction['id']): EndRoundEvent => {
+export const roundEndEvent = (auctionId: AuctionInfo['id']): EndRoundEvent => {
   return validateSchema(endRoundEventSchema, {
     type: 'end-round',
     auctionId: auctionId,
     timestamp: new Date().toISOString(),
   })
 }
-export const auctionEndEvent = (auctionId: Auction['id'], leaderboard: Leaderboard): EndAuctionEvent => {
+export const auctionEndEvent = (auctionId: AuctionInfo['id'], leaderboard: Leaderboard): EndAuctionEvent => {
   return validateSchema(endAuctionEventSchema, {
     type: 'end-auction',
     auctionId: auctionId,
@@ -56,7 +56,7 @@ export const auctionEndEvent = (auctionId: Auction['id'], leaderboard: Leaderboa
     timestamp: new Date().toISOString(),
   })
 }
-export const playerConnectedEvent = (auctionId: Auction['id'], playerId: string): PlayerConnectedEvent => {
+export const playerConnectedEvent = (auctionId: AuctionInfo['id'], playerId: string): PlayerConnectedEvent => {
   return validateSchema(playerConnectedEventSchema, {
     type: 'player-connected',
     auctionId: auctionId,
@@ -64,7 +64,7 @@ export const playerConnectedEvent = (auctionId: Auction['id'], playerId: string)
     timestamp: new Date().toISOString(),
   })
 }
-export const playerDisconnectedEvent = (auctionId: Auction['id'], playerId: Player['id']): PlayerDisconnectedEvent => {
+export const playerDisconnectedEvent = (auctionId: AuctionInfo['id'], playerId: Player['id']): PlayerDisconnectedEvent => {
   return validateSchema(playerDisconnectedEventSchema, {
     type: 'player-disconnected',
     auctionId: auctionId,

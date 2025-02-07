@@ -25,7 +25,7 @@ import { validateSchema } from '@auction/common/validation'
 import { Bid } from '../../schemas/Bid'
 import { Sale } from '../../schemas/Sale'
 import { saleWeight, toInventory } from '../../converters/AuctionConverter'
-import { Auction } from '../../schemas/Auction'
+import { AuctionInfo } from '../../schemas/Auction'
 import { Player } from '../../schemas/Player'
 import { Leaderboard } from '../../schemas/Leaderboard'
 import logger from '@auction/common/logger'
@@ -37,7 +37,7 @@ const toPlayerInfo = (player: Player) => {
   })
 }
 
-export const auctionMessage = (auction: Auction, playerId: string): AuctionMsg => {
+export const auctionMessage = (auction: AuctionInfo, playerId: string): AuctionMsg => {
   const player: Player = auction.players.find(p => p.id === playerId)!
   return validateSchema(auctionMsgSchema, {
     type: 'auction',
@@ -79,7 +79,7 @@ export const playerDisconnectedMessage = (playerId: string): PlayerDisconnectedM
   })
 }
 
-export const roundEndMessage = (auction: Auction, playerId: string): RoundEndMsg => {
+export const roundEndMessage = (auction: AuctionInfo, playerId: string): RoundEndMsg => {
   const player: Player = auction.players.find(p => p.id === playerId)!
   return validateSchema(roundEndMsgSchema, {
     type: 'round-end',

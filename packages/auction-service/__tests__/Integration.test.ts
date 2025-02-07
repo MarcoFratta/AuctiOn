@@ -29,6 +29,7 @@ describe('Auction System Integration Test', () => {
     const admin = new Kafka({
       brokers: [kafkaHost],
       clientId: 'test',
+      logLevel: 0,
     }).admin()
 
     for (let i = 0; i < retries; i++) {

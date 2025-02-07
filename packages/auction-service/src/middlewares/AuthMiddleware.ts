@@ -13,7 +13,6 @@ export interface AuthenticatedRequest extends Request {
 }
 
 export const authMiddleware = (req: AuthenticatedRequest): boolean => {
-  logger.debug(`Authenticating request: ${JSON.stringify(req)}`)
   if (config.env == 'test') {
     logger.info('Running in test mode...')
     req.user = {
