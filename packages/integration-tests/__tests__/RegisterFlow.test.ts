@@ -29,7 +29,6 @@ describe('E2E Tests', () => {
         email: 'test@example.com',
         password: 'Password123',
       })
-
     expect(res.status).toBe(200)
     expect(res.body).toHaveProperty('user')
     expect(res.body.user).toHaveProperty('token')

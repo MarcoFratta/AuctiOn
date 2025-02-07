@@ -1,6 +1,5 @@
 import { connectToServer } from './Connection'
 import { Client } from './Client'
-import logger from './Logger'
 
 
 const API_GATEWAY_URL = 'http://localhost:8080'
@@ -9,15 +8,16 @@ beforeAll(async () => {
   await connectToServer(API_GATEWAY_URL)
 })
 
-
+jest.setTimeout(90000)
 describe('Match simulation', () => {
   it('should simulate a match with 4 players', async () => {
     const creator = await c.registerUser('player1@email.com', 'Password123', 'Player 1')
     const player2 = await c.registerUser('player2@email.com', 'Password123', 'Player 2')
     const player3 = await c.registerUser('player3@email.com', 'Password123', 'Player 3')
     const player4 = await c.registerUser('player4@email.com', 'Password123', 'Player 4')
-    const bidTime = 5
+    const bidTime = 10
     const bidMs = 2 * (bidTime * 1000)
+
     // Create a lobby
     const lobby = await c.createLobby(creator.token, {
       rounds: 3,
@@ -79,42 +79,44 @@ describe('Match simulation', () => {
     // wait for the round to end
     await c.waitFor(bidMs)
 
-    logger.info(`creatorMessages: ${JSON.stringify(messages.creator[messages.creator.length - 1])}`)
-    expect(messages.creator.pop().auction.playerInfo).toEqual({
-      money: 700,
-      inventory: {
-        items: [
-          { item: 'triangle', quantity: 2 },
-          { item: 'square', quantity: 2 },
-          { item: 'circle', quantity: 4 }],
-      },
-    })
-    expect(messages.player2.pop().auction.playerInfo).toEqual({
-      money: 700,
-      inventory: {
-        items: [
-          { item: 'triangle', quantity: 2 },
-          { item: 'square', quantity: 3 },
-          { item: 'circle', quantity: 3 }],
-      },
-    })
-    expect(messages.player3.pop().auction.playerInfo).toEqual({
-      money: 400,
-      inventory: {
-        items: [
-          { item: 'triangle', quantity: 4 },
-          { item: 'square', quantity: 3 },
-          { item: 'circle', quantity: 2 }],
-      },
-    })
-    expect(messages.player4.pop().auction.playerInfo).toEqual({
-      money: 200,
-      inventory: {
-        items: [
-          { item: 'triangle', quantity: 4 },
-          { item: 'square', quantity: 4 },
-          { item: 'circle', quantity: 3 }],
-      },
+    // Check the final state
+    expect(messages.creator.pop().leaderboard).toEqual({
+      leaderboard: [
+        {
+          id: creator.id, money: 700, position: 1, inventory: {
+            items: [
+              { item: 'triangle', quantity: 2 },
+              { item: 'square', quantity: 2 },
+              { item: 'circle', quantity: 4 }],
+          },
+        },
+        {
+          id: player2.id, money: 700, position: 2, inventory: {
+            items: [
+              { item: 'triangle', quantity: 2 },
+              { item: 'square', quantity: 3 },
+              { item: 'circle', quantity: 3 }],
+          },
+        },
+        {
+          id: player3.id, money: 400, position: 3, inventory: {
+            items: [
+              { item: 'triangle', quantity: 4 },
+              { item: 'square', quantity: 3 },
+              { item: 'circle', quantity: 2 }],
+          },
+        },
+      ],
+      removed: [
+        {
+          id: player4.id, money: 200, inventory: {
+            items: [
+              { item: 'triangle', quantity: 4 },
+              { item: 'square', quantity: 4 },
+              { item: 'circle', quantity: 3 }],
+          },
+        },
+      ],
     })
   })
 })

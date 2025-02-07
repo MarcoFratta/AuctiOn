@@ -1,5 +1,5 @@
 import request from 'supertest'
-import logger from './Logger'
+import logger from '@auction/common/logger'
 import WebSocket from 'ws'
 
 export class Client {
@@ -11,26 +11,26 @@ export class Client {
       password,
       name,
     })
-
+    if (res.status !== 201) {
+      logger.info(`Failed to register user: ${JSON.stringify(res)}`)
+      throw new Error('Failed to register user')
+    }
     return res.body.user
   }
 
   async createLobby(creatorToken: string, options: any) {
     const res = await request(this.url).post('/lobbies/create').set('Authorization', `Bearer ${creatorToken}`).send(options)
-    logger.info(`Lobby created: ${JSON.stringify(res)}`)
     return res.body.lobby
   }
 
   async joinLobby(token: string, lobbyId: string) {
     const res = await request(this.url).post(`/lobbies/${lobbyId}/join`).set('Authorization', `Bearer ${token}`)
-    logger.info(res.body)
     await this.waitFor(1000)
     return res.body.lobby
   }
 
   async createMatch(token: string) {
     const res = await request(this.url).post(`/lobbies/start`).set('Authorization', `Bearer ${token}`)
-
     return res.body.lobby
   }
 
@@ -55,6 +55,10 @@ export class Client {
         logger.info(`${id} connected`)
         resolve(player)
       })
+      player.on('error', err => {
+        logger.error(`[${id}] error connecting ${err}`)
+        reject(err)
+      })
       player.on('message', message => {
         const msg = JSON.parse(message.toString())
         if (msg.type) {
@@ -66,10 +70,9 @@ export class Client {
             return
           }
         }
-        logger.info(`[${id}] ${JSON.stringify(msg)})`)
+        // logger.info(`[${id}] ${JSON.stringify(msg)})`)
         messages[id].push(msg)
       })
-      player.on('error', reject)
     })
   }
 
