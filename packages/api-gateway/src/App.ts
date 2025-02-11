@@ -9,7 +9,12 @@ import { healthChecker } from './controllers/HealthChecker'
 import { config } from './configs/Config'
 
 const app = express()
-app.use(cors())
+app.use(
+  cors({
+    origin: 'http://localhost:5173', // Allow Vue frontend
+    credentials: true, // Allow cookies (needed for refresh tokens)
+  })
+)
 app.use(express.json())
 app.use(LoggingMiddleware.requestLogger)
 
