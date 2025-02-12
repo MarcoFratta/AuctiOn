@@ -10,6 +10,7 @@
     "test:api-gateway": "npm test --workspace=api-gateway",
     "test:integration-tests": "npm test --workspace=integration-tests",
     "test:common": "echo \"No tests for common package\"",
+    "test:frontend": "echo \"No tests for frontend package\"",
     "test": "npm-run-all test:*",
     "lint": "npx eslint --max-warnings=0 --fix --config eslint.config.mjs",
     "prettier": "npx prettier --write .",

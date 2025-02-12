@@ -147,8 +147,8 @@ out
 .idea
 dist
 dist/*
-
 public
 *.http
 docs/*
 /init.bash
+packages/frontend/.vscode

@@ -8,6 +8,7 @@ module.exports = {
       'lobby-service',
       'integration-tests',
       'auction-service',
+      'frontend',
       'common']],
     'type-enum': [
       2,
