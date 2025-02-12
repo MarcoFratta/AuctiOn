@@ -22,16 +22,16 @@ export class AuthController {
         res.status(401).json({ message: 'Login required' })
         return
       }
-      const refreshedToken = await this.authService.refreshToken({
+      const user = await this.authService.refreshToken({
         refreshToken,
       })
       logger.debug(`Token refreshed successfully`)
-      res.cookie('refreshToken', refreshedToken.refreshToken, {
+      res.cookie('refreshToken', user.refreshToken, {
         httpOnly: true,
         secure: true,
         sameSite: 'strict',
       })
-      res.status(200).json({ token: refreshedToken.accessToken })
+      res.status(200).json({ token: user.accessToken, user: user.user })
     } catch (error) {
       logger.debug(`Error refreshing token: ${error}`)
       if (error instanceof TokenExpiredError) {

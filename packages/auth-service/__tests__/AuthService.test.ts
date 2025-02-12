@@ -244,6 +244,7 @@ describe('AuthService', () => {
     expect(result).toEqual({
       accessToken: accessToken,
       refreshToken: 'newRefreshToken',
+      user: user,
     })
   })
 

@@ -74,7 +74,7 @@ export class AuthServiceImpl implements AuthService {
     return { accessToken, refreshToken, ...user }
   }
 
-  async refreshToken(token: Omit<Token, 'accessToken'>): Promise<Token> {
+  async refreshToken(token: Omit<Token, 'accessToken'>): Promise<Token & { user: User }> {
     try {
       const decoded = this.generator.verifyRefreshToken(token.refreshToken)
       const storedToken = await this.tokenRepo.findRefreshToken(decoded.id)
@@ -93,7 +93,7 @@ export class AuthServiceImpl implements AuthService {
       // Replace old refresh token with the new one in Redis
       await this.tokenRepo.saveRefreshToken(newRefreshToken, user.id)
 
-      return { accessToken: newAccessToken, refreshToken: newRefreshToken }
+      return { accessToken: newAccessToken, refreshToken: newRefreshToken, user: user }
     } catch (error) {
       throw new InvalidTokenError()
     }

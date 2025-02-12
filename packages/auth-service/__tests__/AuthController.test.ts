@@ -114,13 +114,20 @@ describe('AuthController', () => {
     });
     it('should refresh token', async () => {
       const token = { token: 'mocked-token' }
+      const user = {
+        id: 'test-user-id',
+        email: 'a@email.com',
+        name: 'Test User',
+      }
       const newToken = {
         accessToken: 'new-accessToken',
         refreshToken: 'new-refreshToken',
+        user: user,
       }
       req.cookies = []
       req.cookies['refreshToken'] = 'refresh-token'
       req.body = token
+
       authService.refreshToken.mockResolvedValue(newToken)
       await authController.refreshToken(req as Request, res as Response, next)
 
@@ -130,6 +137,7 @@ describe('AuthController', () => {
       expect(res.status).toHaveBeenCalledWith(200)
       expect(res.json).toHaveBeenCalledWith({
         token: newToken.accessToken,
+        user: user,
       })
       expect(res.cookie).toHaveBeenCalled()
     })
