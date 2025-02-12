@@ -1,6 +1,6 @@
-import { Auction } from '../../schemas/Auction'
 import { Leaderboard } from '../../schemas/Leaderboard'
+import { AuctionInfo } from '../../schemas/Auction'
 
 export interface WinStrategy {
-  computeLeaderboard: (auction: Auction) => Leaderboard
+  computeLeaderboard: (auction: AuctionInfo) => Leaderboard
 }
