@@ -3,15 +3,70 @@ import { computed, ref } from 'vue'
 import { useAuth } from '../composables/useAuth.ts'
 import FormEntry from '../components/FormEntry.vue'
 import { useAuthStore } from '@/stores/authStore.ts'
+import { useForm } from 'vee-validate'
+import { signUpSchema } from '@/schemas/authSchema.ts'
+import { toTypedSchema } from '@vee-validate/zod'
+import router from '@/router/index.ts'
+import { useAlert } from '@/composables/useAlert.ts'
+import LoadingButton from '@/components/LoadingButton.vue'
+import { InvalidData, UserAlreadyRegistered } from '@/api/Errors.ts'
 
 const { register } = useAuth()
-
-const name = ref('')
-const email = ref('')
-const password = ref('')
+const alerts = useAlert()
+const schema = toTypedSchema(signUpSchema)
+const { values, errors, defineField, validate } = useForm({
+  validationSchema: schema,
+,})
+c,onst [name, nameProps] = defineField('name', {
+  props: (state) => ({
+    error: state.errors[0],
+  }),
+,})
+const [email, emailProps] = defineField('email', {
+  props: (state) => ({
+    error: state.errors[0],
+  },),
+})
+const [password, passwordProps] = defineField('password', {
+  props: (state) => ({
+    error: state.errors[0],
+,  }),
+})
+const [repeat, repeatProps] = defineField('repeatPassword', {
+  props: (state) => ({
+    error: state.value === values.password ? undefined : 'Passwords do not match,',
+  }),
+})
 const isAuthenticated = computed(() => useAuthStore().isAuthenticated)
+const canSubmit = computed(
+  () =>
+    !(
+      isAuthenticated.value ||
+      errors.value.email ||
+      errors.value.password ||
+      errors.value.name ||
+      errors.value.repeatPassword
+    ),
+)
+const waitingResponse = ref(false)
 const handleForm = async (event: Event) => {
-  await register(name.value, email.value, password.value)
+  try {
+    await validate() // handle validation when all fields are empty and submit is clicked
+    if (!canSubmit.value) throw new InvalidData()
+    waitingResponse.value = true
+    await register(values.name!, values.email!, values.password!)
+  } catch (error) {
+    if (error instanceof UserAlreadyRegistered) {
+      await alerts.error('User already registered', 'Please sign in')
+      router.push('/login')
+    } else if (error instanceof InvalidData) {
+      await alerts.error('Invalid data', 'Please check your data')
+    } else {
+      await alerts.error('Error', 'An error occurred')
+    }
+  } finally {
+    waitingResponse.value = false
+  }
 }
 </script>
 
@@ -23,21 +78,48 @@ const handleForm = async (event: Event) => {
     <h2 class="text-2xl font-semibold text-gray-800 mb-4">Register</h2>
 
     <!-- Email Input -->
-    <FormEntry v-model="name" placeHolder="Enter your name" title="Name" />
-    <FormEntry v-model="email" placeHolder="Enter your email" title="Email" />
-    <FormEntry v-model="password" placeHolder="Enter your password" title="Password" />
-    <FormEntry placeHolder="Confirm your password" title="Confirm Password" />
+    <FormEntry
+      v-model="name"
+      autocomplete="name"
+      placeHolder="Enter your name"
+      title="Name"
+      v-bind="nameProps"
+    />
+    <FormEntry
+      v-model="email"
+      autocomplete="email"
+      placeHolder="Enter your email"
+      title="Email"
+      v-bind="emailProps"
+    />
+    <FormEntry
+      v-model="password"
+      autocomplete="new-password"
+      placeHolder="Enter your password"
+      title="Password"
+      type="password"
+      v-bind="passwordProps"
+    />
+    <FormEntry
+      v-model="repeat"
+      autocomplete="new-password"
+      placeHolder="Confirm your password"
+      title="Confirm Password"
+      type="password"
+      v-bind="repeatProps"
+    />
 
     <!-- Submit Button -->
-    <button
+    <LoadingButton
+      :disable="!canSubmit"
+      :loading="waitingResponse"
       :class="{
         'cursor-not-allowed': isAuthenticated,
       }"
-      class="w-full py-2 mt-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
-      type="submit"
+      :text="isAuthenticated ? 'Already Logged In' : 'Submit'"
+      @click="handleForm"
     >
-      {{ isAuthenticated ? 'Already Logged In' : 'Submit' }}
-    </button>
+    </LoadingButton>
 
     <p class="text-sm text-gray-600 mt-4">
       Already have an account?

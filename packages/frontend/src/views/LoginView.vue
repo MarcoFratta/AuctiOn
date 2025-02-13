@@ -1,15 +1,67 @@
 <script lang="ts" setup>
 import FormEntry from '@/components/FormEntry.vue'
 import { useAuth } from '@/composables/useAuth.ts'
-import { ref } from 'vue'
 import { useAuthStore } from '@/stores/authStore.ts'
+import { useForm } from 'vee-validate'
+import { toTypedSchema } from '@vee-validate/zod'
+import { signInSchema } from '@/schemas/authSchema.ts'
+import { computed, ref } from 'vue'
+import router from '@/router'
+import { PasswordIncorrect, TooManyRequests, UserNotFound } from '@/api/Errors.ts'
+import { useAlert } from '@/composables/useAlert.ts'
+import LoadingButton from '@/components/LoadingButton.vue'
 
 const { login } = useAuth()
-const email = ref('')
-const password = ref('')
+const schema = toTypedSchema(signInSchema)
+const { values, errors, defineField } = useForm({
+  validationSchema: schema,
+,})
+
+,const [email, emailProps] = defineField('email', {
+  props: (state) => ({
+    error: state.errors[0],
+  }),
+,})
+const [password, passwordProps] = defineField('password', {
+  props: (state) => ({
+    error: state.errors[0],
+  },),
+})
 const auth = useAuthStore()
+const alerts = useAlert()
+const waitingResponse = ref(false)
+const isAuthenticated = computed(() => auth.isAuthenticated)
+const canSubmit = computed(
+  () =>
+    !(
+      isAuthenticated.value ||
+      !values.email ||
+      !values.password ||
+      errors.value.email ||
+      errors.value.password
+    ) && !waitingResponse.value,
+)
 const handleForm = async (event: Event) => {
-  await login(email.value, password.value)
+  try {
+    console.log('canSubmit', canSubmit.value)
+    if (!canSubmit.value) throw new Error('Invalid form')
+    waitingResponse.value = true
+    await login(values.email!, values.password!)
+    router.push('/')
+  } catch (e) {
+    if (e instanceof UserNotFound) {
+      await alerts.error('Account not found', 'Please sign up')
+      router.push('/register')
+    } else if (e instanceof PasswordIncorrect) {
+      await alerts.error('Incorrect password', 'Please try again')
+    } else if (e instanceof TooManyRequests) {
+      await alerts.error('Too many requests', 'Please try again later')
+    } else {
+      await alerts.error('Error', 'An error occurred')
+    }
+  } finally {
+    waitingResponse.value = false
+  }
 }
 </script>
 
@@ -20,24 +72,30 @@ const handleForm = async (event: Event) => {
   >
     <h2 class="text-2xl font-semibold text-gray-800 mb-4">Sign in</h2>
 
-    <FormEntry v-model="email" placeHolder="Enter your email" title="Email" />
+    <FormEntry
+      v-model="email"
+      autocomplete="email"
+      placeHolder="Enter your email"
+      title="Email"
+      type="email"
+      v-bind="emailProps"
+    />
     <FormEntry
       v-model="password"
+      autocomplete="current-password"
       placeHolder="Enter your password"
       title="Password"
+      v-bind="passwordProps"
       type="password"
     />
 
     <!-- Submit Button -->
-    <button
-      :class="{
-        'cursor-not-allowed': auth.isAuthenticated,
-      }"
-      class="w-full py-2 mt-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
-      type="submit"
-    >
-      {{ auth.isAuthenticated ? 'Already Logged In' : 'Submit' }}
-    </button>
+    <LoadingButton
+      :disable="!canSubmit"
+      :loading="waitingResponse"
+      :text="auth.isAuthenticated ? 'Already Logged In' : 'Submit'"
+      @click="handleForm"
+    />
 
     <p class="text-sm text-gray-600 mt-4">
       Don't have an account?
