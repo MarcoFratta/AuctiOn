@@ -23,7 +23,7 @@ describe('Error Use Cases', () => {
     })
 
     describe('Register Endpoint Error Cases', () => {
-        it('should return 400 when the user already exists', async () => {
+      it('should return 409 when the user already exists', async () => {
           // Mock the user service to return an existing user
           (axios.get as jest.Mock).mockResolvedValueOnce({
             data: {
@@ -39,7 +39,7 @@ describe('Error Use Cases', () => {
             name: 'Test User',
           });
 
-          expect(response.status).toBe(400);
+        expect(response.status).toBe(409)
           expect(response.body).toMatchObject({
             error: 'An account with this email already exists',
             message: expect.any(String),

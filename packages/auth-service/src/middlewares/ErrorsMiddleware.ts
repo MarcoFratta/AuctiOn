@@ -25,7 +25,7 @@ export const AuthErrorMiddleware = (err: unknown, _req: Request, res: Response, 
       message: err.message,
     })
   } else if (err instanceof errors.UserAlreadyExistsError) {
-    res.status(400).json({
+    res.status(409).json({
       error: 'An account with this email already exists',
       message: err.message,
     })
