@@ -43,6 +43,11 @@ export class LobbyServiceImpl implements LobbyService {
     return lobby
   }
 
+  async getLobby(id: string): Promise<Lobby> {
+    const res = await this.lobbyRepository.findById(id)
+    return this.checkLobbyExists(res, id)
+  }
+
   async deleteLobby(id: string): Promise<boolean> {
     const lobby: Lobby = await this.lobbyRepository.delete(id)
     await this.userLobbyRepo.removeLobbyUsers(id)

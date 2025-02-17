@@ -537,6 +537,31 @@ describe('LobbyService', () => {
             mockLobbyRepo.findById.mockResolvedValue(lobby)
             await expect(lobbyService.terminateMatch(lobbyId)).rejects.toThrow('Match is not in progress')
         })
+        it('should get an existing lobby', () => {
+            const lobbyId = 'lobbyId'
+            const lobby: Lobby = {
+                id: lobbyId,
+                creator: 'creatorId',
+                players: [
+                    { userId: 'creatorId', status: 'waiting' },
+                    { userId: 'player2', status: 'waiting' },
+                ],
+                maxPlayers: 4,
+                rounds: 3,
+                status: 'waiting',
+                startAmount: 1000,
+                startInventory: {
+                    items: [{
+                        item: 'triangle',
+                        quantity: 1,
+                    }],
+                },
+                bidTime: 30,
+            }
+            mockLobbyRepo.findById.mockResolvedValue(lobby)
+            expect(lobbyService.getLobby(lobbyId)).resolves.toEqual(lobby)
+        })
     })
+
 
 });

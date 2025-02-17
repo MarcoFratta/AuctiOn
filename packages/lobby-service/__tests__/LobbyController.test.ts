@@ -228,6 +228,33 @@ describe('LobbyController', () => {
             });
         });
     });
+  it('should get the lobby of a user that joined', async () => {
+    const id = '123456789012345678901234'
+    const lobby: Lobby = {
+      id,
+      creator: 'creatorId',
+      players: [{ userId: 'creatorId', status: 'waiting' }],
+      maxPlayers: 10,
+      rounds: 5,
+      status: 'waiting',
+      bidTime: 10,
+      startAmount: 100,
+      startInventory: { items: [{ item: 'triangle', quantity: 1 }] },
+    }
+
+    mockRequest.activeLobbyId = id
+    mockLobbyService.getLobby.mockResolvedValue(lobby)
+    mockResponse.status.mockReturnThis()
+    mockResponse.json.mockReturnThis()
+
+    await lobbyController.getLobby(mockRequest, mockResponse, mockNext)
+
+    expect(mockLobbyService.getLobby).toHaveBeenCalledWith(id)
+    expect(mockResponse.status).toHaveBeenCalledWith(200)
+    expect(mockResponse.json).toHaveBeenCalledWith({
+      lobby,
+    })
+  })
 
     it('should throw if the user is not authenticated', () => {
         mockRequest.user = undefined

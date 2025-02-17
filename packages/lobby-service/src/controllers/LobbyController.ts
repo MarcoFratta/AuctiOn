@@ -115,4 +115,27 @@ export class LobbyController {
       next(error)
     }
   }
+  getLobby = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const lobbyId = req.activeLobbyId
+      if (!lobbyId) {
+        res.status(404).json({
+          message: 'Not found',
+        })
+        return
+      }
+      const lobby: Lobby = await this.lobbyService.getLobby(lobbyId)
+      if (lobby.status === 'in-progress') {
+        res.status(409).json({
+          message: 'Match in progress, connect to the match endpoint',
+        })
+        return
+      }
+      res.status(200).json({
+        lobby: lobby,
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
 }

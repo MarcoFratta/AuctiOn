@@ -24,5 +24,7 @@ export const createLobbyRouter = (controller: LobbyController): express.Router =
 
   router.post('/start', activeLobbyMiddleware.attachActiveLobby, controller.startMatch)
 
+  router.get('/', activeLobbyMiddleware.attachActiveLobby, controller.getLobby)
+
   return router
 }

@@ -16,5 +16,7 @@ export interface LobbyService extends LobbyEventsSource {
 
   startMatch(id: string, creator: string): Promise<Lobby>
 
+  getLobby(id: string): Promise<Lobby>
+
   terminateMatch(id: string): Promise<void>
 }
