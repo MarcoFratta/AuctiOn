@@ -8,7 +8,6 @@ import { createLobbyRouter } from './routes/LobbyRoutes'
 import { MongoLobbyRepo } from './repositories/MongoLobbyRepo'
 import { UserLobbyRepo } from './repositories/UserLobbyRepo'
 import { ErrorLoggerMiddleware, GenericErrorMiddleware, LobbyErrorMiddleware } from './middlewares/ErrorsMiddleware'
-import cors from 'cors'
 import { authMiddleware } from './middlewares/AuthMiddleware'
 import { KafkaProducer } from './controllers/KafkaProducer'
 import { Kafka } from 'kafkajs'
@@ -63,7 +62,6 @@ export class App {
 
   private setupMiddlewares(): void {
     this.app.use(express.json())
-    this.app.use(cors())
     this.app.head('/health', (req, res) => {
       logger.info('Health check requested')
       res.status(200).send('OK')
