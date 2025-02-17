@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Request } from 'express'
 import http from 'http'
 import { Kafka } from 'kafkajs'
 import logger from '@auction/common/logger'
@@ -6,8 +6,6 @@ import { KafkaProducer } from './controllers/KafkaProducer'
 import { AuctionServiceImpl } from './services/AuctionServiceImpl'
 import { WebSocketAdapter } from './adapters/WebSocketAdapter'
 import { AuctionController } from './controllers/AuctionController'
-import { AuthenticatedRequest, authMiddleware } from './middlewares/AuthMiddleware'
-import { UserNotAuthenticatedError } from './errors/Errors'
 import { Duplex } from 'stream'
 import { TimerController } from './controllers/TimerController'
 import { KafkaConsumer } from './controllers/KafkaConsumer'
@@ -69,18 +67,14 @@ export class App {
   }
 
   private setupWebSocket() {
-    this.server.on('upgrade', async (req: AuthenticatedRequest, socket: Duplex, head: Buffer) => {
+    this.server.on('upgrade', async (req: Request, socket: Duplex, head: Buffer) => {
       try {
-        const authenticated = authMiddleware(req)
-        if (!authenticated) {
-          throw new UserNotAuthenticatedError()
-        }
         this.wsAdapter.getServer().handleUpgrade(req, socket, head, ws => {
           this.wsAdapter.getServer().emit('connection', ws, req)
         })
       } catch (err) {
         logger.error('WebSocket authentication error:', err)
-        socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n')
+        socket.write('HTTP/1.1 500 Internal server error\r\n\r\n')
         socket.destroy()
       }
     })

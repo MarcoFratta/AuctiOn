@@ -7,6 +7,7 @@ import { Kafka } from 'kafkajs'
 import { AuctionConfig } from '../src/schemas/Auction'
 import redisMock from 'ioredis-mock'
 import Redis from 'ioredis'
+import { User } from '../src/schemas/User'
 
 jest.setTimeout(120 * 1000)
 describe('Auction System Integration Test', () => {
@@ -87,18 +88,19 @@ describe('Auction System Integration Test', () => {
     await redis.flushall()
   })
   const connectPlayer = (player: WebSocket,
-                         id: string, messages: Record<string, any[]>) => {
+                         user: User, messages: Record<string, any[]>) => {
     return new Promise<void>((resolve, reject) => {
       player.on('open', () => {
-        logger.info(`${id} connected`)
-        resolve()
+        logger.info(`${user.id} connected`)
+        player.send(JSON.stringify(user))
+        waitToReceiveMessage().then(() => resolve())
       })
       player.on('message', message => {
         const msg = JSON.parse(message.toString())
         if (msg.type && msg.type == 'timer-start') {
           return
         }
-        messages[id].push(msg)
+        messages[user.id].push(msg)
       })
       player.on('error', reject)
     })
@@ -129,9 +131,9 @@ describe('Auction System Integration Test', () => {
     await service.playerJoin('player1', defaultConfig.id)
     await service.playerJoin('player2', defaultConfig.id)
     await service.playerJoin('player3', defaultConfig.id)
-    const player1 = new WebSocket(`ws://localhost:${port}/player1`)
-    const player2 = new WebSocket(`ws://localhost:${port}/player2`)
-    const player3 = new WebSocket(`ws://localhost:${port}/player3`)
+    const player1 = new WebSocket(`ws://localhost:${port}`)
+    const player2 = new WebSocket(`ws://localhost:${port}`)
+    const player3 = new WebSocket(`ws://localhost:${port}`)
     await service.startAuction(defaultConfig.id)
 
     const messages: Record<string, any[]> = {
@@ -140,9 +142,9 @@ describe('Auction System Integration Test', () => {
       player3: [],
     }
     await Promise.all([
-      connectPlayer(player1, 'player1', messages),
-      connectPlayer(player2, 'player2', messages),
-      connectPlayer(player3, 'player3', messages),
+      connectPlayer(player1, { id: 'player1', name: 'player1', email: 'e@email.com' }, messages),
+      connectPlayer(player2, { id: 'player2', name: 'player2', email: 'e@email.com' }, messages),
+      connectPlayer(player3, { id: 'player3', name: 'player3', email: 'e@email.com' }, messages),
     ])
 
     // Player 1 starts a sale
@@ -199,15 +201,15 @@ describe('Auction System Integration Test', () => {
     await service.setPlayerState('player3', 'connected')
     await service.startAuction(defaultConfig.id)
 
-    const player1 = new WebSocket(`ws://localhost:${port}/player1`)
-    const player2 = new WebSocket(`ws://localhost:${port}/player2`)
-    const player3 = new WebSocket(`ws://localhost:${port}/player3`)
+    const player1 = new WebSocket(`ws://localhost:${port}`)
+    const player2 = new WebSocket(`ws://localhost:${port}`)
+    const player3 = new WebSocket(`ws://localhost:${port}`)
 
     const messages: Record<string, any[]> = { player1: [], player2: [], player3: [] }
     await Promise.all([
-      connectPlayer(player1, 'player1', messages),
-      connectPlayer(player2, 'player2', messages),
-      connectPlayer(player3, 'player3', messages),
+      connectPlayer(player1, { id: 'player1', name: 'player1', email: 'e@email.com' }, messages),
+      connectPlayer(player2, { id: 'player2', name: 'player2', email: 'e@email.com' }, messages),
+      connectPlayer(player3, { id: 'player3', name: 'player3', email: 'e@email.com' }, messages),
     ])
 
     // Player 1 starts a sale
@@ -289,15 +291,15 @@ describe('Auction System Integration Test', () => {
     await service.setPlayerState('player3', 'connected')
     await service.startAuction(config.id)
 
-    const player1 = new WebSocket(`ws://localhost:${port}/player1`)
-    const player2 = new WebSocket(`ws://localhost:${port}/player2`)
-    const player3 = new WebSocket(`ws://localhost:${port}/player3`)
+    const player1 = new WebSocket(`ws://localhost:${port}`)
+    const player2 = new WebSocket(`ws://localhost:${port}`)
+    const player3 = new WebSocket(`ws://localhost:${port}`)
 
     const messages: Record<string, any[]> = { player1: [], player2: [], player3: [] }
     await Promise.all([
-      connectPlayer(player1, 'player1', messages),
-      connectPlayer(player2, 'player2', messages),
-      connectPlayer(player3, 'player3', messages),
+      connectPlayer(player1, { id: 'player1', name: 'player1', email: 'e@email.com' }, messages),
+      connectPlayer(player2, { id: 'player2', name: 'player2', email: 'e@email.com' }, messages),
+      connectPlayer(player3, { id: 'player3', name: 'player3', email: 'e@email.com' }, messages),
     ])
 
     // Player 1 starts a sale
@@ -309,8 +311,8 @@ describe('Auction System Integration Test', () => {
     player2.close()
     await waitToReceiveMessage()
     // Player 2 reconnects and starts a sale
-    const player2Reconnect = new WebSocket(`ws://localhost:${port}/player2`)
-    await connectPlayer(player2Reconnect, 'player2', messages)
+    const player2Reconnect = new WebSocket(`ws://localhost:${port}`)
+    await connectPlayer(player2Reconnect, { id: 'player2', name: 'player2', email: 'e@email.com' }, messages)
 
     player2Reconnect.send(JSON.stringify(sale([{ item: 'triangle', quantity: 1 }])))
     player3.send(JSON.stringify(bid(50, 2)))
@@ -345,15 +347,15 @@ describe('Auction System Integration Test', () => {
     await service.playerJoin('player3', config.id)
     await service.startAuction(config.id)
 
-    const player1 = new WebSocket(`ws://localhost:${port}/player1`)
-    const player2 = new WebSocket(`ws://localhost:${port}/player2`)
-    const player3 = new WebSocket(`ws://localhost:${port}/player3`)
+    const player1 = new WebSocket(`ws://localhost:${port}`)
+    const player2 = new WebSocket(`ws://localhost:${port}`)
+    const player3 = new WebSocket(`ws://localhost:${port}`)
 
     const messages: Record<string, any[]> = { player1: [], player2: [], player3: [] }
     await Promise.all([
-      connectPlayer(player1, 'player1', messages),
-      connectPlayer(player2, 'player2', messages),
-      connectPlayer(player3, 'player3', messages),
+      connectPlayer(player1, { id: 'player1', name: 'player1', email: 'e@email.com' }, messages),
+      connectPlayer(player2, { id: 'player2', name: 'player2', email: 'e@email.com' }, messages),
+      connectPlayer(player3, { id: 'player3', name: 'player3', email: 'e@email.com' }, messages),
     ])
 
     // Player 1 starts a sale
@@ -365,8 +367,8 @@ describe('Auction System Integration Test', () => {
 
     await waitToEndRound(config.id)
     // Player 2 reconnects and starts a sale
-    const player2Reconnect = new WebSocket(`ws://localhost:${port}/player2`)
-    await connectPlayer(player2Reconnect, 'player2', messages)
+    const player2Reconnect = new WebSocket(`ws://localhost:${port}`)
+    await connectPlayer(player2Reconnect, { id: 'player2', name: 'player2', email: 'e@email.com' }, messages)
     // Player 2 cannot start a new sale now because he should be skipped
     player2Reconnect.send(JSON.stringify(sale([{ item: 'triangle', quantity: 1 }])))
     // Player 3 can start a sale

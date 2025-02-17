@@ -78,15 +78,13 @@ describe('WebSocket Server', () => {
 
   it('should send and receive messages correctly', async () => {
     const playerId = 'player1'
-    const ws = new WebSocket(`ws://localhost:${port}/player1`, {
-      headers: {
-        user: JSON.stringify({ id: playerId, email: 'test@example.com', name: 'Test Player' }),
-      },
-    })
+    const user = { id: playerId, email: 'test@example.com', name: 'Test Player' }
+    const ws = new WebSocket(`ws://localhost:${port}`)
 
     await new Promise<void>((resolve, reject) => {
       ws.on('open', () => {
         logger.info('Client connected')
+        ws.send(JSON.stringify(user))
         ws.send(JSON.stringify({ type: 'bid', bid: { amount: 100, round: 1 } }))
         resolve()
       })
@@ -142,13 +140,10 @@ describe('WebSocket Server', () => {
         expect(disconnectedPlayerId).toBe(playerId)
         resolve()
       })
-
-      const ws = new WebSocket(`ws://localhost:${port}/player1`, {
-        headers: {
-          user: JSON.stringify({ id: playerId, email: 'test@example.com', name: 'Test Player' }),
-        },
-      })
+      const user = { id: playerId, email: 'test@example.com', name: 'Test Player' }
+      const ws = new WebSocket(`ws://localhost:${port}/player1`)
       ws.on('open', () => {
+        ws.send(JSON.stringify(user))
         ws.close()
       })
       ws.on('error', reject)
