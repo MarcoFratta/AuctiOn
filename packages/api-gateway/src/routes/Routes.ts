@@ -13,7 +13,7 @@ export class Routes {
     const router = Router()
     router.use('/users', this.proxy.createProxy('users'))
     router.use('/lobbies', AuthMiddleware, this.proxy.createProxy('lobby'))
-    router.use('/auctions', AuthMiddleware, this.auctionWsPros)
+    //router.use('/auctions', AuthMiddleware, this.auctionWsPros)
     router.use('/auth', this.proxy.createProxy('auth'))
     return router
   }

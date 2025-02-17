@@ -29,7 +29,7 @@ app.use(globalLimiter)
 // 🌟 **Login-Specific Rate Limiter** (Prevents Brute Force Attacks)
 const loginLimiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minutes
-  limit: 5, // Allow max 5 requests per minutes
+  limit: 10, // Allow max 5 requests per minutes
   message: {
     error: 'Too many login attempts. Please try again later.',
   },
@@ -38,8 +38,10 @@ const loginLimiter = rateLimit({
 })
 
 // Apply login rate limit only to login and register
-app.use('/auth/login', loginLimiter)
-app.use('/auth/register', loginLimiter)
+if (config.nodeEnv === 'production') {
+  app.use('/auth/login', loginLimiter)
+  app.use('/auth/register', loginLimiter)
+}
 
 app.head(
   '/health',
