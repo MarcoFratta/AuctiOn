@@ -45,15 +45,12 @@ export class Client {
   }
 
   async connectPlayer(token: string, id: string, messages: Record<string, any[]>) {
-    const player = new WebSocket(`${this.url}/auction`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
+    const player = new WebSocket(`${this.url}/auctions`)
     return new Promise<WebSocket>((resolve, reject) => {
       player.on('open', () => {
         logger.info(`${id} connected`)
-        resolve(player)
+        player.send(token)
+        setTimeout(() => resolve(player), 100)
       })
       player.on('error', err => {
         logger.error(`[${id}] error connecting ${err}`)

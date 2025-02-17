@@ -91,7 +91,7 @@ describe('Match simulation', () => {
           },
         },
         {
-          id: player2.id, money: 700, position: 2, inventory: {
+          id: player2.id, money: 700, position: 1, inventory: {
             items: [
               { item: 'triangle', quantity: 2 },
               { item: 'square', quantity: 3 },
