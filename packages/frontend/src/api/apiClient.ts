@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { useAuthStore } from '@/stores/authStore.ts'
+import { UnauthenticatedError } from '@/api/Errors.ts'
 
 const apiClient = axios.create({
   baseURL: 'http://localhost:8080', // Replace with your API URL
@@ -16,22 +17,53 @@ apiClient.interceptors.request.use((config) => {
   return config
 })
 
-// Handle 401 errors by refreshing the token
+// Flag to track if token refresh is in progress
+let isRefreshing = false
+let refreshSubscribers: ((token: string) => void)[] = []
+
+function onRefreshed(token: string) {
+  refreshSubscribers.forEach((callback) => callback(token))
+  refreshSubscribers = [] // Clear after notifying all subscribers
+}
+
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
+    const authStore = useAuthStore()
+
     if (error.response?.status === 401) {
-      try {
-        const res = await apiClient.post('/auth/refresh')
-        const accessToken = res.data.token
-        // Retry the original request with the new token
-        error.config.headers.Authorization = `Bearer ${accessToken}`
-        return apiClient(error.config)
-      } catch (refreshError) {
-        useAuthStore().accessToken = '' // Clear the invalid token
-        window.location.href = '/login' // Redirect to login if refresh fails
+      if (!isRefreshing) {
+        isRefreshing = true
+        try {
+          console.log('Refreshing access token...')
+          const res = await apiClient.post('/auth/refresh', {}, { withCredentials: true })
+          const accessToken = res.data.token
+          console.log('Access token refreshed:', accessToken)
+          authStore.setTokens(accessToken)
+          console.log('Retrying original request...')
+
+          // Notify all queued requests
+          const r = apiClient(error.config)
+          onRefreshed(accessToken)
+          return r
+        } catch (refreshError) {
+          console.error('Failed to refresh access token:', refreshError)
+          authStore.clearTokens() // Remove invalid tokens
+          return Promise.reject(UnauthenticatedError)
+        } finally {
+          isRefreshing = false
+        }
       }
+
+      // Wait for the refresh process to complete before retrying the original request
+      return new Promise((resolve) => {
+        refreshSubscribers.push((token) => {
+          error.config.headers.Authorization = `Bearer ${token}`
+          resolve(apiClient(error.config))
+        })
+      })
     }
+
     return Promise.reject(error)
   },
 )

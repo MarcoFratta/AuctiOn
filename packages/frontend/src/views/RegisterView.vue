@@ -16,21 +16,21 @@ const alerts = useAlert()
 const schema = toTypedSchema(signUpSchema)
 const { values, errors, defineField, validate } = useForm({
   validationSchema: schema,
-,})
-c,onst [name, nameProps] = defineField('name', {
+})
+const [name, nameProps] = defineField('name', {
   props: (state) => ({
     error: state.errors[0],
   }),
-,})
+})
 const [email, emailProps] = defineField('email', {
   props: (state) => ({
     error: state.errors[0],
-  },),
+  }),
 })
 const [password, passwordProps] = defineField('password', {
   props: (state) => ({
     error: state.errors[0],
-,  }),
+  }),
 })
 const [repeat, repeatProps] = defineField('repeatPassword', {
   props: (state) => ({
@@ -42,6 +42,10 @@ const canSubmit = computed(
   () =>
     !(
       isAuthenticated.value ||
+      !values.email ||
+      !values.password ||
+      !values.name ||
+      !values.repeatPassword ||
       errors.value.email ||
       errors.value.password ||
       errors.value.name ||
@@ -61,6 +65,8 @@ const handleForm = async (event: Event) => {
       router.push('/login')
     } else if (error instanceof InvalidData) {
       await alerts.error('Invalid data', 'Please check your data')
+    } else if (error instanceof Error) {
+      await alerts.error('Error', error.message)
     } else {
       await alerts.error('Error', 'An error occurred')
     }

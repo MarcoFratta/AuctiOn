@@ -74,7 +74,7 @@ export const LobbyErrorMiddleware = (err: unknown, _req: Request, res: Response,
       message: err.message,
     })
   } else if (err instanceof UserAlreadyInLobby) {
-    res.status(400).json({
+    res.status(409).json({
       error: 'Bad request',
       message: err.message,
     })

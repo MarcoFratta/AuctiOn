@@ -7,7 +7,7 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { signInSchema } from '@/schemas/authSchema.ts'
 import { computed, ref } from 'vue'
 import router from '@/router'
-import { PasswordIncorrect, TooManyRequests, UserNotFound } from '@/api/Errors.ts'
+import { NotFound, PasswordIncorrect, TooManyRequests } from '@/api/Errors.ts'
 import { useAlert } from '@/composables/useAlert.ts'
 import LoadingButton from '@/components/LoadingButton.vue'
 
@@ -15,17 +15,17 @@ const { login } = useAuth()
 const schema = toTypedSchema(signInSchema)
 const { values, errors, defineField } = useForm({
   validationSchema: schema,
-,})
+})
 
-,const [email, emailProps] = defineField('email', {
+const [email, emailProps] = defineField('email', {
   props: (state) => ({
     error: state.errors[0],
   }),
-,})
+})
 const [password, passwordProps] = defineField('password', {
   props: (state) => ({
     error: state.errors[0],
-  },),
+  }),
 })
 const auth = useAuthStore()
 const alerts = useAlert()
@@ -49,7 +49,7 @@ const handleForm = async (event: Event) => {
     await login(values.email!, values.password!)
     router.push('/')
   } catch (e) {
-    if (e instanceof UserNotFound) {
+    if (e instanceof NotFound) {
       await alerts.error('Account not found', 'Please sign up')
       router.push('/register')
     } else if (e instanceof PasswordIncorrect) {

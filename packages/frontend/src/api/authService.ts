@@ -2,10 +2,10 @@ import apiClient from './apiClient'
 import { isAxiosError } from 'axios'
 import {
   InvalidData,
+  NotFound,
   PasswordIncorrect,
   TooManyRequests,
   UserAlreadyRegistered,
-  UserNotFound,
 } from '@/api/Errors.ts'
 
 export async function login(email: string, password: string) {
@@ -18,7 +18,7 @@ export async function login(email: string, password: string) {
         throw new PasswordIncorrect()
       }
       if (e.response?.status === 404) {
-        throw new UserNotFound(email)
+        throw new NotFound()
       }
       if (e.response?.status === 429) {
         throw new TooManyRequests()
@@ -31,6 +31,9 @@ export async function login(email: string, password: string) {
 export async function register(name: string, email: string, password: string) {
   try {
     const response = await apiClient.post('/auth/register', { name, email, password })
+    if (!(response.status === 200)) {
+      throw new Error(JSON.stringify(response))
+    }
     return response.data
   } catch (error) {
     if (isAxiosError(error)) {
@@ -41,6 +44,7 @@ export async function register(name: string, email: string, password: string) {
         throw new InvalidData()
       }
     }
+    throw error
   }
 }
 
