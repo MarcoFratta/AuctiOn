@@ -1,14 +1,15 @@
 import app from './App'
 import { config } from './configs/Config'
 import logger from '@auction/common/logger'
-import { handleWsAuth } from './middlewares/AuthMiddleware'
-import WebSocket from 'ws'
+import { createServer } from 'http'
+import { createWsServer } from './WsApp'
 
 const port = config.port
 
-const server = app.listen(port, () => {
+const server = createServer(app)
+const _ = createWsServer(server)
+
+server.listen(port, () => {
   logger.info(`API Gateway running on port ${port}`)
   logger.info(config.services)
 })
-const wss = new WebSocket.Server({ server, path: '/auctions' })
-handleWsAuth(wss)
