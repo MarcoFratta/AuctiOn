@@ -1,152 +1,120 @@
-import WebSocket, { Server } from 'ws'
-import { createServer } from 'http'
+import { Server } from 'http'
+import { Server as IoServer } from 'socket.io'
+import { io } from 'socket.io-client'
 import { WebSocketAdapter } from '../src/adapters/WebSocketAdapter'
 import logger from '@auction/common/logger'
-import { AuthenticatedRequest, authMiddleware } from '../src/middlewares/AuthMiddleware'
-import { UserNotAuthenticatedError } from '../src/errors/Errors'
-import { Duplex } from 'stream'
 
-describe('WebSocket Server', () => {
-  let server: Server
-  let httpServer: any
+describe('WebSocketAdapter (Socket.IO)', () => {
+  let httpServer: Server
   let adapter: WebSocketAdapter
+  let ioServer: IoServer
   let port: number
 
-  beforeEach(done => {
-    // Set up the HTTP server and WebSocket server before each test
-    httpServer = createServer()
-    adapter = new WebSocketAdapter({ noServer: true })
-    server = adapter.getServer()
+  function startServer(done: jest.DoneCallback) {
+    httpServer = new Server()
 
-    httpServer.on('upgrade', async (req: AuthenticatedRequest, socket: Duplex, head: Buffer<ArrayBufferLike>) => {
-      try {
-        logger.info(`Authenticating request: ${req.url}`)
-        const authenticated = authMiddleware(req)
-        if (!authenticated) {
-          throw new UserNotAuthenticatedError()
-        }
-        // If auth successful, proceed with WebSocket using existing adapter
-        adapter.getServer().handleUpgrade(req, socket, head, ws => {
-          adapter.getServer().emit('connection', ws, req)
-        })
-      } catch (err) {
-        socket.destroy()
-        logger.error('WebSocket authentication error:', err)
-        throw new Error('WebSocket authentication error')
-      }
-    })
-
-    httpServer.listen(0, () => {
+    httpServer.listen(() => {
       const address = httpServer.address()
-      if (address && typeof address === 'object') {
-        port = address.port // Save the dynamically assigned port
-        logger.info(`Test server started on port ${port}`)
+      if (typeof address !== 'string' && address) {
+        port = address.port
+        ioServer = new IoServer(httpServer)
+
+        logger.info(`Test Socket.IO server started on port ${port}`)
+        ioServer.use((socket, next) => {
+          logger.info(`New Socket.IO connection with player: ${socket.handshake.auth.token}`)
+          socket.handshake.auth.user = { id: socket.handshake.auth.token }
+          next()
+        })
+        ioServer.on('connection', (socket) => {
+          logger.info(`New Socket.IO connection with player: ${socket.handshake.auth.token}`)
+        })
+        adapter = new WebSocketAdapter(ioServer)
         done()
       } else {
         done(new Error('Failed to assign a dynamic port'))
       }
     })
-  })
+  }
 
-  afterEach(done => {
-    // Close WebSocket server and HTTP server after each test
-    server.close(() => {
+  afterAll((done) => {
+    if (httpServer) {
       httpServer.close(done)
-    })
+
+    } else {
+      done()
+    }
   })
 
-  it('should allow clients to connect', async () => {
-    const playerId = 'player1'
-    const ws = new WebSocket(`ws://localhost:${port}/player1`)
-
-    // Wait for the connection to open
-    await new Promise<void>((resolve, reject) => {
-      ws.on('open', () => {
-        logger.info('Client connected')
-        resolve()
-      })
-
-      ws.on('error', err => {
-        logger.error('WebSocket error:', err)
-        reject(err)
-      })
-    })
-    ws.close()
-    // Perform assertions after the connection is established
-    expect(server.clients.size).toBe(1)
+  beforeAll((done) => {
+    startServer(done)
+  })
+  afterEach((done) => {
+    if (ioServer) {
+      ioServer.close().then(() => startServer(done))
+    } else {
+      startServer(done)
+    }
   })
 
-  it('should send and receive messages correctly', async () => {
-    const playerId = 'player1'
-    const user = { id: playerId, email: 'test@example.com', name: 'Test Player' }
-    const ws = new WebSocket(`ws://localhost:${port}`)
-
-    await new Promise<void>((resolve, reject) => {
-      ws.on('open', () => {
-        logger.info('Client connected')
-        ws.send(JSON.stringify(user))
-        ws.send(JSON.stringify({ type: 'bid', bid: { amount: 100, round: 1 } }))
-        resolve()
-      })
-
-      ws.on('error', err => {
-        logger.error('WebSocket error:', err)
-        reject(err)
-      })
+  test('should allow clients to connect', (done) => {
+    const client = io(`http://localhost:${port}`, {
+      auth: { token: 'player1' },
     })
 
-    await new Promise<void>((resolve, reject) => {
-      adapter.onPlayerMessage((receivedPlayerId, message) => {
-        expect(receivedPlayerId).toBe(playerId)
-        expect(JSON.parse(message)).toEqual({ type: 'bid', bid: { amount: 100, round: 1 } })
-        resolve()
-      })
+    client.on('connect', () => {
+      logger.info('Client connected')
+      expect(client.connected).toBe(true)
+      client.close()
+      done()
+    })
+    client.on('error', (err) => {
+      done(err)
+    })
+  });
+
+  test('should send and receive messages correctly', (done) => {
+    const client = io(`http://localhost:${port}`, {
+      auth: { token: 'player1' },
     })
 
-    ws.close()
-  })
-
-  it('should handle player connection', async () => {
-    const playerId = 'player1'
-    adapter.onPlayerConnect((connectedPlayerId: string) => {
-      expect(connectedPlayerId).toBe(playerId)
+    client.on('connect', () => {
+      client.emit('bid', { amount: 100, round: 1 })
     })
 
-    const ws = new WebSocket(`ws://localhost:${port}/player1`, {
-      headers: {
-        user: JSON.stringify({ id: playerId, email: 'test@example.com', name: 'Test Player' }),
-      },
+    adapter.onPlayerMessage((playerId, message) => {
+      expect(playerId).toBe('player1')
+      expect(message.type).toBe('bid')
+      expect({ ...message, type: undefined }).toEqual({ amount: 100, round: 1 })
+      client.close()
+      done()
+    })
+  });
+
+  test('should handle player connection event', (done) => {
+    adapter.onPlayerConnect((playerId) => {
+      expect(playerId).toBe('player2')
+      done()
     })
 
-    await new Promise<void>((resolve, reject) => {
-      ws.on('open', () => {
-        logger.info('Player connected')
-        resolve()
-      })
+    io(`http://localhost:${port}`, {
+      auth: { token: 'player2' },
+    })
+  });
 
-      ws.on('error', err => {
-        logger.error('WebSocket error:', err)
-        reject(err)
-      })
+  test('should handle player disconnection', (done) => {
+
+
+    adapter.onPlayerDisconnect((playerId) => {
+      expect(playerId).toBe('player3')
+      done()
+    })
+    const client = io(`http://localhost:${port}`, {
+      auth: { token: 'player3' },
+      reconnection: false,
     })
 
-    ws.close()
-  })
-
-  it('should handle player disconnection', async () => {
-    const playerId = 'player1'
-    await new Promise<void>((resolve, reject) => {
-      adapter.onPlayerDisconnect((disconnectedPlayerId: string) => {
-        expect(disconnectedPlayerId).toBe(playerId)
-        resolve()
-      })
-      const user = { id: playerId, email: 'test@example.com', name: 'Test Player' }
-      const ws = new WebSocket(`ws://localhost:${port}/player1`)
-      ws.on('open', () => {
-        ws.send(JSON.stringify(user))
-        ws.close()
-      })
-      ws.on('error', reject)
+    client.on('connect', () => {
+      client.close()
     })
-  })
-})
+  });
+});

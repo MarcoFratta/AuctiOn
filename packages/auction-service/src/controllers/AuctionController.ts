@@ -8,6 +8,7 @@ import { AuctionService } from '../services/AuctionService'
 import { ItemSchema } from '../schemas/Item'
 import { Leaderboard } from '../schemas/Leaderboard'
 import {
+  AuctionMessage,
   errorMsgSchema,
   NewBidMsg,
   newBidMsgSchema,
@@ -50,13 +51,12 @@ export class AuctionController {
     this.auctionService.onPlayerLeave(this.handlePlayerLeave)
   }
 
-  handlePlayerMessage = (playerId: string, message: string): void => {
+  handlePlayerMessage = (playerId: string, message: AuctionMessage): void => {
     try {
-      const parsedMessage = JSON.parse(message)
-      const msgType: PlayerActionsType = validateSchema(playerActionsTypeSchema, parsedMessage.type)
+      const msgType: PlayerActionsType = validateSchema(playerActionsTypeSchema, message.type)
       match(msgType)
         .with('bid', () => {
-          const msg: NewBidMsg = validateSchema(newBidMsgSchema, parsedMessage)
+          const msg: NewBidMsg = validateSchema(newBidMsgSchema, message)
           const bid: Bid = validateSchema(BidSchema, {
             playerId,
             amount: msg.bid.amount,
@@ -69,7 +69,7 @@ export class AuctionController {
             .catch(err => this.handleErrors(err, playerId))
         })
         .with('sell', () => {
-          const msg: NewSaleMsg = validateSchema(newSaleMsgSchema, parsedMessage)
+          const msg: NewSaleMsg = validateSchema(newSaleMsgSchema, message)
           const itemsMap = new Map(msg.sale.items.map(({ item, quantity }) => [ItemSchema.parse(item), quantity]))
           const sale: Sale = validateSchema(SaleSchema, {
             sellerId: playerId,
@@ -86,12 +86,10 @@ export class AuctionController {
       logger.debug(`Error handling message from player ${playerId}: ${e}`)
       this.playerChannel.sendToPlayer(
         playerId,
-        JSON.stringify(
-          validateSchema(errorMsgSchema, {
-            type: 'error',
-            message: 'Invalid message format',
-          })
-        )
+        validateSchema(errorMsgSchema, {
+          type: 'error',
+          message: 'Invalid message format',
+        })
       )
     }
   }
@@ -101,7 +99,7 @@ export class AuctionController {
       .setPlayerState(playerId, 'connected')
       .then(auction => {
         logger.debug(`Sending auction message to player ${playerId}`)
-        this.playerChannel.sendToPlayer(playerId, JSON.stringify(auctionMessage(auction, playerId)))
+        this.playerChannel.sendToPlayer(playerId, auctionMessage(auction, playerId))
         logger.debug(`Broadcasting player connected message to auction players`)
         this.lobbyBroadcast(
           auction.players.filter(p => p.id !== playerId),
@@ -127,25 +125,25 @@ export class AuctionController {
 
   private lobbyBroadcast = (players: Player[], msg: any): void => {
     players.forEach(player => {
-      this.playerChannel.sendToPlayer(player.id, JSON.stringify(msg))
+      this.playerChannel.sendToPlayer(player.id, msg)
     })
   }
 
   private handleAuctionEnd = (leaderboard: Leaderboard, _: string): void => {
     const players = [...leaderboard.leaderboard, ...leaderboard.removed]
     players.forEach(player => {
-      this.playerChannel.sendToPlayer(player.id, JSON.stringify(auctionEndMessage(leaderboard)))
+      this.playerChannel.sendToPlayer(player.id, auctionEndMessage(leaderboard))
       this.playerChannel.closeConnection(player.id, true, 'Auction ended')
     })
   }
   private handleRoundEnd = (auction: AuctionInfo) => {
     auction.players.forEach(player => {
-      this.playerChannel.sendToPlayer(player.id, JSON.stringify(roundEndMessage(auction, player.id)))
+      this.playerChannel.sendToPlayer(player.id, roundEndMessage(auction, player.id))
     })
   }
 
   private handleErrors(error: Error, playerId: string): void {
-    this.playerChannel.sendToPlayer(playerId, JSON.stringify(errorMessage(error.message)))
+    this.playerChannel.sendToPlayer(playerId, errorMessage(error.message))
     logger.warn(`Error handling message: ${error}`)
   }
 

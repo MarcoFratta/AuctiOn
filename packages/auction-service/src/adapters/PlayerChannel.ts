@@ -1,7 +1,9 @@
-export interface PlayerChannel {
-  sendToPlayer(playerId: string, message: string): void
+import { AuctionMessage } from '@auction/common/messages'
 
-  broadcast(producer: (id: string) => string, predicate?: (id: string) => boolean): void
+export interface PlayerChannel {
+  sendToPlayer(playerId: string, message: AuctionMessage): void
+
+  broadcast(producer: (id: string) => AuctionMessage, predicate?: (id: string) => boolean): void
 
   closeConnection(playerId: string, normal: boolean, reason: string): void
 }

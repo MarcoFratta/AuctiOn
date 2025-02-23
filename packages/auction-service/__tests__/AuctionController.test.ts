@@ -6,6 +6,7 @@ import { mock, MockProxy } from 'jest-mock-extended'
 import { ItemsMap } from '../src/schemas/Player'
 import { InventoryInput } from '../src/schemas/Item'
 import { AuctionServiceImpl } from '../src/services/AuctionServiceImpl'
+import { NewBidMsg, NewSaleMsg } from '@auction/common/messages'
 
 describe('AuctionController', () => {
   let controller: AuctionController
@@ -59,13 +60,13 @@ describe('AuctionController', () => {
 
   test('should handle player bid message', async () => {
     const playerId = 'player1'
-    const message = JSON.stringify({
+    const message: NewBidMsg = {
       type: 'bid',
       bid: {
         amount: 100,
         round: 1,
       },
-    })
+    }
     const bid = { amount: 100, round: 1 }
 
     mockAuctionService.playerBid.mockResolvedValue({
@@ -101,12 +102,12 @@ describe('AuctionController', () => {
         { item: 'circle', quantity: 1 },
       ],
     }
-    const message = JSON.stringify({
+    const message: NewSaleMsg = {
       type: 'sell',
       sale: {
         items: saleItems.items,
       },
-    })
+    }
 
     const itemsMap: ItemsMap = new Map([
       ['square', 2],

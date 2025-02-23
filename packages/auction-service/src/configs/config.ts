@@ -6,4 +6,5 @@ export const config = {
   kafkaBrokers: (process.env.KAFKA_BROKERS ?? 'localhost:9092').split(','),
   redisUrl: process.env.REDIS_URL ?? 'redis://localhost:6379',
   redisPort: parseInt(process.env.REDIS_PORT ?? '6379'),
+  healthPort: 3006,
 }

@@ -43,7 +43,7 @@ export class TimerController {
             throw new Error(`Timer not found for auction ${auction.id}`)
           }
           if (this.timers.get(auction.id)!.isRunning) {
-            this.playerChannel.sendToPlayer(playerId, JSON.stringify(timerStartMessage(timer.startTime!)))
+            this.playerChannel.sendToPlayer(playerId, timerStartMessage(timer.startTime!))
           }
         })
         .catch(error => {
@@ -55,7 +55,7 @@ export class TimerController {
   private sendTimeUpdate(auction: AuctionInfo) {
     const msg = this.createMessage(auction)
     this.playerChannel.broadcast(
-      () => JSON.stringify(msg),
+      () => msg,
       id => auction.sellerQueue.includes(id)
     )
   }

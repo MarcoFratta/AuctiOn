@@ -1,89 +1,101 @@
-import WebSocket, { ServerOptions, WebSocketServer } from 'ws'
-import { PlayerEventSource } from './PlayerEventSource'
+import { Server, Socket } from 'socket.io'
 import logger from '@auction/common/logger'
+import { PlayerEventSource } from './PlayerEventSource'
 import { PlayerChannel } from './PlayerChannel'
-import { Request } from 'express'
+import { AuctionMessage } from '@auction/common/messages'
 
 export class WebSocketAdapter implements PlayerEventSource, PlayerChannel {
-  private readonly wss: WebSocket.Server
-  private clients: Map<string, WebSocket> = new Map()
+  private clients: Map<string, Socket> = new Map()
 
   private connectListeners: ((playerId: string) => void)[] = []
-  private messageListeners: ((playerId: string, message: string) => void)[] = []
   private disconnectListeners: ((playerId: string) => void)[] = []
+  private messageListeners: ((playerId: string, msg: AuctionMessage) => void)[] = []
 
-  constructor(config: ServerOptions) {
-    this.wss = new WebSocketServer(config)
-    logger.info('WebSocket server started')
-    this.wss.on('connection', (ws: WebSocket, req: Request) => {
+  constructor(private io: Server) {
+    logger.info('Socket.IO server started')
+
+    this.io.on('connection', socket => {
+      logger.info(`[SocketIOAdapter] New connection: ${socket.handshake.auth}`)
       try {
-        logger.info('New WebSocket connection')
-        ws.once('message', async data => {
-          logger.info(`New WebSocket connection with user:  ${JSON.stringify(data)}`)
-          const user = JSON.parse(data.toString())
-          const playerId = user.id // Assuming player ID is in the URL
-          logger.debug(`[WSAdapter] Player connected: ${playerId}`)
-          if (playerId) {
-            this.clients.set(playerId, ws)
-            this.notifyConnect(playerId)
-
-            ws.on('message', (message: string) => {
-              logger.debug(`[WSAdapter] Message from player ${playerId}`)
-              this.notifyMessage(playerId, message)
-            })
-
-            ws.on('close', () => {
-              logger.debug(`[WSAdapter] Player disconnected: ${playerId}`)
-              this.clients.delete(playerId)
-              this.notifyDisconnect(playerId)
-            })
-
-            ws.on('error', error => {
-              logger.error(`[WSAdapter] Error for player ${playerId}: ${error}`)
-            })
+        logger.info(`[SocketIOAdapter] New connection: ${socket.id}`)
+        const playerId = this.extractPlayerId(socket.handshake.auth)
+        if (!playerId) {
+          logger.warn(`Player ID not found in handshake, disconnecting`)
+          socket.disconnect(true)
+          return
+        }
+        // 🛑 If user already has a socket, disconnect the old one
+        if (this.clients.has(playerId)) {
+          const oldSocket = this.clients.get(playerId)
+          if (oldSocket) {
+            logger.info(`Disconnecting previous socket for player ${playerId}`)
+            oldSocket.disconnect(true) // Force disconnect old socket
           }
+        }
+
+        logger.info(`New Socket.IO connection with player: ${playerId}`)
+        this.clients.set(playerId, socket)
+        this.notifyConnect(playerId)
+
+        socket.onAny((event, payload) => {
+          logger.info(`[SocketIOAdapter] Event '${event}' from player ${playerId} with payload: ${JSON.stringify(payload)}`)
+          this.notifyMessage(playerId, event, payload)
+        })
+
+        socket.on('disconnect', () => {
+          logger.info(`[SocketIOAdapter] Player disconnected: ${playerId}`)
+          this.clients.delete(playerId)
+          this.notifyDisconnect(playerId)
+        })
+
+        socket.on('error', error => {
+          logger.error(`[SocketIOAdapter] Error for player ${playerId}: ${error}`)
         })
       } catch (e) {
-        logger.debug(`Error while connecting player:`)
-        ws.close(1008, 'Authentication required')
+        logger.error(`Error while handling player connection:`, e)
       }
     })
   }
 
   closeConnection(playerId: string, normal: boolean = true, reason: string = ''): void {
-    const ws = this.clients.get(playerId)
-    if (ws) {
-      const code = normal ? 1000 : 1011
-      ws.close(code, reason)
-      logger.debug(`Closing connection for player ${playerId} with code ${code} and reason ${reason}`)
+    const socket = this.clients.get(playerId)
+    if (socket) {
+      socket.disconnect(true)
+      logger.debug(`Closing connection for player ${playerId} with reason: ${reason}`)
     }
   }
 
-  sendToPlayer(playerId: string, message: string): void {
-    const ws = this.clients.get(playerId)
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(message)
+  sendToPlayer(playerId: string, msg: AuctionMessage): void {
+    const socket = this.clients.get(playerId)
+    if (socket) {
+      socket.emit(msg.type, { ...msg, type: undefined })
     }
   }
 
-  getServer(): WebSocket.Server {
-    return this.wss
-  }
-
-  broadcast(producer: (id: string) => string, predicate?: (id: string) => boolean): void {
-    this.clients.forEach((client, id) => {
-      if (predicate && predicate(id) && client.readyState === WebSocket.OPEN) {
-        client.send(producer(id))
+  broadcast(producer: (id: string) => AuctionMessage, predicate?: (id: string) => boolean): void {
+    this.clients.forEach((socket, id) => {
+      if (!predicate || predicate(id)) {
+        const msg = producer(id)
+        socket.emit(msg.type, { ...msg, type: undefined })
       }
     })
+  }
+
+  onPlayerMessage(callback: (playerId: string, message: AuctionMessage) => void): void {
+    this.messageListeners.push(callback)
   }
 
   onPlayerConnect(callback: (playerId: string) => void): void {
     this.connectListeners.push(callback)
   }
 
-  onPlayerMessage(callback: (playerId: string, message: string) => void): void {
-    this.messageListeners.push(callback)
+  private extractPlayerId(data: any): string | null {
+    try {
+      return data.user.id || null
+    } catch (e) {
+      logger.warn('Failed to extract player ID from handshake/auth')
+      return null
+    }
   }
 
   onPlayerDisconnect(callback: (playerId: string) => void): void {
@@ -94,8 +106,9 @@ export class WebSocketAdapter implements PlayerEventSource, PlayerChannel {
     this.connectListeners.forEach(callback => callback(playerId))
   }
 
-  private notifyMessage(playerId: string, message: string): void {
-    this.messageListeners.forEach(callback => callback(playerId, message))
+  private notifyMessage(playerId: string, event: string, payload: any): void {
+    const msg = { type: event, ...payload }
+    this.messageListeners.forEach(callback => callback(playerId, msg))
   }
 
   private notifyDisconnect(playerId: string): void {

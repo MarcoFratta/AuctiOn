@@ -35,6 +35,7 @@ export class AuctionServiceImpl extends CallbacksService implements AuctionServi
     const auction: Auction = this.findPlayerAuction(bid.playerId)
     auction.bid(bid)
     const res = auction.toInfo()
+    logger.info(`Player ${bid.playerId} bid ${bid.amount} in auction ${auction.id}`)
     this.notifyAuctionUpdate(res, 'onNewBid')
     this.saveAuction(auction)
     return res
@@ -44,6 +45,7 @@ export class AuctionServiceImpl extends CallbacksService implements AuctionServi
     const auction: Auction = this.findPlayerAuction(sale.sellerId)
     auction.sale(sale)
     const res = auction.toInfo()
+    logger.info(`Player ${sale.sellerId} sold items in auction ${auction.id}`)
     this.notifyAuctionUpdate(res, 'onNewSale')
     this.saveAuction(auction)
     return res
@@ -52,6 +54,7 @@ export class AuctionServiceImpl extends CallbacksService implements AuctionServi
   async endRound(auctionId: Auction['id']): Promise<AuctionInfo | Leaderboard> {
     const auction: Auction = this.findAuctionById(auctionId)
     auction.endRound()
+    logger.info(`Round ended for auction ${auction.id}`)
     if (auction.terminated()) {
       await this.deleteAuction(auction)
       const leaderboard = auction.computeLeaderboard()
@@ -66,6 +69,7 @@ export class AuctionServiceImpl extends CallbacksService implements AuctionServi
 
   async setPlayerState(playerId: Player['id'], state: PlayerState): Promise<AuctionInfo> {
     const auction: Auction = this.findPlayerAuction(playerId)
+    logger.info(`Setting player ${playerId} state to ${state} for auction ${auction.id}`)
     auction.playerState(playerId, state)
     this.saveAuction(auction)
     return auction.toInfo()
@@ -75,6 +79,7 @@ export class AuctionServiceImpl extends CallbacksService implements AuctionServi
     const auction = this.findAuctionById(auctionId)
     auction.join(playerId)
     this.players.set(playerId, auctionId)
+    logger.info(`Player ${playerId} joined auction ${auction.id}`)
     this.saveAuction(auction)
     this.notifyPlayerUpdate(playerId, 'onPlayerJoin')
     return auction.toInfo()
@@ -92,6 +97,7 @@ export class AuctionServiceImpl extends CallbacksService implements AuctionServi
     const auction = this.findAuctionById(auctionId)
     auction.leave(playerId)
     this.players.delete(playerId)
+    logger.info(`Player ${playerId} left auction ${auction.id}`)
     this.saveAuction(auction)
     this.notifyPlayerUpdate(playerId, 'onPlayerLeave')
     return auction.toInfo()
@@ -99,12 +105,14 @@ export class AuctionServiceImpl extends CallbacksService implements AuctionServi
 
   async removeAuction(auctionId: Auction['id']): Promise<void> {
     const auction = this.findAuctionById(auctionId)
+    logger.info(`Removing auction ${auction.id}`)
     await this.deleteAuction(auction)
     this.notifyAuctionUpdate(auction.toInfo(), 'onAuctionDeleted')
   }
 
   async startAuction(auctionId: Auction['id']): Promise<AuctionInfo> {
     const auction: Auction = this.findAuctionById(auctionId)
+    logger.info(`Starting auction ${auction.id}`)
     auction.start()
     this.saveAuction(auction)
     return auction.toInfo()
@@ -130,6 +138,7 @@ export class AuctionServiceImpl extends CallbacksService implements AuctionServi
   private findAuctionById(auctionId: Auction['id']): Auction {
     const auction: Auction | undefined = this.auctions.get(auctionId)
     if (!auction) {
+      logger.error(`Auction with id ${auctionId} not found`)
       throw new Error(`Auction with id ${auctionId} not found`)
     }
     return auction
@@ -138,6 +147,7 @@ export class AuctionServiceImpl extends CallbacksService implements AuctionServi
   private findPlayerAuction(playerId: Player['id']): Auction {
     const playerAuctionId = this.players.get(playerId)
     if (!playerAuctionId) {
+      logger.error(`Player with id ${playerId} not found`)
       throw new Error(`Player with id ${playerId} not found`)
     }
     return this.findAuctionById(playerAuctionId)

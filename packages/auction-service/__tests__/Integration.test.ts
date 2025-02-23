@@ -1,4 +1,3 @@
-import WebSocket from 'ws'
 import logger from '@auction/common/logger'
 import { AuctionService } from '../src/services/AuctionService'
 import { App } from '../src/App'
@@ -8,6 +7,7 @@ import { AuctionConfig } from '../src/schemas/Auction'
 import redisMock from 'ioredis-mock'
 import Redis from 'ioredis'
 import { User } from '../src/schemas/User'
+import { io } from 'socket.io-client'
 
 jest.setTimeout(120 * 1000)
 describe('Auction System Integration Test', () => {
@@ -71,7 +71,7 @@ describe('Auction System Integration Test', () => {
     app = new App(new Kafka({ brokers: kafkaBrokers, logLevel: 0 }),
       redis)
     service = app.auctionService
-    app.start(0).then(() => {
+    app.start(3000).then(() => {
       const address = app.server.address()
       if (address && typeof address === 'object') {
         port = address.port
@@ -86,23 +86,35 @@ describe('Auction System Integration Test', () => {
   afterEach(async () => {
     await app.stop()
     await redis.flushall()
+
   })
-  const connectPlayer = (player: WebSocket,
-                         user: User, messages: Record<string, any[]>) => {
+  const connectPlayer = (
+    player: any,
+    user: User,
+    messages: Record<string, any[]>,
+  ) => {
     return new Promise<void>((resolve, reject) => {
-      player.on('open', () => {
+      player.on('connect', () => {
         logger.info(`${user.id} connected`)
-        player.send(JSON.stringify(user))
-        waitToReceiveMessage().then(() => resolve())
+        resolve()
       })
-      player.on('message', message => {
-        const msg = JSON.parse(message.toString())
-        if (msg.type && msg.type == 'timer-start') {
-          return
+
+      player.onAny((type: any, msg: any) => {
+        logger.info(`Received message ${type} from ${user.id}:
+         ${JSON.stringify(msg)}`)
+        if (type === 'timer-start') {
+          return // Ignore timer-start messages
         }
-        messages[user.id].push(msg)
+        if (!messages[user.id]) {
+          messages[user.id] = []
+        }
+        messages[user.id].push({ ...msg, type })
       })
-      player.on('error', reject)
+
+      player.on('connect_error', (err: any) => {
+        logger.error(`Connection error for player ${user.id}:`, err)
+        reject(err)
+      })
     })
   }
 
@@ -131,9 +143,10 @@ describe('Auction System Integration Test', () => {
     await service.playerJoin('player1', defaultConfig.id)
     await service.playerJoin('player2', defaultConfig.id)
     await service.playerJoin('player3', defaultConfig.id)
-    const player1 = new WebSocket(`ws://localhost:${port}`)
-    const player2 = new WebSocket(`ws://localhost:${port}`)
-    const player3 = new WebSocket(`ws://localhost:${port}`)
+
+    const player1 = io(`http://localhost:${port}`, { path: '/auction', auth: { token: 'player1' } })
+    const player2 = io(`http://localhost:${port}`, { path: '/auction', auth: { token: 'player2' } })
+    const player3 = io(`http://localhost:${port}`, { path: '/auction', auth: { token: 'player3' } })
     await service.startAuction(defaultConfig.id)
 
     const messages: Record<string, any[]> = {
@@ -147,12 +160,14 @@ describe('Auction System Integration Test', () => {
       connectPlayer(player3, { id: 'player3', name: 'player3', email: 'e@email.com' }, messages),
     ])
 
+    logger.info(`starting auction`)
+
     // Player 1 starts a sale
-    player1.send(JSON.stringify(sale([{ item: 'square', quantity: 1 }])))
+    player1.emit('sell', sale([{ item: 'square', quantity: 1 }]))
     await waitToReceiveMessage()
     // Players 2 and 3 place bids
-    player2.send(JSON.stringify(bid(50, 1)))
-    player3.send(JSON.stringify(bid(100, 1)))
+    player2.emit('bid', bid(50, 1))
+    player3.emit('bid', bid(100, 1))
     await waitToReceiveMessage()
     expect(messages.player3.pop().bid).toEqual({
       amount: 100,
@@ -201,9 +216,9 @@ describe('Auction System Integration Test', () => {
     await service.setPlayerState('player3', 'connected')
     await service.startAuction(defaultConfig.id)
 
-    const player1 = new WebSocket(`ws://localhost:${port}`)
-    const player2 = new WebSocket(`ws://localhost:${port}`)
-    const player3 = new WebSocket(`ws://localhost:${port}`)
+    const player1 = io(`http://localhost:${port}`, { path: '/auction', auth: { token: 'player1' } })
+    const player2 = io(`http://localhost:${port}`, { path: '/auction', auth: { token: 'player2' } })
+    const player3 = io(`http://localhost:${port}`, { path: '/auction', auth: { token: 'player3' } })
 
     const messages: Record<string, any[]> = { player1: [], player2: [], player3: [] }
     await Promise.all([
@@ -213,11 +228,11 @@ describe('Auction System Integration Test', () => {
     ])
 
     // Player 1 starts a sale
-    player1.send(JSON.stringify(sale([{ item: 'square', quantity: 1 }])))
+    player1.emit('sell', sale([{ item: 'square', quantity: 1 }]))
     await waitToReceiveMessage()
     // Players 2 and 3 place bids
-    player2.send(JSON.stringify(bid(50, 1)))
-    player3.send(JSON.stringify(bid(55, 1)))
+    player2.emit('bid', bid(50, 1))
+    player3.emit('bid', bid(55, 1))
     await waitToEndRound(defaultConfig.id)
     await waitToReceiveMessage()
     //expect(messages.player1.length).toBe(4)
@@ -234,7 +249,7 @@ describe('Auction System Integration Test', () => {
       inventory: { items: [{ item: 'square', quantity: 1 }] },
     })
     // Player 2 starts a sale
-    player2.send(JSON.stringify(sale([{ item: 'square', quantity: 1 }])))
+    player2.emit('sell', sale([{ item: 'square', quantity: 1 }]))
     // no bids
     await waitToEndRound(defaultConfig.id)
     expect(messages.player3.pop().playerInfo).toEqual({
@@ -251,14 +266,14 @@ describe('Auction System Integration Test', () => {
     })
 
     // Player 3 starts a sale
-    player3.send(JSON.stringify(sale([{ item: 'square', quantity: 1 }])))
+    player3.emit('sell', sale([{ item: 'square', quantity: 1 }]))
     await waitToReceiveMessage()
-    // Player 2 sends an old bid that should be ignored
-    player2.send(JSON.stringify(bid(50, 2)))
+    // Player 2 emits an old bid that should be ignored
+    player2.emit('bid', bid(50, 2))
     //expect(messages.player2.length).toBe(6);
     // Player 1 places a bid
-    player1.send(JSON.stringify(bid(60, 3)))
-    player2.send(JSON.stringify(bid(70, 3)))
+    player1.emit('bid', bid(60, 3))
+    player2.emit('bid', bid(70, 3))
     await waitToEndRound(defaultConfig.id)
     expect(messages.player2.pop().leaderboard).toEqual({
       leaderboard: [
@@ -291,9 +306,9 @@ describe('Auction System Integration Test', () => {
     await service.setPlayerState('player3', 'connected')
     await service.startAuction(config.id)
 
-    const player1 = new WebSocket(`ws://localhost:${port}`)
-    const player2 = new WebSocket(`ws://localhost:${port}`)
-    const player3 = new WebSocket(`ws://localhost:${port}`)
+    const player1 = io(`http://localhost:${port}`, { path: '/auction', auth: { token: 'player1' } })
+    const player2 = io(`http://localhost:${port}`, { path: '/auction', auth: { token: 'player2' } })
+    const player3 = io(`http://localhost:${port}`, { path: '/auction', auth: { token: 'player3' } })
 
     const messages: Record<string, any[]> = { player1: [], player2: [], player3: [] }
     await Promise.all([
@@ -303,22 +318,22 @@ describe('Auction System Integration Test', () => {
     ])
 
     // Player 1 starts a sale
-    player1.send(JSON.stringify(sale([{ item: 'triangle', quantity: 1 }])))
-    player2.send(JSON.stringify(bid(50, 1)))
+    player1.emit('sell', sale([{ item: 'triangle', quantity: 1 }]))
+    player2.emit('bid', bid(50, 1))
 
     await waitToEndRound(config.id)
     // Player 2 disconnects during their turn
     player2.close()
     await waitToReceiveMessage()
     // Player 2 reconnects and starts a sale
-    const player2Reconnect = new WebSocket(`ws://localhost:${port}`)
+    const player2Reconnect = io(`http://localhost:${port}`, { path: '/auction', auth: { token: 'player2' } })
     await connectPlayer(player2Reconnect, { id: 'player2', name: 'player2', email: 'e@email.com' }, messages)
 
-    player2Reconnect.send(JSON.stringify(sale([{ item: 'triangle', quantity: 1 }])))
-    player3.send(JSON.stringify(bid(50, 2)))
+    player2Reconnect.emit('sell', sale([{ item: 'triangle', quantity: 1 }]))
+    player3.emit('sell', bid(50, 2))
 
     await waitToEndRound(config.id)
-    player3.send(JSON.stringify(sale([{ item: 'triangle', quantity: 1 }])))
+    player3.emit('sell', sale([{ item: 'triangle', quantity: 1 }]))
     await waitToEndRound(config.id)
     // Validate auction behavior
     expect(messages.player2.pop().leaderboard).toEqual({
@@ -347,9 +362,9 @@ describe('Auction System Integration Test', () => {
     await service.playerJoin('player3', config.id)
     await service.startAuction(config.id)
 
-    const player1 = new WebSocket(`ws://localhost:${port}`)
-    const player2 = new WebSocket(`ws://localhost:${port}`)
-    const player3 = new WebSocket(`ws://localhost:${port}`)
+    const player1 = io(`http://localhost:${port}`, { path: '/auction', auth: { token: 'player1' } })
+    const player2 = io(`http://localhost:${port}`, { path: '/auction', auth: { token: 'player2' } })
+    const player3 = io(`http://localhost:${port}`, { path: '/auction', auth: { token: 'player3' } })
 
     const messages: Record<string, any[]> = { player1: [], player2: [], player3: [] }
     await Promise.all([
@@ -359,29 +374,29 @@ describe('Auction System Integration Test', () => {
     ])
 
     // Player 1 starts a sale
-    player1.send(JSON.stringify(sale([{ item: 'triangle', quantity: 1 }])))
-    player2.send(JSON.stringify(bid(50, 1)))
+    player1.emit('sell', sale([{ item: 'triangle', quantity: 1 }]))
+    player2.emit('bid', bid(50, 1))
     // Player 2 disconnects before their turn
     player2.close()
     await waitToReceiveMessage()
 
     await waitToEndRound(config.id)
     // Player 2 reconnects and starts a sale
-    const player2Reconnect = new WebSocket(`ws://localhost:${port}`)
+    const player2Reconnect = io(`http://localhost:${port}`, { path: '/auction', auth: { token: 'player2' } })
     await connectPlayer(player2Reconnect, { id: 'player2', name: 'player2', email: 'e@email.com' }, messages)
     // Player 2 cannot start a new sale now because he should be skipped
-    player2Reconnect.send(JSON.stringify(sale([{ item: 'triangle', quantity: 1 }])))
+    player2Reconnect.emit('sell', sale([{ item: 'triangle', quantity: 1 }]))
     // Player 3 can start a sale
     await waitToReceiveMessage()
 
     // Player 3 can sell
-    player3.send(JSON.stringify(sale([{ item: 'triangle', quantity: 1 }])))
+    player3.emit('sell', sale([{ item: 'triangle', quantity: 1 }]))
     await waitToReceiveMessage()
 
     // Player 1 bid
-    player1.send(JSON.stringify(bid(30, 2)))
+    player1.emit('bid', bid(30, 2))
     // Player 2 can also bid
-    player2Reconnect.send(JSON.stringify(bid(50, 2)))
+    player2Reconnect.emit('bid', bid(50, 2))
     // End round
     await waitToEndRound(config.id)
 
@@ -391,9 +406,9 @@ describe('Auction System Integration Test', () => {
     })
 
     // Now player 1 can sell
-    player1.send(JSON.stringify(sale([{ item: 'triangle', quantity: 1 }])))
+    player1.emit('sell', sale([{ item: 'triangle', quantity: 1 }]))
     // Player 3 can bid
-    player3.send(JSON.stringify(bid(50, 3)))
+    player3.emit('bid', bid(50, 3))
     await waitToEndRound(config.id)
 
     expect(messages.player2.pop().leaderboard).toEqual({
