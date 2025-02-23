@@ -73,6 +73,21 @@ export const timerStartMsgSchema = z.object({
   time: z.string().datetime(),
 })
 
+export const typedMessageSchema = z.object({
+  type: z.enum([
+    'error',
+    'auction',
+    'new-bid',
+    'new-sale',
+    'player-connected',
+    'player-disconnected',
+    'round-end',
+    'auction-end',
+    'auction-deleted',
+    'timer-start',
+  ]),
+})
+
 export const playerActionsTypeSchema = z.enum(['sell', 'bid'])
 
 export type NewBidMsg = z.infer<typeof newBidMsgSchema>
@@ -88,3 +103,16 @@ export type AuctionEndMsg = z.infer<typeof auctionEndMsgSchema>
 export type AuctionDeletedMsg = z.infer<typeof auctionDeletedMsgSchema>
 export type TimerStartMsg = z.infer<typeof timerStartMsgSchema>
 export type PlayerActionsType = z.infer<typeof playerActionsTypeSchema>
+export type AuctionMessage =
+  | NewBidMsg
+  | NewSaleMsg
+  | ErrorMsg
+  | AuctionMsg
+  | BidUpdateMsg
+  | SaleUpdateMsg
+  | PlayerConnectedMsg
+  | PlayerDisconnectedMsg
+  | RoundEndMsg
+  | AuctionEndMsg
+  | AuctionDeletedMsg
+  | TimerStartMsg
