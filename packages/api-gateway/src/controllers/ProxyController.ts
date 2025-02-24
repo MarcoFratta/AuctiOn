@@ -44,6 +44,7 @@ export class ProxyController {
 
       // Manually create a WebSocket connection to the Auction Service
       const auctionSocket = ioClient(config.services['auction'].url, {
+        path: '/auction',
         transports: ['websocket'],
         auth: { user: user }, // Forward user data
       })
@@ -59,10 +60,13 @@ export class ProxyController {
       auctionSocket.onAny((event, payload) => {
         socket.emit(event, payload)
       })
+      socket.on('connect_error', err => {
+        logger.error(`[API Gateway] WebSocket connection error: ${err}`)
+      })
 
       // Handle disconnection
       socket.on('disconnect', reason => {
-        logger.info(`[API Gateway] User ${socket.data.user.id} disconnected
+        logger.info(`[API Gateway] User ${user.id} disconnected
         with reason: ${reason}`)
         auctionSocket.disconnect()
       })
@@ -75,6 +79,9 @@ export class ProxyController {
         logger.error(`[API Gateway] Auction Service connection error: ${err}`)
         socket.disconnect()
       })
+    })
+    io.on('connect_error', err => {
+      logger.error(`[API Gateway] WebSocket server error: ${err}`)
     })
   }
 }
