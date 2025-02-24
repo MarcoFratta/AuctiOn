@@ -5,7 +5,7 @@ import * as http from 'node:http'
 
 export function createWsServer(server: http.Server) {
   const io = new Server(server, {
-    path: '/auctions',
+    path: '/auction',
     cors: {
       origin: '*',
       methods: ['GET', 'POST'],
