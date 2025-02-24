@@ -27,12 +27,12 @@ export class App {
   public redis: Redis
   readonly server: http.Server
   private readonly app: Server
-  private express: Express
+  private readonly express: Express
 
   constructor(kafka: Kafka, redis: Redis) {
     this.redis = redis
     this.express = this.setupMiddlewares()
-    this.server = http.createServer(express)
+    this.server = http.createServer(this.express)
     this.app = this.setupWebSocket()
     this.auctionService = new AuctionServiceImpl(new RedisAuctionRepo(redis))
     this.wsAdapter = new WebSocketAdapter(this.app)
@@ -122,7 +122,7 @@ export class App {
     const app = express()
 
     app.head('/health', (req, res) => {
-      console.log('Health check requested')
+      logger.info('Health check requested')
       res.status(200).send('OK')
     })
     return app
