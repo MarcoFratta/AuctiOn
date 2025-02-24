@@ -100,11 +100,9 @@ services:
       context: .
       dockerfile: packages/auction-service/Dockerfile
     restart: always
-    ports:
-      - '${AUCTION_S_H_PORT:-3000}:${AUCTION_S_C_PORT:-3000}' # Default to 3000 if PORT is not defined
     environment:
       - PORT=${AUCTION_S_C_PORT:-3000}
-      - NODE_ENV=test
+      - NODE_ENV=${AUCTION_S_NODE_ENV:-production}
       - KAFKA_BROKERS=${AUCTION_S_KAFKA_BROKERS:-kafka:9092}
       - REDIS_URL=${AUCTION_S_REDIS_URI:-redis://redis:6379}
       - REDIS_PORT=${AUCTION_S_REDIS_PORT:-6379}

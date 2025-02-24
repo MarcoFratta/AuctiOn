@@ -1,6 +1,6 @@
 import request from 'supertest'
 import logger from '@auction/common/logger'
-import WebSocket from 'ws'
+import { io, Socket } from 'socket.io-client'
 
 export class Client {
   constructor(private readonly url: string) {}
@@ -45,29 +45,37 @@ export class Client {
   }
 
   async connectPlayer(token: string, id: string, messages: Record<string, any[]>) {
-    const player = new WebSocket(`${this.url}/auctions`)
-    return new Promise<WebSocket>((resolve, reject) => {
-      player.on('open', () => {
+    const player = io(`http://localhost:8080`, {
+      path: '/auction',
+      auth: { token },
+    })
+    return new Promise<Socket>((resolve, reject) => {
+      player.on('connect', () => {
         logger.info(`${id} connected`)
         player.send(token)
         setTimeout(() => resolve(player), 100)
       })
-      player.on('error', err => {
+      player.on('connect_error', err => {
         logger.error(`[${id}] error connecting ${err}`)
         reject(err)
       })
-      player.on('message', message => {
-        const msg = JSON.parse(message.toString())
-        if (msg.type) {
-          if (msg.type == 'timer-start') {
+      player.on('disconnect', () => {
+        logger.info(`${id} disconnected`)
+      })
+      player.on('error', err => {
+        logger.error(`[${id}] error ${err}`)
+      })
+      player.onAny((type, msg) => {
+        if (type) {
+          if (type == 'timer-start') {
             return
           }
-          if (msg.type == 'error') {
+          if (type == 'error') {
             logger.error(`[${id}] ${JSON.stringify(msg)})`)
             return
           }
         }
-        // logger.info(`[${id}] ${JSON.stringify(msg)})`)
+        logger.info(`[${id}] ${JSON.stringify(msg)})`)
         messages[id].push(msg)
       })
     })
@@ -77,28 +85,23 @@ export class Client {
     return new Promise(resolve => setTimeout(resolve, ms))
   }
 
-  async placeBid(player: WebSocket, amount: number, round: number) {
-    player.send(
-      JSON.stringify({
-        type: 'bid',
-        bid: {
-          amount: amount,
-          round,
-        },
-      })
-    )
+  async placeBid(player: Socket, amount: number, round: number) {
+    player.emit('bid', {
+      bid: {
+        amount: amount,
+        round,
+      },
+    })
     await this.waitFor(1000)
   }
 
-  async saleItem(player: WebSocket, inventory: { item: string; quantity: number }[]) {
-    player.send(
-      JSON.stringify({
-        type: 'sell',
-        sale: {
-          items: inventory,
-        },
-      })
-    )
+  async saleItem(player: Socket, inventory: { item: string; quantity: number }[]) {
+    player.emit('sell', {
+      sale: {
+        items: inventory,
+      },
+    })
+
     await this.waitFor(1000)
   }
 }
