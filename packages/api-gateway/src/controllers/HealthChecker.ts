@@ -8,7 +8,13 @@ export const healthChecker = (services: string[]): RequestHandler => {
       logger.debug('Health check requested')
 
       // Check health of each service
-      const results = await Promise.allSettled(services.map(service => axios.head(`${service}/health`)))
+      const results = await Promise.allSettled(
+        services.map(service =>
+          axios.head(`${service}/health`, {
+            timeout: 1000,
+          })
+        )
+      )
 
       // Find failed services
       const failedServices = services.filter((_, i) => results[i].status === 'rejected')
