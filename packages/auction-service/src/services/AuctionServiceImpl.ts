@@ -55,7 +55,7 @@ export class AuctionServiceImpl extends CallbacksService implements AuctionServi
     const auction: Auction = this.findAuctionById(auctionId)
     auction.endRound()
     logger.info(`Round ended for auction ${auction.id}`)
-    if (auction.terminated()) {
+    if (auction.isTerminated()) {
       await this.deleteAuction(auction)
       const leaderboard = auction.computeLeaderboard()
       this.notifyLeaderBoardUpdate(leaderboard, auctionId)
@@ -81,7 +81,7 @@ export class AuctionServiceImpl extends CallbacksService implements AuctionServi
     this.players.set(playerId, auctionId)
     logger.info(`Player ${playerId} joined auction ${auction.id}`)
     this.saveAuction(auction)
-    this.notifyPlayerUpdate(playerId, 'onPlayerJoin')
+    this.notifyPlayerUpdate(auctionId, playerId, 'onPlayerJoin')
     return auction.toInfo()
   }
 
@@ -99,7 +99,7 @@ export class AuctionServiceImpl extends CallbacksService implements AuctionServi
     this.players.delete(playerId)
     logger.info(`Player ${playerId} left auction ${auction.id}`)
     this.saveAuction(auction)
-    this.notifyPlayerUpdate(playerId, 'onPlayerLeave')
+    this.notifyPlayerUpdate(auctionId, playerId, 'onPlayerLeave')
     return auction.toInfo()
   }
 
@@ -121,7 +121,7 @@ export class AuctionServiceImpl extends CallbacksService implements AuctionServi
   loadAuctions = async () => {
     const auctions = await this.repo.getAuctions()
     auctions.forEach(auction => {
-      logger.info(`Restoring auction: ${auction.id} from db`)
+      logger.info(`Restoring auction: ${JSON.stringify(auction)} from db`)
       this.auctions.set(auction.id, createFromInfo(auction))
       auction.players.forEach((player: Player) => {
         this.players.set(player.id, auction.id)

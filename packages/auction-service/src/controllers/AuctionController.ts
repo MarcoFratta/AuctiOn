@@ -26,6 +26,8 @@ import {
   errorMessage,
   playerConnectedMessage,
   playerDisconnectedMessage,
+  playerJoinMessage,
+  playerLeaveMessage,
   roundEndMessage,
   saleUpdateMessage,
 } from '../domain/messages/MessageFactory'
@@ -49,6 +51,7 @@ export class AuctionController {
     this.auctionService.onRoundEnd(this.handleRoundEnd)
     this.auctionService.onAuctionDeleted(this.handleAuctionDeleted)
     this.auctionService.onPlayerLeave(this.handlePlayerLeave)
+    this.auctionService.onPlayerJoin(this.handlePlayerJoin)
   }
 
   handlePlayerMessage = (playerId: string, message: AuctionMessage): void => {
@@ -98,9 +101,24 @@ export class AuctionController {
     this.auctionService
       .setPlayerState(playerId, 'connected')
       .then(auction => {
-        logger.debug(`Sending auction message to player ${playerId}`)
+        logger.info(`Sending auction message to player ${playerId}`)
         this.playerChannel.sendToPlayer(playerId, auctionMessage(auction, playerId))
-        logger.debug(`Broadcasting player connected message to auction players`)
+        logger.info(`Lobby players ${auction.players.map(p => p.id)}`)
+        auction.players
+          .filter(p => p.id !== playerId)
+          .forEach(p => {
+            logger.info(`Sending player ${p.id} join message to player ${playerId}`)
+            this.playerChannel.sendToPlayer(playerId, playerJoinMessage(p.id))
+          })
+        auction.players
+          .filter(p => p.id !== playerId)
+          .filter(p => p.status == 'connected')
+          .forEach(p => {
+            logger.info(`Sending player ${playerId} connect message to player ${p.id}`)
+            this.playerChannel.sendToPlayer(p.id, playerJoinMessage(playerId))
+          })
+
+        logger.info(`Broadcasting player connected message to auction players`)
         this.lobbyBroadcast(
           auction.players.filter(p => p.id !== playerId),
           playerConnectedMessage(playerId)
@@ -155,7 +173,28 @@ export class AuctionController {
       this.playerChannel.closeConnection(player.id, true, 'Auction ended')
     })
   }
-  private handlePlayerLeave = (playerId: string) => {
+  private handlePlayerLeave = (auctionId: string, playerId: string) => {
     this.playerChannel.closeConnection(playerId, true, 'Player left the auction')
+    this.auctionService
+      .getAuction(auctionId)
+      .then(auction => {
+        this.lobbyBroadcast(auction.players, playerLeaveMessage(playerId))
+      })
+      .catch(err => {
+        logger.warn(`Error handling player leave: ${err}`)
+      })
+  }
+  private handlePlayerJoin = (auctionId: string, playerId: string) => {
+    this.auctionService
+      .getAuction(auctionId)
+      .then(auction => {
+        this.lobbyBroadcast(
+          auction.players.filter(p => p.id != playerId),
+          playerJoinMessage(playerId)
+        )
+      })
+      .catch(err => {
+        logger.warn(`Error handling player join: ${err}`)
+      })
   }
 }

@@ -14,6 +14,9 @@ import {
   PlayerDisconnectedMsg,
   playerDisconnectedMsgSchema,
   playerInfoSchema,
+  PlayerJoinMsg,
+  playerJoinSchema,
+  playerLeaveSchema,
   RoundEndMsg,
   roundEndMsgSchema,
   SaleUpdateMsg,
@@ -29,6 +32,7 @@ import { AuctionInfo } from '../../schemas/Auction'
 import { Player } from '../../schemas/Player'
 import { Leaderboard } from '../../schemas/Leaderboard'
 import logger from '@auction/common/logger'
+import { PlayerLeaveMsg } from '@auction/common/dist/src/messages/AuctionMessages'
 
 const toPlayerInfo = (player: Player) => {
   return validateSchema(playerInfoSchema, {
@@ -107,5 +111,17 @@ export const timerStartMessage = (time: number): TimerStartMsg => {
   return validateSchema(timerStartMsgSchema, {
     type: 'timer-start',
     time: new Date(time).toISOString(),
+  })
+}
+export const playerLeaveMessage = (playerId: string): PlayerLeaveMsg => {
+  return validateSchema(playerLeaveSchema, {
+    type: 'player-leave',
+    playerId,
+  })
+}
+export const playerJoinMessage = (playerId: string): PlayerJoinMsg => {
+  return validateSchema(playerJoinSchema, {
+    type: 'player-join',
+    playerId,
   })
 }

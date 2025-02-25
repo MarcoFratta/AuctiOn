@@ -6,7 +6,7 @@ import { AuctionInfo } from '../schemas/Auction'
 export class CallbacksService implements AuctionEventsSource {
   private auctionsCallbacks = new Map<string, ((auction: AuctionInfo) => void)[]>()
   private leaderBoardCallbacks: ((leaderboard: Leaderboard, auctionId: string) => void)[] = []
-  private playersCallbacks = new Map<string, ((id: string) => void)[]>()
+  private playersCallbacks = new Map<string, ((auctionId: string, playerId: string) => void)[]>()
 
   constructor() {
     const auctionTypes = ['onRoundEnd', 'onAuctionEnd', 'onNewBid', 'onNewSale', 'onAuctionDeleted']
@@ -23,11 +23,11 @@ export class CallbacksService implements AuctionEventsSource {
     this.auctionsCallbacks.get('onRoundEnd')!.push(callback)
   }
 
-  onPlayerJoin(callback: (auction: string) => void): void {
+  onPlayerJoin(callback: (auctionId: string, playerId: string) => void): void {
     this.playersCallbacks.get('onPlayerJoin')!.push(callback)
   }
 
-  onPlayerLeave(callback: (auction: string) => void): void {
+  onPlayerLeave(callback: (auctionId: string, playerId: string) => void): void {
     this.playersCallbacks.get('onPlayerLeave')!.push(callback)
   }
 
@@ -47,8 +47,8 @@ export class CallbacksService implements AuctionEventsSource {
     this.auctionsCallbacks.get(type)!.forEach(callback => callback(res))
   }
 
-  notifyPlayerUpdate(id: string, type: string) {
-    this.playersCallbacks.get(type)!.forEach(callback => callback(id))
+  notifyPlayerUpdate(auctionId: string, playerId: string, type: string) {
+    this.playersCallbacks.get(type)!.forEach(callback => callback(auctionId, playerId))
   }
 
   notifyLeaderBoardUpdate(leaderboard: Leaderboard, auctionId: string) {
