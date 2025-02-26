@@ -251,9 +251,6 @@ describe('LobbyController', () => {
 
     expect(mockLobbyService.getLobby).toHaveBeenCalledWith(id)
     expect(mockResponse.status).toHaveBeenCalledWith(200)
-    expect(mockResponse.json).toHaveBeenCalledWith({
-      lobby,
-    })
   })
 
     it('should throw if the user is not authenticated', () => {

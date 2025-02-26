@@ -131,9 +131,7 @@ export class LobbyController {
         })
         return
       }
-      res.status(200).json({
-        lobby: lobby,
-      })
+      res.status(200).send('ok')
     } catch (error) {
       next(error)
     }

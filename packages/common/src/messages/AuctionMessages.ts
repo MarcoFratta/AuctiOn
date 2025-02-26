@@ -31,7 +31,6 @@ export const errorMsgSchema = z.object({
 export const auctionMsgSchema = z.object({
   type: z.literal('auction'),
   auction: auctionSchema.omit({
-    sellerQueue: true,
     players: true,
   }),
   playerInfo: playerInfoSchema,
@@ -51,6 +50,14 @@ export const playerConnectedMsgSchema = z.object({
 })
 export const playerDisconnectedMsgSchema = z.object({
   type: z.literal('player-disconnected'),
+  playerId: z.string(),
+})
+export const playerJoinSchema = z.object({
+  type: z.literal('player-join'),
+  playerId: z.string(),
+})
+export const playerLeaveSchema = z.object({
+  type: z.literal('player-leave'),
   playerId: z.string(),
 })
 
@@ -98,6 +105,8 @@ export type BidUpdateMsg = z.infer<typeof bidUpdateMsgSchema>
 export type SaleUpdateMsg = z.infer<typeof saleUpdateMsgSchema>
 export type PlayerConnectedMsg = z.infer<typeof playerConnectedMsgSchema>
 export type PlayerDisconnectedMsg = z.infer<typeof playerDisconnectedMsgSchema>
+export type PlayerJoinMsg = z.infer<typeof playerJoinSchema>
+export type PlayerLeaveMsg = z.infer<typeof playerLeaveSchema>
 export type RoundEndMsg = z.infer<typeof roundEndMsgSchema>
 export type AuctionEndMsg = z.infer<typeof auctionEndMsgSchema>
 export type AuctionDeletedMsg = z.infer<typeof auctionDeletedMsgSchema>
@@ -106,6 +115,8 @@ export type PlayerActionsType = z.infer<typeof playerActionsTypeSchema>
 export type AuctionMessage =
   | NewBidMsg
   | NewSaleMsg
+  | PlayerJoinMsg
+  | PlayerLeaveMsg
   | ErrorMsg
   | AuctionMsg
   | BidUpdateMsg
