@@ -104,18 +104,15 @@ export class AuctionController {
         logger.info(`Sending auction message to player ${playerId}`)
         this.playerChannel.sendToPlayer(playerId, auctionMessage(auction, playerId))
         logger.info(`Lobby players ${auction.players.map(p => p.id)}`)
+        auction.players.forEach(p => {
+          logger.info(`Sending player ${p.id} join message to player ${playerId}`)
+          this.playerChannel.sendToPlayer(playerId, playerJoinMessage(p.id))
+        })
         auction.players
-          .filter(p => p.id !== playerId)
-          .forEach(p => {
-            logger.info(`Sending player ${p.id} join message to player ${playerId}`)
-            this.playerChannel.sendToPlayer(playerId, playerJoinMessage(p.id))
-          })
-        auction.players
-          .filter(p => p.id !== playerId)
           .filter(p => p.status == 'connected')
           .forEach(p => {
             logger.info(`Sending player ${playerId} connect message to player ${p.id}`)
-            this.playerChannel.sendToPlayer(p.id, playerJoinMessage(playerId))
+            this.playerChannel.sendToPlayer(playerId, playerConnectedMessage(p.id))
           })
 
         logger.info(`Broadcasting player connected message to auction players`)
