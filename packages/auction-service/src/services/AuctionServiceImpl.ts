@@ -121,6 +121,9 @@ export class AuctionServiceImpl extends CallbacksService implements AuctionServi
   loadAuctions = async () => {
     const auctions = await this.repo.getAuctions()
     auctions.forEach(auction => {
+      auction.players = auction.players.map(player => {
+        return { ...player, status: 'not-connected' }
+      })
       logger.info(`Restoring auction: ${JSON.stringify(auction)} from db`)
       this.auctions.set(auction.id, createFromInfo(auction))
       auction.players.forEach((player: Player) => {
