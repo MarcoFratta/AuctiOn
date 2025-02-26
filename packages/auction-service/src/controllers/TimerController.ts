@@ -38,6 +38,9 @@ export class TimerController {
       this.auctionService
         .getPlayerAuction(playerId)
         .then(auction => {
+          if (!auction.startTimestamp) {
+            return
+          }
           const timer = this.timers.get(auction.id)
           if (!timer) {
             throw new Error(`Timer not found for auction ${auction.id}`)
