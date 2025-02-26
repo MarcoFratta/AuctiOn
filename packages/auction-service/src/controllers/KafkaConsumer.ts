@@ -61,7 +61,8 @@ export class KafkaConsumer {
         })
         .with('lobby-created', async () => {
           const event = validateSchema(lobbyCreatedEventSchema, msg)
-          const lobby = validateSchema(auctionConfigSchema, event.lobby)
+
+          const lobby = validateSchema(auctionConfigSchema, { creatorId: event.creator, ...event.lobby })
           await this.auctionService.createAuction(lobby)
           await this.auctionService.playerJoin(event.creator, event.lobby.id)
         })

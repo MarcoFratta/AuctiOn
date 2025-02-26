@@ -121,6 +121,7 @@ describe('Auction System Integration Test', () => {
   const defaultConfig: AuctionConfig = {
     id: 'auction1',
     maxPlayers: 4,
+    creatorId: 'player1',
     maxRound: 3,
     startAmount: 100,
     startInventory: { items: [{ item: 'square', quantity: 2 }] },

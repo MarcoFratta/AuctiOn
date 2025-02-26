@@ -27,6 +27,7 @@ describe('AuctionService', () => {
     id: 'auction1',
     maxPlayers: 4,
     maxRound: 3,
+    creatorId: 'player1',
     startAmount: 100,
     startInventory: { items: [{ item: 'square', quantity: 2 }] },
     bidTime: 30,
@@ -122,6 +123,7 @@ describe('AuctionService', () => {
   const createMockAuction = (): AuctionConfig => ({
     id: 'auction1',
     maxPlayers: 2,
+    creatorId: 'player1',
     maxRound: 3,
     startAmount: 100,
     startInventory: { items: [{ item: 'square', quantity: 2 }] },

@@ -17,6 +17,7 @@ describe('KafkaConsumer', () => {
   const defaultConfig: AuctionConfig = {
     id: 'lobby1',
     maxPlayers: 4,
+    creatorId: 'player1',
     maxRound: 3,
     startAmount: 100,
     startInventory: { items: [{ item: 'square', quantity: 2 }] },

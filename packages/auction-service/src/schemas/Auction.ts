@@ -6,6 +6,7 @@ import { InventoryOutputSchema } from './Item'
 
 export const auctionConfigSchema = z.object({
   id: z.string(),
+  creatorId: z.string(),
   maxPlayers: z.number(),
   maxRound: z.number(),
   startAmount: z.number(),

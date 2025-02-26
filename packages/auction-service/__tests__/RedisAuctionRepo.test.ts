@@ -29,6 +29,7 @@ describe('RedisAuctionRepo', () => {
         currentSale: undefined,
         currentBid: undefined,
         startTimestamp: new Date().toISOString(),
+        creatorId: '123446789012345678901234',
         maxPlayers: 4,
         startAmount: 100,
         startInventory: {
@@ -42,7 +43,7 @@ describe('RedisAuctionRepo', () => {
       await auctionRepo.saveAuction(auction)
 
       const savedAuction = await mockRedisClient.get(`auction:${auction.id}`)
-      expect(savedAuction).toBe(JSON.stringify(auction))
+      expect(savedAuction).toEqual(JSON.stringify(auction))
     })
   })
 
@@ -50,6 +51,7 @@ describe('RedisAuctionRepo', () => {
     it('should retrieve all auctions from Redis', async () => {
       const auction1: AuctionInfo = {
         id: '123456789012345678901234',
+        creatorId: '11111111111111111111111',
         players: [],
         maxRound: 3,
         sellerQueue: [],
@@ -69,6 +71,7 @@ describe('RedisAuctionRepo', () => {
 
       const auction2: AuctionInfo = {
         id: '123456789012345678901235',
+        creatorId: '22222222222222222222222',
         players: [],
         maxRound: 5,
         sellerQueue: [],

@@ -15,6 +15,7 @@ describe('AuctionController', () => {
 
   const defaultConfig: AuctionConfig = {
     id: 'auction1',
+    creatorId: 'player1',
     maxPlayers: 4,
     maxRound: 3,
     startAmount: 100,
@@ -72,6 +73,7 @@ describe('AuctionController', () => {
     mockAuctionService.playerBid.mockResolvedValue({
       id: 'auction1',
       players: [],
+      creatorId: 'player1',
       maxRound: 10,
       maxPlayers: 4,
       startAmount: 100,
@@ -118,6 +120,7 @@ describe('AuctionController', () => {
       id: 'auction1',
       players: [],
       maxRound: 10,
+      creatorId: 'player1',
       maxPlayers: 4,
       startAmount: 100,
       startInventory: { items: [{ item: 'square', quantity: 2 }] },

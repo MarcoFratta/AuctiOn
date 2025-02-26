@@ -21,7 +21,8 @@ export interface Auction extends AuctionConfig {
   start: () => void
   join: (player: Player['id']) => void
   leave: (playerId: string) => void
-  terminated: () => boolean
+  isTerminated: () => boolean
+  isStarted: () => boolean
   toInfo: () => AuctionInfo
 }
 
@@ -39,10 +40,12 @@ export class AuctionImpl implements Auction {
   readonly startInventory: InventoryOutput
   readonly bidTime: number
   readonly maxPlayers: number
+  readonly creatorId: string
   private modifiers = [Modifiers.noMostItems(), Modifiers.noZeroItems()]
 
   constructor(info: AuctionInfo) {
     this.id = info.id
+    this.creatorId = info.creatorId
     this.currentRound = info.currentRound
     this.players = info.players
     this.sellerQueue = info.sellerQueue
@@ -150,13 +153,18 @@ export class AuctionImpl implements Auction {
     this.sellerQueue = PlayOrderStrategy.sameOrder(this.players.map(player => player.id))
   }
 
-  terminated(): boolean {
+  isTerminated(): boolean {
     return this.endTimestamp !== undefined
+  }
+
+  isStarted(): boolean {
+    return this.startTimestamp !== undefined
   }
 
   toInfo: () => AuctionInfo = () => {
     return validateSchema(AuctionSchema, {
       id: this.id,
+      creatorId: this.creatorId,
       players: cloneDeep(this.players),
       maxRound: this.maxRound,
       bidTime: this.bidTime,
