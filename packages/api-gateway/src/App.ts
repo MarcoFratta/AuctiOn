@@ -11,7 +11,7 @@ import { config } from './configs/Config'
 const app = express()
 app.use(
   cors({
-    origin: 'http://localhost:5173', // Allow Vue frontend
+    origin: ['http://localhost:5173', 'http://192.168.1.20:5173'],
     credentials: true, // Allow cookies (needed for refresh tokens)
   })
 )
