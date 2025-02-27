@@ -3,17 +3,20 @@ import FormEntry from '@/components/FormEntry.vue'
 import { ref } from 'vue'
 import LoadingButton from '@/components/LoadingButton.vue'
 import { joinLobby } from '@/api/lobbyService.ts'
-import { useAlert } from '@/composables/useAlert.ts'
 import { useErrorsHandler } from '@/composables/useErrorsHandler.ts'
+import { useLobbyStore } from '@/stores/lobbyStore.ts'
+import { useRouter } from 'vue-router'
 
-const alerts = useAlert()
+const lobbyStore = useLobbyStore()
 const errorsHandler = useErrorsHandler()
 const lobbyId = ref('')
+const router = useRouter()
 const handleJoin = async (event: Event) => {
   try {
     console.log('Joining lobby with ID:', lobbyId.value)
     const res = await joinLobby(lobbyId.value)
-    alerts.success('Lobby joined', 'You have successfully joined the lobby')
+    lobbyStore.setLobby(res)
+    router.push('/lobby')
   } catch (e) {
     console.error(e)
     const err = errorsHandler
