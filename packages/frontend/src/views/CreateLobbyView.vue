@@ -10,8 +10,11 @@ import { createLobby } from '@/api/lobbyService.ts'
 import { useAuthStore } from '@/stores/authStore.ts'
 import { useErrorsHandler } from '@/composables/useErrorsHandler.ts'
 import { InvalidData } from '@/api/Errors.ts'
+import { useLobbyStore } from '@/stores/lobbyStore.ts'
+import router from '@/router'
 
 const authStore = useAuthStore()
+const lobbyStore = useLobbyStore()
 const isAuthenticated = computed(() => authStore.isAuthenticated)
 const schema = toTypedSchema(lobbyConfigSchema)
 const { values, errors, defineField, validate } = useForm({
@@ -54,41 +57,35 @@ items.value = [
   { item: 'circle', quantity: 2 },
 ]
 
-const canSubmit = computed(
-  () =>
-    isAuthenticated &&
-    !errors.value.startInventory &&
-    !errors.value.rounds &&
-    !errors.value.maxPlayers &&
-    !errors.value.bidTime &&
-    !errors.value.startAmount,
-)
+const canSubmit = computed(() => isAuthenticated)
 const waitForResponse = ref(false)
 const handleForm = async (event: Event) => {
   try {
     await validate()
     if (!canSubmit.value) throw new InvalidData()
     waitForResponse.value = true
-    await createLobby({
+
+    const res = await createLobby({
       rounds: values.rounds!,
       maxPlayers: values.maxPlayers!,
       bidTime: values.bidTime!,
       startAmount: values.startAmount!,
       startInventory: { items: values.startInventory?.items! },
     })
-    console.log('Lobby created')
+    router.push('/lobby')
   } catch (e) {
     console.log('Error', e)
     const err = errorsHandler
       .create(e)
       .unknownError()
       .invalidData()
-      .alreadyInLobby()
-      .authenticationError()
+      .alreadyInLobby('', () => router.push('/lobby'))
+      .authenticationError('', () => router.push('/login'))
       .tooManyRequests()
-      .get()
-    console.error(err)
-    await errorsHandler.show(err)
+    console.error('showing error')
+    await errorsHandler.show(err.get())
+    console.error('error shown')
+    err.run()
   } finally {
     waitForResponse.value = false
   }
@@ -152,10 +149,7 @@ const handleForm = async (event: Event) => {
       </template>
     </InventorySelector>
     <LoadingButton
-      :class="{
-        'cursor-not-allowed': !canSubmit,
-      }"
-      :disable="!canSubmit"
+      :disable="!canSubmit.value"
       :loading="waitForResponse"
       text="Create"
       @click="handleForm"
