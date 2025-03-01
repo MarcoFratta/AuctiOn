@@ -45,6 +45,7 @@ export const auctionConfigSchema = z.object({
 })
 export const auctionSchema = z
   .object({
+    creatorId: playerSchema.shape.id,
     players: z.array(playerSchema),
     sellerQueue: z.array(playerSchema.shape.id),
     currentRound: z.number().min(1),
