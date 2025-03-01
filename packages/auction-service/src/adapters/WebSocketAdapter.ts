@@ -27,7 +27,7 @@ export class WebSocketAdapter implements PlayerEventSource, PlayerChannel {
         // 🛑 If user already has a socket, disconnect the old one
         if (this.clients.has(playerId)) {
           const oldSocket = this.clients.get(playerId)
-          if (oldSocket) {
+          if (oldSocket && oldSocket.id !== socket.id) {
             logger.info(`Disconnecting previous socket for player ${playerId}`)
             oldSocket.disconnect(true) // Force disconnect old socket
           }
@@ -61,7 +61,7 @@ export class WebSocketAdapter implements PlayerEventSource, PlayerChannel {
     const socket = this.clients.get(playerId)
     if (socket) {
       socket.disconnect(true)
-      logger.debug(`Closing connection for player ${playerId} with reason: ${reason}`)
+      logger.info(`Closing connection for player ${playerId} with reason: ${reason}`)
     }
   }
 
