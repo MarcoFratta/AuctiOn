@@ -7,11 +7,17 @@ import { ItemsMap } from '../src/schemas/Player'
 import { InventoryInput } from '../src/schemas/Item'
 import { AuctionServiceImpl } from '../src/services/AuctionServiceImpl'
 import { NewBidMsg, NewSaleMsg } from '@auction/common/messages'
+import redisMock from 'ioredis-mock'
+import { UserService } from '../src/services/UserService'
+import { UserServiceImpl } from '../src/services/UserServiceImpl'
+import Redis from 'ioredis'
 
 describe('AuctionController', () => {
   let controller: AuctionController
   let mockAuctionService: MockProxy<AuctionService>
   let mockWebSocketAdapter: MockProxy<WebSocketAdapter>
+  let redis: Redis
+  let userService: UserService
 
   const defaultConfig: AuctionConfig = {
     id: 'auction1',
@@ -28,7 +34,12 @@ describe('AuctionController', () => {
 
     mockWebSocketAdapter = mock<WebSocketAdapter>()
 
-    controller = new AuctionController(mockAuctionService, mockWebSocketAdapter, mockWebSocketAdapter)
+    redis = new redisMock()
+    userService = new UserServiceImpl(redis)
+    controller = new AuctionController(mockAuctionService, mockWebSocketAdapter, mockWebSocketAdapter, userService)
+  })
+  afterAll(() => {
+    redis.flushall()
   })
 
   it('should handle player connections', () => {

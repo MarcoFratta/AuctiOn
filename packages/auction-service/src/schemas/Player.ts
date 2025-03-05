@@ -9,7 +9,11 @@ export const PlayerSchema = z.object({
   id: z.string(),
   status: PlayerStatusSchema,
 })
+export const PlayerInfoSchema = z.object({
+  username: z.string(),
+})
 
 export type Player = z.infer<typeof PlayerSchema>
+export type PlayerInfo = z.infer<typeof PlayerInfoSchema>
 export type ItemsMap = z.infer<typeof ItemsMapSchema>
 export type PlayerState = z.infer<typeof PlayerStatusSchema>

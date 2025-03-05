@@ -30,7 +30,7 @@ import { Bid } from '../../schemas/Bid'
 import { Sale } from '../../schemas/Sale'
 import { saleWeight, toInventory } from '../../converters/AuctionConverter'
 import { AuctionInfo } from '../../schemas/Auction'
-import { Player } from '../../schemas/Player'
+import { Player, PlayerInfo } from '../../schemas/Player'
 import { Leaderboard } from '../../schemas/Leaderboard'
 import logger from '@auction/common/logger'
 
@@ -119,9 +119,10 @@ export const playerLeaveMessage = (playerId: string): PlayerLeaveMsg => {
     playerId,
   })
 }
-export const playerJoinMessage = (playerId: string): PlayerJoinMsg => {
+export const playerJoinMessage = (playerId: string, info: PlayerInfo): PlayerJoinMsg => {
   return validateSchema(playerJoinSchema, {
     type: 'player-join',
     playerId,
+    username: info.username,
   })
 }

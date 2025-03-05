@@ -6,6 +6,10 @@ import { mock, MockProxy } from 'jest-mock-extended'
 import { AuctionConfig } from '../src/schemas/Auction'
 import { AuctionServiceImpl } from '../src/services/AuctionServiceImpl'
 import { LobbyCreatedEvent, LobbyJoinedEvent, LobbyLeftEvent } from '@auction/common/events/lobby'
+import redisMock from 'ioredis-mock'
+import Redis from 'ioredis'
+import { UserServiceImpl } from '../src/services/UserServiceImpl'
+
 
 jest.setTimeout(60 * 1000)
 describe('KafkaConsumer', () => {
@@ -13,6 +17,7 @@ describe('KafkaConsumer', () => {
   let mockAuctionService: MockProxy<AuctionService>
   let kafka: StartedKafkaContainer
   let producer: any
+  let redis: Redis
 
   const defaultConfig: AuctionConfig = {
     id: 'lobby1',
@@ -65,8 +70,9 @@ describe('KafkaConsumer', () => {
       brokers: [`localhost:${kafka.getMappedPort(9093)}`],
       clientId: 'test-consumer',
     })
-
-    kafkaConsumer = new KafkaConsumer(kafkaClient, mockAuctionService, 'test-group')
+    const redis = new redisMock()
+    const userService = new UserServiceImpl(redis)
+    kafkaConsumer = new KafkaConsumer(kafkaClient, mockAuctionService, 'test-group', userService)
     await kafkaConsumer.connect()
   })
 
@@ -102,6 +108,7 @@ describe('KafkaConsumer', () => {
         type: 'lobby-joined',
         lobbyId: 'lobby1',
         playerId: 'player2',
+        username: 'player2',
       }
 
       await sendMessage(event)

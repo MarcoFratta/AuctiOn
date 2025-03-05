@@ -13,14 +13,17 @@ import {
 } from '@auction/common/events/lobby'
 import { match } from 'ts-pattern'
 import { auctionConfigSchema } from '../schemas/Auction'
+import { UserService } from '../services/UserService'
 
 export class KafkaConsumer {
   private consumer: Consumer
   private auctionService: AuctionService
+  private userService: UserService
 
-  constructor(kafka: Kafka, auctionService: AuctionService, groupId: string) {
+  constructor(kafka: Kafka, auctionService: AuctionService, groupId: string, userService: UserService) {
     this.consumer = kafka.consumer({ groupId })
     this.auctionService = auctionService
+    this.userService = userService
   }
 
   async connect(): Promise<void> {
@@ -47,7 +50,7 @@ export class KafkaConsumer {
     logger.info('Kafka consumer disconnected')
   }
 
-  private async handleLobbyEvent(msg: any, type: LobbyEventType): Promise<void> {
+  private async handleLobbyEvent(msg: unknown, type: LobbyEventType): Promise<void> {
     logger.debug(`Processing lobby event: ${JSON.stringify(type)}`)
     try {
       match(type.type)
@@ -57,6 +60,7 @@ export class KafkaConsumer {
         })
         .with('lobby-joined', async () => {
           const event = validateSchema(lobbyJoinedEventSchema, msg)
+          await this.userService.addUser(event.playerId, { username: event.username })
           await this.auctionService.playerJoin(event.playerId, event.lobbyId)
         })
         .with('lobby-created', async () => {
@@ -68,10 +72,16 @@ export class KafkaConsumer {
         })
         .with('lobby-left', async () => {
           const event = validateSchema(lobbyLeftEventSchema, msg)
+          await this.userService.removeUser(event.playerId)
           await this.auctionService.playerLeave(event.playerId, event.lobbyId)
         })
         .with('lobby-deleted', async () => {
           const event = validateSchema(lobbyDeletedEventSchema, msg)
+          this.auctionService.getAuction(event.lobbyId).then(auction => {
+            auction.players.forEach(async player => {
+              await this.userService.removeUser(player.id)
+            })
+          })
           await this.auctionService.removeAuction(event.lobbyId)
         })
         .otherwise(() => {

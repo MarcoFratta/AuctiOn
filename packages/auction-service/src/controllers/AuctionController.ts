@@ -33,17 +33,19 @@ import {
 } from '../domain/messages/MessageFactory'
 import { Sale, SaleSchema } from '../schemas/Sale'
 import { AuctionInfo } from '../schemas/Auction'
+import { UserService } from '../services/UserService'
 
 export class AuctionController {
   private auctionService: AuctionService
   private eventSource: PlayerEventSource
   private playerChannel: PlayerChannel
+  private userService: UserService
 
-  constructor(auctionService: AuctionService, eventSource: PlayerEventSource, playerChannel: PlayerChannel) {
+  constructor(auctionService: AuctionService, eventSource: PlayerEventSource, playerChannel: PlayerChannel, userService: UserService) {
     this.auctionService = auctionService
     this.eventSource = eventSource
     this.playerChannel = playerChannel
-
+    this.userService = userService
     this.eventSource.onPlayerConnect(this.handlePlayerConnect)
     this.eventSource.onPlayerDisconnect(this.handlePlayerDisconnect)
     this.eventSource.onPlayerMessage(this.handlePlayerMessage)
@@ -105,8 +107,15 @@ export class AuctionController {
         this.playerChannel.sendToPlayer(playerId, auctionMessage(auction, playerId))
         logger.info(`Lobby players ${auction.players.map(p => p.id)}`)
         auction.players.forEach(p => {
-          logger.info(`Sending player ${p.id} join message to player ${playerId}`)
-          this.playerChannel.sendToPlayer(playerId, playerJoinMessage(p.id))
+          this.userService
+            .getUser(p.id)
+            .then(info => {
+              if (info) {
+                logger.info(`Sending player ${p.id} join message to player ${playerId}`)
+                this.playerChannel.sendToPlayer(playerId, playerJoinMessage(p.id, info))
+              }
+            })
+            .catch(err => logger.error(`Error getting user info: ${err}`))
         })
         auction.players
           .filter(p => p.status == 'connected')
@@ -138,7 +147,7 @@ export class AuctionController {
       })
   }
 
-  private lobbyBroadcast = (players: Player[], msg: any): void => {
+  private lobbyBroadcast = (players: Player[], msg: AuctionMessage): void => {
     players.forEach(player => {
       this.playerChannel.sendToPlayer(player.id, msg)
     })
@@ -184,11 +193,14 @@ export class AuctionController {
   private handlePlayerJoin = (auctionId: string, playerId: string) => {
     this.auctionService
       .getAuction(auctionId)
-      .then(auction => {
-        this.lobbyBroadcast(
-          auction.players.filter(p => p.id != playerId),
-          playerJoinMessage(playerId)
-        )
+      .then(async auction => {
+        const info = await this.userService.getUser(playerId)
+        if (info) {
+          this.lobbyBroadcast(
+            auction.players.filter(p => p.id != playerId),
+            playerJoinMessage(playerId, info)
+          )
+        }
       })
       .catch(err => {
         logger.warn(`Error handling player join: ${err}`)

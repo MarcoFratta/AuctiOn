@@ -16,6 +16,8 @@ import { UserNotAuthenticatedError } from './errors/Errors'
 import { validateSchema } from '@auction/common/validation'
 import { userSchema } from './schemas/User'
 import { config } from './configs/config'
+import { UserService } from './services/UserService'
+import { UserServiceImpl } from './services/UserServiceImpl'
 
 export class App {
   public wsAdapter: WebSocketAdapter
@@ -28,6 +30,7 @@ export class App {
   readonly server: http.Server
   private readonly app: Server
   private readonly express: Express
+  private readonly userService: UserService
 
   constructor(kafka: Kafka, redis: Redis) {
     this.redis = redis
@@ -36,14 +39,15 @@ export class App {
     this.app = this.setupWebSocket()
     this.auctionService = new AuctionServiceImpl(new RedisAuctionRepo(redis))
     this.wsAdapter = new WebSocketAdapter(this.app)
-    this.auctionController = new AuctionController(this.auctionService, this.wsAdapter, this.wsAdapter)
+    this.userService = new UserServiceImpl(redis)
+    this.auctionController = new AuctionController(this.auctionService, this.wsAdapter, this.wsAdapter, this.userService)
     this.timerController = new TimerController(this.auctionService, this.wsAdapter, this.wsAdapter)
     this.kafkaProducer = new KafkaProducer(kafka, this.auctionService, this.wsAdapter)
-    this.kafkaConsumer = new KafkaConsumer(kafka, this.auctionService, 'auction-events')
-    this.server.on('upgrade', (req, socket, head) => {
+    this.kafkaConsumer = new KafkaConsumer(kafka, this.auctionService, 'auction-events', this.userService)
+    this.server.on('upgrade', (req, _socket, _head) => {
       logger.info(`WebSocket server upgrade request received: ${req.url}`)
     })
-    this.app.on('upgrade', (req, socket, head) => {
+    this.app.on('upgrade', (req, _s, _h) => {
       logger.info(`WebSocket upgrade request received: ${req.url}`)
     })
     this.app.on('connection', socket => {
@@ -111,7 +115,7 @@ export class App {
       try {
         validateSchema(userSchema, socket.handshake.auth.user)
         return next()
-      } catch (e) {
+      } catch (_error) {
         return next(new UserNotAuthenticatedError())
       }
     })
