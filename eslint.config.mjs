@@ -3,12 +3,13 @@ import tseslint from 'typescript-eslint'
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
 import unusedImports from 'eslint-plugin-unused-imports'
 
-
 export default tseslint.config(
   {
-    files: ['**/*.{ts}'],
-    ...tseslint.configs.recommended,
-    eslintPluginPrettierRecommended,
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      ...tseslint.configs.recommended,
+      eslintPluginPrettierRecommended,
+    ],
     languageOptions: {
       parser: tseslint.parser,
       parserOptions: {
@@ -27,7 +28,7 @@ export default tseslint.config(
     },
     rules: {
       '@typescript-eslint/no-unused-vars': 'off',
-      eqeqeq: 'off',
+      'eqeqeq': 'off',
       'unused-imports/no-unused-imports': 'error',
       'prefer-const': ['error', { ignoreReadBeforeAssign: true }],
       'unused-imports/no-unused-vars': [
@@ -44,4 +45,4 @@ export default tseslint.config(
   {
     ignores: ['**/__tests__/**/*', '**/*.{js,cjs,mjs}'],
   }
-);
+)

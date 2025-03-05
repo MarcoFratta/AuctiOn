@@ -1,18 +1,4 @@
 {
-  "overrides": [
-    {
-      "files": "*.ts",
-      "options": {
-        "parser": "typescript"
-      }
-    },
-    {
-      "files": "*.json",
-      "options": {
-        "parser": "json"
-      }
-    }
-  ],
   "printWidth": 140,
   "tabWidth": 2,
   "semi": false,
@@ -22,5 +8,22 @@
   "arrowParens": "avoid",
   "proseWrap": "preserve",
   "endOfLine": "auto",
-  "htmlWhitespaceSensitivity": "css"
+  "htmlWhitespaceSensitivity": "css",
+  "parser": "typescript",
+  "overrides": [
+    {
+      "files": "*.json",
+      "options": {
+        "parser": "json"
+      }
+    },
+    {
+      "files": "*.vue",
+      "options": {
+        "semi": false,
+        "singleQuote": true,
+        "printWidth": 100
+      }
+    }
+  ]
 }
