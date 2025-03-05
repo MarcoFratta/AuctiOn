@@ -4,8 +4,11 @@ import { KafkaProducer } from '../src/controllers/KafkaProducer'
 import { LobbyService } from '../src/services/LobbyService'
 import { mock } from 'jest-mock-extended'
 import { Lobby } from '../src/schemas/Lobby'
+import { PlayerNotFoundError } from '../src/errors/LobbyErrors'
+
 
 jest.setTimeout(60000)
+
 describe('KafkaProducer', () => {
   let kafka: StartedKafkaContainer
   let kafkaProducer: KafkaProducer
@@ -13,6 +16,7 @@ describe('KafkaProducer', () => {
   let consumer: Consumer
   let receivedMessages: any[] = []
   let callbacks: Map<string, Function[]>
+
 
   const defaultLobby: Lobby = {
     id: 'lobby1',
@@ -129,6 +133,9 @@ describe('KafkaProducer', () => {
 
     it('should produce lobby-joined event', async () => {
       const playerId = 'player2'
+      mockLobbyService.getPlayer.mockResolvedValue({
+        username: 'player2',
+      })
       callbacks.get('onLobbyJoined')![0](defaultLobby, playerId)
 
       await waitForMessages()
@@ -137,7 +144,13 @@ describe('KafkaProducer', () => {
         type: 'lobby-joined',
         lobbyId: defaultLobby.id,
         playerId,
+        username: 'player2',
       })
+    })
+    it('should handle error in getPlayer', async () => {
+      mockLobbyService.getPlayer.mockRejectedValue(new PlayerNotFoundError())
+      await expect(waitForMessages).rejects.toThrow()
+
     })
 
     it('should produce lobby-left event', async () => {
@@ -176,6 +189,9 @@ describe('KafkaProducer', () => {
     })
 
     it('should handle multiple events in sequence', async () => {
+      mockLobbyService.getPlayer.mockResolvedValue({
+        username: 'player2',
+      })
       callbacks.get('onLobbyCreated')![0](defaultLobby)
       callbacks.get('onLobbyJoined')![0](defaultLobby, 'player2')
       callbacks.get('onLobbyStarted')![0](defaultLobby)

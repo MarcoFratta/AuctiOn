@@ -14,7 +14,9 @@ export const playerSchema = z
     userId: z.string().min(1),
   })
   .merge(playerStatusSchema)
-
+export const playerInfoSchema = z.object({
+  username: z.string().min(1).max(30),
+})
 export const lobbyConfigSchema = z.object({
   maxPlayers: z.number().min(1).max(10),
   rounds: z.number().min(1).max(10),
@@ -36,6 +38,7 @@ export const lobbySchema = lobbyIdSchema
 export type Lobby = z.infer<typeof lobbySchema>
 export type LobbyId = z.infer<typeof lobbyIdSchema>
 export type Player = z.infer<typeof playerSchema>
+export type PlayerInfo = z.infer<typeof playerInfoSchema>
 export type PlayerStatus = z.infer<typeof playerStatus>
 export type LobbyConfig = z.infer<typeof lobbyConfigSchema>
 export type LobbyStatus = z.infer<typeof lobbyStatusSchema>

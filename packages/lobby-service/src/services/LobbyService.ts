@@ -1,4 +1,4 @@
-import { Lobby, PlayerStatus } from '../schemas/Lobby'
+import { Lobby, PlayerInfo, PlayerStatus } from '../schemas/Lobby'
 import { LobbyEventsSource } from './LobbyEventsSource'
 
 export interface LobbyService extends LobbyEventsSource {
@@ -15,6 +15,8 @@ export interface LobbyService extends LobbyEventsSource {
   setStatus(id: string, userId: string, status: PlayerStatus): Promise<Lobby>
 
   startMatch(id: string, creator: string): Promise<Lobby>
+
+  getPlayer(id: string): Promise<PlayerInfo>
 
   getLobby(id: string): Promise<Lobby>
 

@@ -3,9 +3,12 @@ import { MongoLobbyRepo } from '../src/repositories/MongoLobbyRepo'
 import { UserLobbyRepo } from '../src/repositories/UserLobbyRepo'
 import { mock, MockProxy } from 'jest-mock-extended'
 import { Lobby, lobbySchema } from '../src/schemas/Lobby'
+import axios from 'axios'
+import { PlayerNotFoundError } from '../src/errors/LobbyErrors'
 
 jest.mock('../src/repositories/MongoLobbyRepo');
 jest.mock('../src/repositories/UserLobbyRepo');
+jest.mock('axios')
 
 describe('LobbyService', () => {
     let mockLobbyRepo: MockProxy<MongoLobbyRepo>;
@@ -561,6 +564,32 @@ describe('LobbyService', () => {
             mockLobbyRepo.findById.mockResolvedValue(lobby)
             expect(lobbyService.getLobby(lobbyId)).resolves.toEqual(lobby)
         })
+    })
+    it('should get the info of a player', async () => {
+        const playerId = 'playerId'
+        const lobbyId = 'lobbyId'
+        mockUserLobbyRepo.getUserActiveLobby.mockResolvedValue({
+            userId: playerId,
+            lobbyId: lobbyId,
+            state: 'waiting',
+            joinedAt: new Date(),
+            leftAt: undefined,
+        })
+        const playerInfo = {
+            email: 'player21@em.com',
+            name: 'player1',
+            id: 'playerId',
+        };
+
+        (axios.get as jest.Mock).mockResolvedValue({ data: playerInfo })
+        await expect(lobbyService.getPlayer(playerId)).resolves.toEqual({
+            username: playerInfo.name,
+        })
+    })
+    it('should return null if the user does not exists', () => {
+        const playerId = 'playerId';
+        (axios.get as jest.Mock).mockRejectedValue(new Error())
+        expect(lobbyService.getPlayer(playerId)).rejects.toThrow(new PlayerNotFoundError())
     })
 
 

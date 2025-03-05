@@ -1,4 +1,4 @@
-import { Lobby, Player, PlayerStatus } from '../schemas/Lobby'
+import { Lobby, Player, PlayerInfo, playerInfoSchema, PlayerStatus } from '../schemas/Lobby'
 import { LobbyRepository } from '../repositories/LobbyRepository'
 import {
   ForbiddenError,
@@ -13,6 +13,9 @@ import {
 import { LobbyService } from './LobbyService'
 import { UserLobbyRepo } from '../repositories/UserLobbyRepo'
 import logger from '@auction/common/logger'
+import { config } from '../configs/config'
+import axios from 'axios'
+import { validateSchema } from '@auction/common/validation'
 
 export class LobbyServiceImpl implements LobbyService {
   private readonly lobbyRepository: LobbyRepository
@@ -46,6 +49,23 @@ export class LobbyServiceImpl implements LobbyService {
   async getLobby(id: string): Promise<Lobby> {
     const res = await this.lobbyRepository.findById(id)
     return this.checkLobbyExists(res, id)
+  }
+
+  async getPlayer(id: string): Promise<PlayerInfo> {
+    try {
+      const res = await this.userLobbyRepo.getUserActiveLobby(id)
+      if (!res) {
+        throw new PlayerNotFoundError()
+      }
+      const { data: info } = await axios.get(`${config.userServiceUrl}/${id}`)
+      logger.info(`retrieved user info ${info}`)
+      return validateSchema(playerInfoSchema, {
+        username: info.name,
+      }) as PlayerInfo
+    } catch (e) {
+      logger.error(`Failed to get player info: ${e}`)
+      throw new PlayerNotFoundError()
+    }
   }
 
   async deleteLobby(id: string): Promise<boolean> {

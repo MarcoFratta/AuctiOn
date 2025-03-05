@@ -1,5 +1,5 @@
 import { validateSchema } from '@auction/common/validation'
-import { Lobby } from '../../schemas/Lobby'
+import { Lobby, PlayerInfo } from '../../schemas/Lobby'
 import {
   LobbyCreatedEvent,
   lobbyCreatedEventSchema,
@@ -31,11 +31,12 @@ export const lobbyCreatedEvent = (lobby: Lobby): LobbyCreatedEvent => {
   })
 }
 
-export const lobbyJoinedEvent = (playerId: string, lobby: Lobby): LobbyJoinedEvent => {
+export const lobbyJoinedEvent = (playerId: string, info: PlayerInfo, lobby: Lobby): LobbyJoinedEvent => {
   return validateSchema(lobbyJoinedEventSchema, {
     type: 'lobby-joined',
     lobbyId: lobby.id,
     playerId,
+    username: info.username,
   })
 }
 
