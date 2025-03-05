@@ -1,13 +1,13 @@
 import { RequestHandler } from 'express'
 import { ZodTypeAny } from 'zod'
-import { validateSchema, ValidationError } from './Validator'
+import { validateSchema, ValidationError } from './Validator.js'
 
 const validate = (schema: ZodTypeAny, source: 'body' | 'params' | 'query'): RequestHandler => {
   return (req, res, next) => {
     try {
       validateSchema(schema, req[source])
       next()
-    } catch (err) {
+    } catch (err: any) {
       if (err instanceof ValidationError) {
         res.status(400).json({
           message: `Invalid ${source}`,

@@ -3,19 +3,61 @@
   "version": "1.0.0",
   "scripts": {
     "test": "npx jest",
-    "build": "tsc"
+    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build:esm": "tsc -p tsconfig.esm.json",
+    "build": "npm run build:cjs && npm run build:esm"
   },
   "exports": {
-    ".": "./dist/index.js",
-    "./logger": "./dist/src/logger/Logger.js",
-    "./events/auction": "./dist/src/events/AuctionEvents.js",
-    "./events/lobby": "./dist/src/events/LobbyEvents.js",
-    "./messages": "./dist/src/messages/AuctionMessages.js",
-    "./mongo": "./dist/src/connections/MongoDB.js",
-    "./redis": "./dist/src/connections/RedisDB.js",
-    "./validation": "./dist/src/validation/Validator.js",
-    "./zod": "./dist/src/utils/ZodWrapper.js",
-    "./middlewares": "./dist/src/middlewares/ValidationMiddleware.js"
+    ".": {
+      "import": "./dist/esm/src/index.js",
+      "require": "./dist/cjs/src/index.js",
+      "types": "./dist/cjs/src/index.d.ts"
+    },
+    "./logger": {
+      "import": "./dist/esm/src/logger/Logger.js",
+      "require": "./dist/cjs/src/logger/Logger.js",
+      "types": "./dist/cjs/src/logger/Logger.d.ts"
+    },
+    "./events/auction": {
+      "import": "./dist/esm/src/events/AuctionEvents.js",
+      "require": "./dist/cjs/src/events/AuctionEvents.js",
+      "types": "./dist/cjs/src/events/AuctionEvents.d.ts"
+    },
+    "./events/lobby": {
+      "import": "./dist/esm/src/events/LobbyEvents.js",
+      "require": "./dist/cjs/src/events/LobbyEvents.js",
+      "types": "./dist/cjs/src/events/LobbyEvents.d.ts"
+    },
+    "./messages": {
+      "import": "./dist/esm/src/messages/AuctionMessages.js",
+      "require": "./dist/cjs/src/messages/AuctionMessages.js",
+      "types": "./dist/cjs/src/messages/AuctionMessages.d.ts"
+    },
+    "./mongo": {
+      "import": "./dist/esm/src/connections/MongoDB.js",
+      "require": "./dist/cjs/src/connections/MongoDB.js",
+      "types": "./dist/cjs/src/connections/MongoDB.d.ts"
+    },
+    "./redis": {
+      "import": "./dist/esm/src/connections/RedisDB.js",
+      "require": "./dist/cjs/src/connections/RedisDB.js",
+      "types": "./dist/cjs/src/connections/RedisDB.d.ts"
+    },
+    "./validation": {
+      "import": "./dist/esm/src/validation/Validator.js",
+      "require": "./dist/cjs/src/validation/Validator.js",
+      "types": "./dist/cjs/src/validation/Validator.d.ts"
+    },
+    "./zod": {
+      "import": "./dist/esm/src/utils/ZodWrapper.js",
+      "require": "./dist/cjs/src/utils/ZodWrapper.js",
+      "types": "./dist/cjs/src/utils/ZodWrapper.d.ts"
+    },
+    "./middlewares": {
+      "import": "./dist/esm/src/middlewares/ValidationMiddleware.js",
+      "require": "./dist/cjs/src/middlewares/ValidationMiddleware.js",
+      "types": "./dist/cjs/src/middlewares/ValidationMiddleware.d.ts"
+    }
   },
   "author": "",
   "license": "ISC",
@@ -33,7 +75,6 @@
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^7.3.0",
-    "@auction/common": "^1.0.0",
     "express": "^4.21.2",
     "ioredis": "^5.4.2",
     "mongoose": "^8.9.6",

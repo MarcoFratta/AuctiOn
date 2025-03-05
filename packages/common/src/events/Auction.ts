@@ -1,4 +1,4 @@
-import { z } from '@auction/common/zod'
+import { z } from 'zod'
 
 export const inventorySchema = z.object({
   items: z.array(

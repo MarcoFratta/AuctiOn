@@ -1,5 +1,5 @@
 import { Redis } from 'ioredis'
-import logger from '../logger/Logger'
+import logger from '../logger/Logger.js'
 
 export const createRedisInstance = (url: string, port: number): Redis => {
   return new Redis(port, url, {

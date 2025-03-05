@@ -1,5 +1,5 @@
-import { z } from '@auction/common/zod'
-import { auctionConfigSchema, playerSchema } from './Auction'
+import { z } from 'zod'
+import { auctionConfigSchema, playerSchema } from './Auction.js'
 
 export const lobbySchema = z.object({
   lobbyId: z.string(),

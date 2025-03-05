@@ -14,12 +14,13 @@ RUN npm install
 # Now, copy the common package
 COPY packages/common/package*.json ./packages/common/
 COPY packages/common/tsconfig.json ./packages/common/
+COPY packages/common/tsconfig.cjs.json ./packages/common/
 COPY packages/common/src ./packages/common/src
 
 # Install the common package's dependencies
 WORKDIR /app/packages/common
 RUN npm install
-RUN npm run build
+RUN npm run build:cjs
 
 # Move to the api-gateway folder
 WORKDIR /app/packages/api-gateway

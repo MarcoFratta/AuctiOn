@@ -17,12 +17,13 @@ COPY tsconfig.base.json ./
 # Now, copy the common package
 COPY packages/common/package*.json ./packages/common/
 COPY packages/common/tsconfig.json ./packages/common/
+COPY packages/common/tsconfig.cjs.json ./packages/common/
 COPY packages/common/src ./packages/common/src
 
 # Install the common package's dependencies
 WORKDIR /app/packages/common
 RUN npm install
-RUN npm run build
+RUN npm run build:cjs
 
 # Copy the user service package files
 WORKDIR /app/packages/user-service

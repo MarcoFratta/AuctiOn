@@ -1,6 +1,5 @@
-import { z } from '@auction/common/zod'
-
-import { auctionSchema, bidSchema, inventorySchema, leaderboardSchema } from '../events/Auction'
+import { z } from 'zod'
+import { auctionSchema, bidSchema, inventorySchema, leaderboardSchema, playerSchema } from '../events/Auction.js'
 
 export const playerInfoSchema = z.object({
   money: z.number().min(0),
@@ -60,6 +59,11 @@ export const playerLeaveSchema = z.object({
   type: z.literal('player-leave'),
   playerId: z.string(),
 })
+export const playerStatusSchema = z.object({
+  type: z.literal('player-status'),
+  playerId: z.string(),
+  status: playerSchema.shape.status,
+})
 
 export const roundEndMsgSchema = z.object({
   type: z.literal('round-end'),
@@ -86,7 +90,10 @@ export const typedMessageSchema = z.object({
     'auction',
     'new-bid',
     'new-sale',
+    'player-join',
+    'player-leave',
     'player-connected',
+    'player-status',
     'player-disconnected',
     'round-end',
     'auction-end',
@@ -112,11 +119,13 @@ export type AuctionEndMsg = z.infer<typeof auctionEndMsgSchema>
 export type AuctionDeletedMsg = z.infer<typeof auctionDeletedMsgSchema>
 export type TimerStartMsg = z.infer<typeof timerStartMsgSchema>
 export type PlayerActionsType = z.infer<typeof playerActionsTypeSchema>
+export type PlayerStatusMsg = z.infer<typeof playerStatusSchema>
 export type AuctionMessage =
   | NewBidMsg
   | NewSaleMsg
   | PlayerJoinMsg
   | PlayerLeaveMsg
+  | PlayerStatusMsg
   | ErrorMsg
   | AuctionMsg
   | BidUpdateMsg

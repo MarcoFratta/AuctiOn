@@ -26,6 +26,7 @@
     "typescript": "^5.7.3"
   },
   "dependencies": {
+    "@auction/common": "^1.0.0",
     "express": "^4.21.2",
     "ioredis": "^5.4.2",
     "kafkajs": "^2.2.4",

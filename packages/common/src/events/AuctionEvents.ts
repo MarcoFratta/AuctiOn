@@ -1,5 +1,5 @@
-import { z } from '@auction/common/zod'
-import { bidSchema, inventorySchema, leaderboardSchema } from './Auction'
+import { z } from 'zod'
+import { bidSchema, inventorySchema, leaderboardSchema } from './Auction.js'
 
 const withAuctionId = z.object({
   auctionId: z.string(),
