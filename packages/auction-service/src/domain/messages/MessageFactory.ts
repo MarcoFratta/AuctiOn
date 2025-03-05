@@ -16,6 +16,7 @@ import {
   playerInfoSchema,
   PlayerJoinMsg,
   playerJoinSchema,
+  PlayerLeaveMsg,
   playerLeaveSchema,
   RoundEndMsg,
   roundEndMsgSchema,
@@ -32,7 +33,6 @@ import { AuctionInfo } from '../../schemas/Auction'
 import { Player } from '../../schemas/Player'
 import { Leaderboard } from '../../schemas/Leaderboard'
 import logger from '@auction/common/logger'
-import { PlayerLeaveMsg } from '@auction/common/dist/src/messages/AuctionMessages'
 
 const toPlayerInfo = (player: Player) => {
   return validateSchema(playerInfoSchema, {
