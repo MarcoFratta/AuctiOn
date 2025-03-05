@@ -28,8 +28,8 @@ export class AuthController {
       logger.debug(`Token refreshed successfully`)
       res.cookie('refreshToken', user.refreshToken, {
         httpOnly: true,
-        secure: true,
-        sameSite: 'strict',
+        secure: false,
+        sameSite: 'lax',
       })
       res.status(200).json({ token: user.accessToken, user: user.user })
     } catch (error) {
@@ -49,8 +49,8 @@ export class AuthController {
 
       res.cookie('refreshToken', user.refreshToken, {
         httpOnly: true,
-        secure: true,
-        sameSite: 'strict',
+        secure: false,
+        sameSite: 'lax',
       })
 
       logger.debug(`User ${inputData.email} logged in successfully `)
@@ -82,8 +82,8 @@ export class AuthController {
       logger.debug(`User ${inputData.email} registered successfully`)
       res.cookie('refreshToken', user.refreshToken, {
         httpOnly: true,
-        secure: true,
-        sameSite: 'strict',
+        secure: false,
+        sameSite: 'lax',
       })
       res.status(201).json({
         message: 'User registered successfully',
