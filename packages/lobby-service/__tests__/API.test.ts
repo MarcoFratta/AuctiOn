@@ -71,12 +71,14 @@ describe('Lobby Service Integration Tests with Auth Service Mock', () => {
     app = new App(kafka)
     await LobbyModel.deleteMany({});
     await UserLobbyModel.deleteMany({});
+    await app.start(0)
     jest.clearAllMocks();
   });
 
   afterAll(async () => {
     await closeLocalMongoConnection(mongoServer);
     await kafkaContainer.stop()
+    await app.stop()
   }, 120000);
 
   afterEach(() => {

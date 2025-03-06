@@ -43,6 +43,7 @@ export class LobbyServiceImpl implements LobbyService {
       throw new Error('Failed to create lobby')
     }
     this.notifyLobbyCallbacks('lobby-created', lobby)
+    this.notifyPlayerCallbacks('lobby-joined', lobby, lobby.creator)
     return lobby
   }
 
@@ -190,6 +191,7 @@ export class LobbyServiceImpl implements LobbyService {
     if (!update) {
       throw new Error('Failed to set player status')
     }
+    this.notifyPlayerCallbacks('status-change', update, userId)
     return update
   }
 
@@ -231,10 +233,15 @@ export class LobbyServiceImpl implements LobbyService {
     this.playerCallbacks.get('lobby-left')!.push(callback)
   }
 
+  onPlayerStatusChanged(callback: (lobbyId: Lobby, playerId: string) => void) {
+    this.playerCallbacks.get('status-change')!.push(callback)
+  }
+
   private initCallbacks(): void {
     this.lobbyCallbacks.set('lobby-created', [])
     this.lobbyCallbacks.set('lobby-started', [])
     this.lobbyCallbacks.set('lobby-deleted', [])
+    this.playerCallbacks.set('status-change', [])
     this.playerCallbacks.set('lobby-joined', [])
     this.playerCallbacks.set('lobby-left', [])
   }

@@ -9,5 +9,7 @@ export interface LobbyEventsSource {
 
   onLobbyLeft(callback: (lobbyId: Lobby, playerId: string) => void): void
 
+  onPlayerStatusChanged(callback: (lobbyId: Lobby, playerId: string) => void): void
+
   onLobbyStarted(callback: (lobbyId: Lobby) => void): void
 }

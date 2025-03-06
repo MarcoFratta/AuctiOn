@@ -11,6 +11,8 @@ import {
   lobbyLeftEventSchema,
   LobbyStartedEvent,
   lobbyStartedEventSchema,
+  PlayerStatusEvent,
+  playerStatusEventSchema,
 } from '@auction/common/events/lobby'
 
 export const lobbyCreatedEvent = (lobby: Lobby): LobbyCreatedEvent => {
@@ -59,5 +61,13 @@ export const lobbyDeletedEvent = (lobby: Lobby): LobbyDeletedEvent => {
   return validateSchema(lobbyDeletedEventSchema, {
     type: 'lobby-deleted',
     lobbyId: lobby.id,
+  })
+}
+export const playerStatusEvent = (lobby: Lobby, playerId: string): PlayerStatusEvent => {
+  return validateSchema(playerStatusEventSchema, {
+    type: 'player-status',
+    lobbyId: lobby.id,
+    playerId,
+    status: lobby.players.find(p => p.userId === playerId)?.status,
   })
 }

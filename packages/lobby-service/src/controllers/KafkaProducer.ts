@@ -3,7 +3,14 @@ import logger from '@auction/common/logger'
 import { LobbyService } from '../services/LobbyService'
 import { Lobby } from '../schemas/Lobby'
 import { LobbyEvent } from '@auction/common/events/lobby'
-import { lobbyCreatedEvent, lobbyDeletedEvent, lobbyJoinedEvent, lobbyLeftEvent, lobbyStartedEvent } from '../domain/events/EventFactory'
+import {
+  lobbyCreatedEvent,
+  lobbyDeletedEvent,
+  lobbyJoinedEvent,
+  lobbyLeftEvent,
+  lobbyStartedEvent,
+  playerStatusEvent,
+} from '../domain/events/EventFactory'
 
 export class KafkaProducer {
   private readonly service: LobbyService
@@ -41,6 +48,7 @@ export class KafkaProducer {
     this.service.onLobbyCreated(this.handleLobbyCreated)
     this.service.onLobbyDeleted(this.handleLobbyDeleted)
     this.service.onLobbyStarted(this.handleLobbyStarted)
+    this.service.onPlayerStatusChanged(this.handleStatusChanged)
   }
 
   private async emitEvent(topic: string, payload: LobbyEvent): Promise<void> {
@@ -100,5 +108,8 @@ export class KafkaProducer {
     } catch (error) {
       logger.error(`Failed to handle lobby started event for lobby ${lobby.id}:`, error)
     }
+  }
+  private handleStatusChanged = async (lobby: Lobby, playerId: string) => {
+    await this.emitEvent('lobby-events', playerStatusEvent(lobby, playerId))
   }
 }
