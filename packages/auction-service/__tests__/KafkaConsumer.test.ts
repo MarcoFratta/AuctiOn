@@ -100,7 +100,7 @@ describe('KafkaConsumer', () => {
       await sendMessage(event)
 
       expect(mockAuctionService.createAuction).toHaveBeenCalledWith(defaultConfig)
-      expect(mockAuctionService.playerJoin).toHaveBeenCalledWith('player1', 'lobby1')
+      expect(mockAuctionService.playerJoin).not.toHaveBeenCalled()
     })
 
     it('should handle lobby-joined event', async () => {

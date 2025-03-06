@@ -10,6 +10,7 @@ import {
   lobbyJoinedEventSchema,
   lobbyLeftEventSchema,
   lobbyStartedEventSchema,
+  playerStatusEventSchema,
 } from '@auction/common/events/lobby'
 import { match } from 'ts-pattern'
 import { auctionConfigSchema } from '../schemas/Auction'
@@ -60,15 +61,16 @@ export class KafkaConsumer {
         })
         .with('lobby-joined', async () => {
           const event = validateSchema(lobbyJoinedEventSchema, msg)
-          await this.userService.addUser(event.playerId, { username: event.username })
+          await this.userService.addUser(event.playerId, {
+            username: event.username,
+            status: 'not-ready',
+          })
           await this.auctionService.playerJoin(event.playerId, event.lobbyId)
         })
         .with('lobby-created', async () => {
           const event = validateSchema(lobbyCreatedEventSchema, msg)
-
           const lobby = validateSchema(auctionConfigSchema, { creatorId: event.creator, ...event.lobby })
           await this.auctionService.createAuction(lobby)
-          await this.auctionService.playerJoin(event.creator, event.lobby.id)
         })
         .with('lobby-left', async () => {
           const event = validateSchema(lobbyLeftEventSchema, msg)
@@ -84,8 +86,12 @@ export class KafkaConsumer {
           })
           await this.auctionService.removeAuction(event.lobbyId)
         })
+        .with('player-status', async () => {
+          const event = validateSchema(playerStatusEventSchema, msg)
+          await this.userService.updateUser(event.playerId, { status: event.status })
+        })
         .otherwise(() => {
-          logger.debug(`[KafkaConsumer] Unknown lobby event type: ${type}`)
+          logger.info(`[KafkaConsumer] Unknown lobby event type: ${type}`)
         })
     } catch (e) {
       logger.warn(`[KafkaConsumer] Error handling message: ${e}`)

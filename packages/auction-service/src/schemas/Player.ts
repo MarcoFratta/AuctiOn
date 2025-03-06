@@ -1,5 +1,6 @@
 import { z } from '@auction/common/zod'
 import { ItemSchema } from './Item'
+import { playerStatusEventSchema } from '@auction/common/events/lobby'
 
 export const ItemsMapSchema = z.map(ItemSchema, z.number().min(0))
 export const PlayerStatusSchema = z.enum(['connected', 'not-connected'])
@@ -11,6 +12,7 @@ export const PlayerSchema = z.object({
 })
 export const PlayerInfoSchema = z.object({
   username: z.string(),
+  status: playerStatusEventSchema.shape.status,
 })
 
 export type Player = z.infer<typeof PlayerSchema>

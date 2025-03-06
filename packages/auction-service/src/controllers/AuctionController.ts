@@ -17,7 +17,7 @@ import {
   PlayerActionsType,
   playerActionsTypeSchema,
 } from '@auction/common/messages'
-import { Player } from 'schemas/Player'
+import { Player, PlayerInfo } from 'schemas/Player'
 import {
   auctionDeletedMessage,
   auctionEndMessage,
@@ -26,6 +26,7 @@ import {
   errorMessage,
   playerConnectedMessage,
   playerDisconnectedMessage,
+  playerInfoMessage,
   playerJoinMessage,
   playerLeaveMessage,
   roundEndMessage,
@@ -54,6 +55,7 @@ export class AuctionController {
     this.auctionService.onAuctionDeleted(this.handleAuctionDeleted)
     this.auctionService.onPlayerLeave(this.handlePlayerLeave)
     this.auctionService.onPlayerJoin(this.handlePlayerJoin)
+    this.userService.onPlayerChange(this.sendPlayerInfo)
   }
 
   handlePlayerMessage = (playerId: string, message: AuctionMessage): void => {
@@ -113,16 +115,14 @@ export class AuctionController {
               if (info) {
                 logger.info(`Sending player ${p.id} join message to player ${playerId}`)
                 this.playerChannel.sendToPlayer(playerId, playerJoinMessage(p.id, info))
+                if (p.status == 'connected') {
+                  logger.info(`Sending player ${p.id} connect message to player ${playerId}`)
+                  this.playerChannel.sendToPlayer(playerId, playerConnectedMessage(p.id))
+                }
               }
             })
             .catch(err => logger.error(`Error getting user info: ${err}`))
         })
-        auction.players
-          .filter(p => p.status == 'connected')
-          .forEach(p => {
-            logger.info(`Sending player ${playerId} connect message to player ${p.id}`)
-            this.playerChannel.sendToPlayer(playerId, playerConnectedMessage(p.id))
-          })
 
         logger.info(`Broadcasting player connected message to auction players`)
         this.lobbyBroadcast(
@@ -205,5 +205,10 @@ export class AuctionController {
       .catch(err => {
         logger.warn(`Error handling player join: ${err}`)
       })
+  }
+  private sendPlayerInfo = (playerId: Player['id'], playerInfo: PlayerInfo) => {
+    this.auctionService.getPlayerAuction(playerId).then(auction => {
+      this.lobbyBroadcast(auction.players, playerInfoMessage(playerId, playerInfo))
+    })
   }
 }
