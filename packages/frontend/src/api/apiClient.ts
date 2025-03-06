@@ -3,8 +3,9 @@ import { useAuthStore } from '@/stores/authStore.ts'
 import { UnauthenticatedError } from '@/api/Errors.ts'
 
 const apiClient = axios.create({
-  baseURL: 'http://localhost:8080', // Replace with your API URL
+  baseURL: 'http://192.168.1.120:8080', // Replace with your API URL
   headers: { 'Content-Type': 'application/json' },
+  timeout: 5000,
   withCredentials: true, // Allows sending cookies (refresh token)
 })
 
@@ -31,6 +32,14 @@ apiClient.interceptors.response.use(
   async (error) => {
     const authStore = useAuthStore()
 
+    // Check if the request is already the refresh request
+    const originalRequest = error.config
+    if (originalRequest.url === '/auth/refresh') {
+      console.error('Refresh token request failed:', error)
+      authStore.clearTokens()
+      return Promise.reject(error)
+    }
+
     if (error.response?.status === 401) {
       if (!isRefreshing) {
         isRefreshing = true
@@ -40,15 +49,15 @@ apiClient.interceptors.response.use(
           const accessToken = res.data.token
           console.log('Access token refreshed:', accessToken)
           authStore.setTokens(accessToken)
-          console.log('Retrying original request...')
 
           // Notify all queued requests
-          const r = apiClient(error.config)
           onRefreshed(accessToken)
-          return r
+
+          // Retry the failed request
+          return apiClient(originalRequest)
         } catch (refreshError) {
           console.error('Failed to refresh access token:', refreshError)
-          authStore.clearTokens() // Remove invalid tokens
+          authStore.clearTokens()
           return Promise.reject(UnauthenticatedError)
         } finally {
           isRefreshing = false
@@ -58,8 +67,8 @@ apiClient.interceptors.response.use(
       // Wait for the refresh process to complete before retrying the original request
       return new Promise((resolve) => {
         refreshSubscribers.push((token) => {
-          error.config.headers.Authorization = `Bearer ${token}`
-          resolve(apiClient(error.config))
+          originalRequest.headers.Authorization = `Bearer ${token}`
+          resolve(apiClient(originalRequest))
         })
       })
     }
