@@ -59,6 +59,7 @@ const handleForm = async (event: Event) => {
     if (!canSubmit.value) throw new InvalidData()
     waitingResponse.value = true
     await register(values.name!, values.email!, values.password!)
+    router.push('/')
   } catch (error) {
     if (error instanceof UserAlreadyRegistered) {
       await alerts.error('User already registered', 'Please sign in')

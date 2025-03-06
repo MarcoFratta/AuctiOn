@@ -1,4 +1,3 @@
-import { useRouter } from 'vue-router'
 import {
   login as loginApi,
   refresh as refreshApi,
@@ -8,7 +7,6 @@ import { useAuthStore } from '@/stores/authStore.ts'
 import { useUserStore } from '@/stores/userStore.ts'
 
 export function useAuth() {
-  const router = useRouter()
   const tokens = useAuthStore()
   const users = useUserStore()
 
@@ -45,6 +43,7 @@ export function useAuth() {
     } catch (error) {
       console.error('Refresh failed', error)
       logout()
+      throw error
     }
   }
 
@@ -53,5 +52,5 @@ export function useAuth() {
     users.removeUser()
   }
 
-  return { register, login, logout, refresh }
+  return { register, login, refresh }
 }
