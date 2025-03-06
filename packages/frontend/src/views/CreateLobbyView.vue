@@ -6,15 +6,16 @@ import InventorySelector from '@/components/InventorySelector.vue'
 import { computed, ref } from 'vue'
 import { lobbyConfigSchema } from '@/schemas/LobbySchema.ts'
 import LoadingButton from '@/components/LoadingButton.vue'
-import { createLobby } from '@/api/lobbyService.ts'
 import { useAuthStore } from '@/stores/authStore.ts'
 import { useErrorsHandler } from '@/composables/useErrorsHandler.ts'
 import { InvalidData } from '@/api/Errors.ts'
 import { useLobbyStore } from '@/stores/lobbyStore.ts'
 import router from '@/router'
+import { useLobbyService } from '@/composables/useLobbyService.ts'
 
 const authStore = useAuthStore()
 const lobbyStore = useLobbyStore()
+const lobbyService = useLobbyService()
 const isAuthenticated = computed(() => authStore.isAuthenticated)
 const schema = toTypedSchema(lobbyConfigSchema)
 const { values, errors, defineField, validate } = useForm({
@@ -65,7 +66,7 @@ const handleForm = async (event: Event) => {
     if (!canSubmit.value) throw new InvalidData()
     waitForResponse.value = true
 
-    const res = await createLobby({
+    const res = await lobbyService.createLobby({
       rounds: values.rounds!,
       maxPlayers: values.maxPlayers!,
       bidTime: values.bidTime!,

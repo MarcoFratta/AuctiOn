@@ -16,27 +16,34 @@
 
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-routr'
+import { useRouter } from 'vue-router'
 import LoadingButton from '@/components/LoadingButton.vue'
 import { useAuth } from '@/composables/useAuth.js'
 import { useAuthStore } from '@/stores/authStore.js'
+import { useLobbyService } from '@/composables/useLobbyService.ts'
 
-const router = useRouter)
-const lobbyId = ref(''
+const router = useRouter()
 
-const goToLobby = () => router.push('/lobby')const createLobby = () => router.push('/create')
-onst joinLobby = () => router.push(`/join`)
+const lobbyId = ref('')
+
+const goToLobby = () => router.push('/lobby')
+const createLobby = () => router.push('/create')
+const joinLobby = () => router.push(`/join`)
+const lobbyService = useLobbyService()
 const authStore = useAuthStore()
 const authenticated = computed(() => authStore.isAuthenticated)
 
 onMounted(() => {
-  useAuth()
-    .refresh()
-    .then(() => {
-      console.log('Authenticated')
-    })
-    .catch((e) => {
-      console.error(e)
-    })
+  if (!authenticated.value) {
+    useAuth()
+      .refresh()
+      .then(() => {
+        console.log('Authenticated')
+      })
+      .then(() => {})
+      .catch((e) => {
+        console.error(e)
+      })
+  }
 })
 </script>
