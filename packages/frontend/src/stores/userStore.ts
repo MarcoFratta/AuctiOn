@@ -1,12 +1,18 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { z } from 'zod'
 
+export const userSchema = z.object({
+  id: z.string(),
+  username: z.string(),
+  email: z.string().email(),
+})
+export type User = z.infer<typeof userSchema>
 export const useUserStore = defineStore('user', {
   state: () => ({
-    user: ref(null),
+    user: null as User | null,
   }),
   actions: {
-    setUser(newUser: any) {
+    setUser(newUser: User) {
       this.user = newUser
     },
     removeUser() {
