@@ -1,12 +1,4 @@
-import {
-  AlreadyInLobby,
-  InvalidData,
-  NotFound,
-  PasswordIncorrect,
-  TooManyRequests,
-  UnauthenticatedError,
-  UserAlreadyRegistered,
-} from '@/api/Errors.ts'
+import { AlreadyInLobby, InvalidData, NotFound, UnauthenticatedError } from '@/api/Errors.ts'
 import { useAlert } from '@/composables/useAlert.ts'
 
 export interface ErrorInfo {
@@ -16,37 +8,39 @@ export interface ErrorInfo {
 
 export class ErrorsHandler {
   private info: ErrorInfo
-
-  constructor(private error: any) {
+  constructor(private error: unknown) {
     this.info = { message: '' }
   }
 
-  invalidData(message: string = 'Invalid data') {
-    return this.check('Invalid data', message, InvalidData)
+  invalidData(message: string = 'Invalid data', callback?: () => void) {
+    return this.check('Invalid data', message, InvalidData, callback)
   }
 
-  userAlreadyRegistered(message: string = 'User is already registered, please sign in') {
-    return this.check('User already registered', message, UserAlreadyRegistered)
+  authenticationError(
+    message: string = 'User is not authenticated, please sign in',
+    callback?: () => void,
+  ) {
+    return this.check('Authentication error', message, UnauthenticatedError, callback)
   }
 
-  authenticationError(message: string = 'User is not authenticated, please sign in') {
-    return this.check('Authentication error', message, UnauthenticatedError)
+  alreadyInLobby(message: string = 'You already joined a lobby', callback?: () => void) {
+    return this.check('Already in lobby', message, AlreadyInLobby, callback)
   }
 
-  passwordIncorrect(message: string = 'Password is incorrect') {
-    return this.check('Password incorrect', message, PasswordIncorrect)
+  tooMunknownRequests(
+    message: string = 'Too munknown requests, please try again later',
+    callback?: () => void,
+  ) {
+    return this.check('Too munknown requests', message, TooMunknownRequests, callback)
   }
 
-  alreadyInLobby(message: string = 'You already joined a lobby') {
-    return this.check('Already in lobby', message, AlreadyInLobby)
+  notFound(message: string = 'Content not found', callback?: () => void) {
+    return this.check('Not found', message, NotFound, callback)
   }
 
-  tooManyRequests(message: string = 'Too many requests, please try again later') {
-    return this.check('Too many requests', message, TooManyRequests)
-  }
-
-  notFound(message: string = 'Content not found') {
-    return this.check('Not found', message, NotFound)
+  run() {
+    this.callback()
+    return this
   }
 
   unknownError(message: string = 'An error occurred') {
@@ -54,13 +48,19 @@ export class ErrorsHandler {
     return this
   }
 
+  private callback: () => void = () => {}
+
   get(): ErrorInfo {
     return this.info
   }
 
-  private check(title: string, message: string, type: any) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private check(title: string, message: string, type: any, callback?: () => void) {
     if (this.error instanceof type) {
       this.info = { title, message }
+      if (callback) {
+        this.callback = callback
+      }
     }
     return this
   }
@@ -69,7 +69,7 @@ export class ErrorsHandler {
 export function useErrorsHandler() {
   const alerts = useAlert()
 
-  function create(err: any): ErrorsHandler {
+  function create(err: unknown): ErrorsHandler {
     return new ErrorsHandler(err)
   }
 
