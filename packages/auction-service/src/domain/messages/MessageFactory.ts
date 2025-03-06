@@ -13,6 +13,8 @@ import {
   playerConnectedMsgSchema,
   PlayerDisconnectedMsg,
   playerDisconnectedMsgSchema,
+  PlayerInfoMsg,
+  playerInfoMsgSchema,
   playerInfoSchema,
   PlayerJoinMsg,
   playerJoinSchema,
@@ -124,5 +126,12 @@ export const playerJoinMessage = (playerId: string, info: PlayerInfo): PlayerJoi
     type: 'player-join',
     playerId,
     username: info.username,
+  })
+}
+export const playerInfoMessage = (playerId: string, info: PlayerInfo): PlayerInfoMsg => {
+  return validateSchema(playerInfoMsgSchema, {
+    type: 'player-info',
+    playerId,
+    playerInfo: info,
   })
 }
