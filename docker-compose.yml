@@ -9,6 +9,7 @@ services:
       - PORT=${LOBBY_S_C_PORT:-3000}
       - NODE_ENV=${LOBBY_S_NODE_ENV:-production}
       - AUTH_SERVICE_URI=${LOBBY_S_AUTH_SERVICE_URI:-http://auth-service:3000/auth}
+      - USER_SERVICE_URI=${LOBBY_S_USER_SERVICE_URI:-http://user-service:3000/users}
       - KAFKA_BROKERS=${LOBBY_S_KAFKA_BROKERS:-kafka:9092}
     networks:
       - lobby-network
