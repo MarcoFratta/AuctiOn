@@ -31,7 +31,7 @@ export async function login(email: string, password: string) {
 export async function register(name: string, email: string, password: string) {
   try {
     const response = await apiClient.post('/auth/register', { name, email, password })
-    if (!(response.status === 200)) {
+    if (!(response.status === 201)) {
       throw new Error(JSON.stringify(response))
     }
     return response.data
@@ -49,6 +49,11 @@ export async function register(name: string, email: string, password: string) {
 }
 
 export async function refresh() {
-  const response = await apiClient.post('/auth/refresh')
-  return response.data
+  try {
+    const response = await apiClient.post('/auth/refresh')
+    return response.data
+  } catch (e) {
+    console.log('Failed to !refresh token:', e)
+    throw e
+  }
 }
