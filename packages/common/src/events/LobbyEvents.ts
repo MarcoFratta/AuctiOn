@@ -15,6 +15,7 @@ export const lobbyJoinedEventSchema = z.object({
   type: z.literal('lobby-joined'),
   lobbyId: lobbySchema.shape.lobbyId,
   playerId: playerSchema.shape.id,
+  username: z.string(),
 })
 export const lobbyLeftEventSchema = z.object({
   type: z.literal('lobby-left'),
@@ -30,13 +31,20 @@ export const lobbyDeletedEventSchema = z.object({
   lobbyId: lobbySchema.shape.lobbyId,
 })
 export const lobbyEventTypeSchema = z.object({
-  type: z.enum(['lobby-created', 'lobby-joined', 'lobby-left', 'lobby-started', 'lobby-deleted']),
+  type: z.enum(['lobby-created', 'lobby-joined', 'lobby-left', 'lobby-started', 'lobby-deleted', 'player-status']),
+})
+export const playerStatusEventSchema = z.object({
+  type: z.literal('player-status'),
+  playerId: playerSchema.shape.id,
+  lobbyId: lobbySchema.shape.lobbyId,
+  status: playerSchema.shape.status,
 })
 
 export type LobbyEventType = z.infer<typeof lobbyEventTypeSchema>
 export type LobbyCreatedEvent = z.infer<typeof lobbyCreatedEventSchema>
 export type LobbyJoinedEvent = z.infer<typeof lobbyJoinedEventSchema>
 export type LobbyLeftEvent = z.infer<typeof lobbyLeftEventSchema>
+export type PlayerStatusEvent = z.infer<typeof playerStatusEventSchema>
 export type LobbyStartedEvent = z.infer<typeof lobbyStartedEventSchema>
 export type LobbyDeletedEvent = z.infer<typeof lobbyDeletedEventSchema>
-export type LobbyEvent = LobbyCreatedEvent | LobbyJoinedEvent | LobbyLeftEvent | LobbyStartedEvent | LobbyDeletedEvent
+export type LobbyEvent = LobbyCreatedEvent | LobbyJoinedEvent | LobbyLeftEvent | LobbyStartedEvent | LobbyDeletedEvent | PlayerStatusEvent

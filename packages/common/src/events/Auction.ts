@@ -14,6 +14,10 @@ export const playerSchema = z.object({
   id: z.string(),
   status: z.string(),
 })
+export const playerLobbyInfoSchema = z.object({
+  username: z.string(),
+  status: z.string(),
+})
 export const saleSchema = z.object({
   items: inventorySchema,
   sellerId: playerSchema.shape.id,
