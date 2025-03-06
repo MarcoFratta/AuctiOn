@@ -1,4 +1,10 @@
-import { AlreadyInLobby, InvalidData, NotFound, UnauthenticatedError } from '@/api/Errors.ts'
+import {
+  AlreadyInLobby,
+  InvalidData,
+  NotFound,
+  TooManyRequests,
+  UnauthenticatedError,
+} from '@/api/Errors.ts'
 import { useAlert } from '@/composables/useAlert.ts'
 
 export interface ErrorInfo {
@@ -27,11 +33,11 @@ export class ErrorsHandler {
     return this.check('Already in lobby', message, AlreadyInLobby, callback)
   }
 
-  tooMunknownRequests(
-    message: string = 'Too munknown requests, please try again later',
+  tooManyRequests(
+    message: string = 'Too unknown requests, please try again later',
     callback?: () => void,
   ) {
-    return this.check('Too munknown requests', message, TooMunknownRequests, callback)
+    return this.check('Too unknown requests', message, TooManyRequests, callback)
   }
 
   notFound(message: string = 'Content not found', callback?: () => void) {
