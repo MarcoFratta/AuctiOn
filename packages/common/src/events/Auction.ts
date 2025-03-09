@@ -18,8 +18,12 @@ export const playerLobbyInfoSchema = z.object({
   username: z.string(),
   status: z.string(),
 })
+export const saleInfoSchema = z.object({
+  weight: z.number(),
+})
+
 export const saleSchema = z.object({
-  items: inventorySchema,
+  info: saleInfoSchema,
   sellerId: playerSchema.shape.id,
   endTimestamp: z.string().datetime().optional(),
 })

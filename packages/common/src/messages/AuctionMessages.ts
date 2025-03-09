@@ -1,15 +1,18 @@
 import { z } from 'zod'
-import { auctionSchema, bidSchema, inventorySchema, leaderboardSchema, playerLobbyInfoSchema, playerSchema } from '../events/Auction.js'
+import {
+  auctionSchema,
+  bidSchema,
+  inventorySchema,
+  leaderboardSchema,
+  playerLobbyInfoSchema,
+  playerSchema,
+  saleInfoSchema,
+} from '../events/Auction.js'
 
 export const playerInfoSchema = z.object({
   money: z.number().min(0),
   inventory: inventorySchema,
 })
-
-export const saleInfoSchema = z.object({
-  weight: z.number(),
-})
-
 // input messages
 export const newBidMsgSchema = z.object({
   type: z.literal('bid'),
@@ -41,7 +44,7 @@ export const bidUpdateMsgSchema = z.object({
 })
 export const saleUpdateMsgSchema = z.object({
   type: z.literal('new-sale'),
-  sale: saleInfoSchema,
+  info: saleInfoSchema,
 })
 export const playerConnectedMsgSchema = z.object({
   type: z.literal('player-connected'),
@@ -66,11 +69,11 @@ export const playerStatusSchema = z.object({
   status: playerSchema.shape.status,
 })
 
-export const roundEndMsgSchema = z.object({
-  type: z.literal('round-end'),
-  nextRound: z.number().min(1),
-  playerInfo: playerInfoSchema,
-})
+export const roundEndMsgSchema = auctionMsgSchema.merge(
+  z.object({
+    type: z.literal('round-end'),
+  })
+)
 
 export const auctionEndMsgSchema = z.object({
   type: z.literal('auction-end'),
@@ -84,6 +87,12 @@ export const timerStartMsgSchema = z.object({
   type: z.literal('timer-start'),
   time: z.string().datetime(),
 })
+export const auctionStartMsgSchema = auctionMsgSchema.merge(
+  z.object({
+    type: z.literal('auction-start'),
+  })
+)
+
 export const playerInfoMsgSchema = z.object({
   type: z.literal('player-info'),
   playerId: z.string(),
@@ -104,6 +113,7 @@ export const typedMessageSchema = z.object({
     'player-disconnected',
     'round-end',
     'auction-end',
+    'auction-start',
     'auction-deleted',
     'timer-start',
   ]),
@@ -127,6 +137,7 @@ export type AuctionDeletedMsg = z.infer<typeof auctionDeletedMsgSchema>
 export type PlayerInfoMsg = z.infer<typeof playerInfoMsgSchema>
 export type TimerStartMsg = z.infer<typeof timerStartMsgSchema>
 export type PlayerActionsType = z.infer<typeof playerActionsTypeSchema>
+export type AuctionStartMsg = z.infer<typeof auctionStartMsgSchema>
 export type PlayerStatusMsg = z.infer<typeof playerStatusSchema>
 export type AuctionMessage =
   | NewBidMsg
@@ -143,5 +154,6 @@ export type AuctionMessage =
   | PlayerDisconnectedMsg
   | RoundEndMsg
   | AuctionEndMsg
+  | AuctionStartMsg
   | AuctionDeletedMsg
   | TimerStartMsg
