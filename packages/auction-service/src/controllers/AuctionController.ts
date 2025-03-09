@@ -22,6 +22,7 @@ import {
   auctionDeletedMessage,
   auctionEndMessage,
   auctionMessage,
+  auctionStartMessage,
   bidUpdateMessage,
   errorMessage,
   playerConnectedMessage,
@@ -52,6 +53,7 @@ export class AuctionController {
     this.eventSource.onPlayerMessage(this.handlePlayerMessage)
     this.auctionService.onAuctionEnd(this.handleAuctionEnd)
     this.auctionService.onRoundEnd(this.handleRoundEnd)
+    this.auctionService.onAuctionStart(this.handleAuctionStart)
     this.auctionService.onAuctionDeleted(this.handleAuctionDeleted)
     this.auctionService.onPlayerLeave(this.handlePlayerLeave)
     this.auctionService.onPlayerJoin(this.handlePlayerJoin)
@@ -105,9 +107,7 @@ export class AuctionController {
     this.auctionService
       .setPlayerState(playerId, 'connected')
       .then(auction => {
-        logger.info(`Sending auction message to player ${playerId}`)
         this.playerChannel.sendToPlayer(playerId, auctionMessage(auction, playerId))
-        logger.info(`Lobby players ${auction.players.map(p => p.id)}`)
         auction.players.forEach(p => {
           this.userService
             .getUser(p.id)
@@ -119,6 +119,7 @@ export class AuctionController {
                   logger.info(`Sending player ${p.id} connect message to player ${playerId}`)
                   this.playerChannel.sendToPlayer(playerId, playerConnectedMessage(p.id))
                 }
+                this.playerChannel.sendToPlayer(playerId, playerInfoMessage(p.id, info))
               }
             })
             .catch(err => logger.error(`Error getting user info: ${err}`))
@@ -209,6 +210,11 @@ export class AuctionController {
   private sendPlayerInfo = (playerId: Player['id'], playerInfo: PlayerInfo) => {
     this.auctionService.getPlayerAuction(playerId).then(auction => {
       this.lobbyBroadcast(auction.players, playerInfoMessage(playerId, playerInfo))
+    })
+  }
+  private handleAuctionStart = (auction: AuctionInfo) => {
+    auction.players.forEach(player => {
+      this.playerChannel.sendToPlayer(player.id, auctionStartMessage(auction, player.id))
     })
   }
 }

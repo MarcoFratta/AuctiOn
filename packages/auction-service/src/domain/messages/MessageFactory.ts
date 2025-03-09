@@ -5,6 +5,8 @@ import {
   auctionEndMsgSchema,
   AuctionMsg,
   auctionMsgSchema,
+  AuctionStartMsg,
+  auctionStartMsgSchema,
   BidUpdateMsg,
   bidUpdateMsgSchema,
   ErrorMsg,
@@ -47,7 +49,15 @@ export const auctionMessage = (auction: AuctionInfo, playerId: string): AuctionM
   const player: Player = auction.players.find(p => p.id === playerId)!
   return validateSchema(auctionMsgSchema, {
     type: 'auction',
-    auction: auction,
+    auction: {
+      ...auction,
+      currentSale: auction.currentSale
+        ? {
+            ...auction.currentSale,
+            info: saleUpdateMessage(auction.currentSale).info,
+          }
+        : undefined,
+    },
     playerInfo: toPlayerInfo(player),
   })
 }
@@ -67,7 +77,7 @@ export const bidUpdateMessage = (bid: Bid): BidUpdateMsg => {
 export const saleUpdateMessage = (sale: Sale): SaleUpdateMsg => {
   return validateSchema(saleUpdateMsgSchema, {
     type: 'new-sale',
-    sale: {
+    info: {
       weight: saleWeight.convert(sale),
     },
   })
@@ -86,11 +96,15 @@ export const playerDisconnectedMessage = (playerId: string): PlayerDisconnectedM
 }
 
 export const roundEndMessage = (auction: AuctionInfo, playerId: string): RoundEndMsg => {
-  const player: Player = auction.players.find(p => p.id === playerId)!
   return validateSchema(roundEndMsgSchema, {
+    ...auctionMessage(auction, playerId),
     type: 'round-end',
-    nextRound: auction.currentRound,
-    playerInfo: toPlayerInfo(player),
+  })
+}
+export const auctionStartMessage = (auction: AuctionInfo, playerId: string): AuctionStartMsg => {
+  return validateSchema(auctionStartMsgSchema, {
+    ...auctionMessage(auction, playerId),
+    type: 'auction-start',
   })
 }
 export const auctionEndMessage = (leaderboard: Leaderboard): AuctionEndMsg => {

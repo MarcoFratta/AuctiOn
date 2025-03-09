@@ -77,8 +77,8 @@ describe('AuctionService', () => {
   describe('Auction Start', () => {
     it('should start an auction', async () => {
       await service.createAuction(defaultConfig)
-      await service.playerJoin('player1', defaultConfig.id)
-      await service.playerJoin('player2', defaultConfig.id)
+      await joinAndConnectPlayer('player1', defaultConfig.id)
+      await joinAndConnectPlayer('player2', defaultConfig.id)
 
       await service.startAuction(defaultConfig.id)
 
@@ -90,8 +90,8 @@ describe('AuctionService', () => {
 
     it('should set up seller queue on start', async () => {
       await service.createAuction(defaultConfig)
-      await service.playerJoin('player1', defaultConfig.id)
-      await service.playerJoin('player2', defaultConfig.id)
+      await joinAndConnectPlayer('player1', defaultConfig.id)
+      await joinAndConnectPlayer('player2', defaultConfig.id)
 
       await service.startAuction(defaultConfig.id)
 
@@ -276,7 +276,7 @@ describe('AuctionService', () => {
     const auction = createMockAuction()
     auction.maxRound = 1 // Set only one round
     await service.createAuction(auction)
-    await service.playerJoin('player1', auction.id)
+    await joinAndConnectPlayer('player1', auction.id)
     await service.startAuction(auction.id)
 
     const endedAuction = (await service.endRound('auction1')) as Leaderboard
@@ -450,5 +450,19 @@ describe('AuctionService', () => {
       items: new Map([['square', 1]]),
     }
     await service.playerSale(sale)
+  })
+  it('should skip the disconnected player also if it is the first player', async () => {
+    const auction = createMockAuction()
+    auction.maxPlayers = 3
+    auction.maxRound = 3
+    auction.startInventory.items.map(item => item.quantity = 5)
+    await service.createAuction(auction)
+    await service.playerJoin('player1', auction.id)
+    await joinAndConnectPlayer('player2', auction.id)
+    await joinAndConnectPlayer('player3', auction.id)
+    await service.setPlayerState('player1', 'not-connected')
+    const info = await service.startAuction(auction.id)
+    expect(info.currentRound).toBe(1)
+    expect(info.sellerQueue).toEqual(['player2', 'player3', 'player1'])
   })
 })

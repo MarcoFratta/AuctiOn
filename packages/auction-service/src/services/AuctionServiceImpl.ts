@@ -115,6 +115,12 @@ export class AuctionServiceImpl extends CallbacksService implements AuctionServi
     logger.info(`Starting auction ${auction.id}`)
     auction.start()
     this.saveAuction(auction)
+    if (auction.isTerminated()) {
+      await this.deleteAuction(auction)
+      const leaderboard = auction.computeLeaderboard()
+      this.notifyLeaderBoardUpdate(leaderboard, auctionId)
+    }
+    this.notifyAuctionUpdate(auction.toInfo(), 'onAuctionStarted')
     return auction.toInfo()
   }
 

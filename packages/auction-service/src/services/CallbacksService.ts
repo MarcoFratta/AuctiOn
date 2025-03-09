@@ -9,7 +9,7 @@ export class CallbacksService implements AuctionEventsSource {
   private playersCallbacks = new Map<string, ((auctionId: string, playerId: string) => void)[]>()
 
   constructor() {
-    const auctionTypes = ['onRoundEnd', 'onAuctionEnd', 'onNewBid', 'onNewSale', 'onAuctionDeleted']
+    const auctionTypes = ['onRoundEnd', 'onAuctionEnd', 'onAuctionStarted', 'onNewBid', 'onNewSale', 'onAuctionDeleted']
     const playerTypes = ['onPlayerJoin', 'onPlayerLeave']
     auctionTypes.forEach(t => this.auctionsCallbacks.set(t, []))
     playerTypes.forEach(t => this.playersCallbacks.set(t, []))
@@ -17,6 +17,10 @@ export class CallbacksService implements AuctionEventsSource {
 
   onAuctionEnd(callback: (auction: Leaderboard, auctionId: Auction['id']) => void): void {
     this.leaderBoardCallbacks.push(callback)
+  }
+
+  onAuctionStart(callback: (auction: AuctionInfo) => void) {
+    this.auctionsCallbacks.get('onAuctionStarted')!.push(callback)
   }
 
   onRoundEnd(callback: (auction: AuctionInfo) => void): void {

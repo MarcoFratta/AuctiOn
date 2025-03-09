@@ -1,7 +1,7 @@
 import { z } from '@auction/common/zod'
 import { PlayerSchema } from './Player'
 import { BidSchema } from './Bid'
-import { SaleSchema } from './Sale'
+import { saleInfoSchema, SaleSchema } from './Sale'
 import { InventoryOutputSchema } from './Item'
 
 export const auctionConfigSchema = z.object({
@@ -43,6 +43,12 @@ export const StoredAuctionSchema = AuctionSchema.merge(
     ),
   })
 )
+export const auctionMsgSchema = AuctionSchema.merge(
+  z.object({
+    currentSale: saleInfoSchema.optional(),
+  })
+)
 export type AuctionInfo = z.infer<typeof AuctionSchema>
+export type AuctionMessage = z.infer<typeof auctionMsgSchema>
 export type AuctionConfig = z.infer<typeof auctionConfigSchema>
 export type StoredAuction = z.infer<typeof StoredAuctionSchema>

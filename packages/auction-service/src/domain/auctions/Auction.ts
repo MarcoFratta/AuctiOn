@@ -151,6 +151,7 @@ export class AuctionImpl implements Auction {
   start(): void {
     this.startTimestamp = new Date().toISOString()
     this.sellerQueue = PlayOrderStrategy.sameOrder(this.players.map(player => player.id))
+    this.skipDisconnectedPlayers()
   }
 
   isTerminated(): boolean {
@@ -189,17 +190,23 @@ export class AuctionImpl implements Auction {
 
   private goToNextRound(): void {
     this.currentRound++
+    if (!this.skipDisconnectedPlayers()) return // End auction if all players are disconnected
+  }
+
+  private skipDisconnectedPlayers(): boolean {
     let disconnectedCounter = 0
     while (this.getPlayer(this.getCurrentSellerId()).status === 'not-connected') {
-      logger.debug(`Player ${this.getCurrentSellerId()} disconnected, skipping round: ${this.currentRound}`)
+      logger.debug(`Player ${this.getCurrentSellerId()} disconnected, skipping them.`)
       this.sellerQueue = this.rotateLeft(this.sellerQueue)
       disconnectedCounter++
-      if (disconnectedCounter == this.players.length - 1) {
-        logger.debug(`Too many players disconnected, ending auction: ${this.id}`)
+
+      if (disconnectedCounter === (this.currentRound == 1 ? this.players.length : this.players.length - 1)) {
+        logger.debug(`All players disconnected, ending auction: ${this.id}`)
         this.endTimestamp = new Date().toISOString()
-        return
+        return false // Indicate that the auction should end
       }
     }
+    return true // Indicate that at least one player is connected
   }
 
   private getCurrentSellerId(): Player['id'] {

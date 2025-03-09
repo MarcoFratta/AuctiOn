@@ -148,7 +148,7 @@ describe('Auction System Integration Test', () => {
     const player1 = io(`http://localhost:${port}`, { path: '/auction', auth: { token: 'player1' } })
     const player2 = io(`http://localhost:${port}`, { path: '/auction', auth: { token: 'player2' } })
     const player3 = io(`http://localhost:${port}`, { path: '/auction', auth: { token: 'player3' } })
-    await service.startAuction(defaultConfig.id)
+
 
     const messages: Record<string, any[]> = {
       player1: [],
@@ -160,6 +160,7 @@ describe('Auction System Integration Test', () => {
       connectPlayer(player2, { id: 'player2', name: 'player2', email: 'e@email.com' }, messages),
       connectPlayer(player3, { id: 'player3', name: 'player3', email: 'e@email.com' }, messages),
     ])
+    await service.startAuction(defaultConfig.id)
 
     logger.info(`starting auction`)
 
@@ -212,10 +213,7 @@ describe('Auction System Integration Test', () => {
     await service.playerJoin('player1', defaultConfig.id)
     await service.playerJoin('player2', defaultConfig.id)
     await service.playerJoin('player3', defaultConfig.id)
-    await service.setPlayerState('player1', 'connected')
-    await service.setPlayerState('player2', 'connected')
-    await service.setPlayerState('player3', 'connected')
-    await service.startAuction(defaultConfig.id)
+
 
     const player1 = io(`http://localhost:${port}`, { path: '/auction', auth: { token: 'player1' } })
     const player2 = io(`http://localhost:${port}`, { path: '/auction', auth: { token: 'player2' } })
@@ -227,6 +225,7 @@ describe('Auction System Integration Test', () => {
       connectPlayer(player2, { id: 'player2', name: 'player2', email: 'e@email.com' }, messages),
       connectPlayer(player3, { id: 'player3', name: 'player3', email: 'e@email.com' }, messages),
     ])
+    await service.startAuction(defaultConfig.id)
 
     // Player 1 starts a sale
     player1.emit('sell', sale([{ item: 'square', quantity: 1 }]))
@@ -302,10 +301,7 @@ describe('Auction System Integration Test', () => {
     await service.playerJoin('player1', config.id)
     await service.playerJoin('player2', config.id)
     await service.playerJoin('player3', config.id)
-    await service.setPlayerState('player1', 'connected')
-    await service.setPlayerState('player2', 'connected')
-    await service.setPlayerState('player3', 'connected')
-    await service.startAuction(config.id)
+
 
     const player1 = io(`http://localhost:${port}`, { path: '/auction', auth: { token: 'player1' } })
     const player2 = io(`http://localhost:${port}`, { path: '/auction', auth: { token: 'player2' } })
@@ -317,6 +313,8 @@ describe('Auction System Integration Test', () => {
       connectPlayer(player2, { id: 'player2', name: 'player2', email: 'e@email.com' }, messages),
       connectPlayer(player3, { id: 'player3', name: 'player3', email: 'e@email.com' }, messages),
     ])
+
+    await service.startAuction(config.id)
 
     // Player 1 starts a sale
     player1.emit('sell', sale([{ item: 'triangle', quantity: 1 }]))
@@ -361,7 +359,7 @@ describe('Auction System Integration Test', () => {
     await service.playerJoin('player1', config.id)
     await service.playerJoin('player2', config.id)
     await service.playerJoin('player3', config.id)
-    await service.startAuction(config.id)
+
 
     const player1 = io(`http://localhost:${port}`, { path: '/auction', auth: { token: 'player1' } })
     const player2 = io(`http://localhost:${port}`, { path: '/auction', auth: { token: 'player2' } })
@@ -373,6 +371,8 @@ describe('Auction System Integration Test', () => {
       connectPlayer(player2, { id: 'player2', name: 'player2', email: 'e@email.com' }, messages),
       connectPlayer(player3, { id: 'player3', name: 'player3', email: 'e@email.com' }, messages),
     ])
+
+    await service.startAuction(config.id)
 
     // Player 1 starts a sale
     player1.emit('sell', sale([{ item: 'triangle', quantity: 1 }]))
