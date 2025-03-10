@@ -8,7 +8,7 @@
     <!-- Lobby Info -->
     <header class="text-center mb-6">
       <h3 class="text-lg font-semibold">Lobby ID: {{ lobby?.id ?? 'Not in a lobby' }}</h3>
-      <p>You are: {{ self?.id?.substring(0, 10) ?? 'Not logged in' }}</p>
+      <p>You are: {{ self?.username ?? 'Not logged in' }}</p>
       <p v-if="amIAdmin" class="text-sm text-gray-400 mt-2">You are the admin</p>
     </header>
 
@@ -27,6 +27,13 @@
         @click="setReady"
       >
         {{ ready ? 'Set Not Ready' : 'Set Ready' }}
+      </button>
+      <button
+        v-if="amIAdmin"
+        class="px-4 py-2 bg-gray-700 rounded-lg text-white font-semibold w-full sm:w-auto"
+        @click="start"
+      >
+        Start Auction
       </button>
 
       <button
@@ -49,124 +56,53 @@
 
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
 import { useLobbyStore } from '@/stores/lobbyStore.ts'
 import { useUserStore } from '@/stores/userStore.ts'
 import LobbyPlayers from '@/components/lobby/LobbyPlayers.vue'
 import LobbyConfigs from '@/components/lobby/LobbyConfigs.vue'
 import ShareCard from '@/components/lobby/ShareCard.vue'
-import { useAlert } from '@/composables/useAlert.ts'
 import CopyCard from '@/components/CopyCard.vue'
 import { useLobbyService } from '@/composables/useLobbyService.ts'
-import { useSocketStore } from '@/stores/socketStore.ts'
-import { match } from 'ts-pattern'
-import * as validator from '@auction/common/validation'
-import * as messages from '@auction/common/messages'
-import type { AuctionMessage } from '@auction/common'
+import { useAlert } from '@/composables/useAlert.ts'
+import { useLobbyMsgHandler } from '@/composables/useLobbyMsgHandler.ts'
+import { useRouter } from 'vue-router'
 
-console.log(validator)
-console.log(messages)
-
-const router = useRouter()
 const lobbyStore = useLobbyStore()
 const userStore = useUserStore()
-const socketStore = useSocketStore()
 const lobby = computed(() => lobbyStore.lobby)
 const users = computed(() => lobbyStore.users)
 const self = computed(() => userStore.user)
 const amIAdmin = computed(() => lobby.value?.creatorId === userStore.user?.id)
 const lobbyUrl = ref(`${window.location.origin}/join/${lobby.value?.id}`)
-const ready = ref(false)
-const alerts = useAlert()
+const ready = computed(
+  () => lobbyStore.users?.find((u) => u.id === userStore.user?.id)?.status === 'ready',
+)
+const router = useRouter()
 const lobbyService = useLobbyService()
+const alerts = useAlert()
 const leave = () => {
   lobbyService.leaveLobby()
 }
 const setReady = () => {
-  lobbyService
-    .setState(!ready.value ? 'ready' : 'waiting')
-    .then(() => {
-      ready.value = !ready.value
-    })
-    .catch((e) => {
-      console.error('Error setting ready:', e)
-    })
+  lobbyService.setState(!ready.value ? 'ready' : 'waiting').catch((_e) => {
+    alerts.error("Couldn't set ready", 'Please try again')
+  })
 }
 
 const kick = (id: string) => {
-  lobbyService
-    .kickPlayer(id)
-    .then(() => {
-      console.log('Kicked player:', id)
-    })
-    .catch((e) => {
-      console.error('Error kicking player:', e)
-    })
+  lobbyService.kickPlayer(id)
+}
+const start = () => {
+  lobbyService.startMatch().catch((_e) => {
+    alerts.error("Couldn't start match", 'All players must be ready')
+  })
 }
 
 onMounted(() => {
-  try {
-    const socket = socketStore.connect(
-      () => console.log('Connected to lobby'),
-      (event: AuctionMessage) => {
-        console.log(`Received event: ${JSON.stringify(event)}`)
-        const ev = validator.validateSchema(messages.typedMessageSchema.shape.type, event.type)
-        match(ev)
-          .with('auction', () => {
-            const msg = validator.validateSchema(messages.auctionMsgSchema, event)
-            lobbyStore.setLobby(msg.auction)
-          })
-          .with('player-join', () => {
-            const msg = validator.validateSchema(messages.playerJoinSchema, event)
-            users.value.push({
-              id: msg.playerId,
-              username: msg.username,
-              connected: false,
-              status: 'waiting',
-            })
-          })
-          .with('player-connected', () => {
-            const msg = validator.validateSchema(messages.playerConnectedMsgSchema, event)
-            const user = users.value.find((user) => user.id === msg.playerId)
-            if (user) user.connected = true
-          })
-          .with('player-disconnected', () => {
-            const msg = validator.validateSchema(messages.playerDisconnectedMsgSchema, event)
-            const user = users.value.find((user) => user.id === msg.playerId)
-            if (user) user.connected = false
-          })
-          .with('player-status', () => {
-            const msg = validator.validateSchema(messages.playerStatusSchema, event)
-            const user = users.value.find((user) => user.id === msg.playerId)
-            if (user) user.status = msg.status
-          })
-          .with('player-leave', () => {
-            const msg = validator.validateSchema(messages.playerLeaveSchema, event)
-            lobbyStore.removeUser(msg.playerId)
-          })
-          .with('player-info', () => {
-            const msg = validator.validateSchema(messages.playerInfoMsgSchema, event)
-            lobbyStore.updateUser(msg.playerId, msg.playerInfo)
-          })
-          .with('auction-deleted', () => {
-            lobbyStore.clearLobby()
-            router.push('/').then(() => {
-              alerts.error('Lobby deleted', '')
-            })
-          })
-          .otherwise(() => {
-            console.error('Unknown event:', event)
-          })
-      },
-      async () => {
-        await alerts.error('Disconnected from lobby', '')
-        router.push('/').then(() => lobbyStore.clearLobby())
-      },
-      (error) => console.error('Error:', error),
-    )
-  } catch (e) {
-    console.error('Error connecting to lobby:', e)
-    router.push('/join')
+  if (lobbyStore.lobby?.startTimestamp) {
+    router.push('/play')
+  } else {
+    useLobbyMsgHandler().connectAndHandle()
   }
 })
 </script>
