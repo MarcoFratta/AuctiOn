@@ -4,7 +4,8 @@ import {
   register as registerApi,
 } from '@/api/authService'
 import { useAuthStore } from '@/stores/authStore.ts'
-import { useUserStore } from '@/stores/userStore.ts'
+import { type User, userSchema, useUserStore } from '@/stores/userStore.ts'
+import { validateSchema } from '@auction/common/validation'
 
 export function useAuth() {
   const tokens = useAuthStore()
@@ -38,7 +39,11 @@ export function useAuth() {
     try {
       const data = await refreshApi()
       tokens.setTokens(data.token)
-      users.setUser(data.user)
+      const user: User = validateSchema(userSchema, {
+        ...data.user,
+        username: data.user.name,
+      })
+      users.setUser(user)
       console.log('Refreshed token')
     } catch (error) {
       console.error('Refresh failed', error)
