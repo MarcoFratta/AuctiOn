@@ -465,4 +465,24 @@ describe('AuctionService', () => {
     expect(info.currentRound).toBe(1)
     expect(info.sellerQueue).toEqual(['player2', 'player3', 'player1'])
   })
+  it('should skip a player if he cannot make a sale', async () => {
+    const auction = createMockAuction()
+    auction.maxPlayers = 3
+    auction.maxRound = 5
+    auction.startInventory.items = [{ item: 'square', quantity: 2 }]
+    await service.createAuction(auction)
+    await joinAndConnectPlayer('player1', auction.id)
+    await joinAndConnectPlayer('player2', auction.id)
+    await joinAndConnectPlayer('player3', auction.id)
+    await service.startAuction(auction.id)
+    await service.playerSale({ sellerId: 'player1', items: new Map([['square', 2]]) })
+    await service.playerBid({ playerId: 'player2', round: 1, amount: 50, timestamp: new Date().toISOString() })
+    await service.endRound('auction1')
+    await service.playerSale({ sellerId: 'player2', items: new Map([['square', 1]]) })
+    await service.endRound('auction1')
+    await service.playerSale({ sellerId: 'player3', items: new Map([['square', 1]]) })
+    const info = await service.endRound('auction1') as AuctionInfo
+    expect(info.currentRound).toBe(4)
+    expect(info.sellerQueue[0]).toBe('player2')
+  })
 })

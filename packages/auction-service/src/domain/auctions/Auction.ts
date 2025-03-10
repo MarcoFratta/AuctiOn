@@ -190,21 +190,26 @@ export class AuctionImpl implements Auction {
 
   private goToNextRound(): void {
     this.currentRound++
+    logger.info('Going to next round')
     if (!this.skipDisconnectedPlayers()) return // End auction if all players are disconnected
   }
 
   private skipDisconnectedPlayers(): boolean {
     let disconnectedCounter = 0
-    while (this.getPlayer(this.getCurrentSellerId()).status === 'not-connected') {
-      logger.debug(`Player ${this.getCurrentSellerId()} disconnected, skipping them.`)
+    let p = this.getPlayer(this.getCurrentSellerId())
+    logger.info(`player ${p.id} inventory ${Array.from(p.inventory)}`)
+    while (p.status === 'not-connected' || Array.from(p.inventory.values()).reduce((a, b) => a + b, 0) === 0) {
+      logger.debug(`Player ${this.getCurrentSellerId()} unable to sale, skipping...`)
       this.sellerQueue = this.rotateLeft(this.sellerQueue)
       disconnectedCounter++
 
       if (disconnectedCounter === (this.currentRound == 1 ? this.players.length : this.players.length - 1)) {
-        logger.debug(`All players disconnected, ending auction: ${this.id}`)
+        logger.debug(`No player can sell, ending auction: ${this.id}`)
         this.endTimestamp = new Date().toISOString()
         return false // Indicate that the auction should end
       }
+      p = this.getPlayer(this.getCurrentSellerId())
+      logger.info(`player ${p.id} inventory sum ${Array.from(p.inventory.values()).reduce((a, b) => a + b, 0)}`)
     }
     return true // Indicate that at least one player is connected
   }
