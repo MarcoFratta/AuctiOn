@@ -4,9 +4,11 @@ export class UserAlreadyRegistered extends Error {
   }
 }
 
-export class NotFound extends Error {
+export class NotFound extends Error {}
+
+export class Forbidden extends Error {
   constructor() {
-    super()
+    super('You are not allowed to do this action')
   }
 }
 

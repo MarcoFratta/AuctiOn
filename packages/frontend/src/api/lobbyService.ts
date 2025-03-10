@@ -2,6 +2,11 @@ import type { LobbyConfig } from '@/schemas/LobbySchema.ts'
 import apiClient from '@/api/apiClient.ts'
 import { io } from 'socket.io-client'
 
+export async function start() {
+  const response = await apiClient.post('/lobbies/start')
+  return response.data!
+}
+
 export async function createLobby(lobby: LobbyConfig): Promise<unknown> {
   const response = await apiClient.post('/lobbies/create', lobby)
   return response.data!
