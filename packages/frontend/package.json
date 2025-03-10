@@ -28,6 +28,8 @@
     "@fortawesome/vue-fontawesome": "^3.0.8",
     "@tailwindcss/vite": "^4.0.6",
     "@vee-validate/zod": "^4.15.0",
+    "@vueuse/core": "^12.8.2",
+    "@vueuse/motion": "^2.2.6",
     "axios": "^1.7.9",
     "pinia": "^2.3.1",
     "pinia-plugin-persistedstate": "^4.2.0",
