@@ -1,14 +1,9 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
 import { useAuthStore } from '@/stores/authStore.ts'
-import { useAuth } from '@/composables/useAuth.ts'
-import { useLobbyStore } from '@/stores/lobbyStore.ts'
 
 const authStore = useAuthStore()
-const lobbyStore = useLobbyStore()
-const auth = useAuth()
 const errors = ref()
-auth.refresh()
 
 const notAuthenticated = computed(() => {
   return !authStore.isAuthenticated
