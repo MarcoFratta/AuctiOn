@@ -2,6 +2,7 @@ import type { LobbyConfig } from '@/schemas/LobbySchema.ts'
 import { isAxiosError } from 'axios'
 import {
   AlreadyInLobby,
+  Forbidden,
   InvalidData,
   NotFound,
   TooManyRequests,
@@ -51,6 +52,14 @@ export function useLobbyService() {
     }
   }
 
+  async function startMatch() {
+    try {
+      return await lobbyService.start()
+    } catch (error) {
+      handleError(error)
+    }
+  }
+
   function connectToLobby() {
     try {
       const token = useAuthStore().accessToken
@@ -72,6 +81,9 @@ export function useLobbyService() {
       if (error.status == 400) {
         throw new InvalidData()
       }
+      if (error.status == 403) {
+        throw new Forbidden()
+      }
       if (error.status == 429) {
         throw new TooManyRequests()
       }
@@ -88,6 +100,7 @@ export function useLobbyService() {
     leaveLobby,
     kickPlayer,
     connectToLobby,
+    startMatch,
     setState,
   }
 }
