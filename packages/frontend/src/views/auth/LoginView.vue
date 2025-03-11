@@ -7,9 +7,9 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { signInSchema } from '@/schemas/authSchema.ts'
 import { computed, ref } from 'vue'
 import router from '@/router'
-import { NotFound, PasswordIncorrect, TooManyRequests } from '@/api/Errors.ts'
 import { useAlert } from '@/composables/useAlert.ts'
 import LoadingButton from '@/components/LoadingButton.vue'
+import { useErrorsHandler } from '@/composables/useErrorsHandler.ts'
 
 const { login } = useAuth()
 const schema = toTypedSchema(signInSchema)
@@ -28,7 +28,8 @@ const [password, passwordProps] = defineField('password', {
   }),
 })
 const auth = useAuthStore()
-const alerts = useAlert()
+useAlert()
+const errorHandler = useErrorsHandler()
 const waitingResponse = ref(false)
 const isAuthenticated = computed(() => auth.isAuthenticated)
 const canSubmit = computed(
@@ -41,24 +42,27 @@ const canSubmit = computed(
       errors.value.password
     ) && !waitingResponse.value,
 )
+const redirectTo = (
+  typeof router.currentRoute.value.query.redirect === 'string'
+    ? router.currentRoute.value.query.redirect
+    : '/'
+) as string
 const handleForm = async (event: Event) => {
   try {
     console.log('canSubmit', canSubmit.value)
     if (!canSubmit.value) throw new Error('Invalid form')
     waitingResponse.value = true
     await login(values.email!, values.password!)
-    router.push('/')
+    router.push(redirectTo)
   } catch (e) {
-    if (e instanceof NotFound) {
-      await alerts.error('Account not found', 'Please sign up')
-      router.push('/register')
-    } else if (e instanceof PasswordIncorrect) {
-      await alerts.error('Incorrect password', 'Please try again')
-    } else if (e instanceof TooManyRequests) {
-      await alerts.error('Too many requests', 'Please try again later')
-    } else {
-      await alerts.error('Error', 'An error occurred')
-    }
+    const err = errorHandler
+      .create(e)
+      .notFound('Account not found', 'Please sign up', () =>
+        router.push(`/register?redirect=${redirectTo}`),
+      )
+      .invalidData('Incorrect password', 'Please try again')
+      .tooManyRequests()
+    await errorHandler.showAndRun(err)
   } finally {
     waitingResponse.value = false
   }
@@ -99,7 +103,12 @@ const handleForm = async (event: Event) => {
 
     <p class="text-sm text-gray-600 mt-4">
       Don't have an account?
-      <router-link class="text-blue-500 hover:underline" to="/register">Sign up</router-link>
+      <router-link
+        :to="redirectTo === '/' ? '/register' : `/register?redirect=${redirectTo}`"
+        class="text-blue-500 hover:underline"
+      >
+        Sign up
+      </router-link>
     </p>
   </form>
 </template>

@@ -1,19 +1,20 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
-import { useAuth } from '../composables/useAuth.ts'
-import FormEntry from '../components/FormEntry.vue'
+import { useAuth } from '@/composables/useAuth.ts'
+import FormEntry from '@/components/FormEntry.vue'
 import { useAuthStore } from '@/stores/authStore.ts'
 import { useForm } from 'vee-validate'
 import { signUpSchema } from '@/schemas/authSchema.ts'
 import { toTypedSchema } from '@vee-validate/zod'
-import router from '@/router/index.ts'
-import { useAlert } from '@/composables/useAlert.ts'
 import LoadingButton from '@/components/LoadingButton.vue'
-import { InvalidData, UserAlreadyRegistered } from '@/api/Errors.ts'
+import { InvalidData } from '@/api/Errors.ts'
+import { useErrorsHandler } from '@/composables/useErrorsHandler.ts'
+import { useRouter } from 'vue-router'
 
 const { register } = useAuth()
-const alerts = useAlert()
 const schema = toTypedSchema(signUpSchema)
+const errorHandler = useErrorsHandler()
+const router = useRouter()
 const { values, errors, defineField, validate } = useForm({
   validationSchema: schema,
 })
@@ -37,6 +38,11 @@ const [repeat, repeatProps] = defineField('repeatPassword', {
     error: state.value === values.password ? undefined : 'Passwords do not match,',
   }),
 })
+const redirectTo = (
+  typeof router.currentRoute.value.query.redirect === 'string'
+    ? router.currentRoute.value.query.redirect
+    : '/'
+) as string
 const isAuthenticated = computed(() => useAuthStore().isAuthenticated)
 const canSubmit = computed(
   () =>
@@ -53,24 +59,22 @@ const canSubmit = computed(
     ),
 )
 const waitingResponse = ref(false)
-const handleForm = async (event: Event) => {
+const handleForm = async () => {
   try {
     await validate() // handle validation when all fields are empty and submit is clicked
     if (!canSubmit.value) throw new InvalidData()
     waitingResponse.value = true
     await register(values.name!, values.email!, values.password!)
-    router.push('/')
+    router.push(redirectTo)
   } catch (error) {
-    if (error instanceof UserAlreadyRegistered) {
-      await alerts.error('User already registered', 'Please sign in')
-      router.push('/login')
-    } else if (error instanceof InvalidData) {
-      await alerts.error('Invalid data', 'Please check your data')
-    } else if (error instanceof Error) {
-      await alerts.error('Error', error.message)
-    } else {
-      await alerts.error('Error', 'An error occurred')
-    }
+    const e = errorHandler
+      .create(error)
+      .unknownError('Error', 'An error occurred')
+      .alreadySignedUp('User already registered', 'Please sign in', () => {
+        router.push(redirectTo == '/' ? '/login' : `/login?redirect=${redirectTo}`)
+      })
+      .invalidData('Invalid data', 'Please check your data')
+    await errorHandler.showAndRun(e)
   } finally {
     waitingResponse.value = false
   }
@@ -130,7 +134,11 @@ const handleForm = async (event: Event) => {
 
     <p class="text-sm text-gray-600 mt-4">
       Already have an account?
-      <router-link class="text-blue-500 hover:underline" to="/login">Sign in</router-link>
+      <router-link
+        :to="redirectTo === '/' ? '/login' : `/login?redirect=${redirectTo}`"
+        class="text-blue-500 hover:underline"
+        >Sign in
+      </router-link>
     </p>
   </form>
 </template>
