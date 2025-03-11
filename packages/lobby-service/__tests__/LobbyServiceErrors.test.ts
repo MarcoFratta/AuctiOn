@@ -1,4 +1,3 @@
-// lobbyServiceErrorHandling.test.ts
 import { LobbyServiceImpl } from '../src/services/LobbyServiceImpl'
 import { Lobby } from '../src/schemas/Lobby'
 import { MongoLobbyRepo } from '../src/repositories/MongoLobbyRepo'
@@ -12,7 +11,7 @@ import {
   NotEnoughPlayersError,
   PlayerNotFoundError,
   PlayersNotReadyError,
-  UserAlreadyJoined,
+  UserAlreadyInLobby,
 } from '../src/errors/LobbyErrors'
 
 describe('LobbyService Error Handling', () => {
@@ -64,7 +63,7 @@ describe('LobbyService Error Handling', () => {
       });
 
         await expect(lobbyService.joinLobby('1', 'user1')).rejects.toThrow(
-            UserAlreadyJoined,
+          UserAlreadyInLobby,
         );
     });
 

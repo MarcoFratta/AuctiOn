@@ -8,7 +8,7 @@ import {
   NotEnoughPlayersError,
   PlayerNotFoundError,
   PlayersNotReadyError,
-  UserAlreadyJoined,
+  UserAlreadyInLobby,
 } from '../errors/LobbyErrors'
 import { LobbyService } from './LobbyService'
 import { UserLobbyRepo } from '../repositories/UserLobbyRepo'
@@ -80,7 +80,7 @@ export class LobbyServiceImpl implements LobbyService {
     const res: Lobby | null = await this.lobbyRepository.findById(id)
     const lobby: Lobby = this.checkLobbyExists(res, id)
     if (lobby.players.find((player: Player) => player.userId === userId)) {
-      throw new UserAlreadyJoined()
+      throw new UserAlreadyInLobby(id)
     }
     if (lobby.players.length >= lobby.maxPlayers) {
       throw new LobbyFullError()

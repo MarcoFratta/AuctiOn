@@ -5,7 +5,7 @@ import {
     NotEnoughPlayersError,
     PlayerNotFoundError,
     PlayersNotReadyError,
-    UserAlreadyJoined,
+    UserAlreadyInLobby,
     UserNotAuthenticatedError,
     UserNotInActiveLobby,
 } from '../src/errors/LobbyErrors'
@@ -110,12 +110,12 @@ describe('Error Middleware Tests', () => {
                 message: error.message,
             })
         })
-        it('should handle players already joined error with 400', () => {
-            const error = new UserAlreadyJoined();
+        it('should handle players already joined error with 409', () => {
+            const error = new UserAlreadyInLobby('email')
 
             LobbyErrorMiddleware(error, mockRequest, mockResponse, mockNext);
 
-            expect(mockResponse.status).toHaveBeenCalledWith(400);
+            expect(mockResponse.status).toHaveBeenCalledWith(409)
             expect(mockResponse.json).toHaveBeenCalledWith({
                 error: 'Bad request',
                 message: error.message,

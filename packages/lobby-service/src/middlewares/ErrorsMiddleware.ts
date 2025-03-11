@@ -8,7 +8,6 @@ import {
   PlayersNotReadyError,
   ServiceUnavailableError,
   UserAlreadyInLobby,
-  UserAlreadyJoined,
   UserNotAuthenticatedError,
   UserNotInActiveLobby,
 } from '../errors/LobbyErrors'
@@ -67,11 +66,6 @@ export const LobbyErrorMiddleware = (err: unknown, _req: Request, res: Response,
     res.status(503).json({
       error: 'Service Temporary Unavailable',
       message: 'Service is not responding',
-    })
-  } else if (err instanceof UserAlreadyJoined) {
-    res.status(400).json({
-      error: 'Bad request',
-      message: err.message,
     })
   } else if (err instanceof UserAlreadyInLobby) {
     res.status(409).json({

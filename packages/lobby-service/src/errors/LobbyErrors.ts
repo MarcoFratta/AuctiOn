@@ -46,12 +46,6 @@ export class UserNotAuthenticatedError extends Error {
   }
 }
 
-export class UserAlreadyJoined extends Error {
-  constructor() {
-    super('User already joined the lobby')
-  }
-}
-
 export class ServiceUnavailableError extends Error {
   constructor() {
     super('Service not available')

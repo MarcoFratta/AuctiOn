@@ -4,7 +4,7 @@ import { Response } from 'express'
 import { anyString, mock, MockProxy, mockReset } from 'jest-mock-extended'
 import { Lobby, LobbyConfig } from '../src/schemas/Lobby'
 import { AuthenticatedRequest } from '../src/types/Index'
-import { UserAlreadyJoined } from '../src/errors/LobbyErrors'
+import { UserAlreadyInLobby } from '../src/errors/LobbyErrors'
 
 // Mocking LobbyService
 const mockLobbyService = mock<LobbyServiceImpl>();
@@ -262,12 +262,12 @@ describe('LobbyController', () => {
         const id = '123456789012345678901234';
         mockRequest.params = { id };
         mockRequest.user = { id: 'userId', name: 'name', email: 'email' };
-        mockLobbyService.joinLobby.mockRejectedValue(new UserAlreadyJoined());
+      mockLobbyService.joinLobby.mockRejectedValue(new UserAlreadyInLobby('email'))
         mockResponse.status.mockReturnThis();
         mockResponse.json.mockReturnThis();
 
         await lobbyController.joinLobby(mockRequest, mockResponse, mockNext);
 
-        expect(mockNext).toHaveBeenCalledWith(new UserAlreadyJoined());
+      expect(mockNext).toHaveBeenCalledWith(new UserAlreadyInLobby('email'))
     });
 })
