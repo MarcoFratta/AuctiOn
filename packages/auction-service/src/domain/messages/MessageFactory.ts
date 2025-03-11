@@ -51,12 +51,7 @@ export const auctionMessage = (auction: AuctionInfo, playerId: string): AuctionM
     type: 'auction',
     auction: {
       ...auction,
-      currentSale: auction.currentSale
-        ? {
-            ...auction.currentSale,
-            info: saleUpdateMessage(auction.currentSale).info,
-          }
-        : undefined,
+      currentSale: auction.currentSale ? saleUpdateMessage(auction.currentSale).sale : undefined,
     },
     playerInfo: toPlayerInfo(player),
   })
@@ -77,8 +72,11 @@ export const bidUpdateMessage = (bid: Bid): BidUpdateMsg => {
 export const saleUpdateMessage = (sale: Sale): SaleUpdateMsg => {
   return validateSchema(saleUpdateMsgSchema, {
     type: 'new-sale',
-    info: {
-      weight: saleWeight.convert(sale),
+    sale: {
+      info: {
+        weight: saleWeight.convert(sale),
+      },
+      sellerId: sale.sellerId,
     },
   })
 }
