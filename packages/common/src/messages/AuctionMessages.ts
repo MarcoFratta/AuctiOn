@@ -6,7 +6,7 @@ import {
   leaderboardSchema,
   playerLobbyInfoSchema,
   playerSchema,
-  saleInfoSchema,
+  saleSchema,
 } from '../events/Auction.js'
 
 export const playerInfoSchema = z.object({
@@ -44,7 +44,7 @@ export const bidUpdateMsgSchema = z.object({
 })
 export const saleUpdateMsgSchema = z.object({
   type: z.literal('new-sale'),
-  info: saleInfoSchema,
+  sale: saleSchema.omit({ endTimestamp: true }),
 })
 export const playerConnectedMsgSchema = z.object({
   type: z.literal('player-connected'),
