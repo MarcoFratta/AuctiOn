@@ -55,7 +55,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useLobbyStore } from '@/stores/lobbyStore.ts'
 import { useUserStore } from '@/stores/userStore.ts'
 import LobbyPlayers from '@/components/lobby/LobbyPlayers.vue'
@@ -73,7 +73,7 @@ const lobby = computed(() => lobbyStore.lobby)
 const users = computed(() => lobbyStore.users)
 const self = computed(() => userStore.user)
 const amIAdmin = computed(() => lobby.value?.creatorId === userStore.user?.id)
-const lobbyUrl = ref(`${window.location.origin}/join/${lobby.value?.id}`)
+const lobbyUrl = computed(() => `${window.location.origin}/join/${lobby.value?.id}`)
 const ready = computed(
   () => lobbyStore.users?.find((u) => u.id === userStore.user?.id)?.status === 'ready',
 )

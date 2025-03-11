@@ -3,7 +3,7 @@ import FormEntry from '@/components/FormEntry.vue'
 import { ref } from 'vue'
 import LoadingButton from '@/components/LoadingButton.vue'
 import { useErrorsHandler } from '@/composables/useErrorsHandler.ts'
-import { useLobbyStore } from '@/stores/lobbyStore.ts'
+import { type Lobby, useLobbyStore } from '@/stores/lobbyStore.ts'
 import { useRouter } from 'vue-router'
 import { useLobbyService } from '@/composables/useLobbyService.ts'
 
@@ -15,7 +15,7 @@ const lobbyService = useLobbyService()
 const handleJoin = async (event: Event) => {
   try {
     console.log('Joining lobby with ID:', lobbyId.value)
-    const res = await lobbyService.joinLobby(lobbyId.value)
+    const res = (await lobbyService.joinLobby(lobbyId.value)) as Lobby
     lobbyStore.setLobby(res)
     router.push('/lobby')
   } catch (e) {
