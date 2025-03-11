@@ -4,16 +4,22 @@ import { computed } from 'vue'
 
 const lobbyStore = useLobbyStore()
 const currentSale = computed(() => lobbyStore.lobby?.currentSale)
+const seller = computed(() => {
+  if (!currentSale.value) return undefined
+  return lobbyStore.users.find((p) => p.id === currentSale.value?.sellerId)
+})
 </script>
 
 <template>
   <div class="bg-gray-800 p-4 lg:p-6 rounded-lg shadow-lg h-full">
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-xl font-bold text-white">📦 Current Sale</h2>
-      <div class="bg-gray-700 px-3 py-1 rounded-full">
+      <div
+        class="bg-gray-700 px-3 py-1 rounded-full flex justify-between gap-2 items-center text-center"
+      >
         <span class="text-gray-400"
           >Status:
-          <span class="text-yellow-400 font-bold">
+          <span :class="currentSale ? 'text-green-400' : 'text-yellow-500'" class="font-bold">
             {{ currentSale ? 'Active' : 'Waiting' }}
           </span>
         </span>
@@ -30,7 +36,7 @@ const currentSale = computed(() => lobbyStore.lobby?.currentSale)
         <div class="flex justify-between items-center">
           <span class="text-gray-400">Seller:</span>
           <span class="text-blue-400">
-            {{ lobbyStore.users.find((p) => p.id === currentSale?.sellerId)?.username ?? '' }}
+            {{ seller?.username ?? '' }}
           </span>
         </div>
       </div>

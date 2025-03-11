@@ -37,9 +37,9 @@ const hasSelectedItems = computed(() => {
   <div class="bg-gray-800 w-full p-4 lg:p-6 rounded-lg shadow-lg">
     <!-- Header Section -->
     <div class="flex items-center justify-between mb-4">
-      <h2 class="text-xl font-bold text-white">📦 Your Sale</h2>
+      <h2 class="text-xl font-bold text-white">📦 Sell</h2>
       <div class="bg-gray-700 px-3 py-1 rounded-full">
-        <span class="text-gray-400">Status: <span class="text-yellow-400">Seller Turn</span></span>
+        <span class="text-gray-400"><span class="text-green-400">Your Turn</span></span>
       </div>
     </div>
 

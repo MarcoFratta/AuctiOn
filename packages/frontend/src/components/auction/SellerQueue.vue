@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-gray-800 w-full p-4 lg:p-6 rounded-lg shadow-lg">
+  <div class="bg-gray-800 w-full p-3 sm:p-4 lg:p-6 rounded-lg shadow-lg">
     <h2 class="text-lg font-semibold mb-3">🔄 Seller Queue</h2>
     <div class="overflow-hidden">
       <ul class="grid gap-3">
