@@ -6,11 +6,13 @@ import {
 import { useAuthStore } from '@/stores/authStore.ts'
 import { type User, userSchema, useUserStore } from '@/stores/userStore.ts'
 import { validateSchema } from '@auction/common/validation'
+import { useErrorsHandler } from '@/composables/useErrorsHandler.ts'
+import { PasswordIncorrect, UserAlreadyRegistered } from '@/api/Errors.ts'
 
 export function useAuth() {
   const tokens = useAuthStore()
   const users = useUserStore()
-
+  const { handleError } = useErrorsHandler()
   async function login(email: string, password: string) {
     try {
       const data = await loginApi(email, password)
@@ -18,8 +20,7 @@ export function useAuth() {
       delete data.user.token
       users.setUser(data.user)
     } catch (error) {
-      console.error('Login failed', error)
-      throw error
+      handleError(error, [[400, new PasswordIncorrect()]])
     }
   }
 
@@ -30,8 +31,7 @@ export function useAuth() {
       delete data.user.token
       users.setUser(data.user)
     } catch (error) {
-      console.log('Register failed', error)
-      throw error
+      handleError(error, [[409, new UserAlreadyRegistered(email)]])
     }
   }
 
@@ -44,11 +44,9 @@ export function useAuth() {
         username: data.user.name,
       })
       users.setUser(user)
-      console.log('Refreshed token')
     } catch (error) {
-      console.error('Refresh failed', error)
+      handleError(error)
       logout()
-      throw error
     }
   }
 

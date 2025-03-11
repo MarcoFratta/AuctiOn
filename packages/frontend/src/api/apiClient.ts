@@ -37,7 +37,7 @@ apiClient.interceptors.response.use(
     if (originalRequest.url === '/auth/refresh') {
       console.error('Refresh token request failed:', error)
       authStore.clearTokens()
-      return Promise.reject(error)
+      throw new UnauthenticatedError()
     }
 
     if (error.response?.status === 401) {
@@ -58,7 +58,7 @@ apiClient.interceptors.response.use(
         } catch (refreshError) {
           console.error('Failed to refresh access token:', refreshError)
           authStore.clearTokens()
-          return Promise.reject(UnauthenticatedError)
+          throw new UnauthenticatedError()
         } finally {
           isRefreshing = false
         }

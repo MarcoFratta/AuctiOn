@@ -1,17 +1,11 @@
 import type { LobbyConfig } from '@/schemas/LobbySchema.ts'
-import { isAxiosError } from 'axios'
-import {
-  AlreadyInLobby,
-  Forbidden,
-  InvalidData,
-  NotFound,
-  TooManyRequests,
-  UnauthenticatedError,
-} from '@/api/Errors.ts'
+import { AlreadyInLobby } from '@/api/Errors.ts'
 import * as lobbyService from '@/api/lobbyService.ts'
 import { useAuthStore } from '@/stores/authStore.ts'
+import { useErrorsHandler } from '@/composables/useErrorsHandler.ts'
 
 export function useLobbyService() {
+  const { handleError } = useErrorsHandler()
   async function createLobby(lobby: LobbyConfig): Promise<unknown> {
     try {
       return await lobbyService.createLobby(lobby)
@@ -68,30 +62,6 @@ export function useLobbyService() {
       console.error('Failed to connect to WebSocket:', error)
       throw error
     }
-  }
-
-  function handleError(error: unknown, cases: [number, Error][] = []): void {
-    if (isAxiosError(error)) {
-      if (cases.map((e) => e[0]).includes(error.status ?? 0)) {
-        throw cases.find((e) => e[0] == error.response?.status)?.[1]
-      }
-      if (error.status == 404) {
-        throw new NotFound()
-      }
-      if (error.status == 400) {
-        throw new InvalidData()
-      }
-      if (error.status == 403) {
-        throw new Forbidden()
-      }
-      if (error.status == 429) {
-        throw new TooManyRequests()
-      }
-      if (error.status == 401) {
-        throw new UnauthenticatedError()
-      }
-    }
-    throw error
   }
 
   return {
