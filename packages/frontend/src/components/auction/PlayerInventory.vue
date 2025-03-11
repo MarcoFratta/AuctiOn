@@ -2,6 +2,7 @@
 import { useLobbyStore } from '@/stores/lobbyStore.ts'
 import { computed } from 'vue'
 import { shapeIcons, type ShapeType } from '@/icons/shapes'
+import InventoryItem from '@/components/auction/InventoryItem.vue'
 
 const lobbyStore = useLobbyStore()
 const playerInfo = computed(() => lobbyStore.playerInfo)
@@ -32,33 +33,17 @@ const getItemStyle = (itemName: string) => {
         >
       </div>
     </div>
-
-    <ul class="grid grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-1 gap-2 sm:gap-3">
-      <li
-        v-for="item in playerInfo?.inventory.items"
-        :key="item.item"
-        class="bg-gray-700 p-4 rounded-md flex items-center align-middle relative overflow-hidden shadow-md hover:shadow-lg transition-all"
-      >
-        <!-- Shape indicator based on item type -->
-        <div
-          :class="getItemStyle(item.item).color"
-          class="w-8 h-8 mr-3 flex items-center justify-center"
-          v-html="getItemStyle(item.item).svg"
-        ></div>
-
-        <div class="flex flex-col flex-grow">
-          <span class="text-white font-medium text-sm">{{ item.item }}</span>
-          <span class="text-gray-400 text-xs">Quantity: {{ item.quantity }}</span>
-        </div>
-
-        <!-- Quantity badge for quick view -->
-        <div
-          class="absolute top-1 right-1 bg-gray-800 rounded-full w-6 h-6 flex items-center justify-center"
+    <div class="bg-gray-700 p-4 sm:p-2 md:p-3 lg:p-4 rounded-lg">
+      <ul class="grid grid-cols-1 gap-3">
+        <li
+          v-for="item in playerInfo?.inventory.items"
+          :key="item.item"
+          class="flex items-center justify-between bg-gray-800 p-1 rounded"
         >
-          <span class="text-white text-xs font-bold">{{ item.quantity }}</span>
-        </div>
-      </li>
-    </ul>
+          <InventoryItem :item="item" />
+        </li>
+      </ul>
+    </div>
 
     <!-- Empty inventory message -->
     <p v-if="!playerInfo?.inventory.items?.length" class="text-gray-400 text-center p-4">

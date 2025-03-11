@@ -12,4 +12,8 @@ export const shapeIcons = {
   </svg>`,
 }
 
+export function getShape(item: string) {
+  return shapeIcons[item as ShapeType]
+}
+
 export type ShapeType = keyof typeof shapeIcons
