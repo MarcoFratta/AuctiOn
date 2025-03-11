@@ -40,7 +40,8 @@
     "vee-validate": "^4.15.0",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0",
-    "vue-social-sharing": "^4.0.0-alpha4"
+    "vue-social-sharing": "^4.0.0-alpha4",
+    "vue3-toastify": "^0.2.8"
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.0",
