@@ -78,11 +78,7 @@ export function useLobbyMsgHandler() {
             })
             .with('new-sale', () => {
               const msg = validator.validateSchema(messages.saleUpdateMsgSchema, event)
-              lobbyStore.setSale({
-                info: msg.info,
-                sellerId: 'not-implemented',
-                startTimestamp: undefined,
-              })
+              lobbyStore.setSale(msg.sale)
             })
             .with('new-bid', () => {
               const msg = validator.validateSchema(messages.bidUpdateMsgSchema, event)
