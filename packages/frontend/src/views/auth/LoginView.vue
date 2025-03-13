@@ -57,6 +57,7 @@ const handleForm = async (event: Event) => {
   } catch (e) {
     const err = errorHandler
       .create(e)
+      .unknownError()
       .notFound('Account not found', 'Please sign up', () =>
         router.push(`/register?redirect=${redirectTo}`),
       )
@@ -70,45 +71,66 @@ const handleForm = async (event: Event) => {
 </script>
 
 <template>
-  <form
-    class="bg-gray-300 p-6 rounded-lg shadow-md w-80 mx-auto flex flex-col gap-4 space-y-4 items-center"
-    @submit.prevent="handleForm"
-  >
-    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Sign in</h2>
+  <div class="min-h-screen bg-gray-900 flex items-center justify-center p-4">
+    <form
+      class="bg-gray-800 p-6 lg:p-8 rounded-lg shadow-lg w-full max-w-md flex flex-col gap-4"
+      @submit.prevent="handleForm"
+    >
+      <!-- Header -->
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold text-white">🔐 Sign In</h2>
+        <p class="text-gray-400 mt-2">Welcome back! Please enter your details.</p>
+      </div>
 
-    <FormEntry
-      v-model="email"
-      autocomplete="email"
-      placeHolder="Enter your email"
-      title="Email"
-      type="email"
-      v-bind="emailProps"
-    />
-    <FormEntry
-      v-model="password"
-      autocomplete="current-password"
-      placeHolder="Enter your password"
-      title="Password"
-      v-bind="passwordProps"
-      type="password"
-    />
+      <!-- Form Fields -->
+      <div class="bg-gray-700 p-4 rounded-lg space-y-4">
+        <div class="space-y-1">
+          <label class="block text-sm font-medium text-gray-300" for="email">Email</label>
+          <FormEntry
+            id="email"
+            v-model="email"
+            autocomplete="email"
+            placeHolder="Enter your email"
+            type="email"
+            v-bind="emailProps"
+          />
+        </div>
+        <div class="space-y-1">
+          <label class="block text-sm font-medium text-gray-300" for="password">Password</label>
+          <FormEntry
+            id="password"
+            v-model="password"
+            autocomplete="current-password"
+            placeHolder="Enter your password"
+            type="password"
+            v-bind="passwordProps"
+          />
+        </div>
+      </div>
 
-    <!-- Submit Button -->
-    <LoadingButton
-      :disable="!canSubmit"
-      :loading="waitingResponse"
-      :text="auth.isAuthenticated ? 'Already Logged In' : 'Submit'"
-      @click="handleForm"
-    />
+      <!-- Action Section -->
+      <div class="flex flex-col gap-2">
+        <LoadingButton
+          :class="
+            canSubmit ? 'bg-blue-500 hover:bg-blue-600 text-white' : 'bg-gray-600 text-gray-400'
+          "
+          :disable="!canSubmit"
+          :loading="waitingResponse"
+          :text="auth.isAuthenticated ? 'Already Logged In' : 'Sign In'"
+          class="w-full py-3 px-4 rounded-md font-semibold text-lg transition-all"
+          @click="handleForm"
+        />
 
-    <p class="text-sm text-gray-600 mt-4">
-      Don't have an account?
-      <router-link
-        :to="redirectTo === '/' ? '/register' : `/register?redirect=${redirectTo}`"
-        class="text-blue-500 hover:underline"
-      >
-        Sign up
-      </router-link>
-    </p>
-  </form>
+        <p class="text-center text-gray-400 mt-4">
+          Don't have an account?
+          <router-link
+            :to="redirectTo === '/' ? '/register' : `/register?redirect=${redirectTo}`"
+            class="text-blue-400 hover:text-blue-300 font-medium"
+          >
+            Sign up
+          </router-link>
+        </p>
+      </div>
+    </form>
+  </div>
 </template>

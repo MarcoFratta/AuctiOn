@@ -55,7 +55,7 @@ const canSubmit = computed(
       errors.value.email ||
       errors.value.password ||
       errors.value.name ||
-      errors.value.repeatPassword
+      repeatProps.value.error
     ),
 )
 const waitingResponse = ref(false)
@@ -82,63 +82,88 @@ const handleForm = async () => {
 </script>
 
 <template>
-  <form
-    class="bg-gray-300 p-6 rounded-lg shadow-md w-80 mx-auto flex flex-col gap-4 space-y-4 items-center"
-    @submit.prevent="handleForm"
-  >
-    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Register</h2>
-
-    <!-- Email Input -->
-    <FormEntry
-      v-model="name"
-      autocomplete="name"
-      placeHolder="Enter your name"
-      title="Name"
-      v-bind="nameProps"
-    />
-    <FormEntry
-      v-model="email"
-      autocomplete="email"
-      placeHolder="Enter your email"
-      title="Email"
-      v-bind="emailProps"
-    />
-    <FormEntry
-      v-model="password"
-      autocomplete="new-password"
-      placeHolder="Enter your password"
-      title="Password"
-      type="password"
-      v-bind="passwordProps"
-    />
-    <FormEntry
-      v-model="repeat"
-      autocomplete="new-password"
-      placeHolder="Confirm your password"
-      title="Confirm Password"
-      type="password"
-      v-bind="repeatProps"
-    />
-
-    <!-- Submit Button -->
-    <LoadingButton
-      :disable="!canSubmit"
-      :loading="waitingResponse"
-      :class="{
-        'cursor-not-allowed': isAuthenticated,
-      }"
-      :text="isAuthenticated ? 'Already Logged In' : 'Submit'"
-      @click="handleForm"
+  <div class="min-h-screen bg-gray-900 flex items-center justify-center p-4">
+    <form
+      class="bg-gray-800 p-6 lg:p-8 rounded-lg shadow-lg w-full max-w-md flex flex-col gap-4"
+      @submit.prevent="handleForm"
     >
-    </LoadingButton>
+      <!-- Header -->
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold text-white">✨ Create Account</h2>
+        <p class="text-gray-400 mt-2">Fill in your information to get started.</p>
+      </div>
 
-    <p class="text-sm text-gray-600 mt-4">
-      Already have an account?
-      <router-link
-        :to="redirectTo === '/' ? '/login' : `/login?redirect=${redirectTo}`"
-        class="text-blue-500 hover:underline"
-        >Sign in
-      </router-link>
-    </p>
-  </form>
+      <!-- Form Fields -->
+      <div class="bg-gray-700 p-4 rounded-lg space-y-4">
+        <div class="space-y-1">
+          <label class="block text-sm font-medium text-gray-300" for="name">Name</label>
+          <FormEntry
+            id="name"
+            v-model="name"
+            autocomplete="name"
+            placeHolder="Enter your name"
+            v-bind="nameProps"
+          />
+        </div>
+        <div class="space-y-1">
+          <label class="block text-sm font-medium text-gray-300" for="email">Email</label>
+          <FormEntry
+            id="email"
+            v-model="email"
+            autocomplete="email"
+            placeHolder="Enter your email"
+            v-bind="emailProps"
+          />
+        </div>
+        <div class="space-y-1">
+          <label class="block text-sm font-medium text-gray-300" for="password">Password</label>
+          <FormEntry
+            id="password"
+            v-model="password"
+            autocomplete="new-password"
+            placeHolder="Enter your password"
+            type="password"
+            v-bind="passwordProps"
+          />
+        </div>
+        <div class="space-y-1">
+          <label class="block text-sm font-medium text-gray-300" for="repeat"
+            >Confirm Password</label
+          >
+          <FormEntry
+            id="repeat"
+            v-model="repeat"
+            autocomplete="new-password"
+            placeHolder="Confirm your password"
+            type="password"
+            v-bind="repeatProps"
+          />
+        </div>
+      </div>
+
+      <!-- Action Section -->
+      <div class="flex flex-col gap-2">
+        <LoadingButton
+          :class="
+            canSubmit ? 'bg-green-500 hover:bg-green-600 text-white' : 'bg-gray-600 text-gray-400'
+          "
+          :disable="!canSubmit"
+          :loading="waitingResponse"
+          :text="isAuthenticated ? 'Already Logged In' : 'Create Account'"
+          class="w-full py-3 px-4 rounded-md font-semibold text-lg transition-all"
+          @click="handleForm"
+        />
+
+        <p class="text-center text-gray-400 mt-4">
+          Already have an account?
+          <router-link
+            :to="redirectTo === '/' ? '/login' : `/login?redirect=${redirectTo}`"
+            class="text-blue-400 hover:text-blue-300 font-medium"
+          >
+            Sign in
+          </router-link>
+        </p>
+      </div>
+    </form>
+  </div>
 </template>
