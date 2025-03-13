@@ -29,30 +29,36 @@ const totalSelected = computed(() => {
 </script>
 
 <template>
-  <div class="bg-gray-800 rounded-lg w-full mb-4">
+  <div class="w-full">
     <!-- Header slot -->
-    <slot name="header"> </slot>
+    <slot name="header"></slot>
 
-    <div class="grid gap-1">
+    <div class="space-y-3">
       <div
         v-for="item in items"
         :key="item.item"
-        class="flex justify-between items-center bg-gray-700 p-1 rounded-md"
+        class="flex items-center justify-between bg-gray-800 p-3 rounded-lg"
       >
-        <span class="text-gray-400">{{ item.item }}</span>
-        <input
-          v-model="item.quantity"
-          :max="details?.get(item.item)?.max"
-          :min="details?.get(item.item)?.min"
-          class="w-16 p-1 bg-gray-600 border border-gray-500 text-white text-center rounded"
-          type="number"
-        />
+        <div class="flex items-center gap-3">
+          <span class="text-gray-200 font-medium">{{ item.item }}</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <label :for="item.item" class="sr-only">Quantity for {{ item.item }}</label>
+          <input
+            :id="item.item"
+            v-model="item.quantity"
+            :max="details?.get(item.item)?.max"
+            :min="details?.get(item.item)?.min"
+            class="w-20 p-2 bg-gray-900 border border-gray-600 text-white text-center rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+            type="number"
+          />
+        </div>
       </div>
     </div>
 
     <div class="mt-4 flex justify-between items-center">
-      <p v-if="!error" class="text-gray-400">
-        Total Selected: <span class="text-green-400 font-medium">{{ totalSelected }}</span>
+      <p v-if="!error" class="text-gray-300">
+        Total Selected: <span class="text-blue-400 font-medium">{{ totalSelected }}</span>
       </p>
       <p v-if="error" class="text-red-400">{{ props.error }}</p>
     </div>

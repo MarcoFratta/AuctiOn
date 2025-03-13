@@ -28,8 +28,11 @@ const internalValue = computed({
 
 <template>
   <div class="w-full">
-    <label class="block text-sm font-medium text-gray-700" for="name">{{ title }}</label>
+    <label v-if="title" :for="title" class="block text-sm font-medium text-gray-200 mb-1">
+      {{ title }}
+    </label>
     <input
+      :id="title"
       v-model="internalValue"
       :placeholder="placeHolder"
       :autocomplete="autocomplete"
@@ -37,10 +40,25 @@ const internalValue = computed({
       :max="max"
       :min="min"
       :step="step"
-      class="mt-1 block w-full px-4 py-2 text-gray-600 placeholder-gray-400 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-      name="name"
+      :class="{ 'border-red-500 focus:border-red-500 focus:ring-red-500': error }"
+      class="w-full px-3 py-2 bg-gray-800 text-white placeholder-gray-400 border border-gray-600 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none disabled:bg-gray-800 disabled:cursor-not-allowed transition-colors"
       required
     />
-    <label class="block text-sm font-medium mt-2 text-red-700" for="name">{{ error }}</label>
+    <p v-if="error" class="mt-1.5 text-sm text-red-400">
+      {{ error }}
+    </p>
   </div>
 </template>
+
+<style scoped>
+/* Hide spinner buttons for number inputs */
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+</style>

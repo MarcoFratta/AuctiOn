@@ -1,49 +1,64 @@
 <template>
-  <div
-    class="min-h-screen w-full flex flex-col items-center justify-center bg-gray-100 text-gray-900 p-6"
-  >
-    <h1 class="text-4xl font-bold mb-6">AuctiOn</h1>
+  <div class="min-h-screen bg-gray-900 p-4 lg:p-6">
+    <!-- Welcome Section -->
+    <div class="max-w-4xl mx-auto text-center mb-12">
+      <h1 class="text-4xl lg:text-5xl font-bold text-white mb-4">⚡ Welcome to Auction Game</h1>
+      <p class="text-gray-400 text-lg">
+        Join exciting auctions, trade items, and compete with other players!
+      </p>
+    </div>
 
-    <div class="flex space-x-4">
-      <LoadingButton v-if="authenticated" text="Go to Lobby" type="submit" @click="goToLobby" />
-      <LoadingButton v-if="authenticated" text="Join Lobby" @click="joinLobby" />
-      <LoadingButton v-if="authenticated" text="Create Lobby" @click="createLobby" />
-      <LoadingButton v-if="!authenticated" text="Login" @click="router.push('/login')" />
-      <LoadingButton v-if="!authenticated" text="Register" @click="router.push('/register')" />
+    <!-- Action Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+      <!-- Create Lobby Card -->
+      <div class="bg-gray-800 rounded-lg p-6 shadow-lg">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-bold text-white">🎮 Create Lobby</h2>
+          <div class="bg-blue-500 bg-opacity-20 px-3 py-1 rounded-full">
+            <span class="text-white font-medium">Host</span>
+          </div>
+        </div>
+        <p class="text-gray-400 mb-6">Create your own auction lobby and invite friends to join.</p>
+        <button
+          class="w-full py-3 px-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md transition-colors"
+          @click="createLobby"
+        >
+          Create New Lobby
+        </button>
+      </div>
+
+      <!-- Join Lobby Card -->
+      <div class="bg-gray-800 rounded-lg p-6 shadow-lg">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-bold text-white">🔍 Join Lobby</h2>
+          <div class="bg-green-500 bg-opacity-20 px-3 py-1 rounded-full">
+            <span class="text-white font-medium">Player</span>
+          </div>
+        </div>
+        <p class="text-gray-400 mb-6">Join an existing auction lobby and start bidding.</p>
+        <button
+          class="w-full py-3 px-4 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-md transition-colors"
+          @click="joinLobby"
+        >
+          Join Existing Lobby
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref } from 'vue'
+import { useAuthStore } from '@/stores/authStore'
 import { useRouter } from 'vue-router'
-import LoadingButton from '@/components/LoadingButton.vue'
-import { useAuth } from '@/composables/useAuth.js'
-import { useAuthStore } from '@/stores/authStore.js'
-import { useLobbyService } from '@/composables/useLobbyService.ts'
 
+const authStore = useAuthStore()
 const router = useRouter()
 
-const lobbyId = ref('')
+const createLobby = () => {
+  router.push('/create')
+}
 
-const goToLobby = () => router.push('/lobby')
-const createLobby = () => router.push('/create')
-const joinLobby = () => router.push(`/join`)
-const lobbyService = useLobbyService()
-const authStore = useAuthStore()
-const authenticated = computed(() => authStore.isAuthenticated)
-
-onMounted(() => {
-  if (!authenticated.value) {
-    useAuth()
-      .refresh()
-      .then(() => {
-        console.log('Authenticated')
-      })
-      .then(() => {})
-      .catch((e) => {
-        console.error(e)
-      })
-  }
-})
+const joinLobby = () => {
+  router.push('/join')
+}
 </script>

@@ -80,8 +80,8 @@ const handleForm = async (event: Event) => {
       .create(e)
       .unknownError()
       .invalidData()
-      .alreadyInLobby('', () => router.push('/lobby'))
-      .authenticationError('', () => router.push('/login'))
+      .alreadyInLobby('You already joined a lobby', () => router.push('/lobby'))
+      .authenticationError('', () => router.push('/login?redirect=/create'))
       .tooManyRequests()
     console.error('showing error')
     await errorsHandler.show(err.get())
@@ -94,67 +94,103 @@ const handleForm = async (event: Event) => {
 </script>
 
 <template>
-  <form>
-    <FormEntry
-      v-model="rounds"
-      :max="lobbyConfigSchema.shape.rounds.maxValue ?? undefined"
-      :min="lobbyConfigSchema.shape.rounds.minValue ?? 0"
-      :step="1"
-      placeHolder="Number of rounds"
-      title="Rounds"
-      type="number"
-      v-bind="roundsProps"
-    ></FormEntry>
-    <FormEntry
-      v-model="maxPlayers"
-      :max="lobbyConfigSchema.shape.maxPlayers.maxValue ?? undefined"
-      :min="lobbyConfigSchema.shape.maxPlayers.minValue ?? 0"
-      :step="1"
-      placeHolder="Maximum number of players"
-      title="Max players"
-      type="number"
-      v-bind="maxPlayersProps"
-    ></FormEntry>
-    <FormEntry
-      v-model="bidTime"
-      :max="lobbyConfigSchema.shape.bidTime.maxValue ?? undefined"
-      :min="lobbyConfigSchema.shape.bidTime.minValue ?? 0"
-      :step="2"
-      placeHolder="Time to bid in seconds"
-      title="Bid time"
-      type="number"
-      v-bind="bidTimeProps"
-    ></FormEntry>
-    <FormEntry
-      v-model="startAmount"
-      :max="lobbyConfigSchema.shape.startAmount.maxValue ?? undefined"
-      :min="lobbyConfigSchema.shape.startAmount.minValue ?? 0"
-      :step="100"
-      placeHolder="Starting amount of money"
-      title="Start amount"
-      type="number"
-      v-bind="startAmountProps"
-    ></FormEntry>
+  <div class="min-h-[80vh] py-8">
+    <div class="max-w-2xl mx-auto bg-gray-800 p-6 lg:p-8 rounded-lg shadow-lg">
+      <!-- Header -->
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold text-white">🎮 Create Lobby</h2>
+        <p class="text-gray-300 mt-2">Configure your game settings and starting inventory.</p>
+      </div>
 
-    <InventorySelector
-      :items="items!"
-      :max="
-        lobbyConfigSchema.shape.startInventory.shape.items.element.shape.quantity.maxValue ??
-        undefined
-      "
-      :min="lobbyConfigSchema.shape.startInventory.shape.items.element.shape.quantity.minValue ?? 0"
-      v-bind="itemsProps"
-    >
-      <template #header>
-        <h2 class="text-lg font-semibold text-gray-800 mb-4">Select starting items</h2>
-      </template>
-    </InventorySelector>
-    <LoadingButton
-      :disable="!canSubmit.value"
-      :loading="waitForResponse"
-      text="Create"
-      @click="handleForm"
-    >
-    </LoadingButton>
-  </form>
+      <!-- Form -->
+      <form class="space-y-6">
+        <!-- Game Settings -->
+        <div class="bg-gray-700 p-4 rounded-lg space-y-4">
+          <h3 class="text-lg font-semibold text-white mb-4">Game Settings</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="space-y-2">
+              <label class="block text-sm font-medium text-gray-200">Rounds</label>
+              <FormEntry
+                v-model="rounds"
+                :max="lobbyConfigSchema.shape.rounds.maxValue ?? undefined"
+                :min="lobbyConfigSchema.shape.rounds.minValue ?? 0"
+                :step="1"
+                placeHolder="Number of rounds"
+                type="number"
+                v-bind="roundsProps"
+              />
+            </div>
+            <div class="space-y-2">
+              <label class="block text-sm font-medium text-gray-200">Max Players</label>
+              <FormEntry
+                v-model="maxPlayers"
+                :max="lobbyConfigSchema.shape.maxPlayers.maxValue ?? undefined"
+                :min="lobbyConfigSchema.shape.maxPlayers.minValue ?? 0"
+                :step="1"
+                placeHolder="Maximum number of players"
+                type="number"
+                v-bind="maxPlayersProps"
+              />
+            </div>
+            <div class="space-y-2">
+              <label class="block text-sm font-medium text-gray-200">Bid Time</label>
+              <FormEntry
+                v-model="bidTime"
+                :max="lobbyConfigSchema.shape.bidTime.maxValue ?? undefined"
+                :min="lobbyConfigSchema.shape.bidTime.minValue ?? 0"
+                :step="2"
+                placeHolder="Time to bid in seconds"
+                type="number"
+                v-bind="bidTimeProps"
+              />
+            </div>
+            <div class="space-y-2">
+              <label class="block text-sm font-medium text-gray-200">Starting Amount</label>
+              <FormEntry
+                v-model="startAmount"
+                :max="lobbyConfigSchema.shape.startAmount.maxValue ?? undefined"
+                :min="lobbyConfigSchema.shape.startAmount.minValue ?? 0"
+                :step="100"
+                placeHolder="Starting amount of money"
+                type="number"
+                v-bind="startAmountProps"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Starting Inventory -->
+        <div class="bg-gray-700 p-4 rounded-lg">
+          <h3 class="text-lg font-semibold text-white mb-4">Starting Inventory</h3>
+          <InventorySelector
+            :items="items!"
+            :max="
+              lobbyConfigSchema.shape.startInventory.shape.items.element.shape.quantity.maxValue
+            "
+            :min="
+              lobbyConfigSchema.shape.startInventory.shape.items.element.shape.quantity.minValue ??
+              0
+            "
+            v-bind="itemsProps"
+          >
+            <template #header>
+              <p class="text-gray-300 mb-4">Set the initial quantity for each item type.</p>
+            </template>
+          </InventorySelector>
+        </div>
+
+        <!-- Submit Button -->
+        <LoadingButton
+          :class="
+            canSubmit ? 'bg-blue-500 hover:bg-blue-600 text-white' : 'bg-gray-600 text-gray-400'
+          "
+          :disable="!canSubmit"
+          :loading="waitForResponse"
+          class="w-full py-3 px-4 rounded-md font-semibold text-lg transition-all"
+          text="Create Lobby"
+          @click="handleForm"
+        />
+      </form>
+    </div>
+  </div>
 </template>
