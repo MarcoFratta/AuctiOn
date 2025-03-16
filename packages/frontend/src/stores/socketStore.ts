@@ -19,6 +19,7 @@ export const useSocketStore = defineStore('socket', {
       onError?: (err: unknown) => void,
     ) {
       if (this.socket) {
+        this.attach()
         return
       }
       try {
@@ -26,26 +27,37 @@ export const useSocketStore = defineStore('socket', {
           throw new UnauthenticatedError()
         }
         console.log('Connecting to WebSocket...')
-        const ws = lobbyService.connectToLobby()
-        this.socket = ws
-        ws.on('connect', onOpen ?? (() => {}))
-        ws.onAny((event, msg) => {
+        this.socket = lobbyService.connectToLobby()
+        this.attach(onOpen, onMessage, onClose, onError)
+      } catch (error) {
+        console.error('Failed to connect to WebSocket:', error)
+        throw error
+      }
+    },
+    attach(
+      onOpen?: () => void,
+      onMessage?: (event: AuctionMessage) => void,
+      onClose?: (reason: string | undefined) => void,
+      onError?: (err: unknown) => void,
+    ) {
+      if (this.socket) {
+        this.socket.on('connect', onOpen ?? (() => {}))
+        this.socket.onAny((event, msg) => {
           if (onMessage) {
             onMessage({ ...msg, type: event })
           }
         })
-        ws.on('disconnect', (reason) => {
+        this.socket.on('disconnect', (reason) => {
           this.socket = null
           onClose?.(reason)
         })
 
-        ws.on('connect_error', (_) => {
+        this.socket.on('connect_error', (_) => {
           this.socket = null
           onError?.(_)
         })
-      } catch (error) {
-        console.error('Failed to connect to WebSocket:', error)
-        throw error
+      } else {
+        console.error('Socket is not connected, cannot attach listener')
       }
     },
     disconnect() {
