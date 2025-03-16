@@ -80,10 +80,11 @@ export const saleUpdateMessage = (sale: Sale): SaleUpdateMsg => {
     },
   })
 }
-export const playerConnectedMessage = (playerId: string): PlayerConnectedMsg => {
-  return validateSchema(playerConnectedMsgSchema, {
+export const playerConnectedMessage = (playerId: string, old: boolean = false): PlayerConnectedMsg => {
+  return <PlayerConnectedMsg>validateSchema(playerConnectedMsgSchema, {
     type: 'player-connected',
     playerId,
+    old: old,
   })
 }
 export const playerDisconnectedMessage = (playerId: string): PlayerDisconnectedMsg => {
@@ -133,17 +134,19 @@ export const playerLeaveMessage = (playerId: string): PlayerLeaveMsg => {
     playerId,
   })
 }
-export const playerJoinMessage = (playerId: string, info: PlayerInfo): PlayerJoinMsg => {
-  return validateSchema(playerJoinSchema, {
+export const playerJoinMessage = (playerId: string, info: PlayerInfo, old: boolean = false): PlayerJoinMsg => {
+  return <PlayerJoinMsg>validateSchema(playerJoinSchema, {
     type: 'player-join',
     playerId,
     username: info.username,
+    old,
   })
 }
-export const playerInfoMessage = (playerId: string, info: PlayerInfo): PlayerInfoMsg => {
-  return validateSchema(playerInfoMsgSchema, {
+export const playerInfoMessage = (playerId: string, info: PlayerInfo, old: boolean = false): PlayerInfoMsg => {
+  return <PlayerInfoMsg>validateSchema(playerInfoMsgSchema, {
     type: 'player-info',
     playerId,
     playerInfo: info,
+    old,
   })
 }
