@@ -1,65 +1,76 @@
 <template>
-  <div class="bg-gray-800 w-full max-w-5xl mt-6 p-6 rounded-lg shadow-lg">
-    <h2 class="text-lg font-semibold mb-3">👥 Connected Players</h2>
+  <div class="w-full">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-semibold text-white">👥 Connected Players</h2>
+      <span class="px-3 py-1 bg-gray-800 rounded-full text-sm text-gray-300">
+        {{ players.length }} / {{ lobbyStore.lobby?.maxPlayers ?? 0 }}
+      </span>
+    </div>
 
-    <ul v-if="players.length > 0" class="grid gap-3">
+    <ul v-if="players.length > 0" class="space-y-2">
       <li
         v-for="player in players"
         :key="player.id"
-        class="flex items-center justify-between p-3 bg-gray-700 rounded-md"
+        class="flex items-center justify-between p-3 bg-gray-800 rounded-lg border border-gray-700 transition-all hover:border-gray-600"
       >
         <!-- Left Side: Player Info -->
-        <div class="flex items-center">
-          <!-- Connection Status Dot -->
-          <span
-            :class="player.connected ? 'bg-green-400' : 'bg-red-500'"
-            class="w-3 h-3 rounded-full mr-3"
-          ></span>
-
-          <!-- Player Name with Crown if Admin -->
-          <div class="flex items-center">
-            <span v-if="player.id === lobbyStore.lobby?.creatorId" class="text-yellow-400 mr-2"
-              >👑</span
-            >
-            <span class="text-white">{{ player.username }}</span>
-
-            <!-- "You" Tag -->
+        <div class="flex items-center gap-3">
+          <!-- Connection Status -->
+          <div class="relative">
             <span
+              :class="player.connected ? 'bg-green-500' : 'bg-red-500'"
+              class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full"
+            ></span>
+            <span class="text-xl">👤</span>
+          </div>
+
+          <!-- Player Name and Badges -->
+          <div class="flex items-center gap-2">
+            <span class="text-gray-200">{{ player.username }}</span>
+
+            <!-- Admin Crown -->
+            <TagCard
+              v-if="player.id === lobbyStore.lobby?.creatorId"
+              class="px-2 py-0.5 bg-yellow-600 text-xs"
+              text="Admin"
+            />
+            <!-- "You" Badge -->
+            <TagCard
               v-if="player.id === userStore.user?.id"
-              class="ml-2 px-2 py-0.5 bg-gray-600 text-yellow-400 text-xs rounded-full"
-            >
-              You
-            </span>
+              class="bg-blue-500 text-white text-xs"
+              text="You"
+            />
           </div>
         </div>
 
-        <!-- Right Side: Player Status & Actions -->
-        <div class="flex items-center space-x-3">
-          <!-- Ready Status Badge -->
+        <!-- Right Side: Status & Actions -->
+        <div class="flex items-center gap-3">
+          <!-- Ready Status -->
           <span
-            :class="
+            :class="[
+              'px-3 py-1 text-sm rounded-full transition-colors',
               player.status === 'ready'
                 ? 'bg-green-500 bg-opacity-20 text-white'
-                : 'bg-gray-600 text-gray-400'
-            "
-            class="px-2 py-0.5 text-xs rounded-full"
+                : 'bg-gray-700 text-gray-400',
+            ]"
           >
             {{ player.status === 'ready' ? 'Ready' : 'Not Ready' }}
           </span>
 
-          <!-- Kick Button (Only If Admin & Not Themselves) -->
+          <!-- Kick Button -->
           <button
             v-if="amIAdmin && player.id !== userStore.user?.id"
-            class="px-3 py-1 text-xs font-medium text-white bg-red-500 hover:bg-red-600 rounded-md transition-all"
+            class="p-2 text-white hover:bg-red-500 hover:bg-opacity-20 px-8 bg-red-400 text-xs rounded-lg transition-colors"
             @click="kickPlayer(player.id)"
+            title="Kick Player"
           >
-            Kick
+            kick
           </button>
         </div>
       </li>
     </ul>
 
-    <p v-else class="text-gray-400 text-center py-3">No players connected.</p>
+    <p v-else class="text-center py-6 text-gray-400">Waiting for players to join...</p>
   </div>
 </template>
 
@@ -67,6 +78,7 @@
 import { computed } from 'vue'
 import { useUserStore } from '@/stores/userStore'
 import { type Player, useLobbyStore } from '@/stores/lobbyStore'
+import TagCard from '@/components/TagCard.vue'
 
 const userStore = useUserStore()
 const lobbyStore = useLobbyStore()

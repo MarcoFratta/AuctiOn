@@ -49,7 +49,7 @@ const totalSelected = computed(() => {
             v-model="item.quantity"
             :max="details?.get(item.item)?.max"
             :min="details?.get(item.item)?.min"
-            class="w-20 p-2 bg-gray-900 border border-gray-600 text-white text-center rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+            class="w-20 p-2 bg-gray-700 border border-gray-600 text-white text-center rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
             type="number"
           />
         </div>
