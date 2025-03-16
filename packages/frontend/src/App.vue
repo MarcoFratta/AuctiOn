@@ -2,8 +2,11 @@
 import { computed, ref } from 'vue'
 import { useAuthStore } from '@/stores/authStore.ts'
 import NavigationDrawer from '@/components/NavigationDrawer.vue'
+import { useAuth } from '@/composables/useAuth.ts'
 
 const authStore = useAuthStore()
+const authService = useAuth()
+authService.refresh()
 const notAuthenticated = computed(() => !authStore.isAuthenticated)
 const isDrawerOpen = ref(false)
 
