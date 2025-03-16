@@ -1,56 +1,59 @@
 <template>
-  <div
-    v-if="lobby"
-    class="w-full md:w-1/2 lg:w-1/3 xl:w-1/3 p-6 bg-gray-900 text-white rounded-xl shadow-lg"
-  >
-    <h2 class="text-2xl font-bold mb-4 text-center">Auction Lobby</h2>
+  <div v-if="lobby" class="min-h-[80vh] py-8">
+    <div class="max-w-3xl mx-auto bg-gray-800 p-6 lg:p-8 rounded-lg shadow-lg">
+      <!-- Header -->
+      <div class="mb-8 text-center">
+        <h2 class="text-3xl font-bold text-white mb-2">🎮 Auction Lobby</h2>
+      </div>
 
-    <!-- Lobby Info -->
-    <header class="text-center mb-6">
-      <h3 class="text-lg font-semibold">Lobby ID: {{ lobby?.id ?? 'Not in a lobby' }}</h3>
-      <p>You are: {{ self?.username ?? 'Not logged in' }}</p>
-      <p v-if="amIAdmin" class="text-sm text-gray-400 mt-2">You are the admin</p>
-    </header>
+      <!-- Game Settings -->
+      <div class="grid gap-6 mb-8">
+        <LobbyConfigs :lobby="lobby" />
 
-    <LobbyConfigs :lobby="lobby" />
+        <!-- Connected Players -->
+        <div class="bg-gray-700 p-4 rounded-lg">
+          <LobbyPlayers :players="users" @kick="kick" />
+        </div>
+      </div>
 
-    <!-- Connected Players -->
-    <section class="mb-6">
-      <LobbyPlayers :players="users" @kick="kick" />
-    </section>
+      <!-- Action Buttons -->
+      <div class="space-y-4">
+        <!-- Primary Actions -->
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+          <button
+            :class="[
+              'px-6 py-3 rounded-lg font-semibold text-white transition-all w-full sm:w-auto',
+              ready ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600',
+            ]"
+            @click="setReady"
+          >
+            {{ ready ? '✓ Ready' : 'Not Ready' }}
+          </button>
 
-    <!-- Player Actions -->
-    <section class="flex flex-col sm:flex-row justify-center items-center gap-3">
-      <button
-        :class="ready ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600'"
-        class="px-4 py-2 rounded-lg text-white font-semibold w-full sm:w-auto"
-        @click="setReady"
-      >
-        {{ ready ? 'Set Not Ready' : 'Set Ready' }}
-      </button>
-      <button
-        v-if="amIAdmin"
-        class="px-4 py-2 bg-gray-700 rounded-lg text-white font-semibold w-full sm:w-auto"
-        @click="start"
-      >
-        Start Auction
-      </button>
+          <button
+            v-if="amIAdmin"
+            class="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold transition-all w-full sm:w-auto"
+            @click="start"
+          >
+            Start Auction
+          </button>
 
-      <button
-        class="px-4 py-2 bg-gray-700 hover:bg-gray-800 text-white rounded-lg w-full sm:w-auto"
-        @click="leave"
-      >
-        {{ amIAdmin ? 'Delete Lobby' : 'Leave Lobby' }}
-      </button>
-    </section>
+          <button
+            class="px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-semibold transition-all w-full sm:w-auto"
+            @click="leave"
+          >
+            {{ amIAdmin ? 'Delete Lobby' : 'Leave Lobby' }}
+          </button>
+        </div>
 
-    <!-- Share Lobby -->
-    <footer class="mt-6 p-4 bg-gray-800 text-white rounded-lg shadow-md text-center">
-      <p class="text-lg font-semibold mb-2">Share Lobby</p>
-      <CopyCard :url="lobbyUrl" />
-
-      <ShareCard :url="lobbyUrl" class="mt-4" />
-    </footer>
+        <!-- Share Section -->
+        <div class="bg-gray-700 p-4 rounded-lg space-y-4">
+          <h3 class="text-lg font-semibold text-white text-center">Share Lobby</h3>
+          <CopyCard :url="lobbyUrl" />
+          <ShareCard :url="lobbyUrl" />
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -66,12 +69,15 @@ import { useLobbyService } from '@/composables/useLobbyService.ts'
 import { useAlert } from '@/composables/useAlert.ts'
 import { useLobbyMsgHandler } from '@/composables/useLobbyMsgHandler.ts'
 import { useRouter } from 'vue-router'
+import { useAuctionNotifications } from '@/composables/auctionNotification.ts'
+import { useSocketStore } from '@/stores/socketStore.ts'
+import { useNotifications } from '@/composables/useNotifications.ts'
 
 const lobbyStore = useLobbyStore()
 const userStore = useUserStore()
 const lobby = computed(() => lobbyStore.lobby)
 const users = computed(() => lobbyStore.users)
-const self = computed(() => userStore.user)
+const currentUser = computed(() => userStore.user)
 const amIAdmin = computed(() => lobby.value?.creatorId === userStore.user?.id)
 const lobbyUrl = computed(() => `${window.location.origin}/join/${lobby.value?.id}`)
 const ready = computed(
@@ -80,6 +86,7 @@ const ready = computed(
 const router = useRouter()
 const lobbyService = useLobbyService()
 const alerts = useAlert()
+const toast = useNotifications()
 const leave = () => {
   lobbyService.leaveLobby()
 }
@@ -97,25 +104,41 @@ const start = () => {
     alerts.error("Couldn't start match", 'All players must be ready')
   })
 }
-
+const auctionNotification = useAuctionNotifications()
+const socketStore = useSocketStore()
+const lobbyMsgHandler = useLobbyMsgHandler()
 onMounted(() => {
   if (lobbyStore.lobby?.startTimestamp) {
     router.push('/play')
   } else {
-    useLobbyMsgHandler().connectAndHandle()
+    socketStore.connect(
+      () => {
+        lobbyMsgHandler.attach()
+        auctionNotification.attach()
+      },
+      undefined,
+      undefined,
+      (e) => {
+        console.error('Error connecting to lobby:', e)
+        router.push('/join')
+      },
+    )
   }
 })
 </script>
 
 <style scoped>
-/* Smooth button hover effect */
-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(255, 255, 255, 0.15);
+/* Smooth transitions */
+button {
+  transition: all 0.2s ease;
 }
 
-/* Input styling for mobile */
-input {
-  font-size: 1rem;
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+button:active {
+  transform: translateY(0);
 }
 </style>
