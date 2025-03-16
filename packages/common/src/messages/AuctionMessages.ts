@@ -49,6 +49,7 @@ export const saleUpdateMsgSchema = z.object({
 export const playerConnectedMsgSchema = z.object({
   type: z.literal('player-connected'),
   playerId: z.string(),
+  old: z.boolean().default(false),
 })
 export const playerDisconnectedMsgSchema = z.object({
   type: z.literal('player-disconnected'),
@@ -58,6 +59,7 @@ export const playerJoinSchema = z.object({
   type: z.literal('player-join'),
   playerId: z.string(),
   username: z.string(),
+  old: z.boolean().default(false),
 })
 export const playerLeaveSchema = z.object({
   type: z.literal('player-leave'),
@@ -97,6 +99,7 @@ export const playerInfoMsgSchema = z.object({
   type: z.literal('player-info'),
   playerId: z.string(),
   playerInfo: playerLobbyInfoSchema,
+  old: z.boolean().default(false),
 })
 
 export const typedMessageSchema = z.object({
