@@ -1,8 +1,12 @@
 <script lang="ts" setup>
 import { useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth.ts'
+import { useLobbyStore } from '@/stores/lobbyStore.ts'
+import { useAuthStore } from '@/stores/authStore.ts'
 
 const auth = useAuth()
+const authStore = useAuthStore()
+const lobbyStore = useLobbyStore()
 const router = useRouter()
 
 defineProps<{
@@ -15,10 +19,22 @@ const emit = defineEmits<{
 
 const menuItems = [
   { icon: '🏠', label: 'Home', route: '/' },
-  { icon: '🎮', label: 'Create Lobby', route: '/create' },
-  { icon: '🔍', label: 'Join Lobby', route: '/join' },
-  { icon: '⚙️', label: 'Settings', route: '/settings' },
-  { icon: '👤', label: 'Account', route: '/account' },
+  { icon: '🎮', label: 'Create Lobby', route: '/create', showIf: () => authStore.isAuthenticated },
+  { icon: '🔍', label: 'Join Lobby', route: '/join', showIf: () => authStore.isAuthenticated },
+  { icon: '⚙️', label: 'Settings', route: '/settings', showIf: () => authStore.isAuthenticated },
+  { icon: '👤', label: 'Account', route: '/account', showIf: () => authStore.isAuthenticated },
+  {
+    icon: '🎯',
+    label: 'Go to lobby',
+    route: '/lobby',
+    showIf: () => authStore.isAuthenticated && lobbyStore.lobby && !lobbyStore.lobby.startTimestamp,
+  },
+  {
+    icon: '🎲',
+    label: 'Play',
+    route: '/play',
+    showIf: () => authStore.isAuthenticated && lobbyStore.lobby?.startTimestamp,
+  },
 ]
 
 const handleLogout = async () => {
@@ -32,14 +48,21 @@ const closeDrawer = () => {
 </script>
 
 <template>
-  <!-- Overlay -->
-  <div v-if="isOpen" class="fixed inset-0 bg-black bg-opacity-50 z-30" @click="closeDrawer"></div>
+  <!-- Backdrop Overlay with transition -->
+  <div
+    :class="[
+      isOpen
+        ? 'pointer-events-auto bg-black/30 backdrop-blur-sm'
+        : 'pointer-events-none bg-black/0 backdrop-blur-none',
+    ]"
+    class="fixed inset-0 z-30 transition-all duration-300 ease-in-out"
+    @click="closeDrawer"
+  ></div>
 
   <!-- Drawer -->
   <div
     :class="[
-      'fixed left-0 top-0 h-full w-64 bg-gray-800 z-40' +
-        ' transform transition-transform duration-300 ease-in-out',
+      'fixed left-0 top-0 h-full w-64 bg-gray-800 z-40 transform transition-transform duration-300 ease-in-out',
       isOpen ? 'translate-x-0' : '-translate-x-full',
     ]"
   >
@@ -53,6 +76,7 @@ const closeDrawer = () => {
       <ul class="space-y-2">
         <li v-for="item in menuItems" :key="item.route">
           <router-link
+            v-if="item.showIf ? item.showIf() : true"
             :to="item.route"
             class="flex items-center gap-3 p-2 rounded-lg text-gray-300 hover:bg-gray-700 transition-colors"
             @click="closeDrawer"
@@ -76,3 +100,14 @@ const closeDrawer = () => {
     </div>
   </div>
 </template>
+
+<style scoped>
+/* Ensure smooth transitions for backdrop-filter */
+.backdrop-blur-none {
+  backdrop-filter: blur(0px);
+}
+
+.backdrop-blur-sm {
+  backdrop-filter: blur(4px);
+}
+</style>

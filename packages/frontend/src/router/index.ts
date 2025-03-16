@@ -1,54 +1,56 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import LoginView from '@/views/auth/LoginView.vue'
-import RegisterView from '@/views/auth/RegisterView.vue'
-import CreateLobbyView from '@/views/lobby/CreateLobbyView.vue'
 import HomeView from '@/views/HomeView.vue'
+import { authRoutes } from './routes/auth'
+import { lobbyRoutes } from './routes/lobby'
+import { gameRoutes } from './routes/game'
+import { useAuthStore } from '@/stores/authStore'
+import { useAuth } from '@/composables/useAuth'
+import { useLobbyStore } from '@/stores/lobbyStore.ts'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/register',
-      name: 'register',
-      component: RegisterView,
-    },
-    {
-      path: '/login',
-      name: 'login',
-      component: LoginView,
-    },
-    {
-      path: '/create',
-      name: 'create',
-      component: CreateLobbyView,
-    },
-    {
       path: '/',
       name: 'home',
       component: HomeView,
+      meta: { requiresAuth: false },
     },
-    {
-      path: '/join',
-      name: 'join',
-      component: () => import('@/views/lobby/JoinView.vue'),
-    },
-    {
-      path: '/lobby',
-      name: 'lobby',
-      component: () => import('@/views/lobby/LobbyView.vue'),
-    },
-    {
-      path: '/join/:lobbyId',
-      name: 'JoinLobby',
-      component: () => import('@/views/lobby/JoinLobby.vue'),
-      meta: { requiresAuth: true }, // Mark it as requiring authentication
-    },
-    {
-      path: '/play',
-      name: 'play',
-      component: () => import('@/views/auction/PlayView.vue'),
-    },
+    ...authRoutes,
+    ...lobbyRoutes,
+    ...gameRoutes,
   ],
+})
+router.beforeEach((to, from, next) => {
+  if (to.meta.requiresLobbyStarted) {
+    const lobbyStore = useLobbyStore()
+    if (!lobbyStore.lobby?.startTimestamp) {
+      next({ name: 'lobby' })
+    } else {
+      next()
+    }
+  } else {
+    next()
+  }
+})
+router.beforeEach(async (to, from, next) => {
+  const authStore = useAuthStore()
+  const { refresh } = useAuth()
+
+  if (to.meta.requiresAuth) {
+    if (!authStore.isAuthenticated) {
+      try {
+        await refresh()
+        next()
+      } catch (_error) {
+        next({ name: 'login', query: { redirect: to.fullPath } })
+      }
+    } else {
+      next()
+    }
+  } else {
+    next()
+  }
 })
 
 export default router

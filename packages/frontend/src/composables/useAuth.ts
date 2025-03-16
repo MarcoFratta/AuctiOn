@@ -55,5 +55,5 @@ export function useAuth() {
     users.removeUser()
   }
 
-  return { register, login, refresh }
+  return { register, login, refresh, logout }
 }
