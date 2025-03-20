@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { z } from 'zod'
-import type { AuctionMsg } from '@auction/common'
+import type { AuctionMsg, EndAuctionEvent } from '@auction/common'
 import { useUserStore } from '@/stores/userStore.ts'
 import { shapeIcons, type ShapeType } from '@/icons/shapes.ts'
 
@@ -12,12 +12,14 @@ export const playerSchema = z.object({
 })
 export type Player = z.infer<typeof playerSchema>
 export type Lobby = AuctionMsg['auction']
+export type Leaderboard = EndAuctionEvent['leaderboard']
 
 interface LobbyState {
   lobby: Lobby | undefined
   users: Player[]
   playerInfo: AuctionMsg['playerInfo'] | undefined
   timerStart: Date | undefined
+  leaderboard: Leaderboard | null
 }
 
 export const useLobbyStore = defineStore('lobby', {
@@ -26,6 +28,7 @@ export const useLobbyStore = defineStore('lobby', {
     users: [],
     playerInfo: undefined,
     timerStart: undefined,
+    leaderboard: null,
   }),
   getters: {
     weights() {
@@ -80,6 +83,9 @@ export const useLobbyStore = defineStore('lobby', {
     addUser(user: Player) {
       this.users.push(user)
     },
+    getUser(id: Player['id']) {
+      return this.users.find((u) => u.id === id)
+    },
     updateUser(id: Player['id'], update: Partial<Player>) {
       const user = this.users.find((u) => u.id === id)
       if (!user) return
@@ -99,6 +105,9 @@ export const useLobbyStore = defineStore('lobby', {
     },
     resetTimer() {
       this.timerStart = undefined
+    },
+    setLeaderboard(leaderboard: Leaderboard) {
+      this.leaderboard = leaderboard
     },
   },
 })
