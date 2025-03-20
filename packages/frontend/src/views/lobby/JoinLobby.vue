@@ -19,7 +19,7 @@ onMounted(() => {
       console.log('Joining lobby error', e)
       const err = errorsHandler
         .create(e)
-        .alreadyInLobby()
+        .alreadyInLobby('You already joined a lobby', () => router.push('/lobby'))
         .authenticationError(undefined, () => {
           console.log('Joining lobby error', err)
           router.push(`/login?redirect=${route.fullPath}`)
