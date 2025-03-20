@@ -14,4 +14,20 @@ export const authRoutes = [
     component: LoginView,
     meta: { requiresAuth: false },
   },
+  {
+    path: '/forgot',
+    name: 'ForgotPassword',
+    component: () => import('@/views/auth/ForgotPasswordView.vue'),
+    meta: {
+      requiresAuth: false,
+    },
+  },
+  {
+    path: '/reset/:token',
+    name: 'ResetPassword',
+    component: () => import('@/views/auth/ResetPasswordView.vue'),
+    meta: {
+      requiresAuth: false,
+    },
+  },
 ]

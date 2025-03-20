@@ -128,7 +128,7 @@ onMounted(() => {
         />
 
         <div class="flex justify-end">
-          <router-link class="text-sm text-blue-400 hover:text-blue-300" to="/forgot-password">
+          <router-link class="text-sm text-blue-400 hover:text-blue-300" to="/forgot">
             Forgot password?
           </router-link>
         </div>
