@@ -124,13 +124,6 @@ export class LobbyController {
         })
         return
       }
-      const lobby: Lobby = await this.lobbyService.getLobby(lobbyId)
-      if (lobby.status === 'in-progress') {
-        res.status(409).json({
-          message: 'Match in progress, connect to the match endpoint',
-        })
-        return
-      }
       res.status(200).send('ok')
     } catch (error) {
       next(error)

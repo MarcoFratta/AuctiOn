@@ -249,7 +249,6 @@ describe('LobbyController', () => {
 
     await lobbyController.getLobby(mockRequest, mockResponse, mockNext)
 
-    expect(mockLobbyService.getLobby).toHaveBeenCalledWith(id)
     expect(mockResponse.status).toHaveBeenCalledWith(200)
   })
 
