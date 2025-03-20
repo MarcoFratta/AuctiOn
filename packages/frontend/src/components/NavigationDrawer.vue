@@ -19,8 +19,18 @@ const emit = defineEmits<{
 
 const menuItems = [
   { icon: '🏠', label: 'Home', route: '/' },
-  { icon: '🎮', label: 'Create Lobby', route: '/create', showIf: () => authStore.isAuthenticated },
-  { icon: '🔍', label: 'Join Lobby', route: '/join', showIf: () => authStore.isAuthenticated },
+  {
+    icon: '🎮',
+    label: 'Create Lobby',
+    route: '/create',
+    showIf: () => authStore.isAuthenticated && !lobbyStore.lobby,
+  },
+  {
+    icon: '🔍',
+    label: 'Join Lobby',
+    route: '/join',
+    showIf: () => authStore.isAuthenticated && !lobbyStore.lobby,
+  },
   { icon: '⚙️', label: 'Settings', route: '/settings', showIf: () => authStore.isAuthenticated },
   { icon: '👤', label: 'Account', route: '/account', showIf: () => authStore.isAuthenticated },
   {
@@ -32,7 +42,7 @@ const menuItems = [
   {
     icon: '🎲',
     label: 'Play',
-    route: '/play',
+    route: '/lobby',
     showIf: () => authStore.isAuthenticated && lobbyStore.lobby?.startTimestamp,
   },
 ]
@@ -66,8 +76,8 @@ const closeDrawer = () => {
       isOpen ? 'translate-x-0' : '-translate-x-full',
     ]"
   >
-    <!-- Drawer Header -->
-    <div class="p-4 border-b border-gray-700">
+    <!-- Drawer Header - match height with main header -->
+    <div class="h-16 flex items-center px-4 border-b border-gray-700">
       <h2 class="text-xl font-bold text-white">AuctiOn</h2>
     </div>
 
