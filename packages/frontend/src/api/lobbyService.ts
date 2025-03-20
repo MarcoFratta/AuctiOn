@@ -14,6 +14,11 @@ export async function createLobby(lobby: LobbyConfig): Promise<unknown> {
 
 export async function joinLobby(lobbyId: string): Promise<unknown> {
   const response = await apiClient.post(`/lobbies/${lobbyId}/join`)
+  return response.data.lobby!
+}
+
+export async function checkActiveLobby(): Promise<unknown> {
+  const response = await apiClient.get('/lobbies')
   return response.data!
 }
 
@@ -42,7 +47,7 @@ export function connectToLobby(token: string) {
     },
     autoConnect: true,
     reconnection: true, // Auto-reconnect on disconnection
-    reconnectionAttempts: 1,
-    reconnectionDelay: 2000, // Wait 2s before retrying
+    reconnectionAttempts: 5,
+    reconnectionDelay: 1000, // Wait 2s before retrying
   })
 }

@@ -6,6 +6,7 @@ import { gameRoutes } from './routes/game'
 import { useAuthStore } from '@/stores/authStore'
 import { useAuth } from '@/composables/useAuth'
 import { useLobbyStore } from '@/stores/lobbyStore.ts'
+import { useAuctionConnection } from '@/composables/useAuctionConnection.ts'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -21,18 +22,6 @@ const router = createRouter({
     ...gameRoutes,
   ],
 })
-router.beforeEach((to, from, next) => {
-  if (to.meta.requiresLobbyStarted) {
-    const lobbyStore = useLobbyStore()
-    if (!lobbyStore.lobby?.startTimestamp) {
-      next({ name: 'lobby' })
-    } else {
-      next()
-    }
-  } else {
-    next()
-  }
-})
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
   const { refresh } = useAuth()
@@ -47,6 +36,50 @@ router.beforeEach(async (to, from, next) => {
       }
     } else {
       next()
+    }
+  } else {
+    next()
+  }
+})
+
+router.beforeEach(async (to, from, next) => {
+  if (to.meta.requiresLobby) {
+    const lobbyStore = useLobbyStore()
+    if (!lobbyStore.lobby) {
+      try {
+        console.log('connecting lobby in router', lobbyStore.lobby)
+        await useAuctionConnection().connect()
+        next()
+      } catch (_e) {
+        next({ name: 'home' })
+      }
+    } else {
+      console.log('lobby already exists in router')
+      next()
+    }
+  } else {
+    next()
+  }
+})
+router.beforeEach(async (to, from, next) => {
+  if (to.meta.requiresLobbyStarted) {
+    const lobbyStore = useLobbyStore()
+    if (!lobbyStore.lobby?.startTimestamp) {
+      next({ name: 'lobby' })
+    } else {
+      next()
+    }
+  } else {
+    next()
+  }
+})
+router.beforeEach(async (to, from, next) => {
+  if (to.meta.requiresNoLobby) {
+    const lobbyStore = useLobbyStore()
+    if (!lobbyStore.lobby) {
+      next()
+    } else {
+      next({ name: 'lobby' })
     }
   } else {
     next()
