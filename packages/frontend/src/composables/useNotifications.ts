@@ -13,5 +13,17 @@ export function useNotifications() {
     })
   }
 
-  return { info, success }
+  function warning(message: string) {
+    toast.warning(message, {
+      theme: 'auto',
+    })
+  }
+
+  function error(message: string) {
+    toast.error(message, {
+      theme: 'auto',
+    })
+  }
+
+  return { info, success, warning, error }
 }
