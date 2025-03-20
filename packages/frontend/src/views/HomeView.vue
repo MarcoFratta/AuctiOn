@@ -37,7 +37,7 @@
         </div>
         <p class="text-gray-400 mb-6">Join an existing auction lobby and start bidding.</p>
         <button
-          class="w-full py-3 px-4 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-md transition-colors"
+          class="w-full py-3 px-4 bg-green-500 align-bottom hover:bg-green-600 text-white font-semibold rounded-md transition-colors"
           @click="joinLobby"
         >
           Join Existing Lobby
@@ -48,11 +48,22 @@
 </template>
 
 <script lang="ts" setup>
-import { useAuthStore } from '@/stores/authStore'
 import { useRouter } from 'vue-router'
+import { useLobbyStore } from '@/stores/lobbyStore.ts'
+import { onMounted } from 'vue'
+import { useSocketStore } from '@/stores/socketStore.ts'
 
-const authStore = useAuthStore()
 const router = useRouter()
+const lobbyStore = useLobbyStore()
+const socketStore = useSocketStore()
+
+// Fix the infinite redirection by using onMounted and checking the current route
+onMounted(() => {
+  if (lobbyStore.lobby && socketStore.isConnected && router.currentRoute.value.path !== '/lobby') {
+    console.log('forwarding to lobby from home')
+    router.push('/lobby')
+  }
+})
 
 const createLobby = () => {
   router.push('/create')

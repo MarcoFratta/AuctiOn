@@ -3,9 +3,13 @@ import { AlreadyInLobby } from '@/api/Errors.ts'
 import * as lobbyService from '@/api/lobbyService.ts'
 import { useAuthStore } from '@/stores/authStore.ts'
 import { useErrorsHandler } from '@/composables/useErrorsHandler.ts'
+import { useLobbyStore } from '@/stores/lobbyStore.ts'
+import { useSocketStore } from '@/stores/socketStore.ts'
 
 export function useLobbyService() {
   const { handleError } = useErrorsHandler()
+  const lobbyStore = useLobbyStore()
+  const socketStore = useSocketStore()
   async function createLobby(lobby: LobbyConfig): Promise<unknown> {
     try {
       return await lobbyService.createLobby(lobby)
@@ -22,9 +26,20 @@ export function useLobbyService() {
     }
   }
 
-  async function leaveLobby(): Promise<unknown> {
+  async function checkActiveLobby(): Promise<unknown> {
     try {
-      return await lobbyService.leaveLobby()
+      await lobbyService.checkActiveLobby()
+      return true
+    } catch (error) {
+      handleError(error)
+    }
+  }
+
+  async function leaveLobby(): Promise<void> {
+    try {
+      await lobbyService.leaveLobby()
+      lobbyStore.clearLobby()
+      socketStore.disconnect()
     } catch (error) {
       handleError(error)
     }
@@ -59,7 +74,6 @@ export function useLobbyService() {
       const token = useAuthStore().accessToken
       return lobbyService.connectToLobby(token)
     } catch (error) {
-      console.error('Failed to connect to WebSocket:', error)
       throw error
     }
   }
@@ -71,6 +85,7 @@ export function useLobbyService() {
     kickPlayer,
     connectToLobby,
     startMatch,
+    checkActiveLobby,
     setState,
   }
 }
