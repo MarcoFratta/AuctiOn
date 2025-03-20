@@ -11,7 +11,7 @@ export function useAuctionNotifications() {
   const notifier = useNotifications()
 
   function attach() {
-    socketStore.attach(undefined, (msg) => {
+    socketStore.attach('auction:notification', undefined, (msg) => {
       console.log(`Received event: ${JSON.stringify(msg)}`)
       match(msg.type)
         .with('player-connected', () => {
@@ -22,7 +22,7 @@ export function useAuctionNotifications() {
           } else if (!event.old) {
             const user = lobbyStore.getUser(event.playerId)
             if (user) {
-              notifier.info(`${user.username} has connected`)
+              notifier.success(`${user.username} has connected`)
             }
           }
         })
@@ -30,14 +30,14 @@ export function useAuctionNotifications() {
           const event = validateSchema(m.playerDisconnectedMsgSchema, msg)
           const user = lobbyStore.getUser(event.playerId)
           if (user) {
-            notifier.info(`${user.username} has disconnected`)
+            notifier.error(`${user.username} has disconnected`)
           }
         })
         .with('player-leave', () => {
           const event = validateSchema(m.playerLeaveSchema, msg)
           const user = lobbyStore.getUser(event.playerId)
           if (user) {
-            notifier.info(`${user.username} has left the lobby`)
+            notifier.warning(`${user.username} has left the lobby`)
           }
         })
         .with('player-info', () => {
@@ -53,5 +53,9 @@ export function useAuctionNotifications() {
     })
   }
 
-  return { attach }
+  function detach() {
+    socketStore.detach('auction:notification')
+  }
+
+  return { attach, detach }
 }

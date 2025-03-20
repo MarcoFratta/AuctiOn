@@ -5,16 +5,15 @@ import * as validator from '@auction/common/validation'
 import * as messages from '@auction/common/messages'
 import { match } from 'ts-pattern'
 import { useRouter } from 'vue-router'
-import { useAlert } from '@/composables/useAlert.ts'
 
 export function useLobbyMsgHandler() {
   const socketStore = useSocketStore()
   const lobbyStore = useLobbyStore()
   const router = useRouter()
-  const alerts = useAlert()
 
   function attach() {
     socketStore.attach(
+      'auction:eventHandler',
       () => console.log('Connected to lobby'),
       (event: AuctionMessage) => {
         console.log(`Received event: ${JSON.stringify(event)}`)
@@ -24,9 +23,6 @@ export function useLobbyMsgHandler() {
             const msg = validator.validateSchema(messages.auctionMsgSchema, event)
             lobbyStore.setLobby(msg.auction)
             lobbyStore.setPlayerInfo(msg.playerInfo)
-            if (msg.auction.startTimestamp) {
-              router.push('/play')
-            }
           })
           .with('player-join', () => {
             const msg = validator.validateSchema(messages.playerJoinSchema, event)
@@ -57,9 +53,6 @@ export function useLobbyMsgHandler() {
           })
           .with('auction-deleted', () => {
             lobbyStore.clearLobby()
-            router.push('/').then(() => {
-              alerts.error('Lobby deleted', '')
-            })
           })
           .with('auction-start', () => {
             const msg = validator.validateSchema(messages.auctionStartMsgSchema, event)
@@ -84,15 +77,23 @@ export function useLobbyMsgHandler() {
             lobbyStore.setPlayerInfo(msg.playerInfo)
             lobbyStore.resetTimer()
           })
+          .with('auction-end', () => {
+            const msg = validator.validateSchema(messages.auctionEndMsgSchema, event)
+            lobbyStore.clearLobby()
+            socketStore.disconnect()
+            lobbyStore.setLeaderboard(msg.leaderboard)
+            router.push('/')
+          })
           .otherwise(() => {
             console.error('Unknown event:', event)
           })
       },
-      async () => {
-        await alerts.error('Disconnected from lobby', '')
-        router.push('/').then(() => lobbyStore.clearLobby())
+      (_reason) => {
+        lobbyStore.clearLobby()
       },
-      (error) => console.error('Error:', error),
+      () => {
+        lobbyStore.clearLobby()
+      },
     )
   }
 
