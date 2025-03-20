@@ -4,7 +4,7 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <!-- Game Rules -->
-      <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+      <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 w-full">
         <h4 class="text-sm font-medium text-gray-400 mb-3">Game Rules</h4>
         <div class="space-y-3">
           <div class="flex justify-between items-center">
@@ -23,7 +23,7 @@
       </div>
 
       <!-- Economy -->
-      <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+      <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 w-full">
         <h4 class="text-sm font-medium text-gray-400 mb-3">Economy</h4>
         <div class="space-y-3">
           <div class="flex justify-between items-center">
@@ -59,5 +59,3 @@ defineProps({
   },
 })
 </script>
-
-<style scoped></style>

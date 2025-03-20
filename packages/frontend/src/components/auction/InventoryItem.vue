@@ -40,11 +40,15 @@ const color = (() => {
 
       <!-- Item details - with or without quantity -->
       <div v-if="item.quantity" class="flex flex-col">
-        <span class="text-white font-medium text-sm md:text-base truncate">{{ item.item }}</span>
+        <span class="text-white font-medium capitalize text-sm md:text-base truncate">{{
+          item.item
+        }}</span>
         <span class="text-gray-400 text-xs md:text-sm">Quantity: {{ item.quantity }}</span>
       </div>
       <div v-else class="flex items-center">
-        <p class="text-white font-medium text-sm md:text-base truncate">{{ item.item }}</p>
+        <p class="text-white capitalize font-medium text-sm md:text-base truncate">
+          {{ item.item }}
+        </p>
       </div>
     </div>
 

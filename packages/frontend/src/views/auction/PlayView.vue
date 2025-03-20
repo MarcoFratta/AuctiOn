@@ -1,71 +1,96 @@
 <template>
-  <div class="min-h-screen w-full bg-gray-900 text-white p-2 sm:p-2 lg:p-4 flex flex-col">
-    <!-- Top Bar -->
-    <div class="flex justify-between items-center mb-4 lg:mb-6">
-      <h1 class="text-xl sm:text-2xl font-bold">⚡ Live Auction</h1>
-      <div class="flex items-center gap-4">
-        <!-- Add any top-right controls here -->
-      </div>
-    </div>
-
+  <div
+    class="min-h-screen w-full bg-gradient-to-b from-gray-850 to-gray-950 text-white flex flex-col"
+  >
+    <!-- Teleport the game status indicators to the header right content slot -->
+    <Teleport to="#header-right-content">
+      <GameHeader />
+    </Teleport>
     <!-- Main Content Area -->
-    <div class="grid grid-cols-1 md:grid-cols-12 gap-2 sm:gap-4 lg:gap-6 flex-grow">
-      <!-- Left Side - Main Game Area (9 columns) -->
-      <div class="col-span-1 md:col-span-9 grid grid-cols-1 gap-2 sm:gap-4">
-        <!-- Top Row -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-2 sm:gap-4">
-          <!-- Current Bid Card - Takes 2/3 of the width -->
-          <div class="lg:col-span-2 order-1">
-            <CurrentBidCard
-              v-if="!lobbyStore.userIsTheSeller || lobbyStore.lobby?.currentSale"
-              :highest-bid="highestBid ?? 0"
-              :highest-bidder="highestBidder"
-              :remaining-time="remainingTime"
-              @bid="bid"
-            />
-            <SaleCard v-else @sale="submitSale" @update:items="sellingItems = $event" />
+    <div
+      class="flex-1 w-full flex flex-col lg:grid lg:grid-cols-12 gap-4 mb-4 sm:px-4 pb-16 sm:pb-3"
+    >
+      <!-- Left and Center Content (9 columns on desktop) -->
+      <div class="lg:col-span-9 flex flex-col gap-4">
+        <!-- Top Row with Bid/Sale Card and Sale Info -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Current Bid/Sale Card - Takes 2/3 of the width on desktop -->
+          <div class="md:col-span-2 flex">
+            <transition mode="out-in" name="fade">
+              <CurrentBidCard
+                v-if="!lobbyStore.userIsTheSeller || lobbyStore.lobby?.currentSale"
+                :highest-bid="highestBid ?? 0"
+                :highest-bidder="highestBidder"
+                :remaining-time="remainingTime"
+                class="w-full transform hover:scale-[1.01] transition-transform"
+                @bid="bid"
+              />
+              <SaleCard
+                v-else
+                class="w-full transform hover:scale-[1.01] transition-transform"
+                @sale="submitSale"
+                @update:items="sellingItems = $event"
+              />
+            </transition>
           </div>
-          <!-- Current Sale Info - Takes 1/3 of the width -->
-          <div class="lg:col-span-1 order-first lg:order-2">
-            <CurrentSaleInfo v-if="!lobbyStore.userIsTheSeller || lobbyStore.lobby?.currentSale" />
-            <NewSaleInfo v-else :current-sale="sellingItems" />
+
+          <!-- Current Sale Info - Takes 1/3 of the width on desktop -->
+          <div class="md:col-span-1 flex">
+            <transition mode="out-in" name="fade">
+              <CurrentSaleInfo
+                v-if="!lobbyStore.userIsTheSeller || lobbyStore.lobby?.currentSale"
+                class="w-full transform hover:scale-[1.01] transition-transform"
+              />
+              <NewSaleInfo
+                v-else
+                :current-sale="sellingItems"
+                class="w-full transform hover:scale-[1.01] transition-transform"
+              />
+            </transition>
           </div>
         </div>
 
-        <!-- Bottom Row - Inventory -->
-        <div>
+        <!-- Bottom Row - Inventory (full width of left section) -->
+        <div class="transform hover:scale-[1.01] transition-transform">
           <PlayerInventory />
         </div>
       </div>
 
-      <!-- Right Side - Rules & Queue (3 columns) -->
-      <div class="col-span-1 md:col-span-3 grid grid-cols-1 gap-2 sm:gap-4">
-        <AuctionRules />
-        <SellerQueue />
+      <!-- Right Side - Rules & Queue (3 columns on desktop) -->
+      <div class="lg:col-span-3 flex flex-col gap-4">
+        <div class="transform hover:scale-[1.01] transition-transform">
+          <AuctionRules />
+        </div>
+        <div class="transform hover:scale-[1.01] transition-transform">
+          <SellerQueue />
+        </div>
       </div>
+    </div>
+
+    <!-- Game Notifications -->
+    <div class="fixed bottom-4 right-4 z-50">
+      <transition-group name="notification">
+        <!-- Notification would go here -->
+      </transition-group>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { computed, onUnmounted, ref, watch } from 'vue'
-import { useLobbyStore } from '@/stores/lobbyStore.js'
-import { useLobbyMsgHandler } from '@/composables/useLobbyMsgHandler.js'
-import { useAuctionService } from '@/composables/useAuctionService.js'
-import { useUserStore } from '@/stores/userStore.ts'
+import { useLobbyStore } from '@/stores/lobbyStore.ts'
+import { useAuctionService } from '@/composables/useAuctionService.ts'
+import CurrentBidCard from '@/components/auction/CurrentBidCard.vue'
+import CurrentSaleInfo from '@/components/auction/CurrentSaleInfo.vue'
+import PlayerInventory from '@/components/auction/PlayerInventory.vue'
 import AuctionRules from '@/components/auction/AuctionRules.vue'
 import SellerQueue from '@/components/auction/SellerQueue.vue'
-import CurrentBidCard from '@/components/auction/CurrentBidCard.vue'
-import PlayerInventory from '@/components/auction/PlayerInventory.vue'
 import SaleCard from '@/components/auction/SaleCard.vue'
-import CurrentSaleInfo from '@/components/auction/CurrentSaleInfo.vue'
 import NewSaleInfo from '@/components/auction/NewSaleInfo.vue'
+import GameHeader from '@/components/auction/GameHeader.vue'
 
-const userStore = useUserStore()
 const lobbyStore = useLobbyStore()
-const msgHandler = useLobbyMsgHandler()
 const auctionService = useAuctionService()
-msgHandler.connectAndHandle()
 
 // Reactive ref to hold the remaining time for countdown
 const remainingTime = ref(0)
@@ -78,7 +103,7 @@ const updateRemainingTime = () => {
     return
   }
 
-  const elapsedTime = Math.floor((Date.now() - new Date(lobbyStore.timerStart)) / 1000)
+  const elapsedTime = Math.floor((Date.now() - new Date(lobbyStore.timerStart).getTime()) / 1000)
   remainingTime.value = Math.max(0, lobbyStore.lobby.bidTime - elapsedTime)
 }
 
@@ -116,9 +141,7 @@ const highestBid = computed(() => lobbyStore.lobby?.currentBid?.amount ?? undefi
 const highestBidder = computed(() =>
   lobbyStore.users.find((user) => user.id === lobbyStore.lobby?.currentBid?.playerId),
 )
-const totalWeight = computed(() => lobbyStore.lobby?.currentSale?.info?.weight ?? undefined)
 const playerMoney = computed(() => lobbyStore.playerInfo?.money ?? 0)
-const playerInventory = computed(() => lobbyStore.playerInfo?.inventory)
 const sellingItems = ref()
 
 // Function to place a bid
@@ -149,3 +172,35 @@ const submitSale = (saleQuantities: { item: string; quantity: number }[]) => {
   auctionService.sellItems(saleList)
 }
 </script>
+
+<style scoped>
+/* Transitions */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.notification-enter-active,
+.notification-leave-active {
+  transition: all 0.3s ease;
+}
+
+.notification-enter-from,
+.notification-leave-to {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+}
+</style>
