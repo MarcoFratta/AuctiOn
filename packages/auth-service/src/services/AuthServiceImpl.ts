@@ -54,6 +54,21 @@ export class AuthServiceImpl implements AuthService {
     }
   }
 
+  async logout(token: Token): Promise<void> {
+    try {
+      const decoded = this.generator.verifyRefreshToken(token.refreshToken)
+      const accessDecode = this.generator.verifyAccessToken(token.accessToken)
+      if (decoded.id !== accessDecode.id) {
+        throw new InvalidTokenError()
+      }
+      await this.tokenRepo.deleteRefreshToken(decoded.id)
+      await this.tokenRepo.deleteResetToken(decoded.id)
+      await this.tokenRepo.blacklistToken(token.accessToken, decoded.exp)
+    } catch (_error) {
+      logger.error(_error)
+      throw new InvalidTokenError()
+    }
+  }
   // Login an existing user
   async login(data: LoginInputData): Promise<RegisterOutput> {
     const existingUser = await this.getUserByEmail(data.email)
@@ -94,19 +109,23 @@ export class AuthServiceImpl implements AuthService {
       await this.tokenRepo.saveRefreshToken(newRefreshToken, user.id)
 
       return { accessToken: newAccessToken, refreshToken: newRefreshToken, user: user }
-    } catch (error) {
+    } catch (_error) {
       throw new InvalidTokenError()
     }
   }
 
   // Validate a JWT
-  validateToken(token: Omit<Token, 'refreshToken'>): User {
+  async validateToken(token: Omit<Token, 'refreshToken'>): Promise<User> {
     try {
       // Decode and verify the token
+      if (await this.tokenRepo.isTokenBlacklisted(token.accessToken)) {
+        throw new InvalidTokenError()
+      }
       const decoded = this.generator.verifyAccessToken(token.accessToken)
       if (!decoded) {
         throw new InvalidTokenError()
       }
+
       return validateSchema(userSchema, decoded)
     } catch (error) {
       if (error instanceof jwt.TokenExpiredError) {
@@ -165,6 +184,10 @@ export class AuthServiceImpl implements AuthService {
     const user = await this.getUserByEmail(email)
     if (!user) {
       throw new UserNotFoundError(email)
+    }
+    const alreadyExists = await this.tokenRepo.findResetToken(user.id)
+    if (alreadyExists) {
+      return alreadyExists
     }
     const resetToken = this.generator.generateResetToken({ id: user.id })
     await this.tokenRepo.saveResetToken(resetToken, user.id)

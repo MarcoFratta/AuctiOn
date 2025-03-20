@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 import { AuthService } from '../services/AuthService'
 import { LoginInputData, RegisterInputData, User } from '../schemas/AuthSchema'
 import logger from '@auction/common/logger'
-import { TokenExpiredError } from '../errors/AuthErrors'
+import { TokenExpiredError, UserNotFoundError } from '../errors/AuthErrors'
 import { MailClient } from '../services/MailClient'
 import { config } from '../configs/config'
 
@@ -65,7 +65,22 @@ export class AuthController {
         },
       })
     } catch (error) {
-      logger.debug(`error logging in user: ${error}`)
+      logger.info(`error logging in user: ${error}`)
+      next(error)
+    }
+  }
+  logout = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const refreshToken = req.cookies['refreshToken']
+      const accessToken = req.headers.authorization?.split(' ')[1]
+      if (!refreshToken || !accessToken) {
+        res.status(401).json({ message: 'Login required' })
+        return
+      }
+      await this.authService.logout({ refreshToken, accessToken })
+      res.clearCookie('refreshToken')
+      res.status(200).json({ message: 'User logged out successfully' })
+    } catch (error) {
       next(error)
     }
   }
@@ -116,6 +131,10 @@ export class AuthController {
         message: "Password reset link sent to user's email",
       })
     } catch (error) {
+      if (error instanceof UserNotFoundError) {
+        res.status(200).json({ message: 'Password reset link sent' })
+        return
+      }
       next(error)
     }
   }
@@ -123,6 +142,7 @@ export class AuthController {
     try {
       const token: string = req.body.token
       const password: string = req.body.password
+      logger.info(`resetting password ${password}`)
       await this.authService.resetPassword(token, password)
       logger.debug(`Password reset successfully`)
       res.status(200).json({ message: 'Password reset successfully' })
@@ -131,7 +151,7 @@ export class AuthController {
     }
   }
 
-  validateToken = (req: Request, res: Response, next: NextFunction) => {
+  validateToken = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const token: string = req.body.token
       if (!token) {
@@ -142,7 +162,7 @@ export class AuthController {
         accessToken: token,
       }
 
-      const decoded: User = this.authService.validateToken(tokens)
+      const decoded: User = await this.authService.validateToken(tokens)
       logger.debug(`Token validated successfully for user ${decoded.email}`)
       res.status(200).json({ user: decoded })
     } catch (error) {

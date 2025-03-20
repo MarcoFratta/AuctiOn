@@ -3,11 +3,15 @@ export interface TokensRepo {
 
   deleteRefreshToken(token: string): Promise<void>
 
-  findRefreshToken(token: string): Promise<string | null>
+  findRefreshToken(userId: string): Promise<string | null>
 
   saveResetToken(resetToken: string, id: string): Promise<void>
 
-  findResetToken(resetToken: string): Promise<string | null>
+  findResetToken(userId: string): Promise<string | null>
 
   deleteResetToken(resetToken: string): Promise<void>
+
+  blacklistToken(token: string, expiresAt: number): Promise<void>
+
+  isTokenBlacklisted(token: string): Promise<boolean>
 }
