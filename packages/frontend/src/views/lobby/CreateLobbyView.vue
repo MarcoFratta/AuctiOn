@@ -66,27 +66,26 @@ const handleForm = async (event: Event) => {
     if (!canSubmit.value) throw new InvalidData()
     waitForResponse.value = true
 
-    const res = await lobbyService.createLobby({
+    await lobbyService.createLobby({
       rounds: values.rounds!,
       maxPlayers: values.maxPlayers!,
       bidTime: values.bidTime!,
       startAmount: values.startAmount!,
       startInventory: { items: values.startInventory?.items! },
     })
-    router.push('/lobby')
+    await router.push('/lobby')
   } catch (e) {
     console.log('Error', e)
     const err = errorsHandler
       .create(e)
       .unknownError()
       .invalidData()
-      .alreadyInLobby('You already joined a lobby', () => router.push('/lobby'))
+      .alreadyInLobby('You already joined a lobby', async () => {
+        await router.push('/lobby')
+      })
       .authenticationError('', () => router.push('/login?redirect=/create'))
       .tooManyRequests()
-    console.error('showing error')
-    await errorsHandler.show(err.get())
-    console.error('error shown')
-    err.run()
+    await errorsHandler.showAndRun(err)
   } finally {
     waitForResponse.value = false
   }
