@@ -5,13 +5,14 @@ import { useAuthStore } from '@/stores/authStore.ts'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import { signInSchema } from '@/schemas/authSchema.ts'
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import router from '@/router'
-import { useAlert } from '@/composables/useAlert.ts'
 import LoadingButton from '@/components/LoadingButton.vue'
 import { useErrorsHandler } from '@/composables/useErrorsHandler.ts'
 
 const { login } = useAuth()
+const auth = useAuthStore()
+
 const schema = toTypedSchema(signInSchema)
 const { values, errors, defineField } = useForm({
   validationSchema: schema,
@@ -27,8 +28,7 @@ const [password, passwordProps] = defineField('password', {
     error: state.errors[0],
   }),
 })
-const auth = useAuthStore()
-useAlert()
+
 const errorHandler = useErrorsHandler()
 const waitingResponse = ref(false)
 const isAuthenticated = computed(() => auth.isAuthenticated)
@@ -61,6 +61,7 @@ const handleForm = async (event: Event) => {
       .notFound('Account not found', 'Please sign up', () =>
         router.push(`/register?redirect=${redirectTo}`),
       )
+      .passwordIncorrect()
       .invalidData('Incorrect password', 'Please try again')
       .tooManyRequests()
     await errorHandler.showAndRun(err)
@@ -68,6 +69,11 @@ const handleForm = async (event: Event) => {
     waitingResponse.value = false
   }
 }
+onMounted(() => {
+  if (isAuthenticated.value) {
+    router.push('/')
+  }
+})
 </script>
 
 <template>
@@ -120,6 +126,12 @@ const handleForm = async (event: Event) => {
           class="w-full py-3 px-4 rounded-md font-semibold text-lg transition-all"
           @click="handleForm"
         />
+
+        <div class="flex justify-end">
+          <router-link class="text-sm text-blue-400 hover:text-blue-300" to="/forgot-password">
+            Forgot password?
+          </router-link>
+        </div>
 
         <p class="text-center text-gray-400 mt-4">
           Don't have an account?

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useAuth } from '@/composables/useAuth.ts'
 import FormEntry from '@/components/FormEntry.vue'
 import { useAuthStore } from '@/stores/authStore.ts'
@@ -79,6 +79,11 @@ const handleForm = async () => {
     waitingResponse.value = false
   }
 }
+onMounted(() => {
+  if (isAuthenticated.value) {
+    router.push('/')
+  }
+})
 </script>
 
 <template>

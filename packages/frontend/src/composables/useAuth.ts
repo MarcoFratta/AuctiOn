@@ -1,13 +1,17 @@
 import {
+  forgotPassword as forgotPasswordApi,
   login as loginApi,
+  logout as logoutApi,
   refresh as refreshApi,
   register as registerApi,
+  resetPassword as resetPasswordApi,
 } from '@/api/authService'
 import { useAuthStore } from '@/stores/authStore.ts'
 import { type User, userSchema, useUserStore } from '@/stores/userStore.ts'
 import { validateSchema } from '@auction/common/validation'
 import { useErrorsHandler } from '@/composables/useErrorsHandler.ts'
 import { PasswordIncorrect, UserAlreadyRegistered } from '@/api/Errors.ts'
+import { useSocketStore } from '@/stores/socketStore.ts'
 
 export function useAuth() {
   const tokens = useAuthStore()
@@ -35,25 +39,58 @@ export function useAuth() {
     }
   }
 
-  async function refresh() {
-    try {
-      const data = await refreshApi()
-      tokens.setTokens(data.token)
-      const user: User = validateSchema(userSchema, {
-        ...data.user,
-        username: data.user.name,
+  function refresh() {
+    if (tokens.refreshing) {
+      return tokens.refreshing
+    }
+    const p = refreshApi()
+      .then((data) => {
+        tokens.setTokens(data.token)
+        const user: User = validateSchema(userSchema, {
+          ...data.user,
+          username: data.user.name,
+        })
+        users.setUser(user)
       })
-      users.setUser(user)
+      .catch((error) => {
+        handleError(error)
+        logout()
+      })
+      .finally(() => {
+        tokens.refreshing = undefined
+      })
+    tokens.refreshing = p
+    return p
+  }
+
+  async function forgotPassword(email: string) {
+    try {
+      const response = await forgotPasswordApi(email)
+      return response.data
     } catch (error) {
       handleError(error)
-      logout()
     }
   }
 
-  function logout() {
-    tokens.clearTokens()
-    users.removeUser()
+  async function resetPassword(token: string, newPassword: string) {
+    try {
+      const response = await resetPasswordApi(token, newPassword)
+      return response.data
+    } catch (error) {
+      handleError(error)
+    }
   }
 
-  return { register, login, refresh, logout }
+  async function logout() {
+    try {
+      await logoutApi()
+      tokens.clearTokens()
+      users.removeUser()
+      useSocketStore().disconnect()
+    } catch (e) {
+      handleError(e)
+    }
+  }
+
+  return { register, login, refresh, logout, resetPassword, forgotPassword }
 }
