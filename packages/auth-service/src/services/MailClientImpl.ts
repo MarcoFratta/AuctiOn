@@ -1,16 +1,27 @@
 import { MailClient } from './MailClient'
 import { Transporter } from 'nodemailer'
 import logger from '@auction/common/logger'
+import { EmailTemplates } from '../templates/EmailTemplates'
 
 export class MailClientImpl implements MailClient {
-  constructor(private readonly client: Transporter) {}
+  private readonly emailTemplates: EmailTemplates
+
+  constructor(
+    private readonly client: Transporter,
+    private readonly appConfig: { appName: string; baseUrl: string }
+  ) {
+    this.emailTemplates = new EmailTemplates({
+      appName: appConfig.appName,
+      baseUrl: appConfig.baseUrl,
+    })
+  }
 
   async sendRegisterMail(email: string): Promise<void> {
     const mailOptions = {
-      from: `AuctiOn <${this.client.options.from}>`,
+      from: `${this.appConfig.appName} <${this.client.options.from}>`,
       to: email,
-      subject: 'Welcome to AuctiOn',
-      html: '<p>Thank you for registering with AuctiOn</p>',
+      subject: `Welcome to ${this.appConfig.appName}`,
+      html: this.emailTemplates.getWelcomeEmailTemplate(),
     }
 
     try {
@@ -23,11 +34,10 @@ export class MailClientImpl implements MailClient {
 
   async sendResetMail(email: string, token: string): Promise<void> {
     const mailOptions = {
-      from: `AuctiOn <${this.client.options.from}>`,
+      from: `${this.appConfig.appName} <${this.client.options.from}>`,
       to: email,
       subject: 'Reset your password',
-      html: `<p>Click <a href="http://localhost/reset/${token}">here</a>
-              to reset your password</p>`,
+      html: this.emailTemplates.getPasswordResetTemplate(token),
     }
     try {
       const info = await this.client.sendMail(mailOptions)

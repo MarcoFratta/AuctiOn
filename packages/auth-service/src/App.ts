@@ -14,6 +14,7 @@ import { RedisTokenRepo } from './repositories/RedisTokenRepo'
 import Redis from 'ioredis'
 import { MailClientImpl } from './services/MailClientImpl'
 import nodemailer from 'nodemailer'
+import { emailConfig } from './configs/emailConfig'
 
 export class App {
   public app: express.Express
@@ -67,7 +68,7 @@ export class App {
       },
     })
 
-    const mailService = new MailClientImpl(mailer)
+    const mailService = new MailClientImpl(mailer, emailConfig)
     const controller = new AuthController(service, mailService) // Use the router
     const router = createRouter(controller)
     this.app.use('/auth', router)
