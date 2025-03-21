@@ -32,6 +32,7 @@ services:
       context: .
       dockerfile: packages/auth-service/Dockerfile
     restart: always
+    dns: [ "8.8.8.8", "1.1.1.1" ]
     environment:
       - DB_URI=${AUTH_S_DB_URI:-mongodb://test:27017/auth}
       - PORT=${AUTH_S_C_PORT:-3000}
