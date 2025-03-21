@@ -10,7 +10,7 @@ import {
   WrongPasswordError,
 } from '../errors/AuthErrors'
 import { AuthService } from './AuthService'
-import { LoginInputData, RegisterInputData, RegisterOutput, Token, User, userSchema } from '../schemas/AuthSchema'
+import { Account, LoginInputData, RegisterInputData, RegisterOutput, Token, User, userSchema } from '../schemas/AuthSchema'
 import logger from '@auction/common/logger'
 import { validateSchema } from '@auction/common/validation'
 import { AccountRepository } from '../repositories/AccountRepository'
@@ -30,7 +30,7 @@ export class AuthServiceImpl implements AuthService {
     const userExists = await this.getUserByEmail(data.email)
     if (userExists) throw new UserAlreadyExistsError(data.email)
 
-    const hashedPassword = await bcrypt.hash(data.password, 10)
+    const hashedPassword = await this.getHashedPassword(data.password)
 
     const account = await this.accountRepo.create({ pHash: hashedPassword })
     const userInfo: User = validateSchema(userSchema, {
@@ -54,6 +54,26 @@ export class AuthServiceImpl implements AuthService {
     }
   }
 
+  // Login an existing user
+  async login(data: LoginInputData): Promise<RegisterOutput> {
+    const existingUser = await this.getUserByEmail(data.email)
+    if (!existingUser) throw new UserNotFoundError(data.email)
+    const user: User = validateSchema(userSchema, existingUser)
+    const account = await this.accountRepo.findById(user.id)
+    if (!account) {
+      throw new UserNotFoundError(data.email)
+    }
+    const isPasswordValid = await this.comparePasswords(data, account)
+    if (!isPasswordValid) throw new WrongPasswordError()
+
+    // Generate both access and refresh tokens
+    const accessToken = this.generator.generateAccessToken(user)
+    const refreshToken = this.generator.generateRefreshToken({ id: user.id })
+    await this.tokenRepo.saveRefreshToken(refreshToken, account.id)
+
+    return { accessToken, refreshToken, ...user }
+  }
+
   async logout(token: Token): Promise<void> {
     try {
       const decoded = this.generator.verifyRefreshToken(token.refreshToken)
@@ -69,24 +89,31 @@ export class AuthServiceImpl implements AuthService {
       throw new InvalidTokenError()
     }
   }
-  // Login an existing user
-  async login(data: LoginInputData): Promise<RegisterOutput> {
-    const existingUser = await this.getUserByEmail(data.email)
-    if (!existingUser) throw new UserNotFoundError(data.email)
-    const user: User = validateSchema(userSchema, existingUser)
-    const account = await this.accountRepo.findById(user.id)
-    if (!account) {
-      throw new UserNotFoundError(data.email)
+
+  async resetPassword(token: string, password: string): Promise<void> {
+    // verify token
+    const decoded = this.generator.verifyResetToken(token)
+    if (!decoded) {
+      throw new InvalidTokenError()
     }
-    const isPasswordValid = await bcrypt.compare(data.password, account.pHash)
-    if (!isPasswordValid) throw new WrongPasswordError()
+    const user = await this.accountRepo.findById(decoded.id)
+    if (!user) {
+      throw new UserNotFoundError('')
+    }
+    const storedToken = await this.tokenRepo.findResetToken(decoded.id)
+    if (!storedToken || storedToken !== token) {
+      throw new InvalidTokenError()
+    }
 
-    // Generate both access and refresh tokens
-    const accessToken = this.generator.generateAccessToken(user)
-    const refreshToken = this.generator.generateRefreshToken({ id: user.id })
-    await this.tokenRepo.saveRefreshToken(refreshToken, account.id)
+    const newPasswordHash = await this.getHashedPassword(password)
+    // update password
+    await this.accountRepo.update(decoded.id, { pHash: newPasswordHash })
+    // delete token
+    await this.tokenRepo.deleteResetToken(decoded.id)
+  }
 
-    return { accessToken, refreshToken, ...user }
+  private async getHashedPassword(password: string) {
+    return await bcrypt.hash(password, 10)
   }
 
   async refreshToken(token: Omit<Token, 'accessToken'>): Promise<Token & { user: User }> {
@@ -195,25 +222,7 @@ export class AuthServiceImpl implements AuthService {
     return resetToken
   }
 
-  async resetPassword(token: string, password: string): Promise<void> {
-    // verify token
-    const decoded = this.generator.verifyResetToken(token)
-    if (!decoded) {
-      throw new InvalidTokenError()
-    }
-    const user = await this.accountRepo.findById(decoded.id)
-    if (!user) {
-      throw new UserNotFoundError('')
-    }
-    const storedToken = await this.tokenRepo.findResetToken(decoded.id)
-    if (!storedToken || storedToken !== token) {
-      throw new InvalidTokenError()
-    }
-
-    const newPasswordHash = await bcrypt.hash(password, 10)
-    // update password
-    await this.accountRepo.update(decoded.id, { pHash: newPasswordHash })
-    // delete token
-    await this.tokenRepo.deleteResetToken(decoded.id)
+  private async comparePasswords(data: LoginInputData, account: Account) {
+    return await bcrypt.compare(data.password, account.pHash)
   }
 }

@@ -17,6 +17,7 @@ describe('Auth Router', () => {
       validateToken: jest.fn(),
       refreshToken: jest.fn(),
       forgotPassword: jest.fn(),
+      logout: jest.fn(),
       resetPassword: jest.fn(),
     } as unknown as jest.Mocked<AuthController>;
 

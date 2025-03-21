@@ -202,8 +202,8 @@ describe('AuthService', () => {
 
     mockTokenGenerator.verifyAccessToken.mockReturnValue(decoded)
 
-    const result = authService.validateToken(token);
 
+    const result = await authService.validateToken(token)
     expect(mockTokenGenerator.verifyAccessToken).toHaveBeenCalledWith(token.accessToken)
     expect(result).toEqual(decoded);
   });
@@ -215,7 +215,7 @@ describe('AuthService', () => {
       throw new Error('Invalid token');
     });
 
-    expect(() => authService.validateToken(token)).toThrow(new InvalidTokenError());
+    await expect(() => authService.validateToken(token)).rejects.toThrow(new InvalidTokenError())
     expect(mockTokenGenerator.verifyAccessToken).toHaveBeenCalledWith(token.accessToken)
   });
   // Test for refresh token
