@@ -17,4 +17,9 @@ export const gameRoutes = [
       requiresAuth: true,
     },
   },
+  {
+    path: '/rules',
+    name: 'rules',
+    component: () => import('@/views/rules/GameRulesView.vue'),
+  },
 ]
