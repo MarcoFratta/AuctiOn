@@ -7,6 +7,8 @@ import { useAuthStore } from '@/stores/authStore'
 import { useAuth } from '@/composables/useAuth'
 import { useLobbyStore } from '@/stores/lobbyStore.ts'
 import { useAuctionConnection } from '@/composables/useAuctionConnection.ts'
+import { userRoutes } from '@/router/routes/user.ts'
+import NotFoundView from '@/views/NotFoundView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -20,6 +22,12 @@ const router = createRouter({
     ...authRoutes,
     ...lobbyRoutes,
     ...gameRoutes,
+    ...userRoutes,
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      component: NotFoundView,
+    },
   ],
 })
 router.beforeEach(async (to, from, next) => {

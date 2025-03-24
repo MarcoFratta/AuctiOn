@@ -31,7 +31,6 @@ const menuItems = [
     route: '/join',
     showIf: () => authStore.isAuthenticated && !lobbyStore.lobby,
   },
-  { icon: '⚙️', label: 'Settings', route: '/settings', showIf: () => authStore.isAuthenticated },
   { icon: '👤', label: 'Account', route: '/account', showIf: () => authStore.isAuthenticated },
   {
     icon: '🎯',
@@ -44,6 +43,11 @@ const menuItems = [
     label: 'Play',
     route: '/lobby',
     showIf: () => authStore.isAuthenticated && lobbyStore.lobby?.startTimestamp,
+  },
+  {
+    icon: '📜',
+    label: 'Game rules',
+    route: '/rules',
   },
 ]
 
@@ -99,7 +103,10 @@ const closeDrawer = () => {
     </nav>
 
     <!-- Logout Button -->
-    <div class="absolute bottom-0 w-full p-4 border-t border-gray-700">
+    <div
+      v-if="authStore.isAuthenticated"
+      class="absolute bottom-0 w-full p-4 border-t border-gray-700"
+    >
       <button
         class="flex items-center gap-3 w-full p-2 rounded-lg text-red-400 hover:bg-gray-700 transition-colors"
         @click="handleLogout"
