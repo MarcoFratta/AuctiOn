@@ -17,12 +17,19 @@ export function useAuth() {
   const tokens = useAuthStore()
   const users = useUserStore()
   const { handleError } = useErrorsHandler()
+
+  function createUserData(user: object | undefined): User {
+    return validateSchema(userSchema, {
+      ...user,
+      username: user.name,
+    }) as User
+  }
   async function login(email: string, password: string) {
     try {
       const data = await loginApi(email, password)
       tokens.setTokens(data.user.token)
       delete data.user.token
-      users.setUser(data.user)
+      users.setUser(createUserData(data.user))
     } catch (error) {
       handleError(error, [[400, new PasswordIncorrect()]])
     }
@@ -33,7 +40,7 @@ export function useAuth() {
       const data = await registerApi(name, email, password)
       tokens.setTokens(data.user.token)
       delete data.user.token
-      users.setUser(data.user)
+      users.setUser(createUserData(data))
     } catch (error) {
       handleError(error, [[409, new UserAlreadyRegistered(email)]])
     }
@@ -46,11 +53,7 @@ export function useAuth() {
     const p = refreshApi()
       .then((data) => {
         tokens.setTokens(data.token)
-        const user: User = validateSchema(userSchema, {
-          ...data.user,
-          username: data.user.name,
-        })
-        users.setUser(user)
+        users.setUser(createUserData(data.user))
       })
       .catch((error) => {
         handleError(error)
