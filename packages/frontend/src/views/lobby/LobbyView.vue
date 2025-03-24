@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-[80vh]">
+  <div v-if="lobby" class="min-h-[80vh]">
     <div class="w-full max-w-3xl mx-auto bg-gray-800 p-4 lg:p-8 rounded-lg shadow-lg">
       <!-- Header -->
       <div class="mb-8 text-center">
