@@ -3,6 +3,7 @@ import { computed, onBeforeMount, ref, watch } from 'vue'
 import { useAuthStore } from '@/stores/authStore.ts'
 import NavigationDrawer from '@/components/NavigationDrawer.vue'
 import AppHeader from '@/components/AppHeader.vue'
+import AppFooter from '@/components/AppFooter.vue'
 import { useLobbyMsgHandler } from '@/composables/useLobbyMsgHandler.ts'
 import { useAuctionNotifications } from '@/composables/useAuctionNotifications.ts'
 import { useAuth } from '@/composables/useAuth.ts'
@@ -28,9 +29,12 @@ watch(
   async (isAuthenticated) => {
     if (isAuthenticated) {
       console.log('Checking active lobby')
-      lobbyService.checkActiveLobby().then(() => {
-        useAuctionConnection().connect()
-      })
+      lobbyService
+        .checkActiveLobby()
+        .then(() => {
+          useAuctionConnection().connect()
+        })
+        .catch()
     }
   },
 )
@@ -38,7 +42,7 @@ onBeforeMount(async () => await useAuth().refresh())
 </script>
 
 <template>
-  <div class="min-h-screen w-full bg-gray-900">
+  <div class="min-h-screen w-full bg-gray-900 flex flex-col">
     <!-- App Header with slots -->
     <AppHeader @toggle-drawer="toggleDrawer">
       <!-- Default title is provided in the component -->
@@ -62,6 +66,14 @@ onBeforeMount(async () => await useAuth().refresh())
               Register
             </RouterLink>
           </nav>
+          <nav v-else class="flex items-center gap-4">
+            <RouterLink
+              class="text-gray-300 hover:text-white transition-colors px-3 py-1 rounded-md hover:bg-gray-700 flex items-center"
+              to="/account"
+            >
+              <span class="mr-1">👤</span> Account
+            </RouterLink>
+          </nav>
         </div>
       </template>
     </AppHeader>
@@ -70,8 +82,14 @@ onBeforeMount(async () => await useAuth().refresh())
     <NavigationDrawer :is-open="isDrawerOpen" @toggle="toggleDrawer" />
 
     <!-- Main Content -->
-    <main class="w-full mt-4 lg:mt-8">
+    <main class="w-full mt-4 lg:mt-8 flex-grow">
       <RouterView></RouterView>
     </main>
+
+    <!-- Footer -->
+    <AppFooter class="mt-4 lg:mt-6 xl:mt-8" />
   </div>
 </template>
+
+// API base URL configuration export const API_BASE_URL = process.env.NODE_ENV === 'production' ?
+'https://your-local-ip-or-domain/api' : 'http://localhost:8080/api';
