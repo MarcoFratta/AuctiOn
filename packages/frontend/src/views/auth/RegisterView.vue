@@ -10,6 +10,7 @@ import LoadingButton from '@/components/LoadingButton.vue'
 import { InvalidData } from '@/api/Errors.ts'
 import { useErrorsHandler } from '@/composables/useErrorsHandler.ts'
 import { useRouter } from 'vue-router'
+import Background from '@/components/Background.vue'
 
 const { register } = useAuth()
 const schema = toTypedSchema(signUpSchema)
@@ -87,88 +88,94 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-    <form
-      class="bg-gray-800 p-6 lg:p-8 rounded-lg shadow-lg w-full max-w-md flex flex-col gap-4"
-      @submit.prevent="handleForm"
-    >
+  <Background>
+    <div class="flex flex-col items-center justify-center py-8 px-4">
       <!-- Header -->
-      <div class="mb-6">
-        <h2 class="text-2xl font-bold text-white">✨ Create Account</h2>
-        <p class="text-gray-400 mt-2">Fill in your information to get started.</p>
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-white mb-6">Create Account</h1>
+        <span class="text-app-violet-200 text-xl block">
+          Join us! Fill in your details below.
+        </span>
       </div>
 
-      <!-- Form Fields -->
-      <div class="bg-gray-700 p-4 rounded-lg space-y-4">
-        <div class="space-y-1">
-          <label class="block text-sm font-medium text-gray-300" for="name">Name</label>
-          <FormEntry
-            id="name"
-            v-model="name"
-            autocomplete="name"
-            placeHolder="Enter your name"
-            v-bind="nameProps"
-          />
+      <form class="w-full max-w-md" @submit.prevent="handleForm">
+        <!-- Form Fields -->
+        <div
+          class="bg-app-black-80 backdrop-blur-md border border-app-violet-900/30 p-6 rounded-lg space-y-4 mb-6"
+        >
+          <div class="space-y-2">
+            <FormEntry
+              id="name"
+              v-model="name"
+              :class="{ '!border-red-500': errors.name }"
+              autocomplete="name"
+              class="w-full"
+              placeHolder="Enter your username"
+              title="Username"
+              v-bind="nameProps"
+            />
+          </div>
+          <div class="space-y-2">
+            <FormEntry
+              id="email"
+              v-model="email"
+              :class="{ '!border-red-500': errors.email }"
+              autocomplete="email"
+              class="w-full"
+              placeHolder="Enter your email"
+              title="Email"
+              v-bind="emailProps"
+            />
+          </div>
+          <div class="space-y-2">
+            <FormEntry
+              id="password"
+              v-model="password"
+              :class="{ '!border-red-500': errors.password }"
+              autocomplete="new-password"
+              class="w-full"
+              placeHolder="Enter your password"
+              title="Password"
+              type="password"
+              v-bind="passwordProps"
+            />
+          </div>
+          <div class="space-y-2">
+            <FormEntry
+              id="repeat"
+              v-model="repeat"
+              :class="{ '!border-red-500': repeatProps.error }"
+              autocomplete="new-password"
+              class="w-full"
+              placeHolder="Confirm your password"
+              title="Repeat Password"
+              type="password"
+              v-bind="repeatProps"
+            />
+          </div>
         </div>
-        <div class="space-y-1">
-          <label class="block text-sm font-medium text-gray-300" for="email">Email</label>
-          <FormEntry
-            id="email"
-            v-model="email"
-            autocomplete="email"
-            placeHolder="Enter your email"
-            v-bind="emailProps"
-          />
-        </div>
-        <div class="space-y-1">
-          <label class="block text-sm font-medium text-gray-300" for="password">Password</label>
-          <FormEntry
-            id="password"
-            v-model="password"
-            autocomplete="new-password"
-            placeHolder="Enter your password"
-            type="password"
-            v-bind="passwordProps"
-          />
-        </div>
-        <div class="space-y-1">
-          <label class="block text-sm font-medium text-gray-300" for="repeat"
-            >Confirm Password</label
-          >
-          <FormEntry
-            id="repeat"
-            v-model="repeat"
-            autocomplete="new-password"
-            placeHolder="Confirm your password"
-            type="password"
-            v-bind="repeatProps"
-          />
-        </div>
-      </div>
 
-      <!-- Action Section -->
-      <div class="flex flex-col gap-2">
-        <LoadingButton
-          :class="
-            canSubmit ? 'bg-green-500 hover:bg-green-600 text-white' : 'bg-gray-600 text-gray-400'
-          "
-          :disable="!canSubmit"
-          :loading="waitingResponse"
-          :text="isAuthenticated ? 'Already Logged In' : 'Create Account'"
-          class="w-full py-3 px-4 rounded-md font-semibold text-lg transition-all"
-          @click="handleForm"
-        />
+        <!-- Action Section -->
+        <div class="flex flex-col gap-4">
+          <LoadingButton
+            :disable="!canSubmit"
+            :loading="waitingResponse"
+            :text="isAuthenticated ? 'Already Logged In' : 'Create Account'"
+            class="w-full py-3"
+            @click="handleForm"
+          />
 
-        <p class="text-center text-gray-400 mt-4">
-          Already have an account?
-          <router-link
-            :to="redirectTo === '/' ? '/login' : `/login?redirect=${redirectTo}`"
-            class="text-blue-400 hover:text-blue-300 font-medium"
-          >
-            Sign in
-          </router-link>
-        </p>
-      </div>
-    </form>
-  </div>
+          <p class="text-center text-app-violet-200">
+            Already have an account?
+            <router-link
+              :to="redirectTo === '/' ? '/login' : `/login?redirect=${redirectTo}`"
+              class="text-app-fuchsia-600 hover:text-app-fuchsia-500 font-medium"
+            >
+              Sign in
+            </router-link>
+          </p>
+        </div>
+      </form>
+    </div>
+  </Background>
 </template>

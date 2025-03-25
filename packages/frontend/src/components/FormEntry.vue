@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
+import { IInput } from '@/components/ui/input'
 
 const props = defineProps({
   title: String,
@@ -27,21 +28,25 @@ const internalValue = computed({
 </script>
 
 <template>
-  <div class="w-full">
-    <label v-if="title" :for="title" class="block text-sm font-medium text-gray-200 mb-1">
+  <div class="flex w-full flex-col items-center justify-center gap-2">
+    <label
+      v-if="title"
+      :for="title"
+      class="ml-4 w-full text-left max-w-sm text-sm font-medium text-gray-200 dark:text-zinc-200"
+    >
       {{ title }}
     </label>
-    <input
+    <IInput
       :id="title"
       v-model="internalValue"
       :placeholder="placeHolder"
       :autocomplete="autocomplete"
+      class="bg-zinc-800 text-gray-200"
+      container-class="w-full max-w-sm"
       :type="type"
       :max="max"
       :min="min"
       :step="step"
-      :class="{ 'border-red-500 focus:border-red-500 focus:ring-red-500': error }"
-      class="w-full px-3 py-2 bg-gray-800 text-white placeholder-gray-400 border border-gray-600 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none disabled:bg-gray-800 disabled:cursor-not-allowed transition-colors"
       required
     />
     <p v-if="error" class="mt-1.5 text-sm text-red-400">
@@ -49,16 +54,3 @@ const internalValue = computed({
     </p>
   </div>
 </template>
-
-<style scoped>
-/* Hide spinner buttons for number inputs */
-input[type='number']::-webkit-outer-spin-button,
-input[type='number']::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-input[type='number'] {
-  -moz-appearance: textfield;
-}
-</style>
