@@ -1,50 +1,27 @@
 <template>
-  <div class="min-h-screen bg-gray-900 p-4 lg:p-6">
-    <!-- Welcome Section -->
-    <div class="max-w-4xl mx-auto text-center mb-12">
-      <h1 class="text-4xl lg:text-5xl font-bold text-white mb-4">⚡ Welcome to Auction Game</h1>
-      <p class="text-gray-400 text-lg">
-        Join exciting auctions, trade items, and compete with other players!
-      </p>
-    </div>
-
-    <!-- Action Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-      <!-- Create Lobby Card -->
-      <div class="bg-gray-800 rounded-lg p-6 shadow-lg">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-xl font-bold text-white">🎮 Create Lobby</h2>
-          <div class="bg-blue-500 bg-opacity-20 px-3 py-1 rounded-full">
-            <span class="text-white font-medium">Host</span>
-          </div>
+  <Background>
+    <div class="size-full flex items-center justify-center">
+      <div class="flex flex-col items-center justify-center px-4">
+        <h1 class="text-5xl lg:text-7xl font-bold text-white mb-6 text-center">Auction Game</h1>
+        <span class="text-app-violet-200 text-xl mb-12 max-w-lg mx-auto text-center">
+          Join exciting auctions, trade items, and compete with other players
+        </span>
+        <!-- Centered Button -->
+        <div class="flex justify-center w-full">
+          <Button
+            :colors="['#ff00ff', '#9900ff', '#6600ff']"
+            :duration="3500"
+            bg-color="app-black-DEFAULT"
+            class="text-white"
+            size="lg"
+            @click="toggleLogin"
+          >
+            Get Started 🚀
+          </Button>
         </div>
-        <p class="text-gray-400 mb-6">Create your own auction lobby and invite friends to join.</p>
-        <button
-          class="w-full py-3 px-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md transition-colors"
-          @click="createLobby"
-        >
-          Create New Lobby
-        </button>
-      </div>
-
-      <!-- Join Lobby Card -->
-      <div class="bg-gray-800 rounded-lg p-6 shadow-lg">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-xl font-bold text-white">🔍 Join Lobby</h2>
-          <div class="bg-green-500 bg-opacity-20 px-3 py-1 rounded-full">
-            <span class="text-white font-medium">Player</span>
-          </div>
-        </div>
-        <p class="text-gray-400 mb-6">Join an existing auction lobby and start bidding.</p>
-        <button
-          class="w-full py-3 px-4 bg-green-500 align-bottom hover:bg-green-600 text-white font-semibold rounded-md transition-colors"
-          @click="joinLobby"
-        >
-          Join Existing Lobby
-        </button>
       </div>
     </div>
-  </div>
+  </Background>
 </template>
 
 <script lang="ts" setup>
@@ -52,6 +29,8 @@ import { useRouter } from 'vue-router'
 import { useLobbyStore } from '@/stores/lobbyStore.ts'
 import { onMounted } from 'vue'
 import { useSocketStore } from '@/stores/socketStore.ts'
+import { GradientButton as Button } from '@/components/ui/gradient-button'
+import Background from '@/components/Background.vue'
 
 const router = useRouter()
 const lobbyStore = useLobbyStore()
@@ -65,11 +44,9 @@ onMounted(() => {
   }
 })
 
-const createLobby = () => {
-  router.push('/create')
-}
-
-const joinLobby = () => {
-  router.push('/join')
+// Single action function
+const toggleLogin = () => {
+  console.log('clicked')
+  router.push('/login')
 }
 </script>
