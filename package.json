@@ -43,6 +43,7 @@
     "typescript-eslint": "^8.22.0"
   },
   "dependencies": {
-    "@auction/common": "^1.0.0"
+    "@auction/common": "^1.0.0",
+    "@vueuse/core": "^13.0.0"
   }
 }
