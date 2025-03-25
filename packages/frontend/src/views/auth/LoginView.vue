@@ -7,8 +7,9 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { signInSchema } from '@/schemas/authSchema.ts'
 import { computed, onMounted, ref } from 'vue'
 import router from '@/router'
-import LoadingButton from '@/components/LoadingButton.vue'
+import { GradientButton } from '@/components/ui/gradient-button'
 import { useErrorsHandler } from '@/composables/useErrorsHandler.ts'
+import Background from '@/components/Background.vue'
 
 const { login } = useAuth()
 const auth = useAuthStore()
@@ -77,72 +78,82 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-    <form
-      class="bg-gray-800 p-6 lg:p-8 rounded-lg shadow-lg w-full max-w-md flex flex-col gap-4"
-      @submit.prevent="handleForm"
-    >
+  <Background>
+    <div class="flex flex-col items-center justify-center px-4">
       <!-- Header -->
-      <div class="mb-6">
-        <h2 class="text-2xl font-bold text-white">🔐 Sign In</h2>
-        <p class="text-gray-400 mt-2">Welcome back! Please enter your details.</p>
+      <div class="text-center mb-8">
+        <h1 class="text-5xl font-bold text-white mb-6">Sign In</h1>
+        <span class="text-app-violet-200 text-xl mb-2 block">
+          Welcome back! Please enter your details.
+        </span>
       </div>
 
-      <!-- Form Fields -->
-      <div class="bg-gray-700 p-4 rounded-lg space-y-4">
-        <div class="space-y-1">
-          <label class="block text-sm font-medium text-gray-300" for="email">Email</label>
-          <FormEntry
-            id="email"
-            v-model="email"
-            autocomplete="email"
-            placeHolder="Enter your email"
-            type="email"
-            v-bind="emailProps"
-          />
-        </div>
-        <div class="space-y-1">
-          <label class="block text-sm font-medium text-gray-300" for="password">Password</label>
-          <FormEntry
-            id="password"
-            v-model="password"
-            autocomplete="current-password"
-            placeHolder="Enter your password"
-            type="password"
-            v-bind="passwordProps"
-          />
-        </div>
-      </div>
+      <form class="w-full max-w-md" @submit.prevent="handleForm">
+        <!-- Form Fields -->
+        <div
+          class="bg-app-black-80 backdrop-blur-md border border-app-violet-900/30 p-6 rounded-lg space-y-4 mb-6"
+        >
+          <div class="space-y-2">
+            <FormEntry
+              id="email"
+              v-model="email"
+              :class="{ '!border-red-500': errors.email }"
+              autocomplete="email"
+              class="w-full"
+              placeHolder="Enter your email"
+              title="Email"
+              v-bind="emailProps"
+            />
+          </div>
 
-      <!-- Action Section -->
-      <div class="flex flex-col gap-2">
-        <LoadingButton
-          :class="
-            canSubmit ? 'bg-blue-500 hover:bg-blue-600 text-white' : 'bg-gray-600 text-gray-400'
-          "
-          :disable="!canSubmit"
-          :loading="waitingResponse"
-          :text="auth.isAuthenticated ? 'Already Logged In' : 'Sign In'"
-          class="w-full py-3 px-4 rounded-md font-semibold text-lg transition-all"
-          @click="handleForm"
-        />
+          <div class="space-y-2">
+            <FormEntry
+              id="password"
+              v-model="password"
+              :class="{ '!border-red-500': errors.password }"
+              autocomplete="current-password"
+              class="w-full"
+              placeHolder="Enter your password"
+              title="Password"
+              type="password"
+              v-bind="passwordProps"
+            />
+          </div>
 
-        <div class="flex justify-end">
-          <router-link class="text-sm text-blue-400 hover:text-blue-300" to="/forgot">
-            Forgot password?
-          </router-link>
+          <div class="flex justify-end">
+            <router-link
+              class="text-sm text-app-violet-300 hover:text-app-violet-200 transition-colors"
+              to="/forgot"
+            >
+              Forgot password?
+            </router-link>
+          </div>
         </div>
 
-        <p class="text-center text-gray-400 mt-4">
-          Don't have an account?
-          <router-link
-            :to="redirectTo === '/' ? '/register' : `/register?redirect=${redirectTo}`"
-            class="text-blue-400 hover:text-blue-300 font-medium"
+        <!-- Action Section -->
+        <div class="flex flex-col gap-4">
+          <GradientButton
+            :class="!canSubmit ? 'disabled opacity-50 cursor-not-allowed' : ''"
+            :colors="['#ff00ff', '#9900ff', '#6600ff']"
+            :duration="3500"
+            bgColor="app-black-DEFAULT"
+            class="w-full py-3"
+            @click="handleForm"
           >
-            Sign up
-          </router-link>
-        </p>
-      </div>
-    </form>
-  </div>
+            {{ auth.isAuthenticated ? 'Already Logged In' : 'Sign In' }}
+          </GradientButton>
+
+          <p class="text-center text-app-violet-200">
+            Don't have an account?
+            <router-link
+              :to="redirectTo === '/' ? '/register' : `/register?redirect=${redirectTo}`"
+              class="text-app-fuchsia-600 hover:text-app-fuchsia-500 font-medium"
+            >
+              Sign up
+            </router-link>
+          </p>
+        </div>
+      </form>
+    </div>
+  </Background>
 </template>
