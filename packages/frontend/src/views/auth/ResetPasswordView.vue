@@ -8,6 +8,7 @@ import { useErrorsHandler } from '@/composables/useErrorsHandler.ts'
 import { resetPassword } from '@/api/authService'
 import { useRoute, useRouter } from 'vue-router'
 import { baseSignUpSchema } from '@/schemas/authSchema.ts'
+import Background from '@/components/Background.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -84,85 +85,89 @@ const handleForm = async () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-    <form
-      class="bg-gray-800 p-6 lg:p-8 rounded-lg shadow-lg w-full max-w-md flex flex-col gap-4"
-      @submit.prevent="handleForm"
-    >
+  <Background>
+    <div class="flex flex-col items-center justify-center py-8 px-4">
       <!-- Header -->
-      <div class="mb-6">
-        <h2 class="text-2xl font-bold text-white">🔐 Reset Password</h2>
-        <p class="text-gray-400 mt-2">Create a new password for your account.</p>
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-white mb-6">Reset Password</h1>
+        <span class="text-app-violet-200 text-xl block">
+          Create a new password for your account.
+        </span>
       </div>
 
-      <!-- Success Message -->
-      <div v-if="successMessage" class="bg-green-800 text-green-100 p-4 rounded-lg mb-4">
-        {{ successMessage }}
-      </div>
-
-      <!-- Form Fields -->
-      <div v-if="!successMessage" class="bg-gray-700 p-4 rounded-lg space-y-4">
-        <div class="space-y-1">
-          <label class="block text-sm font-medium text-gray-300" for="password">New Password</label>
-          <FormEntry
-            id="password"
-            v-model="password"
-            autocomplete="new-password"
-            placeHolder="Enter your new password"
-            type="password"
-            v-bind="passwordProps"
-          />
-        </div>
-        <div class="space-y-1">
-          <label class="block text-sm font-medium text-gray-300" for="repeatPassword"
-            >Confirm Password</label
-          >
-          <FormEntry
-            id="repeatPassword"
-            v-model="repeatPassword"
-            autocomplete="new-password"
-            placeHolder="Confirm your new password"
-            type="password"
-            v-bind="repeatPasswordProps"
-          />
-        </div>
-      </div>
-
-      <!-- Action Section -->
-      <div class="flex flex-col gap-2">
-        <LoadingButton
-          v-if="!successMessage"
-          :class="
-            !errors.password && !errors.repeatPassword && values.password && values.repeatPassword
-              ? 'bg-blue-500 hover:bg-blue-600 text-white'
-              : 'bg-gray-600 text-gray-400'
-          "
-          :disable="
-            !!errors.password ||
-            !!errors.repeatPassword ||
-            !values.password ||
-            !values.repeatPassword
-          "
-          :loading="waitingResponse"
-          class="w-full py-3 px-4 rounded-md font-semibold text-lg transition-all"
-          text="Reset Password"
-          @click="handleForm"
-        />
-
-        <router-link
+      <form class="w-full max-w-md" @submit.prevent="handleForm">
+        <!-- Success Message -->
+        <div
           v-if="successMessage"
-          class="bg-blue-500 hover:bg-blue-600 text-white w-full py-3 px-4 rounded-md font-semibold text-lg transition-all text-center"
-          to="/login"
+          class="bg-app-black-80 backdrop-blur-md border border-green-500/30 p-6 rounded-lg mb-6 text-center"
         >
-          Go to Login
-        </router-link>
-
-        <p class="text-center text-gray-400 mt-4">
-          <router-link class="text-blue-400 hover:text-blue-300 font-medium" to="/login">
-            Back to Login
+          <div class="text-green-400 text-lg mb-4">✓ Success</div>
+          <p class="text-white">{{ successMessage }}</p>
+          <router-link
+            class="mt-6 inline-block bg-app-fuchsia-600 hover:bg-app-fuchsia-500 text-white px-6 py-2 rounded-md transition-colors"
+            to="/login"
+          >
+            Go to Login
           </router-link>
-        </p>
-      </div>
-    </form>
-  </div>
+        </div>
+
+        <!-- Form Fields -->
+        <div
+          v-if="!successMessage"
+          class="bg-app-black-80 backdrop-blur-md border border-app-violet-900/30 p-6 rounded-lg space-y-4 mb-6"
+        >
+          <div class="space-y-2">
+            <FormEntry
+              id="password"
+              v-model="password"
+              :class="{ '!border-red-500': errors.password }"
+              autocomplete="new-password"
+              class="w-full"
+              placeHolder="Enter your new password"
+              title="New Password"
+              type="password"
+              v-bind="passwordProps"
+            />
+          </div>
+          <div class="space-y-2">
+            <FormEntry
+              id="repeatPassword"
+              v-model="repeatPassword"
+              :class="{ '!border-red-500': errors.repeatPassword }"
+              autocomplete="new-password"
+              class="w-full"
+              placeHolder="Confirm your new password"
+              title="Confirm Password"
+              type="password"
+              v-bind="repeatPasswordProps"
+            />
+          </div>
+        </div>
+
+        <!-- Action Section -->
+        <div v-if="!successMessage" class="flex flex-col gap-4">
+          <LoadingButton
+            :disable="
+              !!errors.password ||
+              !!errors.repeatPassword ||
+              !values.password ||
+              !values.repeatPassword
+            "
+            :loading="waitingResponse"
+            text="Reset Password"
+            @click="handleForm"
+          />
+
+          <p class="text-center text-app-violet-200">
+            <router-link
+              class="text-app-fuchsia-600 hover:text-app-fuchsia-500 font-medium"
+              to="/login"
+            >
+              Back to Login
+            </router-link>
+          </p>
+        </div>
+      </form>
+    </div>
+  </Background>
 </template>

@@ -8,6 +8,7 @@ import LoadingButton from '@/components/LoadingButton.vue'
 import { useErrorsHandler } from '@/composables/useErrorsHandler.ts'
 import { forgotPassword } from '@/api/authService'
 import { useRouter } from 'vue-router'
+import Background from '@/components/Background.vue'
 
 const router = useRouter()
 const errorHandler = useErrorsHandler()
@@ -64,66 +65,72 @@ const handleForm = async () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-    <form
-      class="bg-gray-800 p-6 lg:p-8 rounded-lg shadow-lg w-full max-w-md flex flex-col gap-4"
-      @submit.prevent="handleForm"
-    >
+  <Background>
+    <div class="flex flex-col items-center justify-center py-8 px-4">
       <!-- Header -->
-      <div class="mb-6">
-        <h2 class="text-2xl font-bold text-white">🔑 Forgot Password</h2>
-        <p class="text-gray-400 mt-2">Enter your email to receive a password reset link.</p>
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-white mb-6">Forgot Password</h1>
+        <span class="text-app-violet-200 text-xl block">
+          Enter your email to receive a password reset link.
+        </span>
       </div>
 
-      <!-- Success Message -->
-      <div v-if="successMessage" class="bg-green-800 text-green-100 p-4 rounded-lg mb-4">
-        {{ successMessage }}
-      </div>
-
-      <!-- Form Fields -->
-      <div v-if="!successMessage" class="bg-gray-700 p-4 rounded-lg space-y-4">
-        <div class="space-y-1">
-          <label class="block text-sm font-medium text-gray-300" for="email">Email</label>
-          <FormEntry
-            id="email"
-            v-model="email"
-            autocomplete="email"
-            placeHolder="Enter your email"
-            type="email"
-            v-bind="emailProps"
-          />
-        </div>
-      </div>
-
-      <!-- Action Section -->
-      <div class="flex flex-col gap-2">
-        <LoadingButton
-          v-if="!successMessage"
-          :class="
-            !errors.email ? 'bg-blue-500 hover:bg-blue-600 text-white' : 'bg-gray-600 text-gray-400'
-          "
-          :disable="!!errors.email || !values.email"
-          :loading="waitingResponse"
-          class="w-full py-3 px-4 rounded-md font-semibold text-lg transition-all"
-          text="Send Reset Link"
-          @click="handleForm"
-        />
-
-        <router-link
+      <form class="w-full max-w-md" @submit.prevent="handleForm">
+        <!-- Success Message -->
+        <div
           v-if="successMessage"
-          class="bg-blue-500 hover:bg-blue-600 text-white w-full py-3 px-4 rounded-md font-semibold text-lg transition-all text-center"
-          to="/login"
+          class="bg-app-black-80 backdrop-blur-md border border-green-500/30 p-6 rounded-lg mb-6 text-center"
         >
-          Back to Login
-        </router-link>
-
-        <p class="text-center text-gray-400 mt-4">
-          Remember your password?
-          <router-link class="text-blue-400 hover:text-blue-300 font-medium" to="/login">
-            Sign in
+          <div class="text-green-400 text-lg mb-4">✓ Success</div>
+          <p class="text-white">{{ successMessage }}</p>
+          <router-link
+            class="mt-6 inline-block bg-app-fuchsia-600 hover:bg-app-fuchsia-500 text-white px-6 py-2 rounded-md transition-colors"
+            to="/login"
+          >
+            Back to Login
           </router-link>
-        </p>
-      </div>
-    </form>
-  </div>
+        </div>
+
+        <!-- Form Fields -->
+        <div
+          v-if="!successMessage"
+          class="bg-app-black-80 backdrop-blur-md border border-app-violet-900/30 p-6 rounded-lg space-y-4 mb-6"
+        >
+          <div class="space-y-2">
+            <FormEntry
+              id="email"
+              v-model="email"
+              :class="{ '!border-red-500': errors.email }"
+              autocomplete="email"
+              class="w-full"
+              placeHolder="Enter your email"
+              title="Email"
+              v-bind="emailProps"
+            />
+          </div>
+        </div>
+
+        <!-- Action Section -->
+        <div v-if="!successMessage" class="flex flex-col gap-4">
+          <LoadingButton
+            :disable="!!errors.email || !values.email"
+            :loading="waitingResponse"
+            class="w-full py-3"
+            text="Send Reset Link"
+            @click="handleForm"
+          />
+
+          <p class="text-center text-app-violet-200">
+            Remember your password?
+            <router-link
+              class="text-app-fuchsia-600 hover:text-app-fuchsia-500 font-medium"
+              to="/login"
+            >
+              Sign in
+            </router-link>
+          </p>
+        </div>
+      </form>
+    </div>
+  </Background>
 </template>

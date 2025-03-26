@@ -7,9 +7,9 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { signInSchema } from '@/schemas/authSchema.ts'
 import { computed, onMounted, ref } from 'vue'
 import router from '@/router'
-import { GradientButton } from '@/components/ui/gradient-button'
 import { useErrorsHandler } from '@/composables/useErrorsHandler.ts'
 import Background from '@/components/Background.vue'
+import LoadingButton from '@/components/LoadingButton.vue'
 
 const { login } = useAuth()
 const auth = useAuthStore()
@@ -132,16 +132,9 @@ onMounted(() => {
 
         <!-- Action Section -->
         <div class="flex flex-col gap-4">
-          <GradientButton
-            :class="!canSubmit ? 'disabled opacity-50 cursor-not-allowed' : ''"
-            :colors="['#ff00ff', '#9900ff', '#6600ff']"
-            :duration="3500"
-            bgColor="app-black-DEFAULT"
-            class="w-full py-3"
-            @click="handleForm"
-          >
+          <LoadingButton :disable="!canSubmit" :loading="waitingResponse" @click="handleForm">
             {{ auth.isAuthenticated ? 'Already Logged In' : 'Sign In' }}
-          </GradientButton>
+          </LoadingButton>
 
           <p class="text-center text-app-violet-200">
             Don't have an account?
