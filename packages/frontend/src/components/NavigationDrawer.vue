@@ -18,35 +18,37 @@ const emit = defineEmits<{
 }>()
 
 const menuItems = [
-  { icon: '🏠', label: 'Home', route: '/' },
   {
-    icon: '🎮',
+    label: 'Home',
+    route: '/',
+  },
+  {
     label: 'Create Lobby',
     route: '/create',
     showIf: () => authStore.isAuthenticated && !lobbyStore.lobby,
   },
   {
-    icon: '🔍',
     label: 'Join Lobby',
     route: '/join',
     showIf: () => authStore.isAuthenticated && !lobbyStore.lobby,
   },
-  { icon: '👤', label: 'Account', route: '/account', showIf: () => authStore.isAuthenticated },
   {
-    icon: '🎯',
-    label: 'Go to lobby',
+    label: 'Account',
+    route: '/account',
+    showIf: () => authStore.isAuthenticated,,
+  },
+  {
+    'Go to lobby',
     route: '/lobby',
     showIf: () => authStore.isAuthenticated && lobbyStore.lobby && !lobbyStore.lobby.startTimestamp,
   },
   {
-    icon: '🎲',
-    label: 'Play',
+    'Play',
     route: '/lobby',
     showIf: () => authStore.isAuthenticated && lobbyStore.lobby?.startTimestamp,
   },
   {
-    icon: '📜',
-    label: 'Game rules',
+    'Game rules',
     route: '/rules',
   },
 ]
@@ -66,23 +68,32 @@ const closeDrawer = () => {
   <div
     :class="[
       isOpen
-        ? 'pointer-events-auto bg-app-black-40 backdrop-blur-md'
-        : 'pointer-events-none bg-app-black-0 backdrop-blur-none',
+        ? 'pointer-events-auto bg-gray-500/20 dark:bg-app-black-40 backdrop-blur-md'
+        : 'pointer-events-none bg-transparent dark:bg-app-black-0 backdrop-blur-none',
     ]"
-    class="fixed inset-0 z-30 transition-all duration-300 ease-in-out"
+    class="fixed inset-0 z-30 transition-all duration-100 ease-in-out"
     @click="closeDrawer"
   ></div>
 
   <!-- Drawer -->
   <div
     :class="[
-      'fixed left-0 top-0 h-full w-64 bg-app-black-90 backdrop-blur-md z-40 transform transition-transform duration-300 ease-in-out border-r border-app-violet-900/30',
+      'fixed left-0 top-0 h-full w-72 bg-white/90 dark:bg-app-black/90 backdrop-blur-md z-40 transform transition-transform duration-300 ease-in-out shadow-lg',
       isOpen ? 'translate-x-0' : '-translate-x-full',
     ]"
   >
-    <!-- Drawer Header - match height with main header -->
-    <div class="h-12 flex items-center px-4 border-b border-app-violet-900/30">
-      <h2 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-fuchsia">AuctiOn</h2>
+    <!-- Drawer Header -->
+    <div
+      class="h-16 flex items-center justify-start px-6 border-b border-gray-100 dark:border-gray-800"
+    >
+      <router-link class="flex items-center" to="/">
+        <img alt="AuctiOn Logo" class="h-10" src="@/assets/app-logo.svg" style="filter: none" />
+        <h2
+          class="ml-2 text-2xl font-bold bg-gradient-to-r from-app-violet-500 to-app-fuchsia-500 text-transparent bg-clip-text"
+        >
+          Auction
+        </h2>
+      </router-link>
     </div>
 
     <!-- Navigation Links -->
@@ -90,13 +101,12 @@ const closeDrawer = () => {
       <ul class="space-y-1">
         <li v-for="item in menuItems" :key="item.route">
           <router-link
-            v-if="item.showIf ? item.showIf() : true"
+            v-show="item.showIf ? item.showIf() : true"
             :to="item.route"
-            class="flex items-center gap-3 p-2 rounded-lg text-gray-300 hover:bg-app-fuchsia-900/20 transition-colors"
+            class="block px-2 py-3.5 rounded-lg text-gray-700 dark:text-app-white hover:text-app-violet-600 font-medium transition-all duration-200"
             @click="closeDrawer"
           >
-            <span class="text-xl">{{ item.icon }}</span>
-            <span class="text-sm">{{ item.label }}</span>
+            {{ item.label }}
           </router-link>
         </li>
       </ul>
@@ -105,14 +115,13 @@ const closeDrawer = () => {
     <!-- Logout Button -->
     <div
       v-if="authStore.isAuthenticated"
-      class="absolute bottom-0 w-full p-4 border-t border-app-violet-900/30"
+      class="absolute bottom-0 w-full p-4 border-t border-gray-100 dark:border-gray-800"
     >
       <button
-        class="flex items-center gap-3 w-full p-2 rounded-lg text-red-400 hover:bg-app-fuchsia-900/20 transition-colors"
+        class="w-full px-6 py-3.5 rounded-lg text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 font-medium transition-all duration-200 text-left"
         @click="handleLogout"
       >
-        <span class="text-xl">🚪</span>
-        <span class="text-sm">Logout</span>
+        Logout
       </button>
     </div>
   </div>
@@ -125,6 +134,6 @@ const closeDrawer = () => {
 }
 
 .backdrop-blur-md {
-  backdrop-filter: blur(2px);
+  backdrop-filter: blur(8px);
 }
 </style>
