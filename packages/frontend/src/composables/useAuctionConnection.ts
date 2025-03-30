@@ -1,7 +1,9 @@
 import { useSocketStore } from '@/stores/socketStore.ts'
+import { useLobbyService } from '@/composables/useLobbyService.ts'
 
 export function useAuctionConnection() {
   const socketStore = useSocketStore()
+  const lobbyService = useLobbyService()
   let connectionPromise: Promise<void> | null = null
 
   function connect(): Promise<void> {
@@ -14,22 +16,25 @@ export function useAuctionConnection() {
 
     // Create a new connection promise
     connectionPromise = new Promise((resolve, reject) => {
-      try {
-        if (socketStore.isConnected) {
-          // If already connected, resolve immediately
-          resolve()
-          return
-        }
-        socketStore.connect(() => {
-          resolve()
-        })
-      } catch (error) {
-        reject(error)
-      } finally {
-        // Reset the promise once completed (either successfully or with error)
-        // This allows reconnection attempts after a failure
-        connectionPromise = null
+      if (socketStore.isConnected) {
+        // If already connected, resolve immediately
+        resolve()
+        return
       }
+      lobbyService
+        .checkActiveLobby()
+        .then(() => {
+          socketStore.connect(() => {
+            console.log('Connected to auction')
+            resolve()
+          })
+        })
+        .catch((error) => {
+          reject(error)
+        })
+    }).finally(() => {
+      connectionPromise = null
+      return
     })
 
     return connectionPromise
