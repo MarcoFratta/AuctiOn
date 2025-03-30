@@ -35,26 +35,26 @@ const menuItems = [
   {
     label: 'Account',
     route: '/account',
-    showIf: () => authStore.isAuthenticated,,
+    showIf: () => authStore.isAuthenticated,
   },
   {
-    'Go to lobby',
+    label: 'Go to lobby',
     route: '/lobby',
     showIf: () => authStore.isAuthenticated && lobbyStore.lobby && !lobbyStore.lobby.startTimestamp,
   },
   {
-    'Play',
+    label: 'Play',
     route: '/lobby',
     showIf: () => authStore.isAuthenticated && lobbyStore.lobby?.startTimestamp,
   },
   {
-    'Game rules',
+    label: 'Game rules',
     route: '/rules',
   },
 ]
 
 const handleLogout = async () => {
-  auth.logout()
+  await auth.logout()
   router.push('/login')
 }
 
