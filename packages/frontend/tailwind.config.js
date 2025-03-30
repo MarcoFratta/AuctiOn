@@ -2,7 +2,7 @@ import animate from 'tailwindcss-animate'
 import { setupInspiraUI } from '@inspira-ui/plugins'
 
 export default {
-  darkMode: ['selector', 'class'],
+  darkMode: 'selector',
   safelist: ['dark'],
   prefix: '',
   content: [
@@ -88,6 +88,9 @@ export default {
             '30': 'rgba(0, 0, 0, 0.3)',
             '20': 'rgba(0, 0, 0, 0.2)',
             '10': 'rgba(0, 0, 0, 0.1)',
+          },
+          white: {
+            DEFAULT: '#f8f9fa',
           },
         },
       },
