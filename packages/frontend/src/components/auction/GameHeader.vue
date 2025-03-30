@@ -8,18 +8,28 @@ const playerMoney = computed(() => lobbyStore.playerInfo?.money || 0)
 
 <template>
   <!-- Game status indicators - Desktop version (hidden on small screens) -->
-  <div class="hidden sm:flex flex-wrap items-center gap-2 sm:gap-3 justify-end">
+  <div class="ml-1 hidden sm:flex flex-wrap items-center gap-1.5 sm:gap-2 justify-end">
     <div
-      class="bg-gray-700 px-2 sm:px-3 py-1 rounded-full align-middle flex items-center gap-1 sm:gap-2"
+      class="bg-white dark:bg-app-violet-500/20 px-2 py-1 md:px-3 md:py-1.5 rounded-full align-middle flex items-center gap-1.5 border border-gray-200 dark:border-app-violet-500/30"
     >
-      <span class="text-yellow-400">💰</span>
-      <span class="font-bold text-sm text-green-400 sm:text-base">${{ playerMoney }}</span>
+      <span class="text-yellow-500 text-sm md:text-base">💰</span>
+      <span class="font-bold text-xs md:text-sm text-green-600 dark:text-green-400"
+        >${{ playerMoney }}</span
+      >
     </div>
-    <div class="bg-gray-700 px-2 py-1 lg:px-4 lg:py-2 rounded-full shrink-0">
-      <span class="text-gray-400 text-xs lg:text-base flex items-center whitespace-nowrap">
+    <div
+      class="bg-white dark:bg-app-violet-500/20 px-2 py-1 md:px-3 md:py-1.5 rounded-full shrink-0 border border-gray-200 dark:border-app-violet-500/30"
+    >
+      <span
+        class="text-gray-600 dark:text-gray-300 text-xs md:text-sm flex items-center whitespace-nowrap"
+      >
         Status:
         <span
-          :class="lobbyStore.lobby?.currentSale ? 'text-green-400' : 'text-yellow-500'"
+          :class="
+            lobbyStore.lobby?.currentSale
+              ? 'text-green-600 dark:text-green-400'
+              : 'text-yellow-600 dark:text-yellow-400'
+          "
           class="font-bold ml-1"
         >
           {{ lobbyStore.lobby?.currentSale ? 'Active' : 'Waiting' }}
@@ -27,10 +37,10 @@ const playerMoney = computed(() => lobbyStore.playerInfo?.money || 0)
       </span>
     </div>
     <div
-      class="bg-gray-700 px-2 py-1 lg:px-4 lg:py-2 rounded-full flex justify-between gap-1 lg:gap-2 items-center text-center shrink-0"
+      class="bg-white dark:bg-app-violet-500/20 px-2 py-1 md:px-3 md:py-1.5 rounded-full flex justify-between gap-1.5 items-center text-center shrink-0 border border-gray-200 dark:border-app-fuchsia-500/30"
     >
-      <span class="text-gray-400 text-xs lg:text-base">Round</span>
-      <span class="text-yellow-400 font-bold text-xs lg:text-base">
+      <span class="text-gray-600 dark:text-gray-300 text-xs md:text-sm">Round</span>
+      <span class="text-yellow-600 dark:text-yellow-400 font-bold text-xs md:text-sm">
         {{ lobbyStore.lobby?.currentRound ?? 0 }}/{{ lobbyStore.lobby?.maxRound }}
       </span>
     </div>
@@ -38,20 +48,24 @@ const playerMoney = computed(() => lobbyStore.playerInfo?.money || 0)
 
   <!-- Mobile bottom bar (visible only on small screens) -->
   <div
-    class="sm:hidden fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-gray-700 z-40 p-2"
+    class="sm:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-black border-t border-app-violet-900/30 z-40 p-1.5"
   >
     <div class="flex justify-around items-center">
       <!-- Money -->
       <div class="flex flex-col items-center">
-        <span class="text-yellow-400 text-lg">💰</span>
-        <span class="text-green-400 font-bold text-sm">${{ playerMoney }}</span>
+        <span class="text-yellow-500 text-base">💰</span>
+        <span class="text-green-600 dark:text-green-400 font-bold text-xs">${{ playerMoney }}</span>
       </div>
 
       <!-- Status -->
       <div class="flex flex-col items-center">
-        <span class="text-gray-400 text-xs">Status</span>
+        <span class="text-gray-600 dark:text-gray-400 text-xs">Status</span>
         <span
-          :class="lobbyStore.lobby?.currentSale ? 'text-green-400' : 'text-yellow-500'"
+          :class="
+            lobbyStore.lobby?.currentSale
+              ? 'text-green-600 dark:text-green-400'
+              : 'text-yellow-600 dark:text-yellow-400'
+          "
           class="font-bold text-xs"
         >
           {{ lobbyStore.lobby?.currentSale ? 'Active' : 'Waiting' }}
@@ -60,8 +74,8 @@ const playerMoney = computed(() => lobbyStore.playerInfo?.money || 0)
 
       <!-- Round -->
       <div class="flex flex-col items-center">
-        <span class="text-gray-400 text-xs">Round</span>
-        <span class="text-yellow-400 font-bold text-xs">
+        <span class="text-gray-600 dark:text-gray-400 text-xs">Round</span>
+        <span class="text-yellow-600 dark:text-yellow-400 font-bold text-xs">
           {{ lobbyStore.lobby?.currentRound ?? 0 }}/{{ lobbyStore.lobby?.maxRound }}
         </span>
       </div>

@@ -1,13 +1,20 @@
 <script lang="ts" setup>
 import InventorySelector from '@/components/InventorySelector.vue'
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import { useLobbyStore } from '@/stores/lobbyStore.ts'
+import BaseCard from '@/components/BaseCard.vue'
+import LoadingButton from '@/components/LoadingButton.vue'
+import type { ItemQuantity } from '@/schemas/LobbySchema.ts'
 
 const lobbyStore = useLobbyStore()
-const startingItems = lobbyStore.lobby?.startInventory.items.map((i) => {
-  return { ...i, quantity: 0 }
-})
-const saleQuantities = ref({ items: startingItems })
+const startingItems =
+  lobbyStore.lobby?.startInventory.items.map((i) => {
+    return { ...i, quantity: 0 }
+  }) || []
+
+// Use ref instead of reactive to avoid deep reactivity issues
+const items = ref(startingItems)
+
 const details = computed(() => {
   return new Map(
     lobbyStore.playerInfo?.inventory.items.map((item) => [
@@ -19,80 +26,120 @@ const details = computed(() => {
     ]),
   )
 })
-const emits = defineEmits(['sale', 'update:items'])
-watch(
-  () => saleQuantities,
-  () => {
-    emits('update:items', saleQuantities.value.items)
-  },
-  { deep: true },
-)
 
-const hasSelectedItems = computed(() => {
-  return saleQuantities?.value?.items?.some((item) => item.quantity > 0) ?? false
+const isLoading = ref(false)
+const emits = defineEmits(['sale', 'update:items'])
+
+// Handle updates from the InventorySelector
+const updateItems = (newItems: ItemQuantity[]) => {
+  items.value = newItems
+  // Only emit items with quantity > 0
+  const itemsToSell = items.value.filter((i) => i.quantity > 0)
+  emits('update:items', itemsToSell)
+}
+
+const createSale = () => {
+  isLoading.value = true
+  const itemsToSell = items.value.filter((i) => i.quantity > 0)
+  emits('sale', itemsToSell)
+  setTimeout(() => {
+    isLoading.value = false
+  }, 1000)
+}
+
+const canCreateSale = computed(() => {
+  return items.value.some((i) => i.quantity > 0)
 })
 </script>
 
 <template>
-  <div class="bg-gray-800 w-full p-3 lg:p-6 rounded-lg shadow-lg h-full flex flex-col">
-    <!-- Header Section -->
-    <div class="flex items-center justify-between mb-3 lg:mb-5">
-      <h2 class="text-lg lg:text-2xl font-bold text-white flex items-center">
-        <span class="mr-2">📦</span> Sell Items
-      </h2>
-      <div class="bg-gray-700 px-2 py-1 lg:px-3 lg:py-1.5 rounded-full">
-        <span class="text-green-400 text-sm lg:text-base font-medium">Your Turn</span>
+  <BaseCard class="h-full flex flex-col">
+    <!-- Header -->
+    <div class="flex items-center gap-2">
+      <div class="bg-green-100 dark:bg-green-500/20 px-1.5 md:p-2 rounded-lg">
+        <svg
+          class="h-4 w-4 md:h-5 md:w-5 text-green-500 dark:text-green-400"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            clip-rule="evenodd"
+            d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z"
+            fill-rule="evenodd"
+          />
+        </svg>
+      </div>
+      <h2 class="text-lg md:text-xl font-semibold text-zinc-900 dark:text-white">Create Sale</h2>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-grow flex flex-col">
+      <!-- Inventory Selector -->
+      <div class="inventory-selector flex-grow mb-3 md:mb-4">
+        <InventorySelector
+          :details="details"
+          :items="items"
+          class="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-gray-700/50 p-2 md:p-3 h-full"
+          @update:items="updateItems"
+        />
+      </div>
+
+      <!-- Create Sale Button -->
+      <div class="mt-auto">
+        <LoadingButton
+          :disable="!canCreateSale"
+          :loading="isLoading"
+          class="w-full font-medium text-xs md:text-sm transition-colors"
+          @click="canCreateSale && createSale()"
+        >
+          Create Sale
+        </LoadingButton>
+
+        <!-- Helper text -->
+        <p
+          v-if="!canCreateSale"
+          class="text-center text-gray-500 dark:text-gray-400 text-xs mt-1.5"
+        >
+          Select at least one item to sell
+        </p>
       </div>
     </div>
-
-    <!-- Item Selection Section -->
-    <div
-      class="bg-gray-700 p-3 lg:p-5 rounded-lg mb-3 lg:mb-5 flex-grow overflow-auto min-h-[200px]"
-    >
-      <InventorySelector
-        :details="details"
-        :items="saleQuantities?.items ?? []"
-        class="w-full bg-transparent text-gray-400"
-      >
-        <template #header>
-          <p class="text-gray-300 mb-3 text-sm lg:text-base font-medium">Select items to sell:</p>
-        </template>
-      </InventorySelector>
-    </div>
-
-    <!-- Action Section -->
-    <div class="flex flex-col gap-2 mt-auto">
-      <button
-        :class="
-          hasSelectedItems
-            ? 'bg-green-500 hover:bg-green-600 active:bg-green-700 text-white transform active:scale-95'
-            : 'bg-gray-600 text-gray-400 cursor-not-allowed'
-        "
-        :disabled="!hasSelectedItems"
-        class="w-full py-3 px-4 rounded-md font-semibold text-base lg:text-lg transition-all shadow-md"
-        @click="emits('sale', saleQuantities?.items)"
-      >
-        Submit Sale
-      </button>
-
-      <!-- Helper Text -->
-      <p v-if="!hasSelectedItems" class="text-center text-gray-400 text-xs lg:text-sm">
-        Select at least one item to sell
-      </p>
-    </div>
-  </div>
+  </BaseCard>
 </template>
 
 <style scoped>
 .inventory-selector :deep(.quantity-input) {
-  background-color: rgb(31, 41, 55); /* bg-gray-800 */
-  border-color: rgb(75, 85, 99); /* border-gray-600 */
+  width: 3rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  border: 1px solid rgba(209, 213, 219, 0.5);
+  background-color: white;
+  color: rgb(17, 24, 39); /* text-gray-900 */
+}
+
+.dark .inventory-selector :deep(.quantity-input) {
+  background-color: rgba(31, 41, 55, 0.6); /* bg-gray-800/60 */
+  border-color: rgba(75, 85, 99, 0.5); /* border-gray-700/50 */
   color: white;
 }
 
 .inventory-selector :deep(.quantity-input:focus) {
-  border-color: rgb(59, 130, 246); /* border-blue-500 */
-  box-shadow: 0 0 0 1px rgb(59, 130, 246); /* ring-1 ring-blue-500 */
+  border-color: rgb(139, 92, 246); /* border-app-violet-500 */
+  box-shadow: 0 0 0 1px rgb(139, 92, 246); /* ring-1 ring-app-violet-500 */
   outline: none;
+}
+
+/* Fix inventory item icons */
+.inventory-selector :deep(svg) {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .inventory-selector :deep(svg) {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
 }
 </style>
