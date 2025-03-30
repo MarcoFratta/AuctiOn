@@ -44,6 +44,7 @@ interface VortexProps {
   baseRadius?: number
   rangeRadius?: number
   backgroundColor?: string
+  particleOpacity?: number
 }
 
 const props = withDefaults(defineProps<VortexProps>(), {
@@ -55,6 +56,7 @@ const props = withDefaults(defineProps<VortexProps>(), {
   rangeRadius: 2,
   baseHue: 220,
   backgroundColor: '#000000',
+  particleOpacity: 0.8,
 })
 
 const tick = ref<number>(0)
@@ -131,18 +133,18 @@ function updateParticle(i: number) {
   if (!particleProps.value || !canvasRef.value || !ctx.value) return
 
   const canvas = canvasRef.value
-  const props = particleProps.value
+  const pProps = particleProps.value
   const context = ctx.value
 
-  particleCache.x = props[i]
-  particleCache.y = props[i + 1]
-  particleCache.vx = props[i + 2]
-  particleCache.vy = props[i + 3]
-  particleCache.life = props[i + 4]
-  particleCache.ttl = props[i + 5]
-  particleCache.speed = props[i + 6]
-  particleCache.radius = props[i + 7]
-  particleCache.hue = props[i + 8]
+  particleCache.x = pProps[i]
+  particleCache.y = pProps[i + 1]
+  particleCache.vx = pProps[i + 2]
+  particleCache.vy = pProps[i + 3]
+  particleCache.life = pProps[i + 4]
+  particleCache.ttl = pProps[i + 5]
+  particleCache.speed = pProps[i + 6]
+  particleCache.radius = pProps[i + 7]
+  particleCache.hue = pProps[i + 8]
 
   const n =
     noise3D(particleCache.x * X_OFF, particleCache.y * Y_OFF, tick.value * Z_OFF) *
@@ -157,21 +159,26 @@ function updateParticle(i: number) {
   context.save()
   context.lineCap = 'round'
   context.lineWidth = particleCache.radius
-  context.strokeStyle = `hsla(${particleCache.hue},100%,60%,${fadeInOut(
-    particleCache.life,
-    particleCache.ttl,
-  )})`
+
+  // Adjust particle color and opacity based on background
+  const opacity = fadeInOut(particleCache.life, particleCache.ttl) * props.particleOpacity
+  const isLightBackground = isLightColor(props.backgroundColor)
+
+  // Use darker colors for light backgrounds and brighter colors for dark backgrounds
+  const lightness = isLightBackground ? '30%' : '60%'
+  context.strokeStyle = `hsla(${particleCache.hue},100%,${lightness},${opacity})`
+
   context.beginPath()
   context.moveTo(particleCache.x, particleCache.y)
   context.lineTo(nextX, nextY)
   context.stroke()
   context.restore()
 
-  props[i] = nextX
-  props[i + 1] = nextY
-  props[i + 2] = nextVx
-  props[i + 3] = nextVy
-  props[i + 4] = particleCache.life + 1
+  pProps[i] = nextX
+  pProps[i + 1] = nextY
+  pProps[i + 2] = nextVx
+  pProps[i + 3] = nextVy
+  pProps[i + 4] = particleCache.life + 1
 
   if (
     nextX > canvas.width ||
@@ -182,6 +189,21 @@ function updateParticle(i: number) {
   ) {
     initParticle(i)
   }
+}
+
+// Helper function to determine if a color is light
+function isLightColor(color: string): boolean {
+  // Simple check for hex colors
+  if (color.startsWith('#')) {
+    const hex = color.substring(1)
+    const r = parseInt(hex.substring(0, 2), 16)
+    const g = parseInt(hex.substring(2, 4), 16)
+    const b = parseInt(hex.substring(4, 6), 16)
+    // Calculate perceived brightness
+    return r * 0.299 + g * 0.587 + b * 0.114 > 128
+  }
+  // Default to assuming dark background
+  return false
 }
 
 function draw() {
@@ -199,15 +221,20 @@ function draw() {
     updateParticle(i)
   }
 
+  // Adjust blur and brightness based on background color
+  const isLightBg = isLightColor(props.backgroundColor)
+  const blurAmount = isLightBg ? '4px' : '8px'
+  const brightness = isLightBg ? '150%' : '200%'
+
   context.save()
-  context.filter = 'blur(8px) brightness(200%)'
-  context.globalCompositeOperation = 'lighter'
+  context.filter = `blur(${blurAmount}) brightness(${brightness})`
+  context.globalCompositeOperation = isLightBg ? 'multiply' : 'lighter'
   context.drawImage(canvas, 0, 0)
   context.restore()
 
   context.save()
-  context.filter = 'blur(4px) brightness(200%)'
-  context.globalCompositeOperation = 'lighter'
+  context.filter = `blur(${isLightBg ? '2px' : '4px'}) brightness(${brightness})`
+  context.globalCompositeOperation = isLightBg ? 'multiply' : 'lighter'
   context.drawImage(canvas, 0, 0)
   context.restore()
 
