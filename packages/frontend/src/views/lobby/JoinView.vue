@@ -6,17 +6,27 @@ import { useErrorsHandler } from '@/composables/useErrorsHandler.ts'
 import { useLobbyStore } from '@/stores/lobbyStore.ts'
 import { useRouter } from 'vue-router'
 import { useLobbyService } from '@/composables/useLobbyService.ts'
+import Background from '@/components/Background.vue'
+import Title from '@/components/Title.vue'
+import { useAuctionConnection } from '@/composables/useAuctionConnection.ts'
 
 const lobbyStore = useLobbyStore()
 const errorsHandler = useErrorsHandler()
 const lobbyId = ref('')
 const router = useRouter()
 const lobbyService = useLobbyService()
+const isLoading = ref(false)
+
 const handleJoin = async () => {
+  if (!lobbyId.value) return
+
   try {
+    isLoading.value = true
     console.log('Joining lobby with ID:', lobbyId.value)
     await lobbyService.joinLobby(lobbyId.value)
-    router.push('/lobby')
+    await useAuctionConnection()
+      .connect()
+      .then(() => router.push('/lobby'))
   } catch (e) {
     console.error(e)
     const err = errorsHandler
@@ -29,46 +39,82 @@ const handleJoin = async () => {
       .notFound('Lobby not found', 'Please try again')
       .get()
     errorsHandler.show(err)
+  } finally {
+    isLoading.value = false
   }
 }
 </script>
 
 <template>
-  <div class="min-h-[80vh] flex items-center justify-center p-4">
-    <div class="bg-gray-800 p-6 lg:p-8 rounded-lg shadow-lg w-full max-w-md">
+  <Background>
+    <div class="flex flex-col items-center justify-center px-4">
       <!-- Header -->
-      <div class="mb-6">
-        <h2 class="text-2xl font-bold text-white">🔍 Join Lobby</h2>
-        <p class="text-gray-300 mt-2">Enter a lobby ID to join an existing game.</p>
+      <div class="text-center mb-8">
+        <Title class="text-4xl mb-4">Join Lobby</Title>
+        <span class="dark:text-app-violet-200 text-gray-600 text-xl block">
+          Enter a lobby ID to join an existing game
+        </span>
       </div>
 
-      <!-- Form -->
-      <div class="bg-gray-700 p-4 rounded-lg space-y-4">
-        <div class="space-y-2">
-          <label class="block text-sm font-medium text-gray-200" for="lobbyId">Lobby ID</label>
-          <FormEntry
-            id="lobbyId"
-            v-model="lobbyId"
-            class="w-full"
-            placeHolder="Enter the lobby ID"
-            @submit="handleJoin"
+      <div class="w-full max-w-md">
+        <!-- Form Fields -->
+        <div
+          class="dark:bg-app-black-80 bg-white dark:backdrop-blur-md dark:border-app-violet-900/30 border-gray-200 shadow-sm p-6 rounded-lg space-y-4 mb-6"
+        >
+          <div class="space-y-2">
+            <FormEntry
+              id="lobbyId"
+              v-model="lobbyId"
+              class="w-full"
+              placeHolder="Enter the lobby ID"
+              title="Lobby ID"
+              @keyup.enter="handleJoin"
+            />
+          </div>
+        </div>
+
+        <!-- Action Section -->
+        <div class="flex flex-col gap-4">
+          <LoadingButton
+            :disable="!lobbyId"
+            :loading="isLoading"
+            class="w-full py-3"
+            text="Join Lobby"
+            @click="handleJoin"
           />
+          <div class="flex flex-col sm:flex-row justify-center items-center center">
+            <p class="text-center dark:text-app-violet-200 text-gray-600">
+              Want to create your own game?
+            </p>
+            <router-link
+              class="sm:ml-2 dark:text-app-fuchsia-600 dark:hover:text-app-fuchsia-500 text-indigo-600 hover:text-indigo-500 font-medium"
+              to="/create"
+            >
+              Create Lobby
+            </router-link>
+          </div>
         </div>
       </div>
-
-      <!-- Action Button -->
-      <div class="mt-6">
-        <LoadingButton
-          :class="
-            lobbyId ? 'bg-green-500 hover:bg-green-600 text-white' : 'bg-gray-600 text-gray-400'
-          "
-          :disable="!lobbyId"
-          :loading="false"
-          class="w-full py-3 px-4 rounded-md font-semibold text-lg transition-all"
-          text="Join Lobby"
-          @click="handleJoin"
-        />
-      </div>
     </div>
-  </div>
+  </Background>
 </template>
+
+<style scoped>
+/* Gradient text effect for title */
+.bg-gradient-to-r {
+  background-size: 200% 200%;
+  animation: gradient-shift 8s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+</style>

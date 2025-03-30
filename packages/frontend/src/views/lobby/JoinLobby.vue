@@ -3,6 +3,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { onMounted } from 'vue'
 import { useLobbyService } from '@/composables/useLobbyService.ts'
 import { useErrorsHandler } from '@/composables/useErrorsHandler.ts'
+import { useAuctionConnection } from '@/composables/useAuctionConnection.ts'
 
 const route = useRoute()
 const router = useRouter()
@@ -13,7 +14,9 @@ onMounted(() => {
   lobbyService
     .joinLobby(lobbyId)
     .then(() => {
-      router.push(`/lobby`)
+      useAuctionConnection()
+        .connect()
+        .then(() => router.push(`/lobby`))
     })
     .catch((e) => {
       console.log('Joining lobby error', e)
