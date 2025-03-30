@@ -1,34 +1,31 @@
 <template>
   <!-- Social Share Card -->
-  <div
-    class="mb-6 p-4 rounded-xl shadow-md bg-gray-800 bg-opacity-50 border border-gray-600 backdrop-blur-lg w-full"
-  >
-    <h3 class="text-lg font-semibold text-white mb-3 text-center">Share Lobby</h3>
-
-    <div class="w-full">
-      <h3 class="text-sm font-medium text-center text-gray-400 mb-4">Share via</h3>
-      <div class="flex items-center justify-center gap-3">
-        <button
-          v-for="(network, index) in networks"
-          :key="index"
-          :class="[
-            'share-button p-3 rounded-lg transition-all',
-            'hover:scale-105 active:scale-100',
-            network.bgColor,
-          ]"
-          @click="shareVia(network)"
-        >
-          <FontAwesomeIcon :icon="network.icon" class="text-white text-lg" />
-        </button>
-      </div>
+  <InnerCard class="w-full p-3">
+    <h3 class="text-xs font-medium text-center text-gray-600 dark:text-app-violet-200 mb-3">
+      Share via
+    </h3>
+    <div class="flex items-center justify-center gap-3">
+      <button
+        v-for="(network, index) in networks"
+        :key="index"
+        :class="[
+          'share-button p-2 rounded-lg transition-all',
+          'hover:scale-105 active:scale-100',
+          network.bgColor,
+        ]"
+        @click="shareVia(network)"
+      >
+        <FontAwesomeIcon :icon="network.icon" class="text-white text-base" />
+      </button>
     </div>
-  </div>
+  </InnerCard>
 </template>
 
 <script lang="ts" setup>
 import { faTelegram, faWhatsapp } from '@fortawesome/free-brands-svg-icons'
 import { faEnvelope } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import InnerCard from '@/components/InnerCard.vue'
 
 const props = defineProps({
   url: String,
@@ -50,7 +47,7 @@ const networks = [
   {
     name: 'email',
     icon: faEnvelope,
-    bgColor: 'bg-gray-600 hover:bg-gray-700',
+    bgColor: 'bg-app-violet-500 hover:bg-app-violet-600',
     url: (link: string) => `mailto:?subject=Join my Auction Game&body=Join my game here: ${link}`,
   },
 ]
