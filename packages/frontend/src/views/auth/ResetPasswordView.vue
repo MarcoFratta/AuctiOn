@@ -9,10 +9,14 @@ import { resetPassword } from '@/api/authService'
 import { useRoute, useRouter } from 'vue-router'
 import { baseSignUpSchema } from '@/schemas/authSchema.ts'
 import Background from '@/components/Background.vue'
+import { useSettingsStore } from '@/stores/settingsStore.ts'
+import AuthLink from '@/components/AuthLink.vue'
+import BaseCard from '@/components/BaseCard.vue'
 
 const router = useRouter()
 const route = useRoute()
 const errorHandler = useErrorsHandler()
+const settingsStore = useSettingsStore()
 
 // Get token from route params
 const token = ref('')
@@ -89,8 +93,8 @@ const handleForm = async () => {
     <div class="flex flex-col items-center justify-center py-8 px-4">
       <!-- Header -->
       <div class="text-center mb-8">
-        <h1 class="text-3xl font-bold text-white mb-6">Reset Password</h1>
-        <span class="text-app-violet-200 text-xl block">
+        <h1 class="text-3xl font-bold text-zinc-900 dark:text-white mb-6">Reset Password</h1>
+        <span class="text-gray-600 dark:text-app-violet-200 text-xl block">
           Create a new password for your account.
         </span>
       </div>
@@ -99,12 +103,12 @@ const handleForm = async () => {
         <!-- Success Message -->
         <div
           v-if="successMessage"
-          class="bg-app-black-80 backdrop-blur-md border border-green-500/30 p-6 rounded-lg mb-6 text-center"
+          class="bg-white/90 dark:bg-app-black-80 backdrop-blur-md border border-green-500/30 p-6 rounded-lg mb-6 text-center"
         >
-          <div class="text-green-400 text-lg mb-4">✓ Success</div>
-          <p class="text-white">{{ successMessage }}</p>
+          <div class="text-green-600 dark:text-green-400 text-lg mb-4">✓ Success</div>
+          <p class="text-gray-800 dark:text-white">{{ successMessage }}</p>
           <router-link
-            class="mt-6 inline-block bg-app-fuchsia-600 hover:bg-app-fuchsia-500 text-white px-6 py-2 rounded-md transition-colors"
+            class="mt-6 inline-block bg-indigo-600 hover:bg-indigo-500 dark:bg-app-fuchsia-600 dark:hover:bg-app-fuchsia-500 text-white px-6 py-2 rounded-md transition-colors"
             to="/login"
           >
             Go to Login
@@ -112,10 +116,7 @@ const handleForm = async () => {
         </div>
 
         <!-- Form Fields -->
-        <div
-          v-if="!successMessage"
-          class="bg-app-black-80 backdrop-blur-md border border-app-violet-900/30 p-6 rounded-lg space-y-4 mb-6"
-        >
+        <BaseCard v-if="!successMessage">
           <div class="space-y-2">
             <FormEntry
               id="password"
@@ -142,10 +143,10 @@ const handleForm = async () => {
               v-bind="repeatPasswordProps"
             />
           </div>
-        </div>
+        </BaseCard>
 
         <!-- Action Section -->
-        <div v-if="!successMessage" class="flex flex-col gap-4">
+        <div v-if="!successMessage" class="flex flex-col gap-6 mt-6">
           <LoadingButton
             :disable="
               !!errors.password ||
@@ -157,15 +158,7 @@ const handleForm = async () => {
             text="Reset Password"
             @click="handleForm"
           />
-
-          <p class="text-center text-app-violet-200">
-            <router-link
-              class="text-app-fuchsia-600 hover:text-app-fuchsia-500 font-medium"
-              to="/login"
-            >
-              Back to Login
-            </router-link>
-          </p>
+          <AuthLink linkText="Back to login" route-to="/login" title="" />
         </div>
       </form>
     </div>

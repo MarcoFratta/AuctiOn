@@ -1,5 +1,8 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
+import { useSettingsStore } from '@/stores/settingsStore.ts'
+
+const settingsStore = useSettingsStore()
 
 const props = defineProps({
   loading: {
@@ -36,7 +39,9 @@ const handleClick = (event: MouseEvent) => {
 
 const buttonClasses = computed(() => {
   const baseClasses =
-    'relative flex items-center justify-center rounded-md font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black'
+    'relative flex items-center justify-center rounded-md' +
+    ' font-medium transition-all duration-200 focus:outline-none ' +
+    'focus:ring-2 focus:ring-offset-2 focus:ring-offset-black'
 
   // Size classes
   const sizeClasses = {
@@ -45,22 +50,22 @@ const buttonClasses = computed(() => {
     lg: 'px-6 py-3 text-lg',
   }[props.size]
 
-  // Variant classes
+  // Variant classes - with theme support
   const variantClasses = {
     primary:
       props.disable || props.loading
         ? 'bg-app-fuchsia-900/50 text-white/70 cursor-not-allowed'
-        : 'bg-app-fuchsia-600 hover:bg-app-fuchsia-500 text-white shadow-lg shadow-app-fuchsia-900/30 hover:shadow-app-fuchsia-600/40 focus:ring-app-fuchsia-500',
+        : 'bg-app-fuchsia-600 hover:bg-app-fuchsia-500 text-white shadow-md hover:shadow-lg shadow-lg shadow-app-fuchsia-900/30 hover:shadow-app-fuchsia-600/40 focus:ring-indigo-500 focus:ring-app-fuchsia-500',
 
     secondary:
       props.disable || props.loading
-        ? 'bg-app-violet-900/50 text-white/70 cursor-not-allowed'
-        : 'bg-app-violet-900 hover:bg-app-violet-800/70 text-white shadow-lg shadow-app-violet-900/20 hover:shadow-app-violet-800/30 focus:ring-app-violet-700',
+        ? 'bg-app-violet-900/50 text-gray-500 text-white/70 cursor-not-allowed'
+        : 'bg-app-violet-900 hover:bg-app-violet-800/70 text-gray-800 text-white shadow-sm hover:shadow-md shadow-lg shadow-app-violet-900/20 hover:shadow-app-violet-800/30 focus:ring-gray-400 focus:ring-app-violet-700',
 
     danger:
       props.disable || props.loading
-        ? 'bg-red-900/50 text-white/70 cursor-not-allowed'
-        : 'bg-red-600 hover:bg-red-500 text-white shadow-lg shadow-red-900/30 hover:shadow-red-600/40 focus:ring-red-500',
+        ? 'bg-red-300 bg-red-900/50 text-white/70 cursor-not-allowed'
+        : 'text-white shadow-md hover:shadow-lg shadow-lg shadow-red-900/30 hover:shadow-red-600/40 focus:ring-red-500',
   }[props.variant]
 
   return `${baseClasses} ${sizeClasses} ${variantClasses}`
@@ -76,9 +81,8 @@ const buttonClasses = computed(() => {
         <div class="double-bounce2"></div>
       </div>
     </div>
-
-    <!-- Button content with fade effect when loading -->
-    <div :class="{ 'opacity-0': loading }">
+    <!-- Button content -->
+    <div :class="{ invisible: loading }">
       <slot>{{ text }}</slot>
     </div>
   </button>
@@ -118,8 +122,8 @@ const buttonClasses = computed(() => {
   }
 }
 
-/* Glow effect on hover */
-button:not(:disabled):hover::after {
+/* Glow effect on hover - only in dark mode */
+.dark button:not(:disabled):hover::after {
   content: '';
   position: absolute;
   top: -2px;
@@ -134,7 +138,7 @@ button:not(:disabled):hover::after {
   transition: opacity 0.3s ease;
 }
 
-button:not(:disabled):hover::after {
+.dark button:not(:disabled):hover::after {
   opacity: 1;
 }
 </style>

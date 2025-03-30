@@ -11,11 +11,16 @@ import { InvalidData } from '@/api/Errors.ts'
 import { useErrorsHandler } from '@/composables/useErrorsHandler.ts'
 import { useRouter } from 'vue-router'
 import Background from '@/components/Background.vue'
+import Title from '@/components/Title.vue'
+import { useSettingsStore } from '@/stores/settingsStore.ts'
+import BaseCard from '@/components/BaseCard.vue'
+import AuthLink from '@/components/AuthLink.vue'
 
 const { register } = useAuth()
 const schema = toTypedSchema(signUpSchema)
 const errorHandler = useErrorsHandler()
 const router = useRouter()
+const settingsStore = useSettingsStore()
 const { values, errors, defineField, validate } = useForm({
   validationSchema: schema,
 })
@@ -92,17 +97,15 @@ onMounted(() => {
     <div class="flex flex-col items-center justify-center py-8 px-4">
       <!-- Header -->
       <div class="text-center mb-8">
-        <h1 class="text-3xl font-bold text-white mb-6">Create Account</h1>
-        <span class="text-app-violet-200 text-xl block">
+        <Title class="text-5xl font-bold mb-6">Create Account</Title>
+        <span class="text-gray-600 dark:text-app-violet-200 text-xl block">
           Join us! Fill in your details below.
         </span>
       </div>
 
       <form class="w-full max-w-md" @submit.prevent="handleForm">
         <!-- Form Fields -->
-        <div
-          class="bg-app-black-80 backdrop-blur-md border border-app-violet-900/30 p-6 rounded-lg space-y-4 mb-6"
-        >
+        <BaseCard>
           <div class="space-y-2">
             <FormEntry
               id="name"
@@ -153,10 +156,10 @@ onMounted(() => {
               v-bind="repeatProps"
             />
           </div>
-        </div>
+        </BaseCard>
 
         <!-- Action Section -->
-        <div class="flex flex-col gap-4">
+        <div class="flex flex-col gap-6 mt-6">
           <LoadingButton
             :disable="!canSubmit"
             :loading="waitingResponse"
@@ -164,16 +167,11 @@ onMounted(() => {
             class="w-full py-3"
             @click="handleForm"
           />
-
-          <p class="text-center text-app-violet-200">
-            Already have an account?
-            <router-link
-              :to="redirectTo === '/' ? '/login' : `/login?redirect=${redirectTo}`"
-              class="text-app-fuchsia-600 hover:text-app-fuchsia-500 font-medium"
-            >
-              Sign in
-            </router-link>
-          </p>
+          <AuthLink
+            :routeTo="redirectTo === '/' ? '/login' : `/login?redirect=${redirectTo}`"
+            linkText=" Sign in"
+            title="Already have an account?"
+          />
         </div>
       </form>
     </div>

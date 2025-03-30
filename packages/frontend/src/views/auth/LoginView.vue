@@ -10,9 +10,13 @@ import router from '@/router'
 import { useErrorsHandler } from '@/composables/useErrorsHandler.ts'
 import Background from '@/components/Background.vue'
 import LoadingButton from '@/components/LoadingButton.vue'
+import { useSettingsStore } from '@/stores/settingsStore.ts'
+import BaseCard from '@/components/BaseCard.vue'
+import AuthLink from '@/components/AuthLink.vue'
 
 const { login } = useAuth()
 const auth = useAuthStore()
+const settingsStore = useSettingsStore()
 
 const schema = toTypedSchema(signInSchema)
 const { values, errors, defineField } = useForm({
@@ -48,7 +52,7 @@ const redirectTo = (
     ? router.currentRoute.value.query.redirect
     : '/'
 ) as string
-const handleForm = async (event: Event) => {
+const handleForm = async () => {
   try {
     console.log('canSubmit', canSubmit.value)
     if (!canSubmit.value) throw new Error('Invalid form')
@@ -82,17 +86,15 @@ onMounted(() => {
     <div class="flex flex-col items-center justify-center px-4">
       <!-- Header -->
       <div class="text-center mb-8">
-        <h1 class="text-5xl font-bold text-white mb-6">Sign In</h1>
-        <span class="text-app-violet-200 text-xl mb-2 block">
+        <h1 class="text-5xl font-bold text-zinc-900 dark:text-white mb-6">Sign In</h1>
+        <span class="text-gray-600 dark:text-app-violet-200 text-xl mb-2 block">
           Welcome back! Please enter your details.
         </span>
       </div>
 
       <form class="w-full max-w-md" @submit.prevent="handleForm">
         <!-- Form Fields -->
-        <div
-          class="bg-app-black-80 backdrop-blur-md border border-app-violet-900/30 p-6 rounded-lg space-y-4 mb-6"
-        >
+        <BaseCard>
           <div class="space-y-2">
             <FormEntry
               id="email"
@@ -122,29 +124,25 @@ onMounted(() => {
 
           <div class="flex justify-end">
             <router-link
-              class="text-sm text-app-violet-300 hover:text-app-violet-200 transition-colors"
+              class="text-sm text-gray-500 hover:text-gray-700 dark:text-app-violet-300 dark:hover:text-app-violet-200 transition-colors"
               to="/forgot"
             >
               Forgot password?
             </router-link>
           </div>
-        </div>
+        </BaseCard>
 
         <!-- Action Section -->
-        <div class="flex flex-col gap-4">
+        <div class="flex flex-col gap-6 mt-6">
           <LoadingButton :disable="!canSubmit" :loading="waitingResponse" @click="handleForm">
             {{ auth.isAuthenticated ? 'Already Logged In' : 'Sign In' }}
           </LoadingButton>
 
-          <p class="text-center text-app-violet-200">
-            Don't have an account?
-            <router-link
-              :to="redirectTo === '/' ? '/register' : `/register?redirect=${redirectTo}`"
-              class="text-app-fuchsia-600 hover:text-app-fuchsia-500 font-medium"
-            >
-              Sign up
-            </router-link>
-          </p>
+          <AuthLink
+            :route-to="redirectTo === '/' ? '/register' : `/register?redirect=${redirectTo}`"
+            link-text="Sign up"
+            title="Don't have an account?"
+          />
         </div>
       </form>
     </div>
