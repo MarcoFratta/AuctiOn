@@ -8,6 +8,7 @@ import { useAuctionNotifications } from '@/composables/useAuctionNotifications.t
 import { useAuth } from '@/composables/useAuth.ts'
 import { useLobbyService } from '@/composables/useLobbyService.ts'
 import { useAuctionConnection } from '@/composables/useAuctionConnection.ts'
+import { useSettingsStore } from '@/stores/settingsStore'
 
 const authStore = useAuthStore()
 const notAuthenticated = computed(() => !authStore.isAuthenticated)
@@ -27,7 +28,6 @@ watch(
   () => authStore.isAuthenticated,
   async (isAuthenticated) => {
     if (isAuthenticated) {
-      console.log('Checking active lobby')
       lobbyService
         .checkActiveLobby()
         .then(() => {
@@ -36,41 +36,57 @@ watch(
         .catch()
     }
   },
+  { immediate: true },
 )
 onBeforeMount(() => useAuth().refresh().then().catch())
+
+const settingsStore = useSettingsStore()
+settingsStore.init()
+// Watch for changes to the darkMode setting and update the HTML class
+watch(
+  () => settingsStore.darkMode,
+  (isDark) => {
+    if (isDark) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
-  <div class="w-full min-h-screen bg-app-black flex flex-col">
+  <div class="min-w-screen min-h-screen flex flex-col">
     <!-- App Header with slots -->
     <AppHeader @toggle-drawer="toggleDrawer">
       <!-- Default title is provided in the component -->
 
       <!-- Right content slot -->
-      <template #right-content>
+      <template #header-content>
         <!-- Teleport target for game status indicators -->
-        <div id="header-right-content">
+        <div id="header-content">
           <!-- Default auth links -->
-          <nav v-if="notAuthenticated" class="flex items-center gap-4">
+          <nav v-if="notAuthenticated" class="flex items-center gap-2">
             <RouterLink
-              class="text-gray-300 hover:text-white transition-colors px-3 py-1 rounded-md hover:bg-app-fuchsia-900/30"
+              class="text-zinc-800 dark:text-app-white font-medium transition-colors px-2 py-1 rounded-md hover:bg-app-fuchsia-900/30"
               to="/login"
             >
               Login
             </RouterLink>
             <RouterLink
-              class="bg-app-fuchsia-600 hover:bg-app-fuchsia-dark text-white px-4 py-1 rounded-md transition-colors"
+              class="bg-app-fuchsia-600 hover:bg-app-fuchsia-dark text-white px-3 py-1 rounded-md transition-colors"
               to="/register"
             >
               Register
             </RouterLink>
           </nav>
-          <nav v-else class="flex items-center gap-4">
+          <nav v-else-if="!$route.fullPath.startsWith('/play')" class="flex items-center gap-4">
             <RouterLink
-              class="text-gray-300 hover:text-white transition-colors px-3 py-1 rounded-md hover:bg-app-fuchsia-900/30 flex items-center"
+              class="text-zinc-800 font-medium dark:text-app-white hover:text-white transition-colors px-3 py-1 rounded-md hover:bg-app-fuchsia-900/30 flex items-center"
               to="/account"
             >
-              <span class="mr-1">👤</span> Account
+              Account
             </RouterLink>
           </nav>
         </div>
@@ -81,7 +97,7 @@ onBeforeMount(() => useAuth().refresh().then().catch())
     <NavigationDrawer :is-open="isDrawerOpen" @toggle="toggleDrawer" />
 
     <!-- Main Content -->
-    <main class="flex-grow">
+    <main class="size-full">
       <RouterView></RouterView>
     </main>
 
