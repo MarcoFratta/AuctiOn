@@ -63,9 +63,17 @@ items.value = [
   { item: 'circle', quantity: 2 },
 ]
 
-const canSubmit = computed(() => isAuthenticated.value)
+const canSubmit = computed(
+  () =>
+    isAuthenticated.value &&
+    !roundsProps.value.error &&
+    !maxPlayersProps.value.error &&
+    !bidTimeProps.value.error &&
+    !startAmountProps.value.error &&
+    !itemsProps.value.error,
+)
 const waitForResponse = ref(false)
-const handleForm = async (event: Event) => {
+const handleForm = async () => {
   try {
     await validate()
     if (!canSubmit.value) throw new InvalidData()
@@ -252,7 +260,7 @@ const handleForm = async (event: Event) => {
                     ],
                   ])
                 "
-                :items="items!"
+                v-model:items="items!"
                 v-bind="itemsProps"
               >
                 <template #header>
