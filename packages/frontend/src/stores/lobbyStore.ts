@@ -44,9 +44,11 @@ export const useLobbyStore = defineStore('lobby', {
       ]
     },
     timeLeft(state) {
-      if (!state.timerStart) return 0
+      if (!state.timerStart || !state.lobby?.bidTime) return 0
       const now = new Date()
-      return state.timerStart.getTime() - now.getTime()
+      const elapsedMs = now.getTime() - state.timerStart.getTime()
+      const bidTimeMs = state.lobby.bidTime * 1000 // Convert seconds to milliseconds
+      return Math.max(0, Math.floor((bidTimeMs - elapsedMs) / 1000))
     },
     currentUser(state) {
       const userId = useUserStore().user?.id
