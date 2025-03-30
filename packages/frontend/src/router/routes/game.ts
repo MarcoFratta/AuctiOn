@@ -5,7 +5,6 @@ export const gameRoutes = [
     component: () => import('@/views/auction/PlayView.vue'),
     meta: {
       requiresAuth: true,
-      requiresLobbyStarted: true,
       requiresLobby: true,
     },
   },
