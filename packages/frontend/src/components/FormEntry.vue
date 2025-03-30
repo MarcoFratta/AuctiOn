@@ -1,6 +1,9 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { IInput } from '@/components/ui/input'
+import { useSettingsStore } from '@/stores/settingsStore.ts'
+
+const settingsStore = useSettingsStore()
 
 const props = defineProps({
   title: String,
@@ -28,11 +31,11 @@ const internalValue = computed({
 </script>
 
 <template>
-  <div class="flex w-full flex-col items-center justify-center gap-2">
+  <div class="w-full flex flex-col gap-2">
     <label
       v-if="title"
       :for="title"
-      class="ml-4 w-full text-left max-w-sm text-sm font-medium text-gray-200 dark:text-zinc-200"
+      class="w-full ml-1 text-left text-sm font-medium text-gray-700 dark:text-app-violet-200"
     >
       {{ title }}
     </label>
@@ -41,16 +44,14 @@ const internalValue = computed({
       v-model="internalValue"
       :placeholder="placeHolder"
       :autocomplete="autocomplete"
-      class="bg-zinc-800 text-gray-200"
-      container-class="w-full max-w-sm"
+      class="w-full bg-app-white dark:bg-zinc-800"
       :type="type"
       :max="max"
       :min="min"
       :step="step"
       required
+      @keyup.enter="$emit('submit')"
     />
-    <p v-if="error" class="mt-1.5 text-sm text-red-400">
-      {{ error }}
-    </p>
+    <div v-if="error" class="ml-1 text-red-400 text-sm">{{ error }}</div>
   </div>
 </template>
