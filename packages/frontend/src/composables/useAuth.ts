@@ -18,7 +18,7 @@ export function useAuth() {
   const users = useUserStore()
   const { handleError } = useErrorsHandler()
 
-  function createUserData(user: object | undefined): User {
+  function createUserData(user: { name: string; id: string; email: string }): User {
     return validateSchema(userSchema, {
       ...user,
       username: user.name,

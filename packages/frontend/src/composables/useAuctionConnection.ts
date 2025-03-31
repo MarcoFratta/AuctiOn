@@ -15,7 +15,7 @@ export function useAuctionConnection() {
     }
 
     // Create a new connection promise
-    connectionPromise = new Promise((resolve, reject) => {
+    connectionPromise = new Promise<void>((resolve, reject) => {
       if (socketStore.isConnected) {
         // If already connected, resolve immediately
         resolve()
