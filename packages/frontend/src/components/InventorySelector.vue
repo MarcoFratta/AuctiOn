@@ -1,11 +1,13 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
-import type { ItemQuantity } from '@/schemas/LobbySchema.ts'
+import { lobbyConfigSchema } from '@/schemas/LobbySchema.ts'
 import GameShapes from '@/components/ui/GameShapes.vue'
+import z from 'zod'
 
+type EntryType = z.infer<typeof lobbyConfigSchema.shape.startInventory.shape.items>
 // Define slots for better type safety and documentation
 const props = defineProps<{
-  items: ItemQuantity[]
+  items: EntryType
   error?: string
   details?: Map<
     string,
@@ -21,7 +23,7 @@ defineSlots<{
 }>()
 
 const emits = defineEmits<{
-  (event: 'update:items', value: ItemQuantity[]): void
+  (event: 'update:items', value: EntryType): void
 }>()
 
 const totalSelected = computed(() => {
@@ -39,9 +41,11 @@ const updateQuantity = (item: string, value: number) => {
 
   const index = props.items.findIndex((q) => q.item === item)
   if (index !== -1) {
-    const updatedItems = [...props.items]
+    const updatedItems: EntryType = [...props.items]
     updatedItems[index] = { ...updatedItems[index], quantity: clampedValue }
-    emits('update:items', updatedItems)
+    if (updatedItems.find((i) => i.quantity > 0)) {
+      emits('update:items', updatedItems)
+    }
   }
 }
 </script>

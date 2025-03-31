@@ -50,7 +50,6 @@ const internalValue = computed({
       :min="min"
       :step="step"
       required
-      @keyup.enter="$emit('submit')"
     />
     <div v-if="error" class="ml-1 text-red-400 text-sm">{{ error }}</div>
   </div>

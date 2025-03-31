@@ -260,7 +260,8 @@ const handleForm = async () => {
                     ],
                   ])
                 "
-                v-model:items="items!"
+                :items="items!"
+                @update:items="items = $event"
                 v-bind="itemsProps"
               >
                 <template #header>
