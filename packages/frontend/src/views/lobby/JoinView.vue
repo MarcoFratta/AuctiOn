@@ -9,6 +9,7 @@ import { useLobbyService } from '@/composables/useLobbyService.ts'
 import Background from '@/components/Background.vue'
 import Title from '@/components/Title.vue'
 import { useAuctionConnection } from '@/composables/useAuctionConnection.ts'
+import BaseCard from '@/components/BaseCard.vue'
 
 const lobbyStore = useLobbyStore()
 const errorsHandler = useErrorsHandler()
@@ -58,9 +59,7 @@ const handleJoin = async () => {
 
       <div class="w-full max-w-md">
         <!-- Form Fields -->
-        <div
-          class="dark:bg-app-black-80 bg-white dark:backdrop-blur-md dark:border-app-violet-900/30 border-gray-200 shadow-sm p-6 rounded-lg space-y-4 mb-6"
-        >
+        <BaseCard class="mb-6">
           <div class="space-y-2">
             <FormEntry
               id="lobbyId"
@@ -71,7 +70,7 @@ const handleJoin = async () => {
               @keyup.enter="handleJoin"
             />
           </div>
-        </div>
+        </BaseCard>
 
         <!-- Action Section -->
         <div class="flex flex-col gap-4">
