@@ -4,9 +4,9 @@
     <Teleport to="#header-content">
       <GameHeader />
     </Teleport>
-
+    <LobbyLoading v-if="!lobbyStore.lobby" />
     <!-- Main Content Area -->
-    <div class="w-full max-w-7xl mx-auto mb-2 sm:mb-0 sm:mt-2 lg:mt-4 sm:px-4">
+    <div v-else class="w-full max-w-7xl mx-auto mb-2 sm:mb-0 sm:mt-2 lg:mt-4 sm:px-4">
       <!-- Game Shapes for decoration -->
       <div class="absolute top-20 -left-10 opacity-30 hidden xl:block">
         <GameShapes
@@ -88,7 +88,7 @@
 import { useLobbyStore } from '@/stores/lobbyStore.ts'
 import { useUserStore } from '@/stores/userStore.ts'
 import { useSettingsStore } from '@/stores/settingsStore.ts'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import GameHeader from '@/components/auction/GameHeader.vue'
 import CurrentBidCard from '@/components/auction/CurrentBidCard.vue'
@@ -104,6 +104,7 @@ import { useAuctionService } from '@/composables/useAuctionService.ts'
 import { useAuctionTimer } from '@/composables/useAuctionTimer.ts'
 import type { NewSaleMsg } from '@auction/common'
 import { useAuctionConnection } from '@/composables/useAuctionConnection.ts'
+import LobbyLoading from '@/components/lobby/LobbyLoading.vue'
 
 const lobbyStore = useLobbyStore()
 const auctionService = useAuctionService()
@@ -138,4 +139,17 @@ const isCurrentUserSeller = computed(() => {
   return lobbyStore.lobby?.sellerQueue[lobbyStore.sellerIndex] === userStore.user?.id
 })
 const connection = useAuctionConnection()
+if (!lobbyStore.lobby) {
+  connection.connect().catch(() => {
+    router.push('/join')
+  })
+}
+watch(
+  () => lobbyStore.lobby,
+  (newLobby) => {
+    if (newLobby && !newLobby.startTimestamp) {
+      router.push('/lobby')
+    }
+  },
+)
 </script>
