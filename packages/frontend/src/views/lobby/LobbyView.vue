@@ -1,6 +1,10 @@
 <template>
   <Background>
-    <div v-if="lobby" class="w-full md:px-4 xl:px-0 max-w-6xl my-2 md:my-4">
+    <!-- Loading State when lobby is not defined -->
+    <LobbyLoading v-if="!lobby" />
+
+    <!-- Existing lobby content -->
+    <div v-else class="w-full md:px-4 xl:px-0 max-w-6xl my-2 md:my-4">
       <!-- Header with animated shapes -->
       <div class="flex flex-col items-center mb-3 md:mb-4 px-2 relative">
         <div class="absolute top-5 -left-5 opacity-50 hidden md:block">
@@ -109,13 +113,15 @@ import Title from '@/components/Title.vue'
 import LoadingButton from '@/components/LoadingButton.vue'
 import { useSettingsStore } from '@/stores/settingsStore.ts'
 import InnerCard from '@/components/InnerCard.vue'
+import { useErrorsHandler } from '@/composables/useErrorsHandler.ts'
+import LobbyLoading from '@/components/lobby/LobbyLoading.vue'
 
 const lobbyStore = useLobbyStore()
 const router = useRouter()
 const settingsStore = useSettingsStore()
 const userStore = useUserStore()
-const lobby = computed(() => lobbyStore.lobby, { deep: true })
-const users = computed(() => lobbyStore.users, { deep: true })
+const lobby = computed(() => lobbyStore.lobby)
+const users = computed(() => lobbyStore.users)
 const amIAdmin = computed(() => lobby.value?.creatorId === userStore.user?.id)
 const lobbyUrl = computed(() => `${window.location.origin}/join/${lobby.value?.id}`)
 const ready = computed(
@@ -138,7 +144,7 @@ const setReady = () => {
 const kick = (id: string) => {
   lobbyService.kickPlayer(id)
 }
-
+const errorsHandler = useErrorsHandler()
 const start = async () => {
   try {
     // First set the creator as ready if not already
@@ -148,8 +154,17 @@ const start = async () => {
 
     // Then start the match
     await lobbyService.startMatch()
-  } catch (_e) {
-    alerts.error("Couldn't start match", 'All players must be ready')
+  } catch (e) {
+    const err = errorsHandler
+      .create(e)
+      .unknownError()
+      .invalidData(
+        "Couldn't start match",
+        users.value.length > 1 ? 'All players must be ready' : 'You need at least 2 players',
+      )
+      .tooManyRequests()
+      .get()
+    await errorsHandler.show(err)
   }
 }
 if (lobbyStore.lobby?.startTimestamp) {
