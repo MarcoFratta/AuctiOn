@@ -7,10 +7,9 @@ import LoadingButton from '@/components/LoadingButton.vue'
 import type { ItemQuantity } from '@/schemas/LobbySchema.ts'
 
 const lobbyStore = useLobbyStore()
-const startingItems =
-  lobbyStore.lobby?.startInventory.items.map((i) => {
-    return { ...i, quantity: 0 }
-  }) || []
+const startingItems = lobbyStore.lobby!.startInventory.items.map((i) => {
+  return { ...i, quantity: 0 }
+})
 
 // Use ref instead of reactive to avoid deep reactivity issues
 const items = ref(startingItems)
@@ -79,7 +78,7 @@ const canCreateSale = computed(() => {
       <div class="inventory-selector flex-grow mb-3 md:mb-4">
         <InventorySelector
           :details="details"
-          :items="items"
+          :items="[items[0], ...items.slice(1)]"
           class="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-gray-700/50 p-2 md:p-3 h-full"
           @update:items="updateItems"
         />
