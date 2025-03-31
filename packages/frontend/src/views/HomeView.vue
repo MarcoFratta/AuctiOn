@@ -54,7 +54,6 @@ onMounted(() => {
 
 // Single action function
 const toggleLogin = () => {
-  console.log('clicked')
-  router.push('/login')
+  router.push('/join')
 }
 </script>
