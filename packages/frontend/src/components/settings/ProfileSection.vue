@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { useUserStore } from '@/stores/userStore'
 import BaseCard from '@/components/BaseCard.vue'
+import UserAvatar from '@/components/user/UserAvatar.vue'
 
 const props = defineProps<{
   accountCreated: Date
@@ -30,11 +31,11 @@ const formatDate = (date: Date) => {
       <div class="space-y-6">
         <!-- Profile Picture -->
         <div class="flex flex-col sm:flex-row sm:items-center gap-4">
-          <div
-            class="w-24 h-24 bg-gray-200 dark:bg-app-black-90 rounded-full flex items-center justify-center overflow-hidden border border-gray-300 dark:border-app-violet-900/30"
-          >
-            <span class="text-4xl">👤</span>
-          </div>
+          <UserAvatar
+            :username="userStore.user?.username ?? ''"
+            class="bg-neutral-700"
+            size="large"
+          />
           <div>
             <h4 class="text-zinc-900 dark:text-white font-medium mb-1">Profile Picture</h4>
             <p class="text-gray-500 dark:text-app-violet-300 text-sm mb-3">
