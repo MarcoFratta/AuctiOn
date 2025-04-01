@@ -6,7 +6,7 @@
       <!-- Header -->
       <div class="mb-12 text-center">
         <Title class="text-4xl lg:text-5xl mb-4">Game Rules</Title>
-        <p class="text-gray-600 dark:text-app-white text-xl">
+        <p class="text-zinc-600 dark:text-app-white text-xl">
           An online real-time auction game of bluffing, bidding, and resource management
         </p>
       </div>
@@ -17,7 +17,7 @@
           <h2 class="text-2xl font-bold text-zinc-900 dark:text-white mb-4 flex items-center">
             <span class="mr-2">📜</span> Introduction
           </h2>
-          <p class="text-gray-700 dark:text-app-white mb-6">
+          <p class="text-zinc-700 dark:text-app-white mb-6">
             AuctiOn is a turn-based auction game where players strategically buy and sell items to
             accumulate as much virtual currency as possible by the end of the game. Players must
             balance their inventory, engage in bidding wars, bluff, and manage their resources
@@ -27,17 +27,17 @@
             <InnerCard class="flex flex-col justify-center items-center gap-1">
               <GameShapes size="lg" type="circle" />
               <h2 class="text-violet-600 dark:text-app-violet-400 text-lg font-bold">Circle</h2>
-              <p class="text-gray-600 dark:text-app-violet-300 text-sm">Weight: 1</p>
+              <p class="text-zinc-600 dark:text-app-violet-300 text-sm">Weight: 1</p>
             </InnerCard>
             <InnerCard class="flex flex-col justify-center items-center gap-1">
               <GameShapes size="lg" type="triangle" />
               <h2 class="text-violet-600 dark:text-app-violet-400 text-lg font-bold">Triangle</h2>
-              <p class="text-gray-600 dark:text-app-violet-300 text-sm">Weight: 1</p>
+              <p class="text-zinc-600 dark:text-app-violet-300 text-sm">Weight: 1</p>
             </InnerCard>
             <InnerCard class="flex flex-col justify-center items-center gap-1">
               <GameShapes size="lg" type="square" />
               <h2 class="text-violet-600 dark:text-app-violet-400 text-lg font-bold">Square</h2>
-              <p class="text-gray-600 dark:text-app-violet-300 text-sm">Weight: 1</p>
+              <p class="text-zinc-600 dark:text-app-violet-300 text-sm">Weight: 1</p>
             </InnerCard>
           </div>
         </BaseCard>
@@ -52,7 +52,7 @@
           <div class="space-y-4">
             <InnerCard>
               <h3 class="text-xl text-zinc-900 dark:text-white font-semibold mb-2">Objective</h3>
-              <p class="text-gray-700 dark:text-app-white">
+              <p class="text-zinc-700 dark:text-app-white">
                 Players aim to accumulate the highest amount of virtual coins by the end of the game
                 while meeting specific item requirements.
               </p>
@@ -61,7 +61,7 @@
               <h3 class="text-xl text-zinc-900 dark:text-white font-semibold mb-2">
                 Starting Resources
               </h3>
-              <ul class="list-disc list-inside text-gray-700 dark:text-app-white space-y-2">
+              <ul class="list-disc list-inside text-zinc-700 dark:text-app-white space-y-2">
                 <li>
                   Each player starts with a random assortment of items (Squares, Triangles, Circles)
                 </li>
@@ -73,7 +73,7 @@
               <h3 class="text-xl text-zinc-900 dark:text-white font-semibold mb-2">
                 Turn Structure
               </h3>
-              <p class="text-gray-700 dark:text-app-white">
+              <p class="text-zinc-700 dark:text-app-white">
                 Each turn, one player acts as the "seller," while the others are "buyers." The
                 seller offers a batch of items, revealing only the total weight.
               </p>
@@ -98,7 +98,7 @@
                 </div>
                 <h3 class="text-xl text-zinc-900 dark:text-white font-semibold">Selling Phase</h3>
               </div>
-              <p class="text-gray-700 dark:text-app-white mb-2">
+              <p class="text-zinc-700 dark:text-app-white mb-2">
                 The seller selects a batch of items to sell and announces the total weight. Buyers
                 do not know the exact quantity or types of items.
               </p>
@@ -116,7 +116,7 @@
                 </div>
                 <h3 class="text-xl text-zinc-900 dark:text-white font-semibold">Bidding Phase</h3>
               </div>
-              <p class="text-gray-700 dark:text-app-white mb-2">
+              <p class="text-zinc-700 dark:text-app-white mb-2">
                 Each buyer secretly bids a number of coins. The highest bidder wins and receives the
                 items. The seller earns the bid amount.
               </p>
@@ -136,7 +136,7 @@
                   Bluffing & Strategy
                 </h3>
               </div>
-              <p class="text-gray-700 dark:text-app-white mb-2">
+              <p class="text-zinc-700 dark:text-app-white mb-2">
                 Sellers can bluff to drive up bids; buyers must decide how much to risk based on
                 limited information.
               </p>
@@ -156,7 +156,7 @@
                   Item Requirements
                 </h3>
               </div>
-              <ul class="list-disc list-inside text-gray-700 dark:text-app-white space-y-2">
+              <ul class="list-disc list-inside text-zinc-700 dark:text-app-white space-y-2">
                 <li>
                   Players must end the game with at least one item; those with zero items are
                   disqualified from winning.
@@ -181,7 +181,7 @@
           </h2>
 
           <InnerCard>
-            <p class="text-gray-700 dark:text-app-white mb-4">
+            <p class="text-zinc-700 dark:text-app-white mb-4">
               When all turns are completed, players count their remaining coins. The player with the
               most coins, who also meets the item requirements, wins.
             </p>
@@ -192,7 +192,7 @@
               <h3 class="text-xl text-violet-600 dark:text-app-fuchsia-400 font-semibold mb-2">
                 To Win, You Must:
               </h3>
-              <ul class="list-disc list-inside text-gray-700 dark:text-app-white space-y-2">
+              <ul class="list-disc list-inside text-zinc-700 dark:text-app-white space-y-2">
                 <li>Have at least one item</li>
                 <li>Not have the most items among all players</li>
                 <li>Have the highest number of coins among eligible players</li>
@@ -231,7 +231,7 @@
                     Market Events
                   </h3>
                   <p
-                    class="text-gray-600 dark:text-app-violet-300 group-hover:text-gray-800 dark:group-hover:text-white transition-colors"
+                    class="mt-4 xl:mt-6 text-zinc-600 dark:text-app-violet-300 group-hover:text-zinc-800 dark:group-hover:text-white transition-colors"
                   >
                     Periodic changes in item values or temporary bonuses for holding specific types
                     of items.
@@ -254,7 +254,7 @@
                     Power-ups
                   </h3>
                   <p
-                    class="text-gray-600 dark:text-app-violet-300 group-hover:text-gray-800 dark:group-hover:text-white transition-colors"
+                    class="mt-4 xl:mt-6 text-zinc-600 dark:text-app-violet-300 group-hover:text-zinc-800 dark:group-hover:text-white transition-colors"
                   >
                     Special abilities that let you inspect item types, block other players, or gain
                     auction advantages.
@@ -277,7 +277,7 @@
                     Friend System
                   </h3>
                   <p
-                    class="text-gray-600 dark:text-app-violet-300 group-hover:text-gray-800 dark:group-hover:text-white transition-colors"
+                    class="mt-4 xl:mt-6 text-zinc-600 dark:text-app-violet-300 group-hover:text-zinc-800 dark:group-hover:text-white transition-colors"
                   >
                     Connect with other players, send friend requests, and invite friends directly to
                     your game lobbies.
@@ -330,7 +330,7 @@ import StrategyTip from '@/components/rules/StrategyTip.vue'
 }
 
 /* Subtle hover effects */
-.bg-gray-50:hover {
+.bg-zinc-50:hover {
   box-shadow: 0 0 15px rgba(139, 92, 246, 0.15);
 }
 
