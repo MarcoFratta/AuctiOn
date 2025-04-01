@@ -1,7 +1,7 @@
 <template>
   <Background>
     <!-- Loading State when lobby is not defined -->
-    <LobbyLoading v-if="!lobby" />
+    <LobbyLoading v-if="!lobbyStore.lobby" />
 
     <!-- Existing lobby content -->
     <div v-else class="w-full md:px-4 xl:px-0 max-w-6xl my-2 md:my-4">
@@ -37,7 +37,7 @@
           <BaseCard class="h-full">
             <div class="grid gap-4">
               <!-- Game Settings -->
-              <LobbyConfigs :lobby="lobby!" />
+              <LobbyConfigs :lobby="lobbyStore.lobby!" />
 
               <!-- Connected Players -->
               <LobbyPlayers :players="users" @kick="kick" />
@@ -120,10 +120,9 @@ const lobbyStore = useLobbyStore()
 const router = useRouter()
 const settingsStore = useSettingsStore()
 const userStore = useUserStore()
-const lobby = computed(() => lobbyStore.lobby)
 const users = computed(() => lobbyStore.users)
-const amIAdmin = computed(() => lobby.value?.creatorId === userStore.user?.id)
-const lobbyUrl = computed(() => `${window.location.origin}/join/${lobby.value?.id}`)
+const amIAdmin = computed(() => lobbyStore.lobby?.creatorId === userStore.user?.id)
+const lobbyUrl = computed(() => `${window.location.origin}/join/${lobbyStore.lobby?.id}`)
 const ready = computed(
   () => lobbyStore.users?.find((u) => u.id === userStore.user?.id)?.status === 'ready',
 )
@@ -176,7 +175,7 @@ watch(
     if (!lobby) {
       await alerts.error('Disconnected', 'Please refresh the page')
       router.push('/')
-    } else if (lobby.startTimestamp) {
+    } else if (lobbyStore.lobby?.startTimestamp) {
       router.push('/play')
     }
   },
