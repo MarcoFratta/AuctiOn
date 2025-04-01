@@ -20,13 +20,15 @@ app.use(Vue3Toastify, {
   position: 'bottom-right',
   newestOnTop: true,
   limit: 4,
-  theme: 'dark',
+  theme: 'auto',
   closeOnClick: true,
   pauseOnHover: true,
   hideProgressBar: false,
   transition: 'bounce',
   clearOnUrlChange: false,
-  containerId: 'toast-container',
+  style: {
+    background: 'transparent',
+  },
 } as ToastContainerOptions)
 
 app.mount('#app')
