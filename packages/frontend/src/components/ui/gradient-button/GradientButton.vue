@@ -2,7 +2,7 @@
   <button
     :class="
       cn(
-        'relative flex items-center justify-center min-w-28 min-h-10 overflow-hidden before:absolute before:-inset-[200%] animate-rainbow rainbow-btn',
+        'relative flex items-center justify-center min-w-28 min-h-10 overflow-hidden before:absolute before:-inset-[600%] animate-rainbow rainbow-btn',
         props.class,
       )
     "
