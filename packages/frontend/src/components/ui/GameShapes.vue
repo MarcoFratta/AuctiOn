@@ -3,7 +3,7 @@
 const props = withDefaults(
   defineProps<{
     type: string
-    size?: 'sm' | 'md' | 'lg' | 'xl'
+    size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
     color?: string
     animated?: boolean
   }>(),
@@ -20,6 +20,7 @@ const props = withDefaults(
     :class="[
       'game-shape inline-flex items-center justify-center',
       {
+        'w-6 h-6': size == 'xs',
         'w-8 h-8': size === 'sm',
         'w-12 h-12': size === 'md',
         'w-16 h-16': size === 'lg',
