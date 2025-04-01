@@ -9,9 +9,9 @@ export const gameRoutes = [
     },
   },
   {
-    path: '/leaderboard',
-    name: 'leaderboard',
-    component: () => import('@/views/AuctionEndView.vue'),
+    path: '/results',
+    name: 'results',
+    component: () => import('@/views/LeaderboardView.vue'),
     meta: {
       requiresAuth: true,
     },

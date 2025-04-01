@@ -1,5 +1,5 @@
 <template>
-  <div :class="sizeClass" class="user-avatar">
+  <div :class="sizeClass" class="user-avatar bg-neutral-50 dark:bg-neutral-800 text-app-white">
     {{ initials }}
   </div>
 </template>
@@ -9,19 +9,14 @@ import { computed } from 'vue'
 import { useLobbyStore } from '@/stores/lobbyStore'
 
 const props = defineProps<{
-  userId: string
+  username: string
   size?: 'small' | 'medium' | 'large'
 }>()
 
 const lobbyStore = useLobbyStore()
 
-const username = computed(() => {
-  const user = lobbyStore.users.find((u) => u.id === props.userId)
-  return user?.username || 'Unknown'
-})
-
 const initials = computed(() => {
-  return username.value
+  return props.username
     .split(' ')
     .map((word) => word[0])
     .join('')
@@ -40,8 +35,6 @@ const sizeClass = computed(() => {
   justify-content: center;
   align-items: center;
   border-radius: 50%;
-  background-color: var(--color-primary);
-  color: white;
   font-weight: bold;
 }
 
