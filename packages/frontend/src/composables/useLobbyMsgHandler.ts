@@ -5,11 +5,13 @@ import * as validator from '@auction/common/validation'
 import * as messages from '@auction/common/messages'
 import { match } from 'ts-pattern'
 import { useRouter } from 'vue-router'
+import { useResultsStore } from '@/stores/resultsStore.ts'
 
 export function useLobbyMsgHandler() {
   const socketStore = useSocketStore()
   const lobbyStore = useLobbyStore()
   const router = useRouter()
+  const resultsStore = useResultsStore()
 
   function attach() {
     socketStore.attach(
@@ -79,10 +81,10 @@ export function useLobbyMsgHandler() {
           })
           .with('auction-end', () => {
             const msg = validator.validateSchema(messages.auctionEndMsgSchema, event)
+            resultsStore.setLeaderboard(msg.leaderboard, lobbyStore.users)
             lobbyStore.clearLobby()
             socketStore.disconnect()
-            lobbyStore.setLeaderboard(msg.leaderboard)
-            router.push('/')
+            router.push('/results')
           })
           .otherwise(() => {
             console.error('Unknown event:', event)
