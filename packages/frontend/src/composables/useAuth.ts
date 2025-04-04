@@ -40,7 +40,7 @@ export function useAuth() {
       const data = await registerApi(name, email, password)
       tokens.setTokens(data.user.token)
       delete data.user.token
-      users.setUser(createUserData(data))
+      users.setUser(createUserData(data.user))
     } catch (error) {
       handleError(error, [[409, new UserAlreadyRegistered(email)]])
     }
