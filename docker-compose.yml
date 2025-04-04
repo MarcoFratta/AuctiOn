@@ -96,6 +96,7 @@ services:
       - AUCTION_SERVICE_URI=${GATEWAY_S_AUCTION_SERVICE_URI:-http://auction-service:3000/auctions}
     networks:
       - microservices-network
+      - out-network
 
   auction-service:
     build:
@@ -146,7 +147,17 @@ services:
     networks:
       - kafka-network
 
-
+  frontend:
+    build:
+      context: .
+      dockerfile: packages/frontend/Dockerfile
+    restart: always
+    ports:
+      - "${FRONTEND_PORT:-8080}:80"
+    networks:
+      - out-network
+    depends_on:
+      - api-gateway
 
 networks:
   kafka-network:
@@ -160,7 +171,9 @@ networks:
   redis-network:
     driver: bridge
   microservices-network:
-    external: true
+    driver: bridge
+  out-network:
+    driver: bridge
 volumes:
   mongo_user_data:
   mongo_auth_data:
