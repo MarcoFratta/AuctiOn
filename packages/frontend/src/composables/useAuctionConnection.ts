@@ -1,5 +1,6 @@
 import { useSocketStore } from '@/stores/socketStore.ts'
 import { useLobbyService } from '@/composables/useLobbyService.ts'
+import { NotFound } from '@/api/Errors.ts'
 
 export function useAuctionConnection() {
   const socketStore = useSocketStore()
@@ -29,8 +30,8 @@ export function useAuctionConnection() {
             resolve()
           })
         })
-        .catch((error) => {
-          reject(error)
+        .catch((_error) => {
+          reject(new NotFound())
         })
     }).finally(() => {
       connectionPromise = null
