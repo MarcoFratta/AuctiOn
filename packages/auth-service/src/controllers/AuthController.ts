@@ -26,11 +26,13 @@ export class AuthController {
         refreshToken,
       })
       logger.debug(`Token refreshed successfully`)
-      res.cookie('refreshToken', user.refreshToken, {
-        httpOnly: true,
-        secure: false,
-        sameSite: 'lax',
-      })
+
+      // Check if the original cookie had an expiration
+      const hasExpiration = !!(req.cookies['refreshToken'] && req.cookies['refreshToken'].expires)
+
+      // Use the extracted method
+      this.setRefreshTokenCookie(res, user.refreshToken, { hasExpiration })
+
       res.status(200).json({ token: user.accessToken, user: user.user })
     } catch (error) {
       logger.debug(`Error refreshing token: ${error}`)
@@ -47,13 +49,12 @@ export class AuthController {
     try {
       const user = await this.authService.login(inputData)
 
-      res.cookie('refreshToken', user.refreshToken, {
-        httpOnly: true,
-        secure: false,
-        sameSite: 'lax',
-      })
+      const rememberMe = req.body.rememberMe === true
 
-      logger.debug(`User ${inputData.email} logged in successfully `)
+      // Use the extracted method
+      this.setRefreshTokenCookie(res, user.refreshToken, { rememberMe })
+
+      logger.debug(`User ${inputData.email} logged in successfully`)
 
       res.status(200).json({
         message: 'User logged in successfully',
@@ -69,6 +70,7 @@ export class AuthController {
       next(error)
     }
   }
+
   logout = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const refreshToken = req.cookies['refreshToken']
@@ -78,12 +80,13 @@ export class AuthController {
         return
       }
       await this.authService.logout({ refreshToken, accessToken })
-      res.clearCookie('refreshToken')
+      res.clearCookie('refreshToken', { path: '/' }) // Make sure path matches what we set
       res.status(200).json({ message: 'User logged out successfully' })
     } catch (error) {
       next(error)
     }
   }
+
   register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const inputData: RegisterInputData = req.body
     try {
@@ -95,11 +98,10 @@ export class AuthController {
       }
 
       logger.debug(`User ${inputData.email} registered successfully`)
-      res.cookie('refreshToken', user.refreshToken, {
-        httpOnly: true,
-        secure: false,
-        sameSite: 'lax',
-      })
+
+      // For new registrations, default to remembering the user
+      this.setRefreshTokenCookie(res, user.refreshToken, { rememberMe: true })
+
       res.status(201).json({
         message: 'User registered successfully',
         user: {
@@ -113,6 +115,33 @@ export class AuthController {
       next(error)
     }
   }
+
+  // Private method to set refresh token cookie with consistent options
+  private setRefreshTokenCookie(
+    res: Response,
+    token: string,
+    options: {
+      rememberMe?: boolean
+      hasExpiration?: boolean
+    } = {}
+  ): void {
+    const cookieOptions = {
+      httpOnly: true,
+      secure: config.env === 'production',
+      sameSite: 'lax' as const,
+      path: '/',
+    }
+
+    // Add maxAge if rememberMe is true or if the original cookie had an expiration
+    if (options.rememberMe || options.hasExpiration) {
+      Object.assign(cookieOptions, {
+        maxAge: config.refreshTokenExpireDays * 24 * 60 * 60 * 1000, // 30 days in milliseconds
+      })
+    }
+
+    res.cookie('refreshToken', token, cookieOptions)
+  }
+
   forgotPassword = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const email: string = req.params.email
@@ -138,6 +167,7 @@ export class AuthController {
       next(error)
     }
   }
+
   resetPassword = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const token: string = req.body.token
