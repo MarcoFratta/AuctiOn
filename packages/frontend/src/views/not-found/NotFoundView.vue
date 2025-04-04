@@ -133,11 +133,11 @@
 </template>
 
 <script lang="ts" setup>
-import Background from '@/components/Background.vue'
-import Title from '@/components/Title.vue'
-import BaseCard from '@/components/BaseCard.vue'
-import InnerCard from '@/components/InnerCard.vue'
-import GameShapes from '@/components/ui/GameShapes.vue'
+import Background from '@/components/common/Background.vue'
+import Title from '@/components/common/Title.vue'
+import BaseCard from '@/components/common/BaseCard.vue'
+import InnerCard from '@/components/common/InnerCard.vue'
+import GameShapes from '@/components/icons/GameShapes.vue'
 import { GradientButton as Button } from '@/components/ui/gradient-button'
 import { useSettingsStore } from '@/stores/settingsStore.ts'
 

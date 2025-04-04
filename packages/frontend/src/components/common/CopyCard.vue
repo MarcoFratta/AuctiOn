@@ -33,7 +33,7 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import LoadingButton from '@/components/LoadingButton.vue'
+import LoadingButton from '@/components/common/LoadingButton.vue'
 
 const props = defineProps({
   url: String,

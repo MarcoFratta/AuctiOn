@@ -79,9 +79,9 @@
 </template>
 
 <script lang="ts" setup>
-import BaseCard from '@/components/BaseCard.vue'
-import InnerCard from '@/components/InnerCard.vue'
-import GameShapes from '@/components/ui/GameShapes.vue'
+import BaseCard from '@/components/common/BaseCard.vue'
+import InnerCard from '@/components/common/InnerCard.vue'
+import GameShapes from '@/components/icons/GameShapes.vue'
 import { useSettingsStore } from '@/stores/settingsStore.ts'
 
 const settingsStore = useSettingsStore()

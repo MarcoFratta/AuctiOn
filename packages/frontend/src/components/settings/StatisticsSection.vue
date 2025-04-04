@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
-import BaseCard from '@/components/BaseCard.vue'
+import BaseCard from '@/components/common/BaseCard.vue'
 
 const props = defineProps<{
   stats: {

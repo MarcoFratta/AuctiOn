@@ -1,7 +1,7 @@
 <template>
   <Background>
     <!-- Loading State when lobby is not defined -->
-    <LobbyLoading v-if="!lobbyStore.lobby" />
+    <LobbyLoading v-if="!lobbyStore.lobby || !userStore.user" />
 
     <!-- Existing lobby content -->
     <div v-else class="w-full md:px-4 xl:px-0 max-w-6xl my-2 md:my-4">
@@ -102,17 +102,17 @@ import { useUserStore } from '@/stores/userStore.ts'
 import LobbyPlayers from '@/components/lobby/LobbyPlayers.vue'
 import LobbyConfigs from '@/components/lobby/LobbyConfigs.vue'
 import ShareCard from '@/components/lobby/ShareCard.vue'
-import CopyCard from '@/components/CopyCard.vue'
+import CopyCard from '@/components/common/CopyCard.vue'
 import { useLobbyService } from '@/composables/useLobbyService.ts'
 import { useAlert } from '@/composables/useAlert.ts'
 import { useRouter } from 'vue-router'
-import Background from '@/components/Background.vue'
-import GameShapes from '@/components/ui/GameShapes.vue'
-import BaseCard from '@/components/BaseCard.vue'
-import Title from '@/components/Title.vue'
-import LoadingButton from '@/components/LoadingButton.vue'
+import Background from '@/components/common/Background.vue'
+import GameShapes from '@/components/icons/GameShapes.vue'
+import BaseCard from '@/components/common/BaseCard.vue'
+import Title from '@/components/common/Title.vue'
+import LoadingButton from '@/components/common/LoadingButton.vue'
 import { useSettingsStore } from '@/stores/settingsStore.ts'
-import InnerCard from '@/components/InnerCard.vue'
+import InnerCard from '@/components/common/InnerCard.vue'
 import { useErrorsHandler } from '@/composables/useErrorsHandler.ts'
 import LobbyLoading from '@/components/lobby/LobbyLoading.vue'
 
@@ -121,7 +121,10 @@ const router = useRouter()
 const settingsStore = useSettingsStore()
 const userStore = useUserStore()
 const users = computed(() => lobbyStore.users)
-const amIAdmin = computed(() => lobbyStore.lobby?.creatorId === userStore.user?.id)
+const amIAdmin = computed(() => {
+  if (!lobbyStore.lobby || !userStore.user) return false
+  return lobbyStore.lobby?.creatorId === userStore.user?.id
+})
 const lobbyUrl = computed(() => `${window.location.origin}/join/${lobbyStore.lobby?.id}`)
 const ready = computed(
   () => lobbyStore.users?.find((u) => u.id === userStore.user?.id)?.status === 'ready',

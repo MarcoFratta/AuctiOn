@@ -13,9 +13,7 @@ defineProps<{
   isOpen: boolean
 }>()
 
-const emit = defineEmits<{
-  (e: 'toggle'): void
-}>()
+const emits = defineEmits(['closeDrawer'])
 
 const menuItems = [
   {
@@ -59,7 +57,7 @@ const handleLogout = async () => {
 }
 
 const closeDrawer = () => {
-  emit('toggle')
+  emits('closeDrawer')
 }
 </script>
 
@@ -87,7 +85,7 @@ const closeDrawer = () => {
       class="h-16 flex items-center justify-start px-6 border-b border-gray-100 dark:border-gray-800"
     >
       <router-link class="flex items-center" to="/">
-        <img alt="AuctiOn Logo" class="h-10" src="@/assets/app-logo.svg" style="filter: none" />
+        <img alt="AuctiOn Logo" class="h-10" src="../../assets/app-logo.svg" style="filter: none" />
         <h2
           class="ml-2 text-2xl font-bold bg-gradient-to-r from-app-violet-500 to-app-fuchsia-500 text-transparent bg-clip-text"
         >

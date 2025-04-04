@@ -130,7 +130,7 @@ import { computed, ref } from 'vue'
 import InventoryDisplay from '@/components/inventory/InventoryDisplay.vue'
 import { type LeaderboardEntry } from '@/schemas/LeaderboardSchema.ts'
 import { useResultsStore } from '@/stores/resultsStore.ts'
-import InnerCard from '@/components/InnerCard.vue'
+import InnerCard from '@/components/common/InnerCard.vue'
 
 const props = defineProps<{
   entry: LeaderboardEntry | Omit<LeaderboardEntry, 'position'>

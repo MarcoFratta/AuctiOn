@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import FormEntry from '@/components/FormEntry.vue'
+import FormEntry from '@/components/common/FormEntry.vue'
 import { useAuth } from '@/composables/useAuth.ts'
 import { useAuthStore } from '@/stores/authStore.ts'
 import { useForm } from 'vee-validate'
@@ -8,11 +8,11 @@ import { signInSchema } from '@/schemas/authSchema.ts'
 import { computed, onMounted, ref } from 'vue'
 import router from '@/router'
 import { useErrorsHandler } from '@/composables/useErrorsHandler.ts'
-import Background from '@/components/Background.vue'
-import LoadingButton from '@/components/LoadingButton.vue'
+import Background from '@/components/common/Background.vue'
+import LoadingButton from '@/components/common/LoadingButton.vue'
 import { useSettingsStore } from '@/stores/settingsStore.ts'
-import BaseCard from '@/components/BaseCard.vue'
-import AuthLink from '@/components/AuthLink.vue'
+import BaseCard from '@/components/common/BaseCard.vue'
+import AuthLink from '@/components/common/AuthLink.vue'
 
 const { login } = useAuth()
 const auth = useAuthStore()

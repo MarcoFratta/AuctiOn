@@ -1,20 +1,20 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue'
 import { useAuth } from '@/composables/useAuth.ts'
-import FormEntry from '@/components/FormEntry.vue'
+import FormEntry from '@/components/common/FormEntry.vue'
 import { useAuthStore } from '@/stores/authStore.ts'
 import { useForm } from 'vee-validate'
 import { signUpSchema } from '@/schemas/authSchema.ts'
 import { toTypedSchema } from '@vee-validate/zod'
-import LoadingButton from '@/components/LoadingButton.vue'
+import LoadingButton from '@/components/common/LoadingButton.vue'
 import { InvalidData } from '@/api/Errors.ts'
 import { useErrorsHandler } from '@/composables/useErrorsHandler.ts'
 import { useRouter } from 'vue-router'
-import Background from '@/components/Background.vue'
-import Title from '@/components/Title.vue'
+import Background from '@/components/common/Background.vue'
+import Title from '@/components/common/Title.vue'
 import { useSettingsStore } from '@/stores/settingsStore.ts'
-import BaseCard from '@/components/BaseCard.vue'
-import AuthLink from '@/components/AuthLink.vue'
+import BaseCard from '@/components/common/BaseCard.vue'
+import AuthLink from '@/components/common/AuthLink.vue'
 
 const { register } = useAuth()
 const schema = toTypedSchema(signUpSchema)
@@ -71,8 +71,10 @@ const handleForm = async () => {
     if (!canSubmit.value) throw new InvalidData()
     waitingResponse.value = true
     await register(values.name!, values.email!, values.password!)
+    console.log('logged in')
     router.push(redirectTo)
   } catch (error) {
+    console.error(error)
     const e = errorHandler
       .create(error)
       .unknownError('Error', 'An error occurred')

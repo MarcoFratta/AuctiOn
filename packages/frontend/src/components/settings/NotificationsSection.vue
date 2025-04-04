@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { useSettingsStore } from '@/stores/settingsStore'
 import { ref } from 'vue'
-import BaseCard from '@/components/BaseCard.vue'
+import BaseCard from '@/components/common/BaseCard.vue'
 import ToggleSwitch from '@/components/ui/ToggleSwitch.vue'
 
 const settingsStore = useSettingsStore()

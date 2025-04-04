@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import InventorySelector from '@/components/InventorySelector.vue'
+import InventorySelector from '@/components/common/InventorySelector.vue'
 import { computed, ref } from 'vue'
 import { useLobbyStore } from '@/stores/lobbyStore.ts'
-import BaseCard from '@/components/BaseCard.vue'
-import LoadingButton from '@/components/LoadingButton.vue'
+import BaseCard from '@/components/common/BaseCard.vue'
+import LoadingButton from '@/components/common/LoadingButton.vue'
 import type { ItemQuantity } from '@/schemas/LobbySchema.ts'
 
 const lobbyStore = useLobbyStore()

@@ -56,7 +56,7 @@
 
 <script lang="ts" setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import GameShapes from '@/components/ui/GameShapes.vue'
+import GameShapes from '@/components/icons/GameShapes.vue'
 import type { ItemQuantity } from '@/schemas/LobbySchema.ts'
 import { type ShapeType } from '@/icons/shapes.ts'
 

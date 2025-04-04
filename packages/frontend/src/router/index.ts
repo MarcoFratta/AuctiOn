@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '@/views/HomeView.vue'
+import HomeView from '@/views/home/HomeView.vue'
 import { authRoutes } from './routes/auth'
 import { lobbyRoutes } from './routes/lobby'
 import { gameRoutes } from './routes/game'
@@ -7,14 +7,14 @@ import { useAuthStore } from '@/stores/authStore'
 import { useAuth } from '@/composables/useAuth'
 import { useLobbyStore } from '@/stores/lobbyStore.ts'
 import { userRoutes } from '@/router/routes/user.ts'
-import NotFoundView from '@/views/NotFoundView.vue'
+import NotFoundView from '@/views/not-found/NotFoundView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      name: 'home',
+      name: 'Home',
       component: HomeView,
     },
     ...authRoutes,
@@ -28,6 +28,7 @@ const router = createRouter({
     },
   ],
 })
+
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
   const { refresh } = useAuth()
@@ -47,6 +48,7 @@ router.beforeEach(async (to, from, next) => {
     next()
   }
 })
+
 router.beforeEach(async (to, from, next) => {
   if (to.meta.requiresNoLobby) {
     const lobbyStore = useLobbyStore()

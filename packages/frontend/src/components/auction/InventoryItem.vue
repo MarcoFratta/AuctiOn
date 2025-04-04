@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { useLobbyStore } from '@/stores/lobbyStore.ts'
 import { computed } from 'vue'
-import GameShapes from '@/components/ui/GameShapes.vue'
-import AppIcons from '@/components/ui/AppIcons.vue'
+import GameShapes from '@/components/icons/GameShapes.vue'
+import AppIcons from '@/components/icons/AppIcons.vue'
 
 const props = defineProps<{
   item: {

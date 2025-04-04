@@ -3,7 +3,7 @@ import { Vortex } from '@/components/ui/vortex'
 import { BlurReveal } from '@/components/ui/blur-reveal'
 import { useSettingsStore } from '@/stores/settingsStore.ts'
 import { computed } from 'vue'
-import FullScreen from '@/components/FullScreen.vue'
+import FullScreen from '@/components/common/FullScreen.vue'
 
 const settingsStore = useSettingsStore()
 const bgColor = computed(() => (settingsStore.darkMode ? 'black' : '#f8f9fa'))

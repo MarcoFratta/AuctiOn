@@ -101,9 +101,9 @@
 import { useLobbyStore } from '@/stores/lobbyStore'
 import { useUserStore } from '@/stores/userStore'
 import { computed } from 'vue'
-import BaseCard from '@/components/BaseCard.vue'
-import InnerCard from '@/components/InnerCard.vue'
-import AppIcons from '@/components/ui/AppIcons.vue'
+import BaseCard from '@/components/common/BaseCard.vue'
+import InnerCard from '@/components/common/InnerCard.vue'
+import AppIcons from '@/components/icons/AppIcons.vue'
 
 const lobbyStore = useLobbyStore()
 const userStore = useUserStore()

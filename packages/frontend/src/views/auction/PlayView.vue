@@ -1,7 +1,7 @@
 <template>
   <Background>
     <!-- Teleport the game status indicators to the header right content slot -->
-    <Teleport to="#header-content">
+    <Teleport to="#header-right-content">
       <GameHeader />
     </Teleport>
     <LobbyLoading v-if="!lobbyStore.lobby" />
@@ -88,7 +88,7 @@
 import { useLobbyStore } from '@/stores/lobbyStore.ts'
 import { useUserStore } from '@/stores/userStore.ts'
 import { useSettingsStore } from '@/stores/settingsStore.ts'
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import GameHeader from '@/components/auction/GameHeader.vue'
 import CurrentBidCard from '@/components/auction/CurrentBidCard.vue'
@@ -98,13 +98,14 @@ import SaleCard from '@/components/auction/SaleCard.vue'
 import SellerQueue from '@/components/auction/SellerQueue.vue'
 import AuctionRules from '@/components/auction/AuctionRules.vue'
 import NewSaleInfo from '@/components/auction/NewSaleInfo.vue'
-import GameShapes from '@/components/ui/GameShapes.vue'
-import Background from '@/components/Background.vue'
+import GameShapes from '@/components/icons/GameShapes.vue'
+import Background from '@/components/common/Background.vue'
 import { useAuctionService } from '@/composables/useAuctionService.ts'
 import { useAuctionTimer } from '@/composables/useAuctionTimer.ts'
 import type { NewSaleMsg } from '@auction/common'
 import { useAuctionConnection } from '@/composables/useAuctionConnection.ts'
 import LobbyLoading from '@/components/lobby/LobbyLoading.vue'
+import { useHeaderStore } from '@/stores/headerStore.ts'
 
 const lobbyStore = useLobbyStore()
 const auctionService = useAuctionService()
@@ -152,4 +153,11 @@ watch(
     }
   },
 )
+const headerStore = useHeaderStore()
+onMounted(() => {
+  headerStore.used = true
+})
+onUnmounted(() => {
+  headerStore.used = false
+})
 </script>

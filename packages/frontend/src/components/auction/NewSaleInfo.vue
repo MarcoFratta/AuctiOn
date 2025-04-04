@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { useLobbyStore } from '@/stores/lobbyStore.ts'
-import BaseCard from '@/components/BaseCard.vue'
-import InnerCard from '@/components/InnerCard.vue'
+import BaseCard from '@/components/common/BaseCard.vue'
+import InnerCard from '@/components/common/InnerCard.vue'
 
 const props = defineProps<{
   items: {

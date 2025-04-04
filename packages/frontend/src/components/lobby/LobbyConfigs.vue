@@ -69,7 +69,7 @@
 </template>
 
 <script lang="ts" setup>
-import InnerCard from '@/components/InnerCard.vue'
+import InnerCard from '@/components/common/InnerCard.vue'
 
 defineProps({
   lobby: {

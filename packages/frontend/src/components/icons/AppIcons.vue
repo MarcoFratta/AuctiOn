@@ -52,13 +52,20 @@ const colorClass = computed(() => {
       return 'text-current'
   }
 })
+
+// Determine the correct viewBox based on icon name
+const viewBox = computed(() => {
+  // Icons that use the 0 0 24 24 viewBox
+  const is24px = ['sun', 'moon', 'menu', 'waiting']
+  return is24px.includes(props.name) ? '0 0 24 24' : '0 0 20 20'
+})
 </script>
 
 <template>
   <svg
     :class="[sizeClass, colorClass]"
     fill="currentColor"
-    viewBox="0 0 20 20"
+    :viewBox="viewBox"
     xmlns="http://www.w3.org/2000/svg"
   >
     <!-- Inventory icon -->
@@ -147,6 +154,39 @@ const colorClass = computed(() => {
         stroke-width="1.5"
       />
     </g>
+
+    <!-- Sun (light mode) icon -->
+    <path
+      v-else-if="name === 'sun'"
+      d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+      fill="none"
+      stroke="currentColor"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+    />
+
+    <!-- Moon (dark mode) icon -->
+    <path
+      v-else-if="name === 'moon'"
+      d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+      fill="none"
+      stroke="currentColor"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+    />
+
+    <!-- Menu icon -->
+    <path
+      v-else-if="name === 'menu'"
+      d="M4 6h16M4 12h16M4 18h16"
+      fill="none"
+      stroke="currentColor"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+    />
 
     <!-- Fallback to a default icon if name doesn't match -->
     <path

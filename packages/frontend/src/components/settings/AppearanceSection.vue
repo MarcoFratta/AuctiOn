@@ -2,7 +2,7 @@
 import { useSettingsStore } from '@/stores/settingsStore'
 import { computed } from 'vue'
 import RadioSelector from '@/components/ui/RadioSelector.vue'
-import BaseCard from '@/components/BaseCard.vue'
+import BaseCard from '@/components/common/BaseCard.vue'
 
 const settingsStore = useSettingsStore()
 

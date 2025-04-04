@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { lobbyConfigSchema } from '@/schemas/LobbySchema.ts'
-import GameShapes from '@/components/ui/GameShapes.vue'
+import GameShapes from '@/components/icons/GameShapes.vue'
 import z from 'zod'
 
 type EntryType = z.infer<typeof lobbyConfigSchema.shape.startInventory.shape.items>

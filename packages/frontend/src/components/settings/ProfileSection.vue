@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { useUserStore } from '@/stores/userStore'
-import BaseCard from '@/components/BaseCard.vue'
+import BaseCard from '@/components/common/BaseCard.vue'
 import UserAvatar from '@/components/user/UserAvatar.vue'
 
 const props = defineProps<{

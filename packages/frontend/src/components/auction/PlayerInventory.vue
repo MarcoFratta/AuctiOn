@@ -2,9 +2,9 @@
 import { useLobbyStore } from '@/stores/lobbyStore.ts'
 import { computed, ref } from 'vue'
 import InventoryItem from '@/components/auction/InventoryItem.vue'
-import BaseCard from '@/components/BaseCard.vue'
-import InnerCard from '@/components/InnerCard.vue'
-import AppIcons from '@/components/ui/AppIcons.vue'
+import BaseCard from '@/components/common/BaseCard.vue'
+import InnerCard from '@/components/common/InnerCard.vue'
+import AppIcons from '@/components/icons/AppIcons.vue'
 
 const lobbyStore = useLobbyStore()
 const playerInfo = computed(() => lobbyStore.playerInfo)

@@ -49,8 +49,8 @@
 import { computed } from 'vue'
 import { useUserStore } from '@/stores/userStore'
 import LeaderboardEntry from './LeaderboardEntry.vue'
-import BaseCard from '@/components/BaseCard.vue'
-import Title from '@/components/Title.vue'
+import BaseCard from '@/components/common/BaseCard.vue'
+import Title from '@/components/common/Title.vue'
 import LobbyLoading from '@/components/lobby/LobbyLoading.vue'
 import { useResultsStore } from '@/stores/resultsStore.ts'
 

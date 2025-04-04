@@ -2,8 +2,8 @@
 import { useLobbyStore } from '@/stores/lobbyStore.ts'
 import { useUserStore } from '@/stores/userStore.ts'
 import { computed, ref, watch } from 'vue'
-import BaseCard from '@/components/BaseCard.vue'
-import InnerCard from '@/components/InnerCard.vue'
+import BaseCard from '@/components/common/BaseCard.vue'
+import InnerCard from '@/components/common/InnerCard.vue'
 
 const userStore = useUserStore()
 const lobbyStore = useLobbyStore()

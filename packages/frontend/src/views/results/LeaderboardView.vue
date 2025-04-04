@@ -70,9 +70,9 @@
 <script lang="ts" setup>
 import { useRouter } from 'vue-router'
 import LeaderboardDisplay from '@/components/leaderboard/LeaderboardDisplay.vue'
-import Background from '@/components/Background.vue'
-import Title from '@/components/Title.vue'
-import GameShapes from '@/components/ui/GameShapes.vue'
+import Background from '@/components/common/Background.vue'
+import Title from '@/components/common/Title.vue'
+import GameShapes from '@/components/icons/GameShapes.vue'
 import { GradientButton as Button } from '@/components/ui/gradient-button'
 import { useSettingsStore } from '@/stores/settingsStore.ts'
 

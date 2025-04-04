@@ -11,7 +11,7 @@ export const gameRoutes = [
   {
     path: '/results',
     name: 'results',
-    component: () => import('@/views/LeaderboardView.vue'),
+    component: () => import('@/views/results/LeaderboardView.vue'),
     meta: {
       requiresAuth: true,
     },

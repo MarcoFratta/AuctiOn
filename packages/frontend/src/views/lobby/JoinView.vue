@@ -1,15 +1,15 @@
 <script lang="ts" setup>
-import FormEntry from '@/components/FormEntry.vue'
+import FormEntry from '@/components/common/FormEntry.vue'
 import { ref } from 'vue'
-import LoadingButton from '@/components/LoadingButton.vue'
+import LoadingButton from '@/components/common/LoadingButton.vue'
 import { useErrorsHandler } from '@/composables/useErrorsHandler.ts'
 import { useLobbyStore } from '@/stores/lobbyStore.ts'
 import { useRouter } from 'vue-router'
 import { useLobbyService } from '@/composables/useLobbyService.ts'
-import Background from '@/components/Background.vue'
-import Title from '@/components/Title.vue'
+import Background from '@/components/common/Background.vue'
+import Title from '@/components/common/Title.vue'
 import { useAuctionConnection } from '@/composables/useAuctionConnection.ts'
-import BaseCard from '@/components/BaseCard.vue'
+import BaseCard from '@/components/common/BaseCard.vue'
 
 const lobbyStore = useLobbyStore()
 const errorsHandler = useErrorsHandler()

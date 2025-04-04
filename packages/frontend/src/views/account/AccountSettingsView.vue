@@ -55,7 +55,7 @@
 </template>
 
 <script lang="ts" setup>
-import Background from '@/components/Background.vue'
+import Background from '@/components/common/Background.vue'
 import ProfileSection from '@/components/settings/ProfileSection.vue'
 import AppearanceSection from '@/components/settings/AppearanceSection.vue'
 import NotificationsSection from '@/components/settings/NotificationsSection.vue'

@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { useLobbyStore } from '@/stores/lobbyStore.ts'
 import { computed } from 'vue'
-import BaseCard from '@/components/BaseCard.vue'
-import InnerCard from '@/components/InnerCard.vue'
-import GameShapes from '@/components/ui/GameShapes.vue'
-import AppIcons from '@/components/ui/AppIcons.vue'
+import BaseCard from '@/components/common/BaseCard.vue'
+import InnerCard from '@/components/common/InnerCard.vue'
+import GameShapes from '@/components/icons/GameShapes.vue'
+import AppIcons from '@/components/icons/AppIcons.vue'
 
 const lobbyStore = useLobbyStore()
 const weights = computed(() => lobbyStore.weights)

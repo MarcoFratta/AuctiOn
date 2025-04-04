@@ -315,11 +315,11 @@
 </template>
 
 <script lang="ts" setup>
-import Background from '@/components/Background.vue'
-import GameShapes from '@/components/ui/GameShapes.vue'
-import Title from '@/components/Title.vue'
-import BaseCard from '@/components/BaseCard.vue'
-import InnerCard from '@/components/InnerCard.vue'
+import Background from '@/components/common/Background.vue'
+import GameShapes from '@/components/icons/GameShapes.vue'
+import Title from '@/components/common/Title.vue'
+import BaseCard from '@/components/common/BaseCard.vue'
+import InnerCard from '@/components/common/InnerCard.vue'
 import StrategyTip from '@/components/rules/StrategyTip.vue'
 </script>
 

@@ -37,7 +37,7 @@ import { onMounted } from 'vue'
 import { useSocketStore } from '@/stores/socketStore.ts'
 import { useSettingsStore } from '@/stores/settingsStore.ts'
 import { GradientButton as Button } from '@/components/ui/gradient-button'
-import Background from '@/components/Background.vue'
+import Background from '@/components/common/Background.vue'
 
 const router = useRouter()
 const lobbyStore = useLobbyStore()

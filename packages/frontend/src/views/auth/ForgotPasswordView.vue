@@ -1,17 +1,17 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
-import FormEntry from '@/components/FormEntry.vue'
+import FormEntry from '@/components/common/FormEntry.vue'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
-import LoadingButton from '@/components/LoadingButton.vue'
+import LoadingButton from '@/components/common/LoadingButton.vue'
 import { useErrorsHandler } from '@/composables/useErrorsHandler.ts'
 import { forgotPassword } from '@/api/authService'
 import { useRouter } from 'vue-router'
-import Background from '@/components/Background.vue'
+import Background from '@/components/common/Background.vue'
 import { useSettingsStore } from '@/stores/settingsStore.ts'
-import AuthLink from '@/components/AuthLink.vue'
-import BaseCard from '@/components/BaseCard.vue'
+import AuthLink from '@/components/common/AuthLink.vue'
+import BaseCard from '@/components/common/BaseCard.vue'
 
 const router = useRouter()
 const errorHandler = useErrorsHandler()

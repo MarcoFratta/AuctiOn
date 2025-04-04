@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, provide, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 
 const props = defineProps<{
   activeIndex?: number
@@ -16,17 +16,13 @@ const switchTab = (index: number) => {
   emit('tab-change', index)
 }
 
-provide('activeTabIndex', activeTabIndex)
-provide('switchTab', switchTab)
-
 // Get all tab panels
 const tabPanels = ref<any[]>([])
 
 const registerTabPanel = (panel: any) => {
   tabPanels.value.push(panel)
+  return tabPanels.value.length - 1
 }
-
-provide('registerTabPanel', registerTabPanel)
 
 onMounted(() => {
   // Ensure the active tab is visible on mount
@@ -38,9 +34,9 @@ onMounted(() => {
 
 <template>
   <div class="flex flex-col md:flex-row gap-6 w-full">
-    <!-- Mobile Tab Headers - Fixed at top -->
+    <!-- Mobile Tab Headers -->
     <div
-      class="md:hidden fixed top-0 left-0 right-0 z-50 w-full bg-white dark:bg-app-black-80 border-b border-gray-200 dark:border-app-violet-900/30 shadow-sm"
+      class="md:hidden fixed top-0 left-0 right-0 z-50 w-full bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-app-violet-900/30 shadow-sm"
     >
       <div class="overflow-x-auto scrollbar-hide snap-x snap-mandatory">
         <div class="flex min-w-full">
@@ -64,7 +60,7 @@ onMounted(() => {
     <!-- Desktop Tab Headers (sidebar style) -->
     <div class="hidden md:block md:w-64 shrink-0">
       <div
-        class="bg-white dark:bg-app-black-80 border border-gray-200 dark:border-app-violet-900/30 rounded-lg overflow-hidden sticky top-4"
+        class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-app-violet-900/30 rounded-lg overflow-hidden sticky top-4"
       >
         <div class="p-4 border-b border-gray-200 dark:border-app-violet-900/30">
           <h2 class="text-lg font-medium text-zinc-900 dark:text-white">
@@ -91,7 +87,7 @@ onMounted(() => {
 
     <!-- Tab Content -->
     <div class="tab-content flex-1 w-full mt-16 md:mt-0">
-      <slot></slot>
+      <slot :active-tab-index="activeTabIndex" :register-tab-panel="registerTabPanel"></slot>
     </div>
   </div>
 </template>
