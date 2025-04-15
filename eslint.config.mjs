@@ -27,7 +27,14 @@ export default tseslint.config(
       'unused-imports': unusedImports,
     },
     rules: {
-      '@typescript-eslint/no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': ['warn', {
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+        caughtErrorsIgnorePattern: '^_',
+        ignoreRestSiblings: true,
+      }],
+      'no-unused-vars': 'off',
+      'no-unused-caught-errors': 'off',
       'eqeqeq': 'off',
       'unused-imports/no-unused-imports': 'error',
       'prefer-const': ['error', { ignoreReadBeforeAssign: true }],
@@ -38,6 +45,7 @@ export default tseslint.config(
           varsIgnorePattern: '^_',
           args: 'after-used',
           argsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
         },
       ],
     },

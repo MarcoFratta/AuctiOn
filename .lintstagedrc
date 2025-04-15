@@ -1,4 +1,8 @@
 {
+  "./packages/frontend/**/*.{ts,tsx,vue}":[
+   "prettier --w --config ./packages/frontend/.prettierrc.json",
+   "eslint --max-warnings=0 --fix --no-warn-ignored --config ./packages/frontend/eslint.config.ts"
+  ],
   "**/*.{ts,tsx}": [
   "prettier --w",
   "eslint --max-warnings=0 --fix --no-warn-ignored --config eslint.config.mjs"],
