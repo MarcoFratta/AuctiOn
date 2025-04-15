@@ -1,8 +1,14 @@
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useLobbyStore } from '@/stores/lobbyStore.ts'
+import { useStatsCreator } from '@/composables/useStatsCreator.ts'
 import BaseCard from '@/components/common/BaseCard.vue'
 import InnerCard from '@/components/common/InnerCard.vue'
+import AppIcons from '@/components/icons/AppIcons.vue'
+import SaleInfoPreview from './SaleInfoPreview.vue'
+import SaleInfoCompare from './SaleInfoCompare.vue'
+import { useSettingsStore } from '@/stores/settingsStore.ts'
+import { useInventoryUtils } from '@/composables/useInventoryUtils.ts'
 
 const props = defineProps<{
   items: {
@@ -12,104 +18,146 @@ const props = defineProps<{
 }>()
 
 const lobbyStore = useLobbyStore()
+const { avgDollarPerWeight } = useStatsCreator()
+const settings = useSettingsStore()
+const utils = useInventoryUtils()
 
-// Calculate total weight of selected items
-const totalWeight = computed(() => {
-  return props.items
-    .filter((item) => item.quantity > 0)
-    .reduce((acc, item) => {
-      const weight = lobbyStore.weights.find((w) => w.item === item.item)?.weight || 0
-      return acc + weight * item.quantity
-    }, 0)
-})
+const activeTab = ref('preview') // 'preview' or 'inventory'
+
+// --- Computed Properties for Props ---
+
+const isDark = computed(() => settings.darkMode)
 
 // Check if any items are selected
 const hasSelectedItems = computed(() => {
   return props.items.some((item) => item.quantity > 0)
 })
+
+// Calculate total weight of *selected* items
+const totalWeightSelected = computed(() => utils.getTotalWeight(props.items))
+
+// Calculate estimated sale price based on average dollar per weight
+const estimatedPrice = computed(() => {
+  return Math.round(totalWeightSelected.value * avgDollarPerWeight.value)
+})
+
+// Calculate current total inventory weight
+const currentTotalInventoryWeight = computed(() =>
+  utils.getTotalWeight(lobbyStore.playerInfo?.inventory.items || []),
+)
+
+// Calculate remaining inventory items after sale (for count/weight calculation)
+const remainingInventoryItems = computed(() => {
+  if (!lobbyStore.playerInfo?.inventory.items) return []
+
+  const currentInventory = lobbyStore.playerInfo.inventory.items
+  const selectedItemsMap = new Map(props.items.map((i) => [i.item, i.quantity]))
+
+  return currentInventory
+    .map((invItem) => {
+      const soldQuantity = selectedItemsMap.get(invItem.item) || 0
+      return {
+        ...invItem,
+        quantity: Math.max(0, invItem.quantity - soldQuantity),
+      }
+    })
+    .filter((item) => item.quantity > 0) // Keep only items with remaining quantity
+})
+
+// Calculate total remaining weight
+const remainingWeight = computed(() => utils.getTotalWeight(remainingInventoryItems.value))
+
+// Calculate total remaining items count (sum of quantities)
+const remainingItemsCount = computed(() => utils.getItemsCount(remainingInventoryItems.value))
+
+// Calculate percentage of inventory being sold (by weight)
+const inventoryPercentageSold = computed(() => {
+  if (currentTotalInventoryWeight.value === 0) return 0
+  return Math.round((totalWeightSelected.value / currentTotalInventoryWeight.value) * 100)
+})
+
+// Calculate total count of items currently in inventory
+const totalInventoryItemsCount = computed(() =>
+  utils.getItemsCount(lobbyStore.playerInfo?.inventory.items || []),
+)
 </script>
 
 <template>
   <BaseCard class="h-full flex flex-col">
-    <!-- Header with consistent styling -->
-    <div class="flex items-center gap-2 mb-4">
-      <div class="bg-indigo-100 dark:bg-app-fuchsia-500/20 p-2 rounded-lg">
-        <svg
-          class="h-5 w-5 text-indigo-500 dark:text-app-fuchsia-300"
-          fill="currentColor"
-          viewBox="0 0 20 20"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
-          />
-        </svg>
+    <!-- Header with tabs -->
+    <div class="flex items-center justify-between mb-2">
+      <div class="flex items-center gap-1.5">
+        <div class="bg-app-fuchsia-100 dark:bg-app-fuchsia-500/20 p-1 rounded-lg">
+          <AppIcons color="fuchsia" name="preview" size="sm" />
+        </div>
+        <h2 class="text-sm md:text-base font-semibold text-zinc-900 dark:text-white">
+          Sale Preview
+        </h2>
       </div>
-      <h2 class="text-xl font-semibold text-zinc-900 dark:text-white">Sale Preview</h2>
+
+      <!-- Tabs -->
+      <div class="flex text-xs bg-neutral-100 dark:bg-neutral-800 rounded-md p-0.5">
+        <button
+          :class="[
+            'px-2 py-1 rounded transition-colors',
+            activeTab === 'preview'
+              ? 'bg-white dark:bg-neutral-700 text-app-fuchsia-600 dark:text-app-fuchsia-400 shadow-sm'
+              : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-300',
+          ]"
+          @click="activeTab = 'preview'"
+        >
+          Info
+        </button>
+        <button
+          :class="[
+            'px-2 py-1 rounded transition-colors',
+            activeTab === 'inventory'
+              ? 'bg-white dark:bg-neutral-700 text-app-fuchsia-600 dark:text-app-fuchsia-400 shadow-sm'
+              : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-300',
+          ]"
+          @click="activeTab = 'inventory'"
+        >
+          Compare
+        </button>
+      </div>
     </div>
 
-    <!-- Content Container with Fixed Height -->
-    <InnerCard class="flex-grow flex flex-col justify-center min-h-[180px]">
-      <!-- Total Weight (when items selected) -->
-      <div
-        v-if="hasSelectedItems"
-        class="bg-indigo-50 dark:bg-neutral-800 p-4 rounded-lg border border-indigo-100 dark:border-app-fuchsia-500/20"
-      >
-        <div class="flex flex-col">
-          <div class="flex justify-between items-center mb-2">
-            <span class="text-gray-700 dark:text-gray-300 text-sm font-medium">Total Value</span>
-            <div
-              class="bg-white dark:bg-gray-800/80 px-3 py-1 rounded-md border border-indigo-200 dark:border-app-fuchsia-500/30"
-            >
-              <span class="text-indigo-600 dark:text-app-fuchsia-300 font-bold text-lg">{{
-                totalWeight
-              }}</span>
-            </div>
-          </div>
-
-          <!-- Sale status indicator -->
-          <div
-            class="flex items-center mt-2 bg-green-50 dark:bg-green-500/10 p-2 rounded-md border border-green-100 dark:border-green-500/20"
-          >
-            <svg
-              class="h-4 w-4 text-green-500 dark:text-green-400 mr-2"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                clip-rule="evenodd"
-                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                fill-rule="evenodd"
-              />
-            </svg>
-            <span class="text-green-700 dark:text-green-300 text-sm">Ready to sell</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Empty State with consistent styling -->
-      <div v-else class="flex flex-col items-center justify-center py-6">
-        <div class="bg-gray-100 dark:bg-gray-700/50 p-4 rounded-full mb-3">
-          <svg
-            class="h-8 w-8 text-gray-500 dark:text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-            ></path>
-          </svg>
-        </div>
-        <p class="text-gray-600 dark:text-gray-400 text-sm lg:text-base">
-          Select items to see details
-        </p>
-      </div>
+    <!-- Content Container -->
+    <InnerCard class="flex-grow flex flex-col justify-start overflow-y-auto scrollbar-hide">
+      <!-- Dynamic Component based on activeTab -->
+      <SaleInfoPreview
+        v-if="activeTab === 'preview'"
+        :current-total-weight="currentTotalInventoryWeight"
+        :estimated-price="estimatedPrice"
+        :has-selected-items="hasSelectedItems"
+        :inventory-percentage-sold="inventoryPercentageSold"
+        :is-dark="isDark"
+        :remaining-weight="remainingWeight"
+        :total-weight="totalWeightSelected"
+      />
+      <SaleInfoCompare
+        v-else-if="activeTab === 'inventory'"
+        :current-total-weight="currentTotalInventoryWeight"
+        :has-selected-items="hasSelectedItems"
+        :inventory-items="lobbyStore?.playerInfo?.inventory.items || []"
+        :remaining-items-count="remainingItemsCount"
+        :remaining-weight="remainingWeight"
+        :selected-items="props.items"
+        :total-items-count="totalInventoryItemsCount"
+      />
     </InnerCard>
   </BaseCard>
 </template>
+
+<style scoped>
+/* Hide scrollbar for Chrome, Safari and Opera */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+</style>
