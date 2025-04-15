@@ -9,7 +9,7 @@
         v-for="(network, index) in networks"
         :key="index"
         :class="[
-          'share-button p-2 rounded-lg transition-all',
+          'share-button py-1 px-3  rounded-lg transition-all',
           'hover:scale-105 active:scale-100',
           network.bgColor,
         ]"

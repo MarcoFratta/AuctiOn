@@ -8,77 +8,42 @@ const playerMoney = computed(() => lobbyStore.playerInfo?.money || 0)
 
 <template>
   <!-- Game status indicators - Desktop version (hidden on small screens) -->
-  <div class="ml-1 hidden sm:flex flex-wrap items-center gap-1.5 sm:gap-2 justify-end">
+  <div class="ml-1 hidden sm:flex flex-wrap items-center gap-2 justify-end">
+    <!-- Money -->
     <div
-      class="bg-white dark:bg-app-violet-500/20 px-2 py-1 md:px-3 md:py-1.5 rounded-full align-middle flex items-center gap-1.5 border border-gray-200 dark:border-app-violet-500/30"
+      class="bg-white dark:bg-neutral-900 px-3 py-1.5 rounded-lg border border-neutral-100 dark:border-neutral-800/50 flex items-center gap-1.5 shadow-sm"
     >
-      <span class="text-yellow-500 text-sm md:text-base">💰</span>
-      <span class="font-bold text-xs md:text-sm text-green-600 dark:text-green-400"
-        >${{ playerMoney }}</span
-      >
+      <span class="text-yellow-500 text-sm">💰</span>
+      <span class="font-medium text-sm text-green-600 dark:text-green-400">${{ playerMoney }}</span>
     </div>
+
+    <!-- Status -->
     <div
-      class="bg-white dark:bg-app-violet-500/20 px-2 py-1 md:px-3 md:py-1.5 rounded-full shrink-0 border border-gray-200 dark:border-app-violet-500/30"
+      class="bg-white dark:bg-neutral-900 px-3 py-1.5 rounded-lg border border-app-violet-900/30 dark:border-neutral-800/50 flex items-center shadow-sm"
     >
-      <span
-        class="text-gray-600 dark:text-gray-300 text-xs md:text-sm flex items-center whitespace-nowrap"
-      >
+      <span class="text-neutral-600 dark:text-neutral-300 text-sm">
         Status:
         <span
           :class="
             lobbyStore.lobby?.currentSale
               ? 'text-green-600 dark:text-green-400'
-              : 'text-yellow-600 dark:text-yellow-400'
+              : 'text-orange-600 dark:text-orange-400'
           "
-          class="font-bold ml-1"
+          class="font-medium ml-1"
         >
           {{ lobbyStore.lobby?.currentSale ? 'Active' : 'Waiting' }}
         </span>
       </span>
     </div>
+
+    <!-- Round -->
     <div
-      class="bg-white dark:bg-app-violet-500/20 px-2 py-1 md:px-3 md:py-1.5 rounded-full flex justify-between gap-1.5 items-center text-center shrink-0 border border-gray-200 dark:border-app-fuchsia-500/30"
+      class="bg-white dark:bg-neutral-900 px-3 py-1.5 rounded-lg border border-neutral-100 dark:border-neutral-800/50 flex items-center gap-1.5 shadow-sm"
     >
-      <span class="text-gray-600 dark:text-gray-300 text-xs md:text-sm">Round</span>
-      <span class="text-yellow-600 dark:text-yellow-400 font-bold text-xs md:text-sm">
+      <span class="text-neutral-600 dark:text-neutral-300 text-sm">Round:</span>
+      <span class="text-app-violet-600 dark:text-app-violet-400 font-medium text-sm">
         {{ lobbyStore.lobby?.currentRound ?? 0 }}/{{ lobbyStore.lobby?.maxRound }}
       </span>
-    </div>
-  </div>
-
-  <!-- Mobile bottom bar (visible only on small screens) -->
-  <div
-    class="sm:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-black border-t border-app-violet-900/30 z-40 p-1.5"
-  >
-    <div class="flex justify-around items-center">
-      <!-- Money -->
-      <div class="flex flex-col items-center">
-        <span class="text-yellow-500 text-base">💰</span>
-        <span class="text-green-600 dark:text-green-400 font-bold text-xs">${{ playerMoney }}</span>
-      </div>
-
-      <!-- Status -->
-      <div class="flex flex-col items-center">
-        <span class="text-gray-600 dark:text-gray-400 text-xs">Status</span>
-        <span
-          :class="
-            lobbyStore.lobby?.currentSale
-              ? 'text-green-600 dark:text-green-400'
-              : 'text-yellow-600 dark:text-yellow-400'
-          "
-          class="font-bold text-xs"
-        >
-          {{ lobbyStore.lobby?.currentSale ? 'Active' : 'Waiting' }}
-        </span>
-      </div>
-
-      <!-- Round -->
-      <div class="flex flex-col items-center">
-        <span class="text-gray-600 dark:text-gray-400 text-xs">Round</span>
-        <span class="text-yellow-600 dark:text-yellow-400 font-bold text-xs">
-          {{ lobbyStore.lobby?.currentRound ?? 0 }}/{{ lobbyStore.lobby?.maxRound }}
-        </span>
-      </div>
     </div>
   </div>
 </template>

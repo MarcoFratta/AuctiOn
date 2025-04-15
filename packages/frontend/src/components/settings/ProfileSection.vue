@@ -3,10 +3,6 @@ import { useUserStore } from '@/stores/userStore'
 import BaseCard from '@/components/common/BaseCard.vue'
 import UserAvatar from '@/components/user/UserAvatar.vue'
 
-const props = defineProps<{
-  accountCreated: Date
-}>()
-
 const userStore = useUserStore()
 
 // Format date for display
@@ -30,7 +26,7 @@ const formatDate = (date: Date) => {
 
       <div class="space-y-6">
         <!-- Profile Picture -->
-        <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+        <div class="flex flex-row sm:items-center gap-4">
           <UserAvatar
             :username="userStore.user?.username ?? ''"
             class="bg-neutral-700"
@@ -38,13 +34,10 @@ const formatDate = (date: Date) => {
           />
           <div>
             <h4 class="text-zinc-900 dark:text-white font-medium mb-1">Profile Picture</h4>
-            <p class="text-gray-500 dark:text-app-violet-300 text-sm mb-3">
-              Upload a profile picture to personalize your account
-            </p>
             <button
               class="px-3 py-1.5 bg-violet-100 dark:bg-app-violet-900/20 text-violet-700 dark:text-app-violet-400 rounded-md text-sm font-medium hover:bg-violet-200 dark:hover:bg-app-violet-900/30 transition-colors"
             >
-              Upload photo
+              Change color
             </button>
           </div>
         </div>
@@ -91,16 +84,6 @@ const formatDate = (date: Date) => {
           <p class="text-gray-500 dark:text-app-violet-300 text-sm">
             Your email is used for account recovery and notifications
           </p>
-        </div>
-
-        <!-- Account Created -->
-        <div class="space-y-2">
-          <label class="block text-zinc-900 dark:text-white font-medium">Account Created</label>
-          <div
-            class="px-3 py-2 bg-gray-50 dark:bg-app-black-90 border border-gray-300 dark:border-app-violet-900/30 rounded-md text-zinc-900 dark:text-white"
-          >
-            {{ formatDate(accountCreated) }}
-          </div>
         </div>
       </div>
     </BaseCard>

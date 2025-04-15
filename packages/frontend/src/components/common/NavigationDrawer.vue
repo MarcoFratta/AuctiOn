@@ -82,7 +82,7 @@ const closeDrawer = () => {
   >
     <!-- Drawer Header -->
     <div
-      class="h-16 flex items-center justify-start px-6 border-b border-gray-100 dark:border-gray-800"
+      class="h-12 flex items-center justify-start px-6 border-b border-gray-100 dark:border-gray-800"
     >
       <router-link class="flex items-center" to="/">
         <img alt="AuctiOn Logo" class="h-10" src="../../assets/app-logo.svg" style="filter: none" />

@@ -22,7 +22,7 @@ const toggleDarkMode = () => {
 
 <template>
   <header
-    class="bg-white dark:bg-app-black border-b border-app-violet-900/30 h-12 flex items-center justify-between px-4 z-20 sticky top-0 left-0 right-0"
+    class="sticky top-0 left-0 right-0 bg-white dark:bg-app-black border-b border-app-violet-900/30 h-12 flex items-center justify-between px-2 md:px-4 z-50 w-full"
   >
     <!-- Left section with menu button and title -->
     <div class="flex items-center">
@@ -53,7 +53,7 @@ const toggleDarkMode = () => {
       </button>
 
       <!-- Target div for teleported content -->
-      <div id="header-right-content" class="lg:ml-2"></div>
+      <div id="header-right-content" class="lg:ml-2 flex flex-row gap-2"></div>
 
       <!-- Default auth links if no custom content -->
       <template v-if="!hasCustomContent">
@@ -61,10 +61,11 @@ const toggleDarkMode = () => {
           <DefaultAuthLinks v-if="!authStore.isAuthenticated" />
           <router-link
             v-else
-            class="text-zinc-800 dark:text-app-white hover:text-violet-800 dark:hover:text-app-fuchsia-300"
+            class="p-1.5 rounded-md text-zinc-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-app-fuchsia-900/20 transition-colors flex items-center justify-center"
             to="/account"
+            title="Profile"
           >
-            Profile
+            <AppIcons name="account" size="md" />
           </router-link>
         </div>
       </template>

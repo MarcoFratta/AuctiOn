@@ -41,11 +41,11 @@ const percentageTextColor = computed(() => {
 <template>
   <BaseCard class="h-full flex flex-col">
     <!-- Header -->
-    <div class="flex items-center gap-2 mb-2 md:mb-3">
-      <div class="bg-fuchsia-100 dark:bg-app-fuchsia-500/20 p-1.5 md:p-2 rounded-lg">
-        <AppIcons color="fuchsia" name="sale" />
+    <div class="flex items-center gap-1.5 mb-1">
+      <div class="bg-app-fuchsia-100 dark:bg-app-fuchsia-500/20 p-0.5 rounded-lg">
+        <AppIcons color="fuchsia" name="sale" size="sm" />
       </div>
-      <h2 class="text-lg md:text-xl font-semibold text-zinc-900 dark:text-white">Current Sale</h2>
+      <h2 class="text-base font-semibold text-zinc-900 dark:text-white">Current Sale</h2>
     </div>
 
     <!-- Empty state -->
@@ -75,10 +75,10 @@ const percentageTextColor = computed(() => {
 
       <!-- Items Summary -->
       <div
-        class="bg-gray-50 dark:bg-neutral-800/50 rounded-lg p-2 md:p-3 mb-2 md:mb-3 border border-gray-200 dark:border-gray-700/50"
+        class="bg-gray-50 dark:bg-neutral-800/50 rounded-lg p-2 mb-2 md:mb-3 border border-gray-200 dark:border-gray-700/50"
       >
         <div class="flex justify-between items-center">
-          <div class="flex flex-col items-start">
+          <div class="flex flex-row justify-start items-center gap-2">
             <h2 class="text-xs md:text-sm font-medium text-gray-600 dark:text-gray-300">
               Total Weight:
             </h2>

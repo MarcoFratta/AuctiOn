@@ -18,7 +18,7 @@
     "lint": "run-s lint:*",
     "format": "prettier --write src/",
     "tailwind:init": "npx tailwindcss init",
-    "local-deploy": "ngrok http http://192.168.1.14:5173"
+    "local-deploy": "ngrok http http://192.168.1.120:5173"
   },
   "dependencies": {
     "@auction/common": "^1.0.0",
@@ -32,6 +32,7 @@
     "@vueuse/core": "^12.8.2",
     "@vueuse/motion": "^2.2.6",
     "axios": "^1.7.9",
+    "chart.js": "^4.4.8",
     "lucide-vue-next": "^0.483.0",
     "motion-v": "^0.13.1",
     "pinia": "^2.3.1",
@@ -42,6 +43,7 @@
     "ts-pattern": "^5.6.2",
     "vee-validate": "^4.15.0",
     "vue": "^3.5.13",
+    "vue-chartjs": "^5.3.2",
     "vue-router": "^4.5.0",
     "vue-social-sharing": "^4.0.0-alpha4",
     "vue3-toastify": "^0.2.8"
@@ -74,7 +76,7 @@
     "postcss": "^8.5.3",
     "prettier": "^3.4.2",
     "start-server-and-test": "^2.0.10",
-    "tailwind-merge": "^3.0.2",
+    "tailwind-merge": "^3.2.0",
     "tailwindcss": "^3.4.17",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "~5.7.3",

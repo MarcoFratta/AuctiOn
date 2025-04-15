@@ -1,5 +1,5 @@
 <template>
-  <Background containerClass="flex justify-center items-center">
+  <Background container-class="justify-center" no-scroll>
     <div class="flex flex-col items-center justify-center px-4 gap-2">
       <h1 class="text-5xl lg:text-7xl font-bold text-zinc-900 dark:text-white mb-6 text-center">
         Auction Game

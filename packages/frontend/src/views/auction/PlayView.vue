@@ -1,12 +1,26 @@
 <template>
-  <Background>
-    <!-- Teleport the game status indicators to the header right content slot -->
-    <Teleport to="#header-right-content">
+  <MobileBottomBar
+    v-if="lobbyStore.lobby"
+    :remaining-time="remainingTime"
+    :total-time="lobbyStore.lobby!.bidTime"
+  />
+  <Background container-class="justify-start sm:justify-center h-full md:p-2">
+    <!-- Teleport for desktop header content only -->
+    <Teleport v-if="lobbyStore.lobby" class="hidden lg:block" to="#header-right-content">
       <GameHeader />
     </Teleport>
+    <Teleport
+      v-if="isCurrentUserSeller && lobbyStore.lobby!.currentSale"
+      class="hidden lg:block"
+      to="#header-right-content"
+    >
+      <AuctionTimer :remaining-time="remainingTime" :total-time="lobbyStore.lobby!.bidTime" />
+    </Teleport>
+    <!-- Mobile Bottom Bar at the top -->
     <LobbyLoading v-if="!lobbyStore.lobby" />
-    <!-- Main Content Area -->
-    <div v-else class="w-full max-w-7xl mx-auto mb-2 sm:mb-0 sm:mt-2 lg:mt-4 sm:px-4">
+
+    <!-- Main Content Area - Responsive height handling -->
+    <div v-else class="flex flex-col w-full h-full">
       <!-- Game Shapes for decoration -->
       <div class="absolute top-20 -left-10 opacity-30 hidden xl:block">
         <GameShapes
@@ -34,50 +48,94 @@
       </div>
 
       <!-- Game Content -->
+      <!-- Mobile and Tablet layout -->
       <div
-        class="flex-1 w-full flex flex-col lg:grid lg:grid-cols-12 sm:gap-2 md:gap-4 mb-4 pb-8 sm:pb-3 relative z-10"
+        class="md:hidden flex flex-col justify-start mb-12 sm:gap-2 md:gap-4 overflow-auto overscroll-contain scrollbar-hide pt-1 flex-grow"
       >
-        <!-- Left and Center Content (9 columns on desktop) -->
-        <div class="lg:col-span-9 flex flex-col sm:gap-2 md:gap-4">
-          <!-- Top Row: Current Bid/Sale Card and Current Sale Info -->
-          <div class="grid grid-cols-1 md:grid-cols-2 sm:gap-2 md:gap-4">
-            <!-- Current Bid Card (shown when user is not seller and no active sale) -->
-
-            <!-- Sale Card (shown when user is seller) -->
+        <!-- Top Row: Current Bid/Sale Card and Current Sale Info -->
+        <div class="grid grid-cols-1 md:grid-cols-2 sm:gap-2 md:gap-4">
+          <!-- Current Bid Card or Sale Card - with fixed height -->
+          <div v-if="isCurrentUserSeller && !lobbyStore.lobby?.currentSale">
             <SaleCard
-              v-if="isCurrentUserSeller && !lobbyStore.lobby?.currentSale"
+              class="h-full max-h-[300px]"
               @sale="handleSale"
               @update:items="sellingItems = $event"
             />
-            <CurrentBidCard
-              v-else
-              :highest-bid="highestBid"
-              :highest-bidder="highestBidder"
-              :remaining-time="remainingTime"
-              @bid="handleBid"
-            />
-
-            <!-- Current Sale Info -->
-            <NewSaleInfo
-              v-if="isCurrentUserSeller && !lobbyStore.lobby?.currentSale"
-              :items="sellingItems"
-            />
-            <CurrentSaleInfo v-else />
           </div>
+          <CurrentBidCard
+            v-else
+            :highest-bid="highestBid"
+            :highest-bidder="highestBidder"
+            :remaining-time="remainingTime"
+            class="h-full"
+            @bid="handleBid"
+          />
 
-          <!-- Bottom Row: Player Inventory and Game Rules -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4">
-            <!-- Player Inventory (always shown) -->
-            <PlayerInventory />
-
-            <!-- Game Rules (always shown in second column) -->
-            <AuctionRules />
-          </div>
+          <!-- Current Sale Info - with fixed height -->
+          <NewSaleInfo
+            v-if="isCurrentUserSeller && !lobbyStore.lobby?.currentSale"
+            :items="sellingItems"
+          />
+          <CurrentSaleInfo v-else class="h-full" />
         </div>
 
-        <!-- Right Sidebar (3 columns on desktop) -->
-        <div class="lg:col-span-3 mt-2 md:mt-0">
-          <SellerQueue />
+        <!-- Auction Stats -->
+        <AuctionStats class="h-full max-h-[350px]" />
+
+        <!-- Player Inventory - with fixed height -->
+        <PlayerInventory class="h-full max-h-[300px]" />
+
+        <!-- Seller Queue - with fixed height -->
+        <SellerQueue class="h-full max-h-[350px]" />
+      </div>
+
+      <!-- Desktop layout - Full height with 60/40 split -->
+      <div
+        class="hidden md:grid md:grid-cols-12 gap-3 px-2 h-full md:grid-rows-[minmax(300px,55%)_minmax(250px,45%)]"
+      >
+        <!-- Top row: Current Auction/Sale and Auction Stats (60%) -->
+        <div class="col-span-12 md:col-span-6 lg:col-span-4 h-full">
+          <!-- Current Bid Card or Sale Card -->
+          <SaleCard
+            v-if="isCurrentUserSeller && !lobbyStore.lobby?.currentSale"
+            class="h-full"
+            @sale="handleSale"
+            @update:items="sellingItems = $event"
+          />
+          <CurrentBidCard
+            v-else
+            :highest-bid="highestBid"
+            :highest-bidder="highestBidder"
+            :remaining-time="remainingTime"
+            class="h-full"
+            @bid="handleBid"
+          />
+        </div>
+
+        <div class="col-span-12 md:col-span-6 lg:col-span-8 h-full">
+          <!-- Auction Stats - wider -->
+          <AuctionStats class="h-full" />
+        </div>
+
+        <!-- Bottom row: Current Sale Info, Player Inventory, and Seller Queue (40%) -->
+        <div class="col-span-12 md:col-span-4 h-full">
+          <!-- Current Sale Info -->
+          <NewSaleInfo
+            v-if="isCurrentUserSeller && !lobbyStore.lobby?.currentSale"
+            :items="sellingItems"
+            class="h-full"
+          />
+          <CurrentSaleInfo v-else class="h-full" />
+        </div>
+
+        <div class="col-span-12 md:col-span-4 h-full">
+          <!-- Player Inventory -->
+          <PlayerInventory class="h-full" />
+        </div>
+
+        <div class="col-span-12 md:col-span-4 h-full">
+          <!-- Seller Queue -->
+          <SellerQueue class="h-full" />
         </div>
       </div>
     </div>
@@ -96,7 +154,6 @@ import CurrentSaleInfo from '@/components/auction/CurrentSaleInfo.vue'
 import PlayerInventory from '@/components/auction/PlayerInventory.vue'
 import SaleCard from '@/components/auction/SaleCard.vue'
 import SellerQueue from '@/components/auction/SellerQueue.vue'
-import AuctionRules from '@/components/auction/AuctionRules.vue'
 import NewSaleInfo from '@/components/auction/NewSaleInfo.vue'
 import GameShapes from '@/components/icons/GameShapes.vue'
 import Background from '@/components/common/Background.vue'
@@ -106,6 +163,10 @@ import type { NewSaleMsg } from '@auction/common'
 import { useAuctionConnection } from '@/composables/useAuctionConnection.ts'
 import LobbyLoading from '@/components/lobby/LobbyLoading.vue'
 import { useHeaderStore } from '@/stores/headerStore.ts'
+import AuctionStats from '@/components/auction/AuctionStats.vue'
+import AuctionTimer from '@/components/auction/AuctionTimer.vue'
+import MobileBottomBar from '@/components/auction/MobileBottomBar.vue'
+import ScrollableContainer from '@/components/common/ScrollableContainer.vue'
 
 const lobbyStore = useLobbyStore()
 const auctionService = useAuctionService()
@@ -141,9 +202,12 @@ const isCurrentUserSeller = computed(() => {
 })
 const connection = useAuctionConnection()
 if (!lobbyStore.lobby) {
-  connection.connect().catch(() => {
-    router.push('/join')
-  })
+  connection
+    .connect()
+    .then(undefined)
+    .catch(() => {
+      router.push('/join')
+    })
 }
 watch(
   () => lobbyStore.lobby,

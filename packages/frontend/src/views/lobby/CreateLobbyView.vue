@@ -17,6 +17,7 @@ import GameShapes from '@/components/icons/GameShapes.vue'
 import BaseCard from '@/components/common/BaseCard.vue'
 import Title from '@/components/common/Title.vue'
 import { useAuctionConnection } from '@/composables/useAuctionConnection.ts'
+import AppIcons from '@/components/icons/AppIcons.vue'
 
 const authStore = useAuthStore()
 const lobbyService = useLobbyService()
@@ -86,6 +87,7 @@ const handleForm = async () => {
       startAmount: values.startAmount!,
       startInventory: { items: values.startInventory?.items! },
     })
+    await new Promise((resolve) => setTimeout(resolve, 200))
     await useAuctionConnection().connect()
     await router.push('/lobby')
   } catch (e) {
@@ -105,130 +107,118 @@ const handleForm = async () => {
   }
 }
 </script>
-
 <template>
-  <Background>
-    <div class="w-full max-w-3xl my-4">
-      <!-- Header with animated shapes -->
-      <div class="flex flex-col items-center mb-4 md:mb-6 lg:mb-8 px-2 relative">
-        <div class="absolute top-5 -left-5 opacity-50 hidden md:block">
-          <GameShapes
-            :color="settingsStore.darkMode ? 'violet' : 'default'"
-            animated
-            size="md"
-            type="circle"
-          />
-        </div>
-        <div class="absolute top-5 -right-5 opacity-50 hidden md:block">
-          <GameShapes
-            :color="settingsStore.darkMode ? 'fuchsia' : 'default'"
-            animated
-            size="md"
-            type="triangle"
-          />
-        </div>
-
-        <Title class="text-4xl md:text-4xl mb-3"> Create New Lobby </Title>
-        <p class="text-gray-600 dark:text-app-violet-200 text-center max-w-md">
-          Configure your game settings and starting inventory for an exciting auction experience
-        </p>
+  <Background container-class="gap-2 lg:gap-4 xl:gap-6 h-fit px-2 py-4 sm:pb-6 sm:my-0">
+    <!-- Header with animated shapes -->
+    <div class="flex w-full flex-col items-center mb-4 px-2 relative">
+      <div class="absolute top-5 -left-5 opacity-50 hidden md:block">
+        <GameShapes
+          :color="settingsStore.darkMode ? 'violet' : 'default'"
+          animated
+          size="md"
+          type="circle"
+        />
+      </div>
+      <div class="absolute top-5 -right-5 opacity-50 hidden md:block">
+        <GameShapes
+          :color="settingsStore.darkMode ? 'fuchsia' : 'default'"
+          animated
+          size="md"
+          type="triangle"
+        />
       </div>
 
-      <!-- Form Container -->
-      <BaseCard class="mb-2 md:mb-4 lg:mb-6">
-        <form class="flex flex-grow flex-col gap-4 lg:gap-6">
+      <Title class="text-3xl md:text-4xl mb-2"> Create New Lobby </Title>
+      <p class="text-gray-600 dark:text-app-violet-200 text-center max-w-md text-sm md:text-base">
+        Configure your game settings and starting inventory for an exciting auction experience
+      </p>
+    </div>
+
+    <!-- Main content container -->
+    <BaseCard class="flex flex-col gap-4 max-w-5xl">
+      <form class="flex flex-col">
+        <!-- Main content area - flex row on desktop, column on mobile -->
+        <div class="flex flex-col lg:flex-row gap-6 lg:min-h-[150px] lg:max-h-[50vh]">
           <!-- Game Settings Section -->
-          <div class="flex flex-col justify-start gap-2">
+          <div class="flex flex-grow flex-col lg:w-1/2">
             <div class="flex items-center gap-2 mb-4">
               <div class="bg-blue-100 dark:bg-app-violet-500/20 p-2 rounded-lg">
-                <svg
-                  class="h-5 w-5 text-blue-500 dark:text-app-violet-300"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    clip-rule="evenodd"
-                    d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z"
-                    fill-rule="evenodd"
-                  />
-                </svg>
+                <AppIcons color="violet" name="settings" />
               </div>
-              <h2 class="text-xl font-semibold text-zinc-900 dark:text-white">Game Settings</h2>
+              <Title class="text-xl">Game Settings</Title>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 g:gap-6">
-              <FormEntry
-                class="w-full"
-                v-model="rounds"
-                :max="lobbyConfigSchema.shape.rounds.maxValue ?? undefined"
-                :min="lobbyConfigSchema.shape.rounds.minValue ?? 0"
-                :step="1"
-                placeHolder="Number of rounds"
-                type="number"
-                title="Rounds"
-                v-bind="roundsProps"
-              />
+            <div
+              class="bg-gray-50 dark:bg-neutral-900 p-2 lg:p-4 rounded-lg flex-grow flex flex-col"
+            >
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-2 lg:gap-4 flex-grow">
+                <FormEntry
+                  v-model="rounds"
+                  :max="lobbyConfigSchema.shape.rounds.maxValue ?? undefined"
+                  :min="lobbyConfigSchema.shape.rounds.minValue ?? 0"
+                  :step="1"
+                  class="w-full"
+                  placeHolder="Number of rounds"
+                  title="Rounds"
+                  type="number"
+                  v-bind="roundsProps"
+                />
 
-              <FormEntry
-                class="w-full"
-                v-model="maxPlayers"
-                :max="lobbyConfigSchema.shape.maxPlayers.maxValue ?? undefined"
-                :min="lobbyConfigSchema.shape.maxPlayers.minValue ?? 0"
-                :step="1"
-                placeHolder="Maximum number of players"
-                type="number"
-                title="Max players"
-                v-bind="maxPlayersProps"
-              />
+                <FormEntry
+                  v-model="maxPlayers"
+                  :max="lobbyConfigSchema.shape.maxPlayers.maxValue ?? undefined"
+                  :min="lobbyConfigSchema.shape.maxPlayers.minValue ?? 0"
+                  :step="1"
+                  class="w-full"
+                  placeHolder="Maximum number of players"
+                  title="Max players"
+                  type="number"
+                  v-bind="maxPlayersProps"
+                />
 
-              <FormEntry
-                class="w-full"
-                v-model="bidTime"
-                :max="lobbyConfigSchema.shape.bidTime.maxValue ?? undefined"
-                :min="lobbyConfigSchema.shape.bidTime.minValue ?? 0"
-                :step="2"
-                placeHolder="Time to bid in seconds"
-                type="number"
-                title="Bid time (seconds)"
-                v-bind="bidTimeProps"
-              />
-              <FormEntry
-                class="w-full"
-                v-model="startAmount"
-                :max="lobbyConfigSchema.shape.startAmount.maxValue ?? undefined"
-                :min="lobbyConfigSchema.shape.startAmount.minValue ?? 0"
-                :step="100"
-                placeHolder="Starting amount of money"
-                type="number"
-                title="Starting amount"
-                v-bind="startAmountProps"
-              />
+                <FormEntry
+                  v-model="bidTime"
+                  :max="lobbyConfigSchema.shape.bidTime.maxValue ?? undefined"
+                  :min="lobbyConfigSchema.shape.bidTime.minValue ?? 0"
+                  :step="2"
+                  class="w-full"
+                  placeHolder="Time to bid in seconds"
+                  title="Bid time (seconds)"
+                  type="number"
+                  v-bind="bidTimeProps"
+                />
+                <FormEntry
+                  v-model="startAmount"
+                  :max="lobbyConfigSchema.shape.startAmount.maxValue ?? undefined"
+                  :min="lobbyConfigSchema.shape.startAmount.minValue ?? 0"
+                  :step="100"
+                  class="w-full"
+                  placeHolder="Starting amount of money"
+                  title="Starting amount"
+                  type="number"
+                  v-bind="startAmountProps"
+                />
+              </div>
             </div>
           </div>
 
           <!-- Inventory Section -->
-          <div class="space-y-4">
+          <div class="flex flex-col lg:w-1/2">
             <div class="flex items-center gap-2 mb-4">
               <div class="bg-purple-100 dark:bg-app-fuchsia-500/20 p-2 rounded-lg">
-                <svg
-                  class="h-5 w-5 text-purple-500 dark:text-app-fuchsia-300"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"
-                  />
-                </svg>
+                <AppIcons color="fuchsia" name="inventory" />
               </div>
               <h2 class="text-xl font-semibold text-zinc-900 dark:text-white">
                 Starting Inventory
               </h2>
             </div>
 
-            <div>
+            <div
+              class="bg-gray-50 dark:bg-neutral-900 p-2 lg:p-4 rounded-lg flex-grow flex flex-col overflow-hidden"
+            >
+              <!-- Responsive height for inventory -->
               <InventorySelector
+                class="w-full h-full"
                 :details="
                   new Map([
                     [
@@ -263,6 +253,7 @@ const handleForm = async () => {
                 :items="items!"
                 @update:items="items = $event"
                 v-bind="itemsProps"
+                compact
               >
                 <template #header>
                   <div class="flex items-center gap-2 mb-4">
@@ -274,26 +265,26 @@ const handleForm = async () => {
               </InventorySelector>
             </div>
           </div>
+        </div>
+      </form>
+    </BaseCard>
 
-          <!-- Submit Button -->
-          <div class="mt-2">
-            <LoadingButton
-              :disable="!canSubmit"
-              :loading="waitForResponse"
-              class="w-full"
-              @click="handleForm"
-              >Create Lobby
-            </LoadingButton>
+    <!-- Create Lobby Button - Always at the bottom -->
+    <div class="flex items-center justify-center w-full p-2">
+      <LoadingButton
+        :disable="!canSubmit"
+        :loading="waitForResponse"
+        class="w-full max-w-md"
+        @click="handleForm"
+        >Create Lobby
+      </LoadingButton>
 
-            <p
-              v-if="!canSubmit && !isAuthenticated"
-              class="mt-3 text-center text-sm text-red-500 dark:text-red-400"
-            >
-              You need to be logged in to create a lobby
-            </p>
-          </div>
-        </form>
-      </BaseCard>
+      <p
+        v-if="!canSubmit && !isAuthenticated"
+        class="mt-3 text-center text-sm text-red-500 dark:text-red-400"
+      >
+        You need to be logged in to create a lobby
+      </p>
     </div>
   </Background>
 </template>

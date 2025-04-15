@@ -5,6 +5,7 @@
       :key="index"
       ref="childElements"
       :initial="getInitial()"
+      class="size-full"
       :transition="{
         duration: props.duration,
         easing: 'easeInOut',

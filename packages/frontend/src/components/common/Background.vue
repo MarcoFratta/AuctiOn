@@ -12,19 +12,19 @@ const bgColor = computed(() => (settingsStore.darkMode ? 'black' : '#f8f9fa'))
 const baseHue = 250
 const particleOpacity = computed(() => (settingsStore.darkMode ? 0.7 : 1))
 defineProps({
+  noScroll: {
+    type: Boolean,
+    default: false,
+  },
   containerClass: {
     type: String,
-    default: 'flex justify-center items-center',
+    default: '',
   },
 })
 </script>
 
 <template>
-  <div
-    id="background"
-    :class="settingsStore.darkMode ? 'bg-black' : 'bg-app-white'"
-    class="w-full min-h-[calc(100vh-3rem)] overflow-hidden"
-  >
+  <div id="background" class="flex w-full h-full bg-app-white dark:bg-black">
     <!-- Fixed background with vortex effect -->
     <Vortex
       :backgroundColor="bgColor"
@@ -33,16 +33,22 @@ defineProps({
       :particleOpacity="particleOpacity"
       :range-speed="settingsStore.darkMode ? 0.5 : 0.4"
       :range-y="150"
-      class="sticky top-0 w-full h-full min-h-[calc(100vh-3rem)]"
-    >
-      <!-- Content layer that scrolls over the background -->
-      <div class="w-full min-h-[calc(100vh-3rem)] z-10">
-        <BlurReveal :delay="0.2" :duration="0.75">
-          <FullScreen :class="containerClass">
-            <slot />
-          </FullScreen>
-        </BlurReveal>
-      </div>
-    </Vortex>
+      class="fixed top-0 z-0 overflow-hidden"
+      containerClass="fixed"
+    />
+    <!-- Content layer that scrolls over the background -->
+    <div class="relative size-full z-10">
+      <BlurReveal :delay="0.2" :duration="0.75" class="size-full overflow-hidden">
+        <FullScreen
+          :containerCls="
+            containerClass +
+            ' scrollbar-hide ' +
+            (noScroll ? 'h-[calc(100%)]' + ' overflow-hidden' : '')
+          "
+        >
+          <slot />
+        </FullScreen>
+      </BlurReveal>
+    </div>
   </div>
 </template>

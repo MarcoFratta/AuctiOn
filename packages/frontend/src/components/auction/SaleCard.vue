@@ -4,9 +4,13 @@ import { computed, ref } from 'vue'
 import { useLobbyStore } from '@/stores/lobbyStore.ts'
 import BaseCard from '@/components/common/BaseCard.vue'
 import LoadingButton from '@/components/common/LoadingButton.vue'
+import AppIcons from '@/components/icons/AppIcons.vue'
+import { useStatsCreator } from '@/composables/useStatsCreator.ts'
 import type { ItemQuantity } from '@/schemas/LobbySchema.ts'
+import InnerCard from '@/components/common/InnerCard.vue'
 
 const lobbyStore = useLobbyStore()
+const { avgDollarPerWeight } = useStatsCreator()
 const startingItems = lobbyStore.lobby!.startInventory.items.map((i) => {
   return { ...i, quantity: 0 }
 })
@@ -24,6 +28,21 @@ const details = computed(() => {
       },
     ]),
   )
+})
+
+// Calculate total weight of selected items
+const totalWeight = computed(() => {
+  return items.value
+    .filter((item) => item.quantity > 0)
+    .reduce((acc, item) => {
+      const weight = lobbyStore.weights.find((w) => w.item === item.item)?.weight || 0
+      return acc + weight * item.quantity
+    }, 0)
+})
+
+// Calculate estimated sale price based on average dollar per weight
+const estimatedPrice = computed(() => {
+  return Math.round(totalWeight.value * avgDollarPerWeight.value)
 })
 
 const isLoading = ref(false)
@@ -49,60 +68,50 @@ const createSale = () => {
 const canCreateSale = computed(() => {
   return items.value.some((i) => i.quantity > 0)
 })
+
+// Calculate percentage of inventory being sold (by weight)
+const inventoryPercentageSold = computed(() => {
+  const currentTotalWeight =
+    lobbyStore.playerInfo?.inventory.items.reduce((acc, item) => {
+      const weight = lobbyStore.weights.find((w) => w.item === item.item)?.weight || 0
+      return acc + weight * item.quantity
+    }, 0) || 0
+
+  if (currentTotalWeight === 0) return 0
+  return Math.round((totalWeight.value / currentTotalWeight) * 100)
+})
 </script>
 
 <template>
   <BaseCard class="h-full flex flex-col">
     <!-- Header -->
-    <div class="flex items-center gap-2">
-      <div class="bg-green-100 dark:bg-green-500/20 px-1.5 md:p-2 rounded-lg">
-        <svg
-          class="h-4 w-4 md:h-5 md:w-5 text-green-500 dark:text-green-400"
-          fill="currentColor"
-          viewBox="0 0 20 20"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            clip-rule="evenodd"
-            d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z"
-            fill-rule="evenodd"
-          />
-        </svg>
+    <div class="flex items-center justify-start mb-2">
+      <div class="flex items-center gap-1.5">
+        <div class="bg-green-100 dark:bg-green-500/20 p-1 rounded-lg">
+          <AppIcons color="green" name="create-sale" size="sm" />
+        </div>
+        <h2 class="text-sm md:text-base font-semibold text-zinc-900 dark:text-white">Sell</h2>
       </div>
-      <h2 class="text-lg md:text-xl font-semibold text-zinc-900 dark:text-white">Create Sale</h2>
     </div>
 
-    <!-- Main Content -->
-    <div class="flex-grow flex flex-col">
-      <!-- Inventory Selector -->
-      <div class="inventory-selector flex-grow mb-3 md:mb-4">
-        <InventorySelector
-          :details="details"
-          :items="[items[0], ...items.slice(1)]"
-          class="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-gray-700/50 p-2 md:p-3 h-full"
-          @update:items="updateItems"
-        />
-      </div>
+    <div class="overflow-y-auto">
+      <InventorySelector
+        :details="details"
+        :items="[items[0], ...items.slice(1)]"
+        @update:items="updateItems"
+      />
+    </div>
 
-      <!-- Create Sale Button -->
-      <div class="mt-auto">
-        <LoadingButton
-          :disable="!canCreateSale"
-          :loading="isLoading"
-          class="w-full font-medium text-xs md:text-sm transition-colors"
-          @click="canCreateSale && createSale()"
-        >
-          Create Sale
-        </LoadingButton>
-
-        <!-- Helper text -->
-        <p
-          v-if="!canCreateSale"
-          class="text-center text-gray-500 dark:text-gray-400 text-xs mt-1.5"
-        >
-          Select at least one item to sell
-        </p>
-      </div>
+    <!-- Create Sale Button with Stats -->
+    <div class="mt-2 space-y-2">
+      <LoadingButton
+        :disable="!canCreateSale"
+        :loading="isLoading"
+        class="w-full font-medium text-xs transition-colors"
+        @click="canCreateSale && createSale()"
+      >
+        {{ !canCreateSale ? 'Select at least one item to sell' : 'Create Sale' }}
+      </LoadingButton>
     </div>
   </BaseCard>
 </template>
@@ -129,16 +138,14 @@ const canCreateSale = computed(() => {
   outline: none;
 }
 
-/* Fix inventory item icons */
-.inventory-selector :deep(svg) {
-  width: 1.25rem;
-  height: 1.25rem;
+/* Hide scrollbar for Chrome, Safari and Opera */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 
-@media (min-width: 768px) {
-  .inventory-selector :deep(svg) {
-    width: 1.5rem;
-    height: 1.5rem;
-  }
+/* Hide scrollbar for IE, Edge and Firefox */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 </style>

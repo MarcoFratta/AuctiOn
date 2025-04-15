@@ -5,6 +5,7 @@ import InventoryItem from '@/components/auction/InventoryItem.vue'
 import BaseCard from '@/components/common/BaseCard.vue'
 import InnerCard from '@/components/common/InnerCard.vue'
 import AppIcons from '@/components/icons/AppIcons.vue'
+import ScrollableContainer from '@/components/common/ScrollableContainer.vue'
 
 const lobbyStore = useLobbyStore()
 const playerInfo = computed(() => lobbyStore.playerInfo)
@@ -28,7 +29,6 @@ const sortedInventory = computed(() => {
       const weightB = lobbyStore.weights.find((w) => w.item === b.item)?.weight || 0
       comparison = weightA * a.quantity - weightB * b.quantity
     }
-
     return sortDirection.value === 'asc' ? comparison : -comparison
   })
 })
@@ -64,79 +64,78 @@ const totalItemsCount = computed(() => {
 
 <template>
   <BaseCard class="h-full flex flex-col">
-    <!-- Header -->
-    <div class="flex items-center gap-2 mb-2 md:mb-3">
-      <div class="bg-violet-100 dark:bg-app-violet-500/20 p-1.5 md:p-2 rounded-lg">
-        <AppIcons color="violet" name="inventory" />
-      </div>
-      <h2 class="text-lg md:text-xl font-semibold text-zinc-900 dark:text-white">Your Inventory</h2>
-    </div>
-
-    <!-- Inventory Summary -->
-    <div class="mb-2 md:mb-3 grid grid-cols-2 gap-2">
-      <div
-        class="bg-white dark:bg-neutral-800 p-2 md:p-3 rounded-lg border border-gray-100 dark:border-neutral-700/50"
-      >
-        <div class="flex items-center justify-between">
-          <span class="text-xs md:text-sm text-gray-500 dark:text-gray-400">Total Items</span>
-          <span class="text-sm md:text-base font-bold text-gray-900 dark:text-white">{{
-            totalItemsCount
-          }}</span>
+    <!-- More compact header with integrated summary -->
+    <div class="flex items-center justify-between gap-2 mb-1">
+      <div class="flex items-center gap-1.5">
+        <div class="bg-app-fuchsia-100 dark:bg-app-fuchsia-500/20 p-1 rounded-lg">
+          <AppIcons color="fuchsia" name="inventory" size="sm" />
         </div>
+        <h2 class="text-sm md:text-base font-semibold text-zinc-900 dark:text-white">
+          Your Inventory
+        </h2>
       </div>
 
-      <div
-        class="bg-white dark:bg-neutral-800 p-2 md:p-3 rounded-lg border border-gray-100 dark:border-neutral-700/50"
-      >
-        <div class="flex items-center justify-between">
-          <span class="text-xs md:text-sm text-gray-500 dark:text-gray-400">Total Weight</span>
-          <span class="text-sm md:text-base font-bold text-orange-600 dark:text-orange-400">{{
+      <!-- Inventory Summary - Always visible, more compact -->
+      <div class="flex items-center gap-2 text-xs">
+        <div class="flex items-center">
+          <span class="text-gray-500 dark:text-gray-400 mr-1">Items:</span>
+          <span class="font-bold text-gray-900 dark:text-white">{{ totalItemsCount }}</span>
+        </div>
+        <div class="flex items-center">
+          <span class="text-gray-500 dark:text-gray-400 mr-1">Weight:</span>
+          <span class="font-bold text-orange-600 dark:text-orange-400">{{
             totalInventoryWeight
           }}</span>
         </div>
       </div>
     </div>
 
-    <!-- Sort Controls -->
-    <div class="flex justify-between items-center mb-1 md:mb-2 px-1">
-      <span class="text-xs md:text-sm text-gray-600 dark:text-gray-400">Sort by:</span>
-      <div class="flex items-center gap-1 md:gap-1.5">
+    <!-- Sort Controls - Integrated with header -->
+    <div class="flex justify-start items-center mb-1 px-1">
+      <span class="text-xs text-gray-600 dark:text-gray-400 mr-1">Sort:</span>
+      <div class="flex items-center gap-1">
         <button
           v-for="option in sortOptions"
           :key="option"
           :class="[
+            'px-1 py-0.5 rounded-md transition-colors capitalize text-xs',
             sortBy === option
               ? 'bg-violet-100 dark:bg-app-violet-500/20 text-violet-700 dark:text-app-violet-300'
               : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700/30',
           ]"
-          class="px-1.5 py-0.5 md:px-2 md:py-1 rounded-md transition-colors capitalize text-xs md:text-sm"
           @click="toggleSort(option)"
         >
           {{ option }}
-          <span v-if="sortBy === option" class="ml-0.5">
-            {{ sortDirection === 'asc' ? '↑' : '↓' }}
-          </span>
+          <span v-if="sortBy === option">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
         </button>
       </div>
     </div>
 
-    <InnerCard class="flex-grow overflow-auto scrollbar-hide p-2 md:p-3">
-      <!-- Item Categories -->
-      <div v-if="sortedInventory.length" class="space-y-3">
-        <TransitionGroup class="space-y-1.5 md:space-y-2" name="list" tag="div">
-          <InventoryItem v-for="item in sortedInventory" :key="item.item" :item="item" />
-        </TransitionGroup>
-      </div>
-
-      <!-- Empty State -->
-      <div v-else class="flex flex-col items-center justify-center h-full py-4">
-        <div class="bg-zinc-100 dark:bg-zinc-700/50 p-3 rounded-full mb-2">
-          <AppIcons color="gray" name="empty" size="lg" />
+    <!-- Inventory Items - Single column on small screens, scrollable -->
+    <InnerCard class="flex-grow overflow-y-auto scrollbar-hide">
+      <ScrollableContainer show-scroll-indicator>
+        <!-- Item Categories -->
+        <div v-if="sortedInventory.length" class="flex w-full flex-col">
+          <TransitionGroup class="flex flex-col gap-1" name="list" tag="div">
+            <InventoryItem
+              v-for="item in sortedInventory"
+              :key="item.item"
+              :item="item"
+              class="w-full"
+            />
+          </TransitionGroup>
         </div>
-        <p class="text-zinc-600 dark:text-zinc-400 text-xs md:text-sm text-center">
-          Your inventory is empty
-        </p>
-      </div>
+
+        <!-- Empty State - More compact -->
+        <div v-else class="flex flex-col items-center justify-center h-full py-2">
+          <div class="bg-zinc-100 dark:bg-zinc-700/50 p-2 rounded-full mb-1">
+            <AppIcons color="gray" name="empty" size="md" />
+          </div>
+          <p class="text-zinc-600 dark:text-zinc-400 text-xs text-center">
+            Your inventory is empty
+          </p>
+        </div>
+      </ScrollableContainer>
     </InnerCard>
   </BaseCard>
 </template>

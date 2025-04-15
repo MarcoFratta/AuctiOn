@@ -1,54 +1,52 @@
 <template>
-  <Background
-    container-class="flex max-w-screen align-top
-     flex-col items-center justify-start scrollbar-hide overflow-hidden"
-  >
+  <Background container-class="flex flex-col justify-start h-full">
     <!-- Main container -->
-
-    <!-- Tab navigation -->
-    <div
-      ref="tabsContainer"
-      class="flex flex-row justify-start center-items text-center max-w-full bg-app-white dark:bg-app-black scrollbar-hide border-b border-gray-200 overflow-x-auto px-4 py-2 dark:border-app-violet-900/30"
-    >
-      <button
-        v-for="(tab, index) in tabs"
-        :key="index"
-        :ref="
-          (el) => {
-            if (el) tabRefs[index] = el
-          }
-        "
-        :class="[
-          'px-4 py-2 mx-1 font-medium text-sm rounded-lg transition-all',
-          activeTab === index
-            ? 'text-violet-600 dark:text-app-fuchsia-500 border-b-2 border-violet-600 dark:border-app-fuchsia-500 bg-white dark:bg-app-black-90'
-            : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-app-black-80',
-        ]"
-        @click="selectTab(index)"
+    <div class="size-full flex flex-col justify-start items-center">
+      <!-- Tab navigation -->
+      <div
+        ref="tabsContainer"
+        class="flex flex-row sm:justify-center center-items text-center w-screen sm:w-fit sm:max-w-4xl bg-app-white dark:bg-app-black scrollbar-hide border-b sm:border-x rounded-lg h-12 max-h-12 min-h-12 border-gray-200 overflow-x-auto px-2 py-2 md:px-4 dark:border-app-violet-900/30"
       >
-        {{ tab }}
-      </button>
-    </div>
-
-    <!-- Content area -->
-    <div
-      class="w-full min-h-max pt-2 mb-4 lg:md-6 md:pt-4 lg:pt-16 sm:px-6 max-w-4xl mx-auto scrollbar-hide overflow-y-auto"
-    >
-      <!-- Tab content sections -->
-      <div v-show="activeTab === 0">
-        <ProfileSection :account-created="accountCreated" />
+        <button
+          v-for="(tab, index) in tabs"
+          :key="index"
+          :ref="
+            (el) => {
+              if (el) tabRefs[index] = el
+            }
+          "
+          :class="[
+            'px-4 py-2 mx-1 text-sm  rounded-lg transition-all',
+            activeTab === index
+              ? 'text-violet-600 dark:text-app-fuchsia-500 font-bold'
+              : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-app-black-80',
+          ]"
+          @click="selectTab(index)"
+        >
+          {{ tab }}
+        </button>
       </div>
 
-      <div v-show="activeTab === 1">
-        <AppearanceSection />
-      </div>
+      <!-- Content area -->
+      <div
+        class="w-full px-2 sm:px0 pt-2 mb-4 lg:md-6 md:pt-4 lg:pt-10 max-w-4xl mx-auto scrollbar-hide overflow-y-auto"
+      >
+        <!-- Tab content sections -->
+        <div v-if="activeTab === 0">
+          <ProfileSection />
+        </div>
 
-      <div v-show="activeTab === 2">
-        <NotificationsSection />
-      </div>
+        <div v-if="activeTab === 1">
+          <AppearanceSection />
+        </div>
 
-      <div v-show="activeTab === 3">
-        <StatisticsSection :stats="stats" />
+        <div v-if="activeTab === 2">
+          <NotificationsSection />
+        </div>
+
+        <div v-if="activeTab === 3">
+          <StatisticsSection :stats="stats" />
+        </div>
       </div>
     </div>
   </Background>
@@ -94,8 +92,6 @@ const selectTab = (index: number) => {
   }, 10)
 }
 
-// Account creation date (placeholder until you add this to your user model)
-const accountCreated = ref(new Date('2023-01-15'))
 // Game statistics (placeholder until you add this to your user model)
 const stats = ref({
   wins: 15,
@@ -103,14 +99,3 @@ const stats = ref({
   gamesPlayed: 20,
 })
 </script>
-
-<style scoped>
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-</style>

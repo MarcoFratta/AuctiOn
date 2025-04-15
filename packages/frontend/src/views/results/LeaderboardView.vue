@@ -1,7 +1,7 @@
 <template>
-  <Background container-class="w-full mt-4 px-2 lg:mt-12 xl:mt-16">
+  <Background container-class="overflow-y-auto scrollbar-hide">
     <!-- Header with animated shapes -->
-    <div class="flex flex-col items-center mb-4 lg:mb-8 relative">
+    <div class="w-full flex flex-col items-center mt-2 mb-4 lg:mb-8">
       <div class="absolute top-0 -left-10 opacity-50 hidden md:block">
         <GameShapes
           :color="settingsStore.darkMode ? 'violet' : 'default'"
@@ -19,7 +19,7 @@
         />
       </div>
 
-      <Title class="text-4xl lg:text-5xl mb-2">Auction Results</Title>
+      <Title class="text-3xl lg:text-5xl mb-2">Auction Results</Title>
       <p class="text-gray-600 dark:text-app-violet-200 text-center text-lg">
         Here are your last auction results!
       </p>
@@ -31,7 +31,7 @@
     </div>
 
     <!-- Action Buttons -->
-    <div class="flex justify-center mt-8 px-2">
+    <div class="flex justify-center mb-4 px-2 w-full">
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-md">
         <Button
           :bgColor="settingsStore.darkMode ? 'black' : '#f8f9fa'"

@@ -9,10 +9,6 @@
     >
       <canvas ref="canvasRef"></canvas>
     </Motion>
-
-    <div :class="cn('relative z-10', props.class)">
-      <slot />
-    </div>
   </div>
 </template>
 

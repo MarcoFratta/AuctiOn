@@ -4,7 +4,7 @@
     <LobbyLoading v-if="!lobbyStore.lobby || !userStore.user" />
 
     <!-- Existing lobby content -->
-    <div v-else class="w-full md:px-4 xl:px-0 max-w-6xl my-2 md:my-4">
+    <div v-else class="w-full h-fit flex flex-col justify-center items-center">
       <!-- Header with animated shapes -->
       <div class="flex flex-col items-center mb-3 md:mb-4 px-2 relative">
         <div class="absolute top-5 -left-5 opacity-50 hidden md:block">
@@ -31,7 +31,7 @@
       </div>
 
       <!-- Main Content - Reorganized for better space utilization -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-4">
+      <div class="w-full grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-4 max-w-5xl">
         <!-- Left Column: Game Settings & Players -->
         <div class="lg:col-span-2">
           <BaseCard class="h-full">
@@ -115,6 +115,7 @@ import { useSettingsStore } from '@/stores/settingsStore.ts'
 import InnerCard from '@/components/common/InnerCard.vue'
 import { useErrorsHandler } from '@/composables/useErrorsHandler.ts'
 import LobbyLoading from '@/components/lobby/LobbyLoading.vue'
+import { useAuctionConnection } from '@/composables/useAuctionConnection.ts'
 
 const lobbyStore = useLobbyStore()
 const router = useRouter()
@@ -125,10 +126,14 @@ const amIAdmin = computed(() => {
   if (!lobbyStore.lobby || !userStore.user) return false
   return lobbyStore.lobby?.creatorId === userStore.user?.id
 })
-const lobbyUrl = computed(() => `${window.location.origin}/join/${lobbyStore.lobby?.id}`)
-const ready = computed(
-  () => lobbyStore.users?.find((u) => u.id === userStore.user?.id)?.status === 'ready',
-)
+const lobbyUrl = computed(() => {
+  if (!lobbyStore.lobby) return ''
+  return `${window.location.origin}/join/${lobbyStore.lobby?.id}`
+})
+const ready = computed(() => {
+  if (!lobbyStore.lobby || !userStore.user) return false
+  return lobbyStore.users.find((u) => u.id === userStore.user!.id)?.status === 'ready'
+})
 const lobbyService = useLobbyService()
 const alerts = useAlert()
 
@@ -169,6 +174,13 @@ const start = async () => {
     await errorsHandler.show(err)
   }
 }
+if (!lobbyStore.lobby) {
+  useAuctionConnection()
+    .connect()
+    .catch(() => {
+      router.push('/')
+    })
+}
 if (lobbyStore.lobby?.startTimestamp) {
   router.push('/play')
 }
@@ -179,6 +191,7 @@ watch(
       await alerts.error('Disconnected', 'Please refresh the page')
       router.push('/')
     } else if (lobbyStore.lobby?.startTimestamp) {
+      await alerts.error('game started', 'Please refresh the page')
       router.push('/play')
     }
   },
