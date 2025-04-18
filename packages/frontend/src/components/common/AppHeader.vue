@@ -3,15 +3,31 @@ import { useSettingsStore } from '@/stores/settingsStore.ts'
 import DefaultAuthLinks from '@/components/DefaultAuthLinks.vue'
 import { useAuthStore } from '@/stores/authStore.ts'
 import { useHeaderStore } from '@/stores/headerStore'
+import { useLobbyStore } from '@/stores/lobbyStore'
 import { computed } from 'vue'
 import AppIcons from '@/components/icons/AppIcons.vue'
+import { useRoute } from 'vue-router'
 
 const settingsStore = useSettingsStore()
 const authStore = useAuthStore()
 const headerStore = useHeaderStore()
+const lobbyStore = useLobbyStore()
+const route = useRoute()
 
 // Compute whether we have custom content
 const hasCustomContent = computed(() => headerStore.used)
+
+// Check if user is in an active lobby
+const isInActiveLobby = computed(() => !!lobbyStore.lobby)
+
+// Check if user is already on the lobby or play page
+const isOnLobbyPage = computed(() => {
+  const path = route.path
+  return path.startsWith('/lobby') || path.startsWith('/play')
+})
+
+// Show lobby button only if in active lobby but not on lobby pages
+const showLobbyButton = computed(() => isInActiveLobby.value && !isOnLobbyPage.value)
 
 const emits = defineEmits(['openDrawer'])
 
@@ -43,7 +59,23 @@ const toggleDarkMode = () => {
     </div>
 
     <!-- Right section with theme toggle and user actions -->
-    <div class="flex items-center">
+    <div class="flex items-center gap-1">
+      <!-- Enhanced Lobby Button - Only shown when in active lobby but not on lobby pages -->
+      <router-link
+        v-if="showLobbyButton"
+        class="relative flex items-center text-md font-bold justify-center mr-2 px-2 py-1.5 rounded-lg bg-app-violet-500 text-white hover:bg-violet-600"
+        title="Return to active lobby"
+        to="/lobby"
+      >
+        <span class="absolute -top-1 -right-1 flex h-3 w-3">
+          <span
+            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"
+          ></span>
+          <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+        </span>
+        <span class="text-xs font-medium">Go to Auction</span>
+      </router-link>
+
       <!-- Theme Toggle -->
       <button
         class="p-1.5 rounded-md text-zinc-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-app-fuchsia-900/20 transition-colors flex items-center justify-center"
@@ -53,11 +85,11 @@ const toggleDarkMode = () => {
       </button>
 
       <!-- Target div for teleported content -->
-      <div id="header-right-content" class="lg:ml-2 flex flex-row gap-2"></div>
+      <div id="header-right-content" class="flex flex-row gap-2"></div>
 
       <!-- Default auth links if no custom content -->
       <template v-if="!hasCustomContent">
-        <div class="flex items-center ml-2 lg:ml-2">
+        <div class="flex items-center">
           <DefaultAuthLinks v-if="!authStore.isAuthenticated" />
           <router-link
             v-else
@@ -72,3 +104,19 @@ const toggleDarkMode = () => {
     </div>
   </header>
 </template>
+
+<style scoped>
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+</style>
