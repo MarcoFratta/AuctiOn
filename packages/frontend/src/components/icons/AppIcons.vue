@@ -235,6 +235,14 @@ const viewBox = computed(() => {
       stroke-width="2"
     />
 
+    <!-- Eye icon -->
+    <path
+      v-else-if="name === 'eye'"
+      clip-rule="evenodd"
+      d="M10 4C5.522 4 1.732 6.943 0.458 11C1.732 15.057 5.522 18 10 18C14.478 18 18.268 15.057 19.542 11C18.268 6.943 14.478 4 10 4ZM10 15C7.239 15 5 13.21 5 11C5 8.79 7.239 7 10 7C12.761 7 15 8.79 15 11C15 13.21 12.761 15 10 15ZM10 13C11.105 13 12 12.105 12 11C12 9.895 11.105 9 10 9C8.895 9 8 9.895 8 11C8 12.105 8.895 13 10 13Z"
+      fill-rule="evenodd"
+    />
+
     <!-- Fallback to a default icon if name doesn't match -->
     <path
       v-else
