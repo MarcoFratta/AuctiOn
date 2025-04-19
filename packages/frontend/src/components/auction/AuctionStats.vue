@@ -1,27 +1,21 @@
 <script lang="ts" setup>
-import { useStatsCreator } from '@/composables/useStatsCreator.ts'
 import { computed, onMounted, ref } from 'vue'
 import BaseCard from '@/components/common/BaseCard.vue'
 import InnerCard from '@/components/common/InnerCard.vue'
 import AppIcons from '@/components/icons/AppIcons.vue'
 import StatDisplay from '@/components/common/StatDisplay.vue'
+import SectionHeader from '@/components/common/SectionHeader.vue'
+import AuctionAnalysisTooltip from '@/components/auction/AuctionAnalysisTooltip.vue'
 import { Chart, registerables } from 'chart.js'
 import { Line } from 'vue-chartjs'
 import { useLobbyStore } from '@/stores/lobbyStore.ts'
+import { useStatsCreator } from '@/composables/useStatsCreator.ts'
 
 // Register Chart.js components
 Chart.register(...registerables)
 
-const {
-  avgBid,
-  bids,
-  bidLabels,
-  highestBid,
-  bidCount,
-  recentMomentum,
-  predictedSalePrice,
-  priceVsPrediction,
-} = useStatsCreator()
+const { avgBid, bids, bidLabels, highestBid, bidCount, recentMomentum, predictedSalePrice } =
+  useStatsCreator()
 
 // Chart data
 const chartData = computed(() => ({
@@ -123,187 +117,43 @@ onMounted(() => {
   observer.observe(document.documentElement, { attributes: true })
 })
 
-// Add a computed property for momentum icon
-const momentumIcon = computed(() => {
-  if (recentMomentum.value > 0) return 'up'
-  if (recentMomentum.value < 0) return 'down'
-  return 'neutral'
-})
 const lobbyStore = useLobbyStore()
 
-// Add a computed property for prediction icon
-const predictionIcon = computed(() => {
-  if (priceVsPrediction.value > 0) return 'up'
-  if (priceVsPrediction.value < 0) return 'down'
-  return 'neutral'
+// Determine if there's a critical warning to show
+const hasWarning = computed(() => {
+  // Check if there's an inventory risk warning
+  if (lobbyStore.lobby?.currentSale && !lobbyStore.userIsTheSeller) {
+    return true
+  }
+  return false
 })
 </script>
 
 <template>
   <BaseCard class="h-full flex flex-col">
-    <!-- Header with trend indicator icon -->
-    <div class="flex items-center justify-between mb-1">
-      <div class="flex items-center gap-1.5">
-        <div class="bg-indigo-100 dark:bg-indigo-500/20 p-0.5 rounded-lg">
-          <AppIcons color="indigo" name="chart" size="sm" />
-        </div>
-        <h2 class="text-base font-semibold text-zinc-900 dark:text-white">Stats</h2>
-      </div>
-
-      <!-- Trend indicator with tooltip -->
-      <div v-if="bidCount > 1" class="relative group">
-        <div
-          :class="[
-            recentMomentum > 0
-              ? 'text-green-600 dark:text-green-400'
-              : recentMomentum < 0
-                ? 'text-red-600 dark:text-red-400'
-                : 'text-gray-600 dark:text-gray-400',
-            'p-1.5 rounded-full cursor-help',
-          ]"
+    <!-- Replace the header with the new component -->
+    <SectionHeader iconColor="violet" iconName="chart" title="Stats">
+      <!-- Eye icon for analysis tooltip -->
+      <div v-if="bidCount > 1 && !lobbyStore.userIsTheSeller" class="relative group">
+        <button
+          aria-label="View auction analysis"
+          class="flex items-center justify-center p-1 rounded-full bg-violet-100 dark:bg-violet-800/40 text-violet-700 dark:text-violet-300 hover:bg-violet-200 dark:hover:bg-violet-700/60 transition-colors"
+          type="button"
         >
-          <svg
-            v-if="momentumIcon === 'up'"
-            class="w-4 h-4"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              clip-rule="evenodd"
-              d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z"
-              fill-rule="evenodd"
-            ></path>
-          </svg>
-          <svg
-            v-else-if="momentumIcon === 'down'"
-            class="w-4 h-4"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              clip-rule="evenodd"
-              d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z"
-              fill-rule="evenodd"
-            ></path>
-          </svg>
-          <svg
-            v-else
-            class="w-4 h-4"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              clip-rule="evenodd"
-              d="M5 10a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z"
-              fill-rule="evenodd"
-            ></path>
-          </svg>
-        </div>
+          <!-- Use AppIcons for the eye icon with larger size -->
+          <AppIcons color="violet" name="eye" size="sm" />
 
-        <!-- Tooltip popup -->
-        <div
-          class="absolute right-0 z-10 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-opacity duration-200 w-64 p-3 mt-2 bg-white dark:bg-neutral-800 rounded-lg shadow-lg border border-gray-100 dark:border-neutral-700/50"
-        >
-          <div class="flex items-start mb-2">
-            <div
-              class="bg-app-violet-100 dark:bg-app-violet-500/20 p-1 rounded-md mr-2 flex-shrink-0"
-            >
-              <svg
-                class="w-3 h-3 text-app-violet-600 dark:text-app-violet-400"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1h4v1a2 2 0 11-4 0zM12 14c.015-.34.208-.646.477-.859a4 4 0 10-4.954 0c.27.213.462.519.476.859h4.002z"
-                ></path>
-              </svg>
-            </div>
-            <div>
-              <h3 class="text-xs font-medium text-app-violet-700 dark:text-app-violet-300 mb-1">
-                Auction Analysis
-              </h3>
-              <div class="flex items-center mb-2">
-                <span
-                  :class="[
-                    recentMomentum > 0
-                      ? 'text-green-600 dark:text-green-400'
-                      : recentMomentum < 0
-                        ? 'text-red-600 dark:text-red-400'
-                        : 'text-gray-600 dark:text-gray-400',
-                    'text-sm font-bold',
-                  ]"
-                >
-                  {{ recentMomentum > 0 ? '+' : '' }}{{ recentMomentum }}% momentum
-                </span>
-              </div>
-              <p class="text-xs text-app-violet-600 dark:text-app-violet-400">
-                <template v-if="priceVsPrediction > 10">
-                  Current bid is significantly above predicted value. This item is in high demand!
-                </template>
-                <template v-else-if="priceVsPrediction > 0">
-                  Current bid is above predicted value. This is a competitive auction.
-                </template>
-                <template v-else-if="priceVsPrediction < -10">
-                  Current bid is well below predicted value. This could be a good opportunity to
-                  bid.
-                </template>
-                <template v-else-if="priceVsPrediction < 0">
-                  Current bid is slightly below predicted value. Consider placing a bid.
-                </template>
-                <template v-else>
-                  Current bid matches the predicted value based on historical sales.
-                </template>
-              </p>
-            </div>
-          </div>
-          <div class="flex items-center text-xs text-gray-500 dark:text-gray-400">
-            <span
-              v-if="priceVsPrediction !== 0"
-              :class="[
-                priceVsPrediction > 0
-                  ? 'text-green-600 dark:text-green-400'
-                  : priceVsPrediction < 0
-                    ? 'text-red-600 dark:text-red-400'
-                    : 'text-gray-600 dark:text-gray-400',
-                'ml-2 flex items-center',
-              ]"
-            >
-              {{ priceVsPrediction > 0 ? '+' : '' }}{{ priceVsPrediction }}%
-              <svg
-                v-if="predictionIcon === 'up'"
-                class="w-3 h-3 ml-0.5"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  clip-rule="evenodd"
-                  d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z"
-                  fill-rule="evenodd"
-                ></path>
-              </svg>
-              <svg
-                v-else-if="predictionIcon === 'down'"
-                class="w-3 h-3 ml-0.5"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  clip-rule="evenodd"
-                  d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z"
-                  fill-rule="evenodd"
-                ></path>
-              </svg>
-            </span>
-          </div>
-        </div>
+          <!-- Add a notification dot if there's a warning -->
+          <span
+            v-if="hasWarning"
+            class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 rounded-full border border-white dark:border-neutral-800"
+          ></span>
+        </button>
+
+        <!-- Keep the tooltip component -->
+        <AuctionAnalysisTooltip />
       </div>
-    </div>
+    </SectionHeader>
 
     <InnerCard class="scrollbar-hide p-2 md:p-3 flex-grow flex flex-col overflow-y-auto">
       <!-- Stats Grid - Redesigned for desktop -->
@@ -323,7 +173,7 @@ const predictionIcon = computed(() => {
           :trendValue="recentMomentum"
           :value="recentMomentum"
           prefix="%"
-          title="Recent Momentum"
+          title="Increase Rate"
         />
 
         <StatDisplay
