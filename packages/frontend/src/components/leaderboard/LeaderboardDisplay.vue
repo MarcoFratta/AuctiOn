@@ -32,16 +32,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Loading State -->
-    <div v-else>
-      <LobbyLoading
-        message="Please wait while we calculate the final standings."
-        tipText="The auction has ended and the final results are being prepared."
-        tipTitle="Game Complete"
-        title="Loading Results"
-      />
-    </div>
   </BaseCard>
 </template>
 
@@ -51,7 +41,6 @@ import { useUserStore } from '@/stores/userStore'
 import LeaderboardEntry from './LeaderboardEntry.vue'
 import BaseCard from '@/components/common/BaseCard.vue'
 import Title from '@/components/common/Title.vue'
-import LobbyLoading from '@/components/lobby/LobbyLoading.vue'
 import { useResultsStore } from '@/stores/resultsStore.ts'
 
 const userStore = useUserStore()

@@ -1,32 +1,17 @@
 <template>
   <Background container-class="overflow-y-auto scrollbar-hide">
-    <!-- Header with animated shapes -->
-    <div class="w-full flex flex-col items-center mt-2 mb-4 lg:mb-8">
-      <div class="absolute top-0 -left-10 opacity-50 hidden md:block">
-        <GameShapes
-          :color="settingsStore.darkMode ? 'violet' : 'default'"
-          animated
-          size="md"
-          type="circle"
-        />
-      </div>
-      <div class="absolute top-0 -right-10 opacity-50 hidden md:block">
-        <GameShapes
-          :color="settingsStore.darkMode ? 'fuchsia' : 'default'"
-          animated
-          size="md"
-          type="triangle"
-        />
-      </div>
-
-      <Title class="text-3xl lg:text-5xl mb-2">Auction Results</Title>
-      <p class="text-gray-600 dark:text-app-violet-200 text-center text-lg">
-        Here are your last auction results!
-      </p>
-    </div>
+    <!-- Replace the header with our new component -->
+    <PageHeader subtitle="Here are your last auction results!" title="Auction Results" />
 
     <!-- Leaderboard -->
-    <div class="mb-8 w-full mx-auto flex justify-center">
+    <LobbyLoading
+      v-if="!resultsStore.leaderboard"
+      message="Please wait while we calculate the final standings."
+      tipText="The auction has ended and the final results are being prepared."
+      tipTitle="Game Complete"
+      title="Loading Results"
+    />
+    <div v-else class="mb-8 w-full mx-auto flex justify-center">
       <LeaderboardDisplay class="max-w-3xl" />
     </div>
 
@@ -71,13 +56,15 @@
 import { useRouter } from 'vue-router'
 import LeaderboardDisplay from '@/components/leaderboard/LeaderboardDisplay.vue'
 import Background from '@/components/common/Background.vue'
-import Title from '@/components/common/Title.vue'
-import GameShapes from '@/components/icons/GameShapes.vue'
 import { GradientButton as Button } from '@/components/ui/gradient-button'
 import { useSettingsStore } from '@/stores/settingsStore.ts'
+import PageHeader from '@/components/common/PageHeader.vue'
+import LobbyLoading from '@/components/lobby/LobbyLoading.vue'
+import { useResultsStore } from '@/stores/resultsStore.ts'
 
 const router = useRouter()
 const settingsStore = useSettingsStore()
+const resultsStore = useResultsStore()
 
 function backToHome() {
   router.push('/')
