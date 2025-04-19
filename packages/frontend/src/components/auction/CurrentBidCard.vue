@@ -5,7 +5,7 @@ import { computed, ref, watch } from 'vue'
 import BaseCard from '@/components/common/BaseCard.vue'
 import InnerCard from '@/components/common/InnerCard.vue'
 import AuctionTimer from '@/components/auction/AuctionTimer.vue'
-import AppIcons from '@/components/icons/AppIcons.vue'
+import SectionHeader from '@/components/common/SectionHeader.vue'
 
 const userStore = useUserStore()
 const lobbyStore = useLobbyStore()
@@ -29,7 +29,13 @@ const isHighestBidder = computed(() => {
 
 // Check if user is the seller
 const isCurrentSeller = computed(() => {
-  return lobbyStore.lobby?.sellerQueue[lobbyStore.sellerIndex] === userStore.user?.id
+  return lobbyStore.userIsTheSeller
+})
+
+// Calculate future balance after sale (for seller)
+const futureBalance = computed(() => {
+  if (!isCurrentSeller.value) return userMoney.value
+  return userMoney.value + highestBid.value
 })
 
 // Check if user can bid (time remaining, not seller, not highest bidder)
@@ -120,15 +126,8 @@ const quickBidOptions = computed(() => {
 
 <template>
   <BaseCard class="h-full flex flex-col">
-    <!-- Header with timer - more compact -->
-    <div class="flex items-center justify-between mb-1">
-      <div class="flex items-center gap-1">
-        <div class="bg-app-violet-100 dark:bg-app-violet-500/20 p-0.5 rounded-lg">
-          <AppIcons color="violet" name="bid" size="sm" />
-        </div>
-        <h2 class="text-sm font-semibold text-zinc-900 dark:text-white">Current Auction</h2>
-      </div>
-
+    <!-- Replace the header with the new component -->
+    <SectionHeader iconColor="violet" iconName="bid" title="Current Auction">
       <!-- Timer -->
       <div v-if="lobbyStore.lobby?.currentSale">
         <AuctionTimer
@@ -137,61 +136,100 @@ const quickBidOptions = computed(() => {
           compact
         />
       </div>
-    </div>
+    </SectionHeader>
 
-    <!-- Main Content - Flexible layout -->
-    <InnerCard class="flex-grow flex flex-col p-1.5 overflow-hidden">
-      <!-- Current Bid Info - More compact -->
-      <div class="bg-app-violet-50/30 dark:bg-app-violet-900/10 rounded-md p-2 mb-2 flex-shrink-0">
-        <div class="flex flex-col">
-          <!-- Current Bid Amount -->
-          <div class="flex justify-center">
-            <span class="text-app-violet-600 dark:text-app-violet-400 font-bold text-xl">
-              ${{ highestBid }}
-            </span>
-          </div>
+    <!-- Main Content - Modify the InnerCard to handle scrolling properly -->
+    <InnerCard class="flex-grow flex flex-col p-1.5 relative">
+      <!-- Current Bid Info -->
+      <div
+        class="bg-app-violet-400/20 dark:bg-app-violet-500/20 rounded-md p-2 mb-2 flex flex-col justify-center items-center flex-grow"
+      >
+        <!-- Current Bid Amount -->
+        <span class="text-app-violet-600 dark:text-app-violet-400 font-bold text-xl xl:text-2xl">
+          ${{ highestBid }}
+        </span>
 
-          <!-- Bidder Info -->
-          <div class="flex justify-center items-center gap-1">
-            <span class="text-neutral-600 dark:text-neutral-400 text-xs">by</span>
-            <span class="text-neutral-900 dark:text-white font-medium text-xs">
-              {{ highestBidder?.username || 'No bids yet' }}
-            </span>
-            <!-- "You" tag -->
-            <span
-              v-if="isHighestBidder"
-              class="bg-green-100 dark:bg-green-800/30 text-green-800 dark:text-green-300 text-xs px-1 py-0 rounded-full font-medium"
-            >
-              You
-            </span>
-          </div>
-
-          <!-- Status indicator -->
-          <div
-            v-if="isHighestBidder || isCurrentSeller || remainingTime <= 0"
-            class="mt-1 text-center text-xs font-medium"
+        <!-- Bidder Info -->
+        <div class="flex justify-center items-center gap-1">
+          <span class="text-neutral-600 dark:text-neutral-400 text-xs">by</span>
+          <span class="text-neutral-900 dark:text-white font-medium text-xs">
+            {{ highestBidder?.username || 'No bids yet' }}
+          </span>
+          <!-- "You" tag -->
+          <span
+            v-if="isHighestBidder"
+            class="bg-green-100 dark:bg-green-800/30 text-green-800 dark:text-green-300 text-xs px-1 py-0 rounded-full font-medium"
           >
-            <span v-if="isHighestBidder" class="text-green-700 dark:text-green-300">
-              You are the highest bidder
-            </span>
-            <span v-else-if="isCurrentSeller" class="text-blue-700 dark:text-blue-300">
-              You are the seller
-            </span>
-            <span v-else-if="remainingTime <= 0" class="text-neutral-700 dark:text-neutral-300">
-              Waiting for next auction
-            </span>
+            You
+          </span>
+        </div>
+
+        <!-- Status indicator -->
+        <div
+          v-if="isHighestBidder || isCurrentSeller || remainingTime <= 0"
+          class="mt-1 text-center text-xs font-medium"
+        >
+          <span v-if="isHighestBidder" class="text-green-600 dark:text-green-300">
+            You are the highest bidder
+          </span>
+          <span v-else-if="isCurrentSeller" class="text-blue-700 dark:text-blue-300">
+            You are the seller
+          </span>
+          <span v-else-if="remainingTime <= 0" class="text-neutral-700 dark:text-neutral-300">
+            Waiting for next auction
+          </span>
+        </div>
+      </div>
+
+      <!-- Seller View - Show when user is the seller -->
+      <div v-if="isCurrentSeller" class="flex flex-col px-2">
+        <div class="flex flex-col h-full justify-between">
+          <!-- Current Bid Status -->
+          <div class="space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="text-neutral-600 dark:text-neutral-400 text-xs">Current Bid:</span>
+              <span class="text-app-violet-600 dark:text-app-violet-400 font-bold">
+                ${{ highestBid }}
+              </span>
+            </div>
+
+            <div class="flex justify-between items-center">
+              <span class="text-neutral-600 dark:text-neutral-400 text-xs">Highest Bidder:</span>
+              <span class="text-neutral-900 dark:text-white font-medium text-xs">
+                {{ highestBidder?.username || 'No bids yet' }}
+              </span>
+            </div>
+
+            <div class="border-t border-violet-100 dark:border-violet-800/30 my-2 pt-2">
+              <div class="flex justify-between items-center">
+                <span class="text-neutral-600 dark:text-neutral-400 text-xs">Current Balance:</span>
+                <span class="text-green-600 dark:text-green-400 font-medium">
+                  ${{ userMoney }}
+                </span>
+              </div>
+
+              <div class="flex justify-between items-center">
+                <span class="text-neutral-600 dark:text-neutral-400 text-xs">After Sale:</span>
+                <span class="text-green-600 dark:text-green-400 font-bold">
+                  ${{ futureBalance }}
+                  <span class="text-green-500 dark:text-green-300 text-xs ml-1">
+                    (+${{ highestBid }})
+                  </span>
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Quick Bid Options - More compact with flex-shrink-0 -->
-      <div class="flex-shrink-0 mb-2">
+      <!-- Quick Bid Options - Only show when not seller -->
+      <div v-if="!isCurrentSeller" class="mb-2">
         <div class="grid grid-cols-2 gap-1.5">
           <button
             v-for="(amount, index) in quickBidOptions"
             :key="index"
             :class="[
-              'py-1 px-1.5 rounded-md font-medium transition-colors text-xs',
+              'py-1 px-1.5 xl:py-2 rounded-md font-medium transition-colors text-xs lg:text-md',
               canBid && isValidBid(amount)
                 ? 'bg-app-violet-500 hover:bg-app-violet-600 active:bg-app-violet-700 text-white'
                 : 'bg-neutral-100 dark:bg-neutral-800/50 text-neutral-400 dark:text-neutral-500 cursor-not-allowed',
@@ -215,8 +253,8 @@ const quickBidOptions = computed(() => {
         </div>
       </div>
 
-      <!-- Bottom section: Custom bid input - More compact with flex-shrink-0 -->
-      <div class="mt-auto flex-shrink-0">
+      <!-- Bottom section: Custom bid input - Only show when not seller -->
+      <div v-if="!isCurrentSeller" class="mt-auto">
         <!-- Money available indicator -->
         <div
           class="flex justify-between items-center text-xs text-neutral-500 dark:text-neutral-400 mb-1"
@@ -315,5 +353,11 @@ input[type='number'] {
 .flash-border {
   animation: flash-border 0.5s ease;
   border-color: var(--app-violet-500, #8b5cf6);
+}
+
+/* Prevent bounce scrolling on iOS */
+.no-bounce {
+  -webkit-overflow-scrolling: auto;
+  overscroll-behavior: contain;
 }
 </style>
