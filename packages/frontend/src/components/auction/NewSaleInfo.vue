@@ -4,7 +4,7 @@ import { useLobbyStore } from '@/stores/lobbyStore.ts'
 import { useStatsCreator } from '@/composables/useStatsCreator.ts'
 import BaseCard from '@/components/common/BaseCard.vue'
 import InnerCard from '@/components/common/InnerCard.vue'
-import AppIcons from '@/components/icons/AppIcons.vue'
+import SectionHeader from '@/components/common/SectionHeader.vue'
 import SaleInfoPreview from './SaleInfoPreview.vue'
 import SaleInfoCompare from './SaleInfoCompare.vue'
 import { useSettingsStore } from '@/stores/settingsStore.ts'
@@ -84,17 +84,8 @@ const totalInventoryItemsCount = computed(() =>
 
 <template>
   <BaseCard class="h-full flex flex-col">
-    <!-- Header with tabs -->
-    <div class="flex items-center justify-between mb-2">
-      <div class="flex items-center gap-1.5">
-        <div class="bg-app-fuchsia-100 dark:bg-app-fuchsia-500/20 p-1 rounded-lg">
-          <AppIcons color="fuchsia" name="preview" size="sm" />
-        </div>
-        <h2 class="text-sm md:text-base font-semibold text-zinc-900 dark:text-white">
-          Sale Preview
-        </h2>
-      </div>
-
+    <!-- Replace the header with the new component -->
+    <SectionHeader iconColor="fuchsia" iconName="preview" title="Sale Preview">
       <!-- Tabs -->
       <div class="flex text-xs bg-neutral-100 dark:bg-neutral-800 rounded-md p-0.5">
         <button
@@ -120,7 +111,7 @@ const totalInventoryItemsCount = computed(() =>
           Compare
         </button>
       </div>
-    </div>
+    </SectionHeader>
 
     <!-- Content Container -->
     <InnerCard class="flex-grow flex flex-col justify-start overflow-y-auto scrollbar-hide">
