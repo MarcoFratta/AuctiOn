@@ -5,6 +5,7 @@ import InventoryItem from '@/components/auction/InventoryItem.vue'
 import BaseCard from '@/components/common/BaseCard.vue'
 import InnerCard from '@/components/common/InnerCard.vue'
 import AppIcons from '@/components/icons/AppIcons.vue'
+import SectionHeader from '@/components/common/SectionHeader.vue'
 import ScrollableContainer from '@/components/common/ScrollableContainer.vue'
 
 const lobbyStore = useLobbyStore()
@@ -64,17 +65,8 @@ const totalItemsCount = computed(() => {
 
 <template>
   <BaseCard class="h-full flex flex-col">
-    <!-- More compact header with integrated summary -->
-    <div class="flex items-center justify-between gap-2 mb-1">
-      <div class="flex items-center gap-1.5">
-        <div class="bg-app-fuchsia-100 dark:bg-app-fuchsia-500/20 p-1 rounded-lg">
-          <AppIcons color="fuchsia" name="inventory" size="sm" />
-        </div>
-        <h2 class="text-sm md:text-base font-semibold text-zinc-900 dark:text-white">
-          Your Inventory
-        </h2>
-      </div>
-
+    <!-- Replace the header with the new component -->
+    <SectionHeader iconColor="fuchsia" iconName="inventory" title="Your Inventory">
       <!-- Inventory Summary - Always visible, more compact -->
       <div class="flex items-center gap-2 text-xs">
         <div class="flex items-center">
@@ -88,7 +80,7 @@ const totalItemsCount = computed(() => {
           }}</span>
         </div>
       </div>
-    </div>
+    </SectionHeader>
 
     <!-- Sort Controls - Integrated with header -->
     <div class="flex justify-start items-center mb-1 px-1">
