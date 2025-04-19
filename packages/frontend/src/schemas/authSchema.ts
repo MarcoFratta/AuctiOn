@@ -6,12 +6,12 @@ const passwordRegex = new RegExp(
 )
 
 export const baseSignUpSchema = z.object({
-  name: z
+  name: z.coerce
     .string()
     .min(3)
     .max(20)
     .regex(/^[A-Za-zÀ-ÿ]+$/, 'Name can only contain letters (no spaces or special characters)'),
-  email: z.string().email().max(50),
+  email: z.string().trim().toLowerCase().email().max(50),
   password: z
     .string()
     .min(8)
@@ -33,6 +33,6 @@ export const signUpSchema = baseSignUpSchema.refine(
 )
 
 export const signInSchema = z.object({
-  email: z.string().email().max(50),
+  email: baseSignUpSchema.shape.email,
   password: z.string().nonempty().max(30),
 })
