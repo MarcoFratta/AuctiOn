@@ -10,12 +10,15 @@ import { useAuthStore } from '@/stores/authStore.ts'
 import { type User, userSchema, useUserStore } from '@/stores/userStore.ts'
 import { validateSchema } from '@auction/common/validation'
 import { useErrorsHandler } from '@/composables/useErrorsHandler.ts'
-import { PasswordIncorrect, UserAlreadyRegistered } from '@/api/Errors.ts'
+import { InvalidData, PasswordIncorrect, UserAlreadyRegistered } from '@/api/Errors.ts'
 import { useSocketStore } from '@/stores/socketStore.ts'
+import { useAuctionConnection } from '@/composables/useAuctionConnection.ts'
+import { baseSignUpSchema } from '@/schemas/authSchema.ts'
 
 export function useAuth() {
   const tokens = useAuthStore()
   const users = useUserStore()
+  const connection = useAuctionConnection()
   const { handleError } = useErrorsHandler()
 
   function createUserData(user: { name: string; id: string; email: string }): User {
@@ -24,12 +27,23 @@ export function useAuth() {
       username: user.name,
     }) as User
   }
+
+  function validateEmail(email: string) {
+    const e = baseSignUpSchema.shape.email.safeParse(email)
+    if (!e.success) {
+      throw new InvalidData()
+    }
+    return e.data
+  }
   async function login(email: string, password: string) {
     try {
-      const data = await loginApi(email, password)
+      const e = validateEmail(email)
+      console.log('login in with', e)
+      const data = await loginApi(e, password)
       tokens.setTokens(data.user.token)
       delete data.user.token
       users.setUser(createUserData(data.user))
+      connection.connect().catch(() => {})
     } catch (error) {
       handleError(error, [[400, new PasswordIncorrect()]])
     }
@@ -37,10 +51,12 @@ export function useAuth() {
 
   async function register(name: string, email: string, password: string) {
     try {
-      const data = await registerApi(name, email, password)
+      const e = validateEmail(email)
+      const data = await registerApi(name, e, password)
       tokens.setTokens(data.user.token)
       delete data.user.token
       users.setUser(createUserData(data.user))
+      connection.connect().catch(() => {})
     } catch (error) {
       handleError(error, [[409, new UserAlreadyRegistered(email)]])
     }
@@ -54,6 +70,12 @@ export function useAuth() {
       .then((data) => {
         tokens.setTokens(data.token)
         users.setUser(createUserData(data.user))
+        connection
+          .connect()
+          .then(undefined)
+          .catch((_err) => {
+            console.log('no active lobby found')
+          })
       })
       .catch((error) => {
         handleError(error)
