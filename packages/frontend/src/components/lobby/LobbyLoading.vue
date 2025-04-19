@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full max-w-4xl mx-auto px-4 py-6 min-h-[80vh] flex items-center justify-center">
+  <div class="w-full max-w-4xl mx-auto px-4 py-6 flex items-center justify-center">
     <div class="w-full max-w-md">
       <BaseCard class="relative overflow-hidden">
         <!-- Animated shapes in background -->
