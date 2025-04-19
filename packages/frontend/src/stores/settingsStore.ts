@@ -3,13 +3,17 @@ import { defineStore } from 'pinia'
 export const useSettingsStore = defineStore('settings', {
   state: () => ({
     darkMode: true,
-    notifications: true,
+    auctionNotifications: true,
+    lobbyNotifications: true,
   }),
   actions: {
     toggleDarkMode() {
       this.darkMode = !this.darkMode
       this.applyTheme()
-      console.log('Theme toggled:', this.darkMode ? 'dark' : 'light')
+    },
+    disableNotifications() {
+      this.auctionNotifications = false
+      this.lobbyNotifications = false
     },
     applyTheme() {
       if (this.darkMode) {
@@ -21,7 +25,6 @@ export const useSettingsStore = defineStore('settings', {
       }
     },
     init() {
-      console.log('Initializing theme, current setting:', this.darkMode ? 'dark' : 'light')
       this.applyTheme()
     },
   },
