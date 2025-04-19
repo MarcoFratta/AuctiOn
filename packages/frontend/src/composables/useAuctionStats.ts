@@ -21,6 +21,9 @@ export function useAuctionStats() {
             const event = validateSchema(m.bidUpdateMsgSchema, msg)
             statsStore.storeBid(event.bid)
           })
+          .with('auction-start', () => {
+            statsStore.reset()
+          })
           .with('auction-end', () => {
             statsStore.reset()
           })
