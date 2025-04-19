@@ -4,6 +4,7 @@ import { computed } from 'vue'
 import BaseCard from '@/components/common/BaseCard.vue'
 import InnerCard from '@/components/common/InnerCard.vue'
 import AppIcons from '@/components/icons/AppIcons.vue'
+import SectionHeader from '@/components/common/SectionHeader.vue'
 
 const lobbyStore = useLobbyStore()
 const currentSale = computed(() => lobbyStore.lobby?.currentSale)
@@ -40,13 +41,8 @@ const percentageTextColor = computed(() => {
 
 <template>
   <BaseCard class="h-full flex flex-col">
-    <!-- Header -->
-    <div class="flex items-center gap-1.5 mb-1">
-      <div class="bg-app-fuchsia-100 dark:bg-app-fuchsia-500/20 p-0.5 rounded-lg">
-        <AppIcons color="fuchsia" name="sale" size="sm" />
-      </div>
-      <h2 class="text-base font-semibold text-zinc-900 dark:text-white">Current Sale</h2>
-    </div>
+    <!-- Replace the header with the new component -->
+    <SectionHeader iconColor="fuchsia" iconName="sale" title="Current Sale"> </SectionHeader>
 
     <!-- Empty state -->
     <InnerCard v-if="!currentSale" class="flex-grow flex items-center justify-center">
@@ -77,12 +73,10 @@ const percentageTextColor = computed(() => {
       <div
         class="bg-gray-50 dark:bg-neutral-800/50 rounded-lg p-2 mb-2 md:mb-3 border border-gray-200 dark:border-gray-700/50"
       >
-        <div class="flex justify-between items-center">
+        <div class="flex justify-start items-center">
           <div class="flex flex-row justify-start items-center gap-2">
-            <h2 class="text-xs md:text-sm font-medium text-gray-600 dark:text-gray-300">
-              Total Weight:
-            </h2>
-            <div class="text-orange-600 dark:text-orange-400 font-bold text-sm md:text-base">
+            <h2 class="text-md font-medium text-gray-600 dark:text-gray-300">Total Weight:</h2>
+            <div class="text-orange-600 dark:text-orange-400 font-bold text-md">
               {{ totalWeight }}
             </div>
           </div>
