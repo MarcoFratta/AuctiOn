@@ -1,33 +1,25 @@
 <script lang="ts" setup>
 import { useSettingsStore } from '@/stores/settingsStore'
-import { ref } from 'vue'
+import { computed } from 'vue'
 import BaseCard from '@/components/common/BaseCard.vue'
 import ToggleSwitch from '@/components/ui/ToggleSwitch.vue'
 
 const settingsStore = useSettingsStore()
 
-// Notification settings
-const notificationsEnabled = ref(true) // Default to enabled
-const gameInvites = ref(true)
-const gameUpdates = ref(true)
-const systemAnnouncements = ref(true)
-
-const toggleNotifications = () => {
-  notificationsEnabled.value = !notificationsEnabled.value
-  settingsStore.notifications = notificationsEnabled.value
-}
-
-const updateGameInvites = (value: boolean) => {
-  gameInvites.value = value
-}
-
-const updateGameUpdates = (value: boolean) => {
-  gameUpdates.value = value
-}
-
-const updateSystemAnnouncements = (value: boolean) => {
-  systemAnnouncements.value = value
-}
+// Computed property to check if any notifications are enabled
+const notificationsEnabled = computed({
+  get: () => settingsStore.lobbyNotifications || settingsStore.auctionNotifications,
+  set: (value) => {
+    if (!value) {
+      // Just disable both notification types
+      settingsStore.disableNotifications()
+    } else {
+      // Enable both when turning notifications back on
+      settingsStore.lobbyNotifications = true
+      settingsStore.auctionNotifications = true
+    }
+  },
+})
 </script>
 
 <template>
@@ -40,67 +32,42 @@ const updateSystemAnnouncements = (value: boolean) => {
       </h3>
 
       <div class="space-y-6">
-        <!-- Global Notifications Toggle -->
-        <div class="flex items-center justify-between">
-          <div>
-            <h4 class="text-zinc-900 dark:text-white font-medium">Enable Notifications</h4>
-            <p class="text-gray-500 dark:text-app-violet-300 text-sm mr-3">
-              Receive notifications about game events and updates
-            </p>
-          </div>
-          <ToggleSwitch
-            id="notification-toggle"
-            :modelValue="notificationsEnabled"
-            @update:modelValue="toggleNotifications"
-          />
-        </div>
-
         <!-- Notification Types -->
-        <div class="space-y-4 pt-4 border-t border-gray-200 dark:border-app-violet-900/30">
-          <h4 class="text-zinc-900 dark:text-white font-medium">Notification Types</h4>
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <h4 class="text-zinc-900 dark:text-white font-medium">Notification Settings</h4>
+            <button
+              v-if="notificationsEnabled"
+              class="text-sm text-app-violet-600 dark:text-app-violet-400 hover:text-app-violet-800 dark:hover:text-app-violet-300"
+              @click="settingsStore.disableNotifications()"
+            >
+              Disable All
+            </button>
+          </div>
 
           <div class="flex items-center justify-between py-2">
             <div>
-              <h5 class="text-zinc-900 dark:text-white">Game Invites</h5>
+              <h5 class="text-zinc-900 dark:text-white">Lobby Notifications</h5>
               <p class="text-gray-500 dark:text-app-violet-300 text-sm mr-3">
-                Notifications when you're invited to join a game
+                Notifications about lobby events
               </p>
             </div>
             <ToggleSwitch
-              id="game-invites-toggle"
-              :disabled="!notificationsEnabled"
-              :modelValue="gameInvites"
-              @update:modelValue="updateGameInvites"
+              id="lobby-notifications-toggle"
+              v-model="settingsStore.lobbyNotifications"
             />
           </div>
 
           <div class="flex items-center justify-between py-2">
             <div>
-              <h5 class="text-zinc-900 dark:text-white">Game Updates</h5>
+              <h5 class="text-zinc-900 dark:text-white">Auction Notifications</h5>
               <p class="text-gray-500 dark:text-app-violet-300 text-sm mr-3">
-                Notifications about your turn or game state changes
+                Notifications about auction events and updates
               </p>
             </div>
             <ToggleSwitch
-              id="game-updates-toggle"
-              :disabled="!notificationsEnabled"
-              :modelValue="gameUpdates"
-              @update:modelValue="updateGameUpdates"
-            />
-          </div>
-
-          <div class="flex items-center justify-between py-2">
-            <div>
-              <h5 class="text-zinc-900 dark:text-white">System Announcements</h5>
-              <p class="text-gray-500 dark:text-app-violet-300 text-sm mr-3">
-                Important announcements about the platform
-              </p>
-            </div>
-            <ToggleSwitch
-              id="system-announcements-toggle"
-              :disabled="!notificationsEnabled"
-              :modelValue="systemAnnouncements"
-              @update:modelValue="updateSystemAnnouncements"
+              id="auction-notifications-toggle"
+              v-model="settingsStore.auctionNotifications"
             />
           </div>
         </div>
