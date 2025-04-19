@@ -4,13 +4,10 @@ import { computed, ref } from 'vue'
 import { useLobbyStore } from '@/stores/lobbyStore.ts'
 import BaseCard from '@/components/common/BaseCard.vue'
 import LoadingButton from '@/components/common/LoadingButton.vue'
-import AppIcons from '@/components/icons/AppIcons.vue'
-import { useStatsCreator } from '@/composables/useStatsCreator.ts'
 import type { ItemQuantity } from '@/schemas/LobbySchema.ts'
-import InnerCard from '@/components/common/InnerCard.vue'
+import SectionHeader from '@/components/common/SectionHeader.vue'
 
 const lobbyStore = useLobbyStore()
-const { avgDollarPerWeight } = useStatsCreator()
 const startingItems = lobbyStore.lobby!.startInventory.items.map((i) => {
   return { ...i, quantity: 0 }
 })
@@ -30,21 +27,6 @@ const details = computed(() => {
   )
 })
 
-// Calculate total weight of selected items
-const totalWeight = computed(() => {
-  return items.value
-    .filter((item) => item.quantity > 0)
-    .reduce((acc, item) => {
-      const weight = lobbyStore.weights.find((w) => w.item === item.item)?.weight || 0
-      return acc + weight * item.quantity
-    }, 0)
-})
-
-// Calculate estimated sale price based on average dollar per weight
-const estimatedPrice = computed(() => {
-  return Math.round(totalWeight.value * avgDollarPerWeight.value)
-})
-
 const isLoading = ref(false)
 const emits = defineEmits(['sale', 'update:items'])
 
@@ -60,6 +42,8 @@ const createSale = () => {
   isLoading.value = true
   const itemsToSell = items.value.filter((i) => i.quantity > 0)
   emits('sale', itemsToSell)
+  items.value = startingItems
+  emits('update:items', items)
   setTimeout(() => {
     isLoading.value = false
   }, 1000)
@@ -68,42 +52,25 @@ const createSale = () => {
 const canCreateSale = computed(() => {
   return items.value.some((i) => i.quantity > 0)
 })
-
-// Calculate percentage of inventory being sold (by weight)
-const inventoryPercentageSold = computed(() => {
-  const currentTotalWeight =
-    lobbyStore.playerInfo?.inventory.items.reduce((acc, item) => {
-      const weight = lobbyStore.weights.find((w) => w.item === item.item)?.weight || 0
-      return acc + weight * item.quantity
-    }, 0) || 0
-
-  if (currentTotalWeight === 0) return 0
-  return Math.round((totalWeight.value / currentTotalWeight) * 100)
-})
 </script>
 
 <template>
-  <BaseCard class="h-full flex flex-col">
-    <!-- Header -->
-    <div class="flex items-center justify-start mb-2">
-      <div class="flex items-center gap-1.5">
-        <div class="bg-green-100 dark:bg-green-500/20 p-1 rounded-lg">
-          <AppIcons color="green" name="create-sale" size="sm" />
-        </div>
-        <h2 class="text-sm md:text-base font-semibold text-zinc-900 dark:text-white">Sell</h2>
-      </div>
-    </div>
+  <BaseCard class="h-full justify-start flex-grow">
+    <!-- Replace the header with the new component -->
+    <SectionHeader iconColor="green" iconName="create-sale" title="Sell"></SectionHeader>
 
-    <div class="overflow-y-auto">
+    <!-- Content -->
+    <div class="flex h-full flex-col overflow-y-auto scrollbar-hide">
+      <!-- Inventory Selector - Make sure InnerCard passes height properly -->
+
       <InventorySelector
-        :details="details"
         :items="[items[0], ...items.slice(1)]"
+        :details="details"
         @update:items="updateItems"
       />
     </div>
-
     <!-- Create Sale Button with Stats -->
-    <div class="mt-2 space-y-2">
+    <div class="mt-3 space-y-2">
       <LoadingButton
         :disable="!canCreateSale"
         :loading="isLoading"
