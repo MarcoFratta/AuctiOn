@@ -12,7 +12,6 @@ import { useErrorsHandler } from '@/composables/useErrorsHandler.ts'
 import { useRouter } from 'vue-router'
 import Background from '@/components/common/Background.vue'
 import Title from '@/components/common/Title.vue'
-import { useSettingsStore } from '@/stores/settingsStore.ts'
 import BaseCard from '@/components/common/BaseCard.vue'
 import AuthLink from '@/components/common/AuthLink.vue'
 
@@ -20,7 +19,6 @@ const { register } = useAuth()
 const schema = toTypedSchema(signUpSchema)
 const errorHandler = useErrorsHandler()
 const router = useRouter()
-const settingsStore = useSettingsStore()
 const { values, errors, defineField, validate } = useForm({
   validationSchema: schema,
 })
