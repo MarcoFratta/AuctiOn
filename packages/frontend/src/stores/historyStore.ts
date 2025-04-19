@@ -12,6 +12,8 @@ export const useHistoryStore = defineStore('history', {
   actions: {
     storeSale(s: Sale) {
       this.sales.push(s)
+      console.log(`updating last sale index to ${this.bids.length}`)
+      this.lastSaleIndex = this.bids.length
     },
     storeBid(b: Bid) {
       this.bids.push(b)
