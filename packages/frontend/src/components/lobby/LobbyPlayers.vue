@@ -98,14 +98,19 @@
           </span>
 
           <!-- Kick Button -->
-          <button
+          <LoadingButton
+            :confirm-message="`Are you sure you want to kick ${player.username}?`"
+            btn-style="px-3 py-1 text-white bg-red-500 hover:bg-red-600 rounded-md transition-colors text-xs font-medium"
+            confirm-button-text="Kick"
+            confirm-title="Kick Player"
+            custom-style
             v-if="amIAdmin && player.id !== userStore.user?.id"
-            class="p-1 text-white bg-red-500 hover:bg-red-600 rounded-lg transition-colors text-xs font-medium"
+            require-confirm
             @click="kickPlayer(player.id)"
             title="Kick Player"
           >
             Kick
-          </button>
+          </LoadingButton>
         </div>
       </li>
     </ul>
@@ -120,6 +125,7 @@
 import { computed } from 'vue'
 import { useUserStore } from '@/stores/userStore'
 import { type Player, useLobbyStore } from '@/stores/lobbyStore'
+import LoadingButton from '@/components/common/LoadingButton.vue'
 
 const userStore = useUserStore()
 const lobbyStore = useLobbyStore()
