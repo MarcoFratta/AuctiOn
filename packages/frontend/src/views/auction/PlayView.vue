@@ -9,13 +9,6 @@
     <Teleport v-if="lobbyStore.lobby" class="hidden lg:block" to="#header-right-content">
       <GameHeader />
     </Teleport>
-    <Teleport
-      v-if="isCurrentUserSeller && lobbyStore.lobby!.currentSale"
-      class="hidden lg:block"
-      to="#header-right-content"
-    >
-      <AuctionTimer :remaining-time="remainingTime" :total-time="lobbyStore.lobby!.bidTime" />
-    </Teleport>
     <!-- Mobile Bottom Bar at the top -->
     <LobbyLoading v-if="!lobbyStore.lobby" />
 
@@ -57,7 +50,7 @@
           <!-- Current Bid Card or Sale Card - with fixed height -->
           <div v-if="isCurrentUserSeller && !lobbyStore.lobby?.currentSale">
             <SaleCard
-              class="h-full max-h-[300px]"
+              class="h-full max-h-[320px]"
               @sale="handleSale"
               @update:items="sellingItems = $event"
             />
@@ -144,7 +137,6 @@
 
 <script lang="ts" setup>
 import { useLobbyStore } from '@/stores/lobbyStore.ts'
-import { useUserStore } from '@/stores/userStore.ts'
 import { useSettingsStore } from '@/stores/settingsStore.ts'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
@@ -164,13 +156,10 @@ import { useAuctionConnection } from '@/composables/useAuctionConnection.ts'
 import LobbyLoading from '@/components/lobby/LobbyLoading.vue'
 import { useHeaderStore } from '@/stores/headerStore.ts'
 import AuctionStats from '@/components/auction/AuctionStats.vue'
-import AuctionTimer from '@/components/auction/AuctionTimer.vue'
 import MobileBottomBar from '@/components/auction/MobileBottomBar.vue'
-import ScrollableContainer from '@/components/common/ScrollableContainer.vue'
 
 const lobbyStore = useLobbyStore()
 const auctionService = useAuctionService()
-const userStore = useUserStore()
 const settingsStore = useSettingsStore()
 const router = useRouter()
 // Use our auction timer composable
@@ -198,7 +187,7 @@ const handleSale = (items: NewSaleMsg['sale']['items']) => {
 
 // Check if current user is the seller
 const isCurrentUserSeller = computed(() => {
-  return lobbyStore.lobby?.sellerQueue[lobbyStore.sellerIndex] === userStore.user?.id
+  return lobbyStore.userIsTheSeller
 })
 const connection = useAuctionConnection()
 if (!lobbyStore.lobby) {
