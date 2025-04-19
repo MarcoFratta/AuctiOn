@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
-import { useSettingsStore } from '@/stores/settingsStore.ts'
+import { useAlert } from '@/composables/useAlert'
 
-const settingsStore = useSettingsStore()
+const alert = useAlert()
 
 const props = defineProps({
   loading: {
@@ -27,12 +27,49 @@ const props = defineProps({
     default: 'md', // sm, md, lg
     validator: (value: string) => ['sm', 'md', 'lg'].includes(value),
   },
+  // New props for confirmation
+  requireConfirm: {
+    type: Boolean,
+    default: false,
+  },
+  confirmTitle: {
+    type: String,
+    default: 'Confirm Action',
+  },
+  confirmMessage: {
+    type: String,
+    default: 'Are you sure you want to proceed?',
+  },
+  confirmButtonText: {
+    type: String,
+    default: 'Confirm',
+  },
+  btnStyle: {
+    type: String,
+    default: '',
+  },
+  customStyle: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const emit = defineEmits(['click'])
 
-const handleClick = (event: MouseEvent) => {
-  if (!props.disable && !props.loading) {
+const handleClick = async (event: MouseEvent) => {
+  if (props.disable || props.loading) return
+
+  if (props.requireConfirm) {
+    const confirmed = await alert.confirm(
+      props.confirmTitle,
+      props.confirmMessage,
+      props.confirmButtonText,
+    )
+
+    if (confirmed) {
+      emit('click', event)
+    }
+  } else {
     emit('click', event)
   }
 }
@@ -68,14 +105,19 @@ const buttonClasses = computed(() => {
         : 'text-white shadow-md hover:shadow-lg shadow-lg shadow-red-900/30 hover:shadow-red-600/40 focus:ring-red-500',
   }[props.variant]
 
-  return `${baseClasses} ${sizeClasses} ${variantClasses}`
+  return `${sizeClasses} ${variantClasses} ${baseClasses} `
 })
 </script>
 
 <template>
-  <button :class="buttonClasses" :disabled="disable || loading" type="button" @click="handleClick">
+  <button
+    :class="(customStyle ? '' : buttonClasses) + ` ${btnStyle}`"
+    :disabled="disable || loading"
+    type="button"
+    @click="handleClick"
+  >
     <!-- Loading spinner -->
-    <div v-if="loading" class="absolute inset-0 flex items-center justify-center">
+    <div v-if="loading && !customStyle" class="absolute inset-0 flex items-center justify-center">
       <div class="spinner">
         <div class="double-bounce1"></div>
         <div class="double-bounce2"></div>
@@ -120,22 +162,6 @@ const buttonClasses = computed(() => {
   50% {
     transform: scale(1);
   }
-}
-
-/* Glow effect on hover - only in dark mode */
-.dark button:not(:disabled):hover::after {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  border-radius: 0.375rem;
-  background: linear-gradient(45deg, rgba(255, 0, 255, 0.2), rgba(102, 0, 255, 0.2));
-  z-index: -1;
-  filter: blur(8px);
-  opacity: 0;
-  transition: opacity 0.3s ease;
 }
 
 .dark button:not(:disabled):hover::after {
