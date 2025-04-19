@@ -1,10 +1,18 @@
 import { useSocketStore } from '@/stores/socketStore.ts'
 import { useLobbyService } from '@/composables/useLobbyService.ts'
 import { NotFound } from '@/api/Errors.ts'
+import { useLobbyMsgHandler } from '@/composables/useLobbyMsgHandler.ts'
+import { useLobbyNotifications } from '@/composables/useLobbyNotifications.ts'
+import { useAuctionNotifications } from '@/composables/useAuctionNotifications.ts'
+import { useAuctionStats } from '@/composables/useAuctionStats.ts'
 
 export function useAuctionConnection() {
   const socketStore = useSocketStore()
   const lobbyService = useLobbyService()
+  const lobbyMsgHandler = useLobbyMsgHandler()
+  const lobbyNotifications = useLobbyNotifications()
+  const auctionNotifications = useAuctionNotifications()
+  const auctionStats = useAuctionStats()
   let connectionPromise: Promise<void> | null = null
 
   function connect(): Promise<void> {
@@ -25,17 +33,25 @@ export function useAuctionConnection() {
       lobbyService
         .checkActiveLobby()
         .then(() => {
-          socketStore.connect(() => {
-            console.log('Connected to auction')
-            resolve()
-          })
+          try {
+            lobbyNotifications.attach()
+            lobbyMsgHandler.attach()
+            auctionNotifications.attach()
+            auctionStats.attach()
+            socketStore.connect(() => {
+              console.log('Connected to auction')
+              resolve()
+            })
+          } catch (_error) {
+            reject()
+          }
         })
-        .catch((_error) => {
+        .catch(async () => {
           reject(new NotFound())
         })
-    }).finally(() => {
+    })
+    connectionPromise.finally(() => {
       connectionPromise = null
-      return
     })
 
     return connectionPromise

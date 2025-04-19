@@ -1,11 +1,8 @@
 <script lang="ts" setup>
-import { onBeforeMount, ref, watch } from 'vue'
+import { onBeforeMount, onMounted, ref, watch } from 'vue'
 import { useAuthStore } from '@/stores/authStore.ts'
 import AppHeader from '@/components/common/AppHeader.vue'
-import { useLobbyMsgHandler } from '@/composables/useLobbyMsgHandler.ts'
-import { useAuctionNotifications } from '@/composables/useAuctionNotifications.ts'
 import { useAuth } from '@/composables/useAuth.ts'
-import { useLobbyService } from '@/composables/useLobbyService.ts'
 import { useAuctionConnection } from '@/composables/useAuctionConnection.ts'
 import { useSettingsStore } from '@/stores/settingsStore'
 import NavigationDrawer from '@/components/common/NavigationDrawer.vue'
@@ -17,27 +14,8 @@ const isDrawerOpen = ref(false)
 const toggleDrawer = () => {
   isDrawerOpen.value = !isDrawerOpen.value
 }
-const lobbyMsgHandler = useLobbyMsgHandler()
-const auctionNotifications = useAuctionNotifications()
-const lobbyService = useLobbyService()
 
-lobbyMsgHandler.attach()
-auctionNotifications.attach()
-watch(
-  () => authStore.isAuthenticated,
-  async (isAuthenticated) => {
-    if (isAuthenticated) {
-      console.log('Checking active lobby')
-      lobbyService
-        .checkActiveLobby()
-        .then(() => {
-          useAuctionConnection().connect()
-        })
-        .catch()
-    }
-  },
-)
-onBeforeMount(() => useAuth().refresh().then().catch())
+onBeforeMount(() => useAuth().refresh().catch())
 
 const settingsStore = useSettingsStore()
 settingsStore.init()
@@ -53,10 +31,28 @@ watch(
   },
   { immediate: true },
 )
+onMounted(() => {
+  // Check if the user is authenticated
+  if (authStore.isAuthenticated) {
+    // If authenticated, connect to the auction
+    useAuctionConnection()
+      .connect()
+      .then(undefined)
+      .catch(() => {
+        console.log('no active auction found for user')
+      })
+  }
+})
 </script>
 
 <template>
-  <NavigationDrawer :is-open="isDrawerOpen" @closeDrawer="toggleDrawer" />
-  <AppHeader @openDrawer="toggleDrawer"> </AppHeader>
-  <router-view />
+  <div class="flex flex-col h-[100dvh] min-w-screen overflow-x-hidden">
+    <AppHeader class="z-50" @openDrawer="toggleDrawer" />
+    <NavigationDrawer :is-open="isDrawerOpen" @closeDrawer="toggleDrawer" />
+    <main
+      class="flex-1 size-full bg-app-white dark:bg-black overflow-y-hidden relative max-w-screen"
+    >
+      <router-view />
+    </main>
+  </div>
 </template>
