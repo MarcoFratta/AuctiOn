@@ -51,7 +51,7 @@ const computedTrendColor = computed(() => {
 
 // Determine if we should show the trend indicator
 const showTrendIndicator = computed(() => {
-  return props.referenceValue !== undefined
+  return props.referenceValue !== undefined && props.value !== 0
 })
 </script>
 
