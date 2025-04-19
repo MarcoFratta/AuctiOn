@@ -8,7 +8,6 @@ import z from 'zod'
 import ValueBadge from '@/components/common/ValueBadge.vue'
 import QuantitySelector from '@/components/common/QuantitySelector.vue'
 import ScrollableContainer from '@/components/common/ScrollableContainer.vue'
-import InnerCard from '@/components/common/InnerCard.vue'
 
 type EntryType = z.infer<typeof lobbyConfigSchema.shape.startInventory.shape.items>
 type ItemDetail = { min: number; max: number }
@@ -20,9 +19,7 @@ const props = defineProps<{
   compact?: boolean
 }>()
 
-defineSlots<{
-  header?: () => any
-}>()
+defineSlots(['header'])
 
 const emits = defineEmits<{
   (event: 'update:items', value: EntryType): void
@@ -77,7 +74,7 @@ const updateQuantity = (itemName: string, newQuantity: number) => {
     <div class="flex-grow flex flex-col overflow-y-auto scrollbar-hide">
       <!-- Scrollable items area - ONLY items should scroll -->
       <ScrollableContainer
-        container-class="rounded-md flex justify-start center-items gap-1"
+        container-class="rounded-md flex flex-col justify-start center-items gap-1"
         show-scroll-indicator
       >
         <div
