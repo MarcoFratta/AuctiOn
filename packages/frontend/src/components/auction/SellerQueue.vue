@@ -1,12 +1,7 @@
 <template>
   <BaseCard class="h-full flex flex-col">
-    <!-- More compact header -->
-    <div class="flex items-center gap-1.5 mb-1.5">
-      <div class="bg-app-violet-100 dark:bg-app-violet-500/20 p-1 rounded-lg">
-        <AppIcons color="violet" name="queue" size="sm" />
-      </div>
-      <h2 class="text-sm md:text-base font-semibold text-zinc-900 dark:text-white">Seller Queue</h2>
-    </div>
+    <!-- Replace the header with the new component -->
+    <SectionHeader iconColor="violet" iconName="queue" title="Seller Queue"> </SectionHeader>
 
     <!-- InnerCard with ScrollableContainer -->
     <InnerCard class="flex-grow flex flex-col overflow-y-auto scrollbar-hide">
@@ -90,6 +85,7 @@ import { computed } from 'vue'
 import BaseCard from '@/components/common/BaseCard.vue'
 import InnerCard from '@/components/common/InnerCard.vue'
 import AppIcons from '@/components/icons/AppIcons.vue'
+import SectionHeader from '@/components/common/SectionHeader.vue'
 import ScrollableContainer from '@/components/common/ScrollableContainer.vue'
 
 const lobbyStore = useLobbyStore()
