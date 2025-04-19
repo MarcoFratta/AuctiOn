@@ -4,22 +4,22 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import InventorySelector from '@/components/common/InventorySelector.vue'
 import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { lobbyConfigSchema } from '@/schemas/LobbySchema.ts'
 import LoadingButton from '@/components/common/LoadingButton.vue'
 import { useAuthStore } from '@/stores/authStore.ts'
 import { useErrorsHandler } from '@/composables/useErrorsHandler.ts'
 import { InvalidData } from '@/api/Errors.ts'
-import router from '@/router'
 import { useLobbyService } from '@/composables/useLobbyService.ts'
 import Background from '@/components/common/Background.vue'
 import { useSettingsStore } from '@/stores/settingsStore.ts'
 import GameShapes from '@/components/icons/GameShapes.vue'
 import BaseCard from '@/components/common/BaseCard.vue'
 import Title from '@/components/common/Title.vue'
-import { useAuctionConnection } from '@/composables/useAuctionConnection.ts'
 import AppIcons from '@/components/icons/AppIcons.vue'
 
 const authStore = useAuthStore()
+const router = useRouter()
 const lobbyService = useLobbyService()
 const settingsStore = useSettingsStore()
 const isAuthenticated = computed(() => authStore.isAuthenticated)
@@ -88,8 +88,7 @@ const handleForm = async () => {
       startInventory: { items: values.startInventory?.items! },
     })
     await new Promise((resolve) => setTimeout(resolve, 200))
-    await useAuctionConnection().connect()
-    await router.push('/lobby')
+    await router.replace('/lobby')
   } catch (e) {
     console.log('Error', e)
     const err = errorsHandler
@@ -97,7 +96,7 @@ const handleForm = async () => {
       .unknownError()
       .invalidData()
       .alreadyInLobby('You already joined a lobby', async () => {
-        await router.push('/lobby')
+        await router.replace('/lobby')
       })
       .authenticationError('', () => router.push('/login?redirect=/create'))
       .tooManyRequests()

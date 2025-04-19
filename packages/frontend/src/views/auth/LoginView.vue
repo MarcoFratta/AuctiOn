@@ -6,17 +6,16 @@ import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import { signInSchema } from '@/schemas/authSchema.ts'
 import { computed, onMounted, ref } from 'vue'
-import router from '@/router'
+import { useRouter } from 'vue-router'
 import { useErrorsHandler } from '@/composables/useErrorsHandler.ts'
 import Background from '@/components/common/Background.vue'
 import LoadingButton from '@/components/common/LoadingButton.vue'
-import { useSettingsStore } from '@/stores/settingsStore.ts'
 import BaseCard from '@/components/common/BaseCard.vue'
 import AuthLink from '@/components/common/AuthLink.vue'
 
 const { login } = useAuth()
 const auth = useAuthStore()
-const settingsStore = useSettingsStore()
+const router = useRouter()
 
 const schema = toTypedSchema(signInSchema)
 const { values, errors, defineField } = useForm({
