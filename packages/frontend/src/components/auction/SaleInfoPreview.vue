@@ -19,11 +19,13 @@ defineProps<{
     <!-- Sale Stats -->
     <div class="grid grid-cols-2 gap-2 mb-3">
       <StatDisplay
+        prefix=""
         :value="totalWeight"
         title="Selected Weight"
         valueColor="text-orange-600 dark:text-orange-400"
       />
       <StatDisplay
+        prefix="$"
         :show-percentage="false"
         :value="estimatedPrice"
         title="Estimated Price"
