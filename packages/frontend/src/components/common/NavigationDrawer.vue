@@ -3,6 +3,7 @@ import { useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth.ts'
 import { useLobbyStore } from '@/stores/lobbyStore.ts'
 import { useAuthStore } from '@/stores/authStore.ts'
+import LoadingButton from '@/components/common/LoadingButton.vue'
 
 const auth = useAuth()
 const authStore = useAuthStore()
@@ -115,12 +116,20 @@ const closeDrawer = () => {
       v-if="authStore.isAuthenticated"
       class="absolute bottom-0 w-full p-4 border-t border-gray-100 dark:border-gray-800"
     >
-      <button
-        class="w-full px-6 py-3.5 rounded-lg text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 font-medium transition-all duration-200 text-left"
+      <LoadingButton
+        btn-style="w-full py-2 rounded-lg bg-transparent
+        hover:bg-transparent
+        shadow-none text-red-500 dark:text-red-400 hover:text-red-600
+        dark:hover:text-red-300 font-medium transition-all duration-200 text-left align-left"
+        confirm-button-text="Logout"
+        confirm-message="Are you sure you want to logout?"
+        confirm-title="Logout"
+        custom-style
+        require-confirm
         @click="handleLogout"
       >
         Logout
-      </button>
+      </LoadingButton>
     </div>
   </div>
 </template>
