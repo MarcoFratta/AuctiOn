@@ -4,50 +4,55 @@ import { match } from 'ts-pattern'
 import { validateSchema } from '@auction/common/validation'
 import * as m from '@auction/common/messages'
 import { useNotifications } from '@/composables/useNotifications'
+import { useSettingsStore } from '@/stores/settingsStore'
 
 export function useAuctionNotifications() {
   const socketStore = useSocketStore()
   const lobbyStore = useLobbyStore()
+  const settingsStore = useSettingsStore()
   const notifier = useNotifications()
 
   function attach() {
     socketStore.attach('auction:notification', undefined, (msg) => {
-      console.log(`Received event: ${JSON.stringify(msg)}`)
+      if (!settingsStore.auctionNotifications) return
+
       match(msg.type)
-        .with('player-connected', () => {
-          const event = validateSchema(m.playerConnectedMsgSchema, msg)
-          // Only show notification if we've seen this user join before
-          if (event.playerId == lobbyStore.currentUser?.id) {
-            notifier.success(`Connected to the lobby`)
-          } else if (!event.old) {
-            const user = lobbyStore.getUser(event.playerId)
-            if (user) {
-              notifier.success(`${user.username} has connected`)
-            }
+        .with('new-sale', () => {
+          const event = validateSchema(m.saleUpdateMsgSchema, msg)
+          const seller = lobbyStore.getUser(event.sale.sellerId)
+          notifier.info(`New sale from: ${seller!.username}`)
+        })
+        .with('new-bid', () => {
+          const event = validateSchema(m.bidUpdateMsgSchema, msg)
+          const bidder = lobbyStore.getUser(event.bid.playerId)
+          const bidderName = bidder ? bidder.username : 'Someone'
+
+          if (event.bid.playerId === lobbyStore.currentUser?.id) {
+            notifier.success(`You placed a bid of ${event.bid.amount}`)
+          } else {
+            notifier.info(`${bidderName} placed a bid of ${event.bid.amount}`)
           }
         })
-        .with('player-disconnected', () => {
-          const event = validateSchema(m.playerDisconnectedMsgSchema, msg)
-          const user = lobbyStore.getUser(event.playerId)
-          if (user) {
-            notifier.error(`${user.username} has disconnected`)
+        .with('timer-start', () => {
+          const event = validateSchema(m.timerStartMsgSchema, msg)
+          const timeLeft = Math.floor((new Date(event.time).getTime() - Date.now()) / 1000)
+
+          if (timeLeft > 0) {
+            notifier.warning(`Bidding ends in ${timeLeft} seconds!`)
           }
         })
-        .with('player-leave', () => {
-          const event = validateSchema(m.playerLeaveSchema, msg)
-          const user = lobbyStore.getUser(event.playerId)
-          if (user) {
-            notifier.warning(`${user.username} has left the lobby`)
-          }
+        .with('round-end', () => {
+          const event = validateSchema(m.roundEndMsgSchema, msg)
+          const currentRound = event.auction.currentRound
+
+          notifier.success(`Round ${currentRound - 1} completed!`)
         })
-        .with('player-info', () => {
-          const event = validateSchema(m.playerInfoMsgSchema, msg)
-          if (event.playerId != lobbyStore.currentUser?.id && !event.old) {
-            notifier.info(
-              `${event.playerInfo.username} is ` +
-                `${event.playerInfo.status == 'waiting' ? 'Not ready' : 'Ready'}`,
-            )
-          }
+        .with('auction-start', () => {
+          const event = validateSchema(m.auctionStartMsgSchema, msg)
+          notifier.success(`Auction has started! ${event.auction.maxRound} rounds total.`)
+        })
+        .with('auction-end', () => {
+          notifier.warning('Auction has ended! View the results to see the final standings.')
         })
         .otherwise(() => {})
     })
