@@ -1,24 +1,9 @@
 <script lang="ts" setup>
 import { useLobbyStore } from '@/stores/lobbyStore.ts'
-import { useUserStore } from '@/stores/userStore.ts'
-import { computed, ref, onMounted } from 'vue'
-import AuctionTimer from '@/components/auction/AuctionTimer.vue'
-import AppIcons from '@/components/icons/AppIcons.vue'
+import { computed } from 'vue'
 
 const lobbyStore = useLobbyStore()
-const userStore = useUserStore()
 const playerMoney = computed(() => lobbyStore.playerInfo?.money || 0)
-
-// Check if current user is the seller
-const isCurrentUserSeller = computed(() => {
-  return lobbyStore.lobby?.sellerQueue[lobbyStore.sellerIndex] === userStore.user?.id
-})
-
-// Get remaining time from props
-const props = defineProps<{
-  remainingTime: number
-  totalTime: number
-}>()
 </script>
 
 <template>
@@ -31,7 +16,7 @@ const props = defineProps<{
       <div class="flex items-center gap-2">
         <!-- Money -->
         <div
-          class="bg-white/50 dark:bg-neutral-800/50 px-2 py-1 rounded-lg border border-neutral-100 dark:border-neutral-800 flex items-center gap-1 shadow-sm"
+          class="bg-white/50 dark:bg-neutral-800/50 px-2 py-1 rounded-lg border border-app-violet-900/30 dark:border-neutral-800 flex items-center gap-1 shadow-sm"
         >
           <span class="text-yellow-500 text-sm">💰</span>
           <span class="font-medium text-sm text-green-600 dark:text-green-400"
@@ -63,17 +48,12 @@ const props = defineProps<{
       <div class="flex items-center gap-2">
         <!-- Round -->
         <div
-          class="bg-white/50 dark:bg-neutral-800/50 px-2 py-1 rounded-lg border border-neutral-100 dark:border-neutral-800 flex items-center gap-1 shadow-sm"
+          class="bg-white/50 dark:bg-neutral-800/50 px-2 py-1 rounded-lg border border-app-violet-900/30 dark:border-neutral-800 flex items-center gap-1 shadow-sm"
         >
           <span class="text-neutral-600 dark:text-neutral-300 text-sm">Round:</span>
           <span class="text-app-violet-600 dark:text-app-violet-400 font-medium text-xs">
             {{ lobbyStore.lobby?.currentRound ?? 0 }}/{{ lobbyStore.lobby?.maxRound }}
           </span>
-        </div>
-
-        <!-- Timer (only shown for seller during active sale) -->
-        <div v-if="isCurrentUserSeller && lobbyStore.lobby?.currentSale">
-          <AuctionTimer :remaining-time="remainingTime" :total-time="totalTime" compact />
         </div>
       </div>
     </div>
