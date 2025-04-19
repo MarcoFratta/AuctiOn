@@ -20,9 +20,6 @@ export function useAuctionTimer() {
     // Calculate remaining time
     const remaining = bidTimeMs - elapsedMs
 
-    // For debugging
-    console.log(`Timer update: ${Math.floor(remaining / 1000)}s remaining`)
-
     // Return remaining time in seconds, clamped to 0 if negative
     return Math.max(0, Math.floor(remaining / 1000))
   }
@@ -30,8 +27,6 @@ export function useAuctionTimer() {
   const startTimer = () => {
     // Clear any existing timer
     stopTimer()
-
-    console.log('Starting timer')
 
     // Only start timer if there's an active sale
     if (lobbyStore.lobby?.currentSale) {
@@ -49,7 +44,6 @@ export function useAuctionTimer() {
 
   const stopTimer = () => {
     if (timerInterval) {
-      console.log('Stopping timer')
       window.clearInterval(timerInterval)
       timerInterval = undefined
     }
@@ -57,13 +51,11 @@ export function useAuctionTimer() {
 
   // Watch for changes in the current sale or timer start
   watch([() => lobbyStore.lobby?.currentSale, () => lobbyStore.timerStart], () => {
-    console.log('Sale or timer start changed, restarting timer')
     startTimer()
   })
 
   // Start the timer when the component mounts
   onMounted(() => {
-    console.log('Component mounted, starting timer')
     startTimer()
   })
 
