@@ -40,8 +40,11 @@ export async function setState(state: string): Promise<unknown> {
 }
 
 export function connectToLobby(token: string) {
-  return io(apiClient.defaults.baseURL, {
-    path: '/auction',
+  return io(import.meta.env.NODE_ENV == 'production' ? '/' : 'http://192.168.1.20:8080', {
+    path:
+      import.meta.env.NODE_ENV == 'production'
+        ? `/${import.meta.env.FRONTEND_API_URL || 'http://192.168.1.20:8080'}/auction`
+        : '/auction',
     auth: {
       token, // Pass token for authentication
     },
