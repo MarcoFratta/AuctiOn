@@ -79,6 +79,9 @@ export class LobbyServiceImpl implements LobbyService {
   async joinLobby(id: string, userId: string): Promise<Lobby> {
     const res: Lobby | null = await this.lobbyRepository.findById(id)
     const lobby: Lobby = this.checkLobbyExists(res, id)
+    if (lobby.status === 'completed') {
+      throw new LobbyNotFoundError(id)
+    }
     if (lobby.players.find((player: Player) => player.userId === userId)) {
       throw new UserAlreadyInLobby(id)
     }
