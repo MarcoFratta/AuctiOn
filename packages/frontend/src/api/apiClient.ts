@@ -3,7 +3,7 @@ import { useAuthStore } from '@/stores/authStore.ts'
 import { UnauthenticatedError } from '@/api/Errors.ts'
 
 const apiClient = axios.create({
-  baseURL: 'http://192.168.1.120:8080', // Replace with your API URL
+  baseURL: import.meta.env.FRONTEND_API_URL || 'http://192.168.1.20:8080', // Replace with your API URL
   headers: { 'Content-Type': 'application/json' },
   timeout: 5000,
   withCredentials: true, // Allows sending cookies (refresh token)
