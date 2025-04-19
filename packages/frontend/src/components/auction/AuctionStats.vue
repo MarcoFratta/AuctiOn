@@ -122,10 +122,7 @@ const lobbyStore = useLobbyStore()
 // Determine if there's a critical warning to show
 const hasWarning = computed(() => {
   // Check if there's an inventory risk warning
-  if (lobbyStore.lobby?.currentSale && !lobbyStore.userIsTheSeller) {
-    return true
-  }
-  return false
+  return !!(lobbyStore.lobby?.currentSale && !lobbyStore.userIsTheSeller)
 })
 </script>
 
