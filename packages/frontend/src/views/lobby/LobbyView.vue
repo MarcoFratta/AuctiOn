@@ -4,31 +4,12 @@
     <LobbyLoading v-if="!lobbyStore.lobby || !userStore.user" />
 
     <!-- Existing lobby content -->
-    <div v-else class="w-full h-fit flex flex-col justify-center items-center">
-      <!-- Header with animated shapes -->
-      <div class="flex flex-col items-center mb-3 md:mb-4 px-2 relative">
-        <div class="absolute top-5 -left-5 opacity-50 hidden md:block">
-          <GameShapes
-            :color="settingsStore.darkMode ? 'violet' : 'default'"
-            animated
-            size="md"
-            type="circle"
-          />
-        </div>
-        <div class="absolute top-5 -right-5 opacity-50 hidden md:block">
-          <GameShapes
-            :color="settingsStore.darkMode ? 'fuchsia' : 'default'"
-            animated
-            size="md"
-            type="triangle"
-          />
-        </div>
-
-        <Title class="text-3xl md:text-4xl mb-2"> Auction Lobby </Title>
-        <p class="text-gray-600 dark:text-app-violet-200 text-center max-w-md text-sm md:text-base">
-          Get ready for the auction! Invite friends and start when everyone is ready.
-        </p>
-      </div>
+    <div v-else class="w-full h-fit flex flex-col justify-center items-center mt-2">
+      <!-- Replace the header with our new component -->
+      <PageHeader
+        subtitle="Get ready for the auction! Invite friends and start when everyone is ready."
+        title="Auction Lobby"
+      />
 
       <!-- Main Content - Reorganized for better space utilization -->
       <div class="w-full grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-4 max-w-5xl">
@@ -56,25 +37,33 @@
                   v-if="!amIAdmin"
                   :class="[
                     'px-4 py-2 rounded-lg font-semibold text-white transition-all w-full',
-                    ready
+                    !ready
                       ? 'bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700'
                       : 'bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700',
                   ]"
                   @click="setReady"
                 >
-                  {{ ready ? '✓ Ready' : 'Not Ready' }}
+                  {{ ready ? 'Set Not Ready' : 'Set Ready' }}
                 </button>
 
                 <LoadingButton v-if="amIAdmin" class="w-full" @click="start">
                   Start Auction
                 </LoadingButton>
 
-                <button
-                  class="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white rounded-lg font-semibold transition-all w-full"
+                <LoadingButton
+                  btnStyle="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700
+                  shadow-none dark:hover:bg-gray-600  rounded-lg
+                  font-semibold transition-all w-full"
+                  confirm-button-text="Delete"
+                  confirm-message="Are you sure you want to delete this lobby? This action cannot be undone."
+                  confirm-title="Delete lobby"
+                  require-confirm
                   @click="leave"
                 >
-                  {{ amIAdmin ? 'Delete Lobby' : 'Leave Lobby' }}
-                </button>
+                  <p class="text-neutral-600 dark:text-white">
+                    {{ amIAdmin ? 'Delete Lobby' : 'Leave Lobby' }}
+                  </p>
+                </LoadingButton>
               </div>
             </div>
 
@@ -107,19 +96,16 @@ import { useLobbyService } from '@/composables/useLobbyService.ts'
 import { useAlert } from '@/composables/useAlert.ts'
 import { useRouter } from 'vue-router'
 import Background from '@/components/common/Background.vue'
-import GameShapes from '@/components/icons/GameShapes.vue'
 import BaseCard from '@/components/common/BaseCard.vue'
-import Title from '@/components/common/Title.vue'
 import LoadingButton from '@/components/common/LoadingButton.vue'
-import { useSettingsStore } from '@/stores/settingsStore.ts'
 import InnerCard from '@/components/common/InnerCard.vue'
 import { useErrorsHandler } from '@/composables/useErrorsHandler.ts'
 import LobbyLoading from '@/components/lobby/LobbyLoading.vue'
 import { useAuctionConnection } from '@/composables/useAuctionConnection.ts'
+import PageHeader from '@/components/common/PageHeader.vue'
 
 const lobbyStore = useLobbyStore()
 const router = useRouter()
-const settingsStore = useSettingsStore()
 const userStore = useUserStore()
 const users = computed(() => lobbyStore.users)
 const amIAdmin = computed(() => {
@@ -143,7 +129,7 @@ const leave = async () => {
 }
 
 const setReady = () => {
-  lobbyService.setState(!ready.value ? 'ready' : 'waiting').catch((_e) => {
+  lobbyService.setState(!ready.value ? 'ready' : 'waiting').catch(() => {
     alerts.error("Couldn't set ready", 'Please try again')
   })
 }
@@ -178,6 +164,7 @@ if (!lobbyStore.lobby) {
   useAuctionConnection()
     .connect()
     .catch(() => {
+      alerts.error('Not found', 'You have not joined any lobby, please try again later')
       router.push('/')
     })
 }
@@ -188,10 +175,9 @@ watch(
   () => lobbyStore.lobby,
   async (lobby) => {
     if (!lobby) {
-      await alerts.error('Disconnected', 'Please refresh the page')
+      await alerts.error('Disconnected', 'You have been disconnected from the lobby')
       router.push('/')
     } else if (lobbyStore.lobby?.startTimestamp) {
-      await alerts.error('game started', 'Please refresh the page')
       router.push('/play')
     }
   },
