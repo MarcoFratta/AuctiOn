@@ -37,51 +37,110 @@ export class ProxyController {
   }
 
   createWsProxy(io: Server) {
-    // Forward WebSocket connection to Auction Service after authentication
     io.on('connection', (socket: Socket) => {
       const user = socket.handshake.auth.user
-      logger.info(`[API Gateway] WebSocket connection authenticated for user: ${user.id}`)
+      if (!user || !user.id) {
+        logger.debug('[API Gateway] WebSocket connection attempt without user info in auth. Disconnecting.')
+        socket.disconnect(true)
+        return
+      }
+      logger.debug(`[API Gateway] WebSocket connection authenticated for user: ${user.id}`)
+
+      const auctionServiceUrl = config.services['auction']?.url
+      if (!auctionServiceUrl) {
+        logger.error('[API Gateway] Auction service URL not configured. Disconnecting client.')
+        socket.disconnect(true)
+        return
+      }
 
       // Manually create a WebSocket connection to the Auction Service
-      const auctionSocket = ioClient(config.services['auction'].url, {
-        path: '/auction',
+      const auctionSocket = ioClient(auctionServiceUrl, {
+        path: '/auction', // Ensure this path matches your auction service setup if needed
         transports: ['websocket'],
         auth: { user: user }, // Forward user data
+        // Add reconnection options if desired
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000,
       })
 
-      // Forward messages between client and auction service
-      socket.onAny((event, payload) => {
-        logger.info(`[API Gateway] Forwarding event '${event}' for user ${user.id}`)
-        auctionSocket.emit(event, payload)
+      // --- Forward messages from Client to Auction Service (with Ack handling) ---
+      socket.onAny((event, ...args) => {
+        // Check if the last argument is a function (the acknowledgement callback)
+        const ack = typeof args[args.length - 1] === 'function' ? args.pop() : undefined
+        if (ack) {
+          // If there's an ack, forward the event, args, and a *new* callback
+          // that will call the original client's ack when the auction service responds.
+          auctionSocket.emit(event, ...args, (...responseArgs: unknown[]) => {
+            try {
+              ack(...responseArgs) // Call the original client's callback
+            } catch (e) {
+              logger.debug(`[API Gateway] Error executing client ack callback for event '${event}':`, e)
+            }
+          })
+        } else {
+          // If no ack, just forward the event and arguments
+          auctionSocket.emit(event, ...args)
+        }
       })
-      auctionSocket.on('connection', () => {
-        logger.info(`[API Gateway] Connected to Auction Service for user ${user.id}`)
+      // --- End Forward Client to Auction Service ---
+
+      // --- Forward messages from Auction Service to Client ---
+      auctionSocket.onAny((event, ...args) => {
+        // Check for acknowledgement from auction service (less common, but possible)
+        const ack = typeof args[args.length - 1] === 'function' ? args.pop() : undefined
+        if (ack) {
+          socket.emit(event, ...args, (...responseArgs: unknown[]) => {
+            try {
+              ack(...responseArgs) // Call the auction service's callback
+            } catch (e) {
+              logger.debug(`[API Gateway] Error executing auction service ack callback for event '${event}':`, e)
+            }
+          })
+        } else {
+          socket.emit(event, ...args)
+        }
       })
-      auctionSocket.onAny((event, payload) => {
-        socket.emit(event, payload)
-      })
-      socket.on('connect_error', err => {
-        logger.error(`[API Gateway] WebSocket connection error: ${err}`)
+      // --- End Forward Auction Service to Client ---
+
+      // --- Connection Handling ---
+      auctionSocket.on('connect', () => {
+        // Changed from 'connection' to 'connect' for client
+        logger.debug(`[API Gateway] Successfully connected to Auction Service WS for user ${user.id}`)
       })
 
-      // Handle disconnection
       socket.on('disconnect', reason => {
-        logger.info(`[API Gateway] User ${user.id} disconnected
-        with reason: ${reason}`)
+        logger.debug(`[API Gateway] Client disconnected: User ${user.id}. Reason: ${reason}. Disconnecting from Auction Service.`)
         auctionSocket.disconnect()
       })
+
       auctionSocket.on('disconnect', reason => {
-        logger.info(`[API Gateway] Auction Service disconnected for user ${user.id} 
-        with reason: ${reason}`)
-        socket.disconnect()
+        logger.debug(`[API Gateway] Disconnected from Auction Service for user ${user.id}. Reason: ${reason}. Disconnecting client.`)
+        // Avoid potential infinite loop if disconnects trigger each other rapidly
+        if (socket.connected) {
+          socket.disconnect()
+        }
       })
+
       auctionSocket.on('connect_error', err => {
-        logger.error(`[API Gateway] Auction Service connection error: ${err}`)
-        socket.disconnect()
+        logger.debug(`[API Gateway] Auction Service connection error for user ${user.id}: ${err.message}. Disconnecting client.`)
+        if (socket.connected) {
+          socket.disconnect()
+        }
       })
+
+      // Optional: Handle errors on the client-facing socket too
+      socket.on('error', err => {
+        logger.debug(`[API Gateway] Error on client socket for user ${user.id}: ${err.message}`)
+        // Consider disconnecting both sides on error
+        if (auctionSocket.connected) auctionSocket.disconnect()
+        if (socket.connected) socket.disconnect()
+      })
+      // --- End Connection Handling ---
     })
-    io.on('connect_error', err => {
-      logger.error(`[API Gateway] WebSocket server error: ${err}`)
+
+    // Handle errors on the main IO server instance (e.g., initial connection errors)
+    io.engine.on('connection_error', err => {
+      logger.error(`[API Gateway] Main WS Server Connection Error - Code: ${err.code}, Message: ${err.message}, Context: ${err.context}`)
     })
   }
 }
