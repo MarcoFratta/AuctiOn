@@ -24,11 +24,11 @@ export class WebSocketAdapter implements PlayerEventSource, PlayerChannel {
           socket.disconnect(true)
           return
         }
-        // 🛑 If user already has a socket, disconnect the old one
+        // If user already has a socket, disconnect the old one
         if (this.clients.has(playerId)) {
           const oldSocket = this.clients.get(playerId)
           if (oldSocket && oldSocket.id !== socket.id) {
-            logger.info(`Disconnecting previous socket for player ${playerId}`)
+            logger.debug(`Disconnecting previous socket for player ${playerId}`)
             oldSocket.disconnect(true) // Force disconnect old socket
           }
         }
@@ -36,14 +36,21 @@ export class WebSocketAdapter implements PlayerEventSource, PlayerChannel {
         logger.info(`New Socket.IO connection with player: ${playerId}`)
         this.clients.set(playerId, socket)
         this.notifyConnect(playerId)
-
+        socket.on('time-sync', (_: unknown, ack?: (response: { serverTime: number }) => void) => {
+          logger.debug(`[SocketIOAdapter] Time sync request from player ${playerId}`)
+          const response = { serverTime: Date.now() }
+          if (typeof ack === 'function') {
+            ack(response)
+          } else {
+            logger.warn(`[SocketIOAdapter] Time sync request from player ${playerId} did not include an acknowledgement callback.`)
+          }
+        })
         socket.onAny((event, payload) => {
-          logger.info(`[SocketIOAdapter] Event '${event}' from player ${playerId} with payload: ${JSON.stringify(payload)}`)
           this.notifyMessage(playerId, event, payload)
         })
 
         socket.on('disconnect', () => {
-          logger.info(`[SocketIOAdapter] Player disconnected: ${playerId}`)
+          logger.debug(`[SocketIOAdapter] Player disconnected: ${playerId}`)
           this.clients.delete(playerId)
           this.notifyDisconnect(playerId)
         })
@@ -57,7 +64,7 @@ export class WebSocketAdapter implements PlayerEventSource, PlayerChannel {
     })
   }
 
-  closeConnection(playerId: string, normal: boolean = true, reason: string = ''): void {
+  closeConnection(playerId: string, _normal: boolean = true, reason: string = ''): void {
     const socket = this.clients.get(playerId)
     if (socket) {
       socket.disconnect(true)
@@ -89,10 +96,11 @@ export class WebSocketAdapter implements PlayerEventSource, PlayerChannel {
     this.connectListeners.push(callback)
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private extractPlayerId(data: any): string | null {
     try {
       return data.user.id || null
-    } catch (e) {
+    } catch (_e) {
       logger.warn('Failed to extract player ID from handshake/auth')
       return null
     }
@@ -106,6 +114,7 @@ export class WebSocketAdapter implements PlayerEventSource, PlayerChannel {
     this.connectListeners.forEach(callback => callback(playerId))
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private notifyMessage(playerId: string, event: string, payload: any): void {
     const msg = { type: event, ...payload }
     this.messageListeners.forEach(callback => callback(playerId, msg))
