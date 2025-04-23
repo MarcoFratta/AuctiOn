@@ -109,9 +109,6 @@ export class LobbyServiceImpl implements LobbyService {
     if (!lobby.players.find((player: Player) => player.userId === userId)) {
       throw new PlayerNotFoundError()
     }
-    if (lobby.status === 'in-progress') {
-      throw new MatchAlreadyInProgressError('Cannot leave lobby while match is in progress')
-    }
     if (lobby.creator === userId) {
       await this.deleteLobby(id)
       return null

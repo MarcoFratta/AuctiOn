@@ -93,7 +93,7 @@ describe('UserLobbyRepo', () => {
   });
 
   describe('removeUserFromLobby', () => {
-    it('should remove user only if in waiting state', async () => {
+    it('should remove user', async () => {
       // Setup: Add users in different states
       await repo.addUserToLobby('user1', 'lobby1');
       await repo.addUserToLobby('user2', 'lobby2');
@@ -103,12 +103,12 @@ describe('UserLobbyRepo', () => {
       await repo.removeUserFromLobby('user1', 'lobby1');
       await repo.removeUserFromLobby('user2', 'lobby2');
 
-      // Verify: Only waiting user should be removed
+      // Verify: Both should be removed
       const user1Lobby = await repo.getUserActiveLobby('user1');
       const user2Lobby = await repo.getUserActiveLobby('user2');
 
-      expect(user1Lobby).toBeNull();
-      expect(user2Lobby?.state).toBe('in-progress');
+      expect(user1Lobby).toBeNull()
+      expect(user2Lobby).toBeNull()
     });
   });
 
