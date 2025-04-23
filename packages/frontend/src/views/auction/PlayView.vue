@@ -157,6 +157,9 @@ import LobbyLoading from '@/components/lobby/LobbyLoading.vue'
 import { useHeaderStore } from '@/stores/headerStore.ts'
 import AuctionStats from '@/components/auction/AuctionStats.vue'
 import MobileBottomBar from '@/components/auction/MobileBottomBar.vue'
+import { useAlert } from '@/composables/useAlert.ts'
+import { useResultsStore } from '@/stores/resultsStore.ts'
+import { useSocketStore } from '@/stores/socketStore.ts'
 
 const lobbyStore = useLobbyStore()
 const auctionService = useAuctionService()
@@ -198,11 +201,27 @@ if (!lobbyStore.lobby) {
       router.push('/join')
     })
 }
+const alerts = useAlert()
+const resultsStore = useResultsStore()
+const socketStore = useSocketStore()
+const lobbyId = ref(lobbyStore.lobby?.id || '')
 watch(
   () => lobbyStore.lobby,
   (newLobby) => {
-    if (newLobby && !newLobby.startTimestamp) {
-      router.push('/lobby')
+    if (newLobby) {
+      if (!newLobby.startTimestamp) {
+        router.push('/lobby')
+      }
+      lobbyId.value = newLobby.id
+    }
+  },
+)
+watch(
+  () => socketStore.isConnected,
+  (connected) => {
+    if (!connected && (!resultsStore.leaderboard || resultsStore.auctionId !== lobbyId.value)) {
+      alerts.error('Disconnected', `You have been disconnected from the game`)
+      router.push('/join')
     }
   },
 )
