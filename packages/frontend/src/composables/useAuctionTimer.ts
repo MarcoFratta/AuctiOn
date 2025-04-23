@@ -1,72 +1,72 @@
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useLobbyStore } from '@/stores/lobbyStore'
+import { useTimeSync } from '@/composables/useTimeSync'
 
 export function useAuctionTimer() {
   const lobbyStore = useLobbyStore()
+  const { getSyncedTime } = useTimeSync()
   const remainingTime = ref(0)
   let timerInterval: number | undefined
 
-  const calculateRemainingTime = (): number => {
-    const lobby = lobbyStore.lobby
-    if (!lobby?.currentSale || !lobbyStore.timerStart) return 0
-
-    const now = new Date()
-    const startTime = lobbyStore.timerStart
-    const bidTimeMs = (lobby.bidTime || 30) * 1000 // Convert seconds to milliseconds
-
-    // Calculate time elapsed since start
-    const elapsedMs = now.getTime() - startTime.getTime()
-
-    // Calculate remaining time
-    const remaining = bidTimeMs - elapsedMs
-
-    // Return remaining time in seconds, clamped to 0 if negative
-    return Math.max(0, Math.floor(remaining / 1000))
+  const calculateRemainingTime = () => {
+    const endTime = lobbyStore.auctionEndTime
+    if (endTime === null) {
+      return 0
+    }
+    const now = getSyncedTime()
+    const diff = endTime - now
+    return Math.max(0, Math.floor(diff / 1000))
   }
 
   const startTimer = () => {
-    // Clear any existing timer
+    console.log('[useAuctionTimer] Attempting to start timer...')
     stopTimer()
 
-    // Only start timer if there's an active sale
-    if (lobbyStore.lobby?.currentSale) {
-      // Initial calculation
+    if (lobbyStore.auctionEndTime !== null) {
+      console.log('[useAuctionTimer] Conditions met (auctionEndTime exists). Starting timer.')
       remainingTime.value = calculateRemainingTime()
 
-      // Set interval for updates - using a more reliable approach
       timerInterval = window.setInterval(() => {
         remainingTime.value = calculateRemainingTime()
       }, 1000)
+      console.log('[useAuctionTimer] Interval timer started with ID:', timerInterval)
     } else {
+      console.log(
+        '[useAuctionTimer] Conditions not met (auctionEndTime is null). Setting remainingTime to 0.',
+      )
       remainingTime.value = 0
     }
   }
 
   const stopTimer = () => {
     if (timerInterval) {
+      console.log('[useAuctionTimer] Stopping timer interval ID:', timerInterval)
       window.clearInterval(timerInterval)
       timerInterval = undefined
     }
   }
 
-  // Watch for changes in the current sale or timer start
-  watch([() => lobbyStore.lobby?.currentSale, () => lobbyStore.timerStart], () => {
-    startTimer()
-  })
+  watch(
+    () => lobbyStore.auctionEndTime,
+    (newEndTime, oldEndTime) => {
+      console.log(
+        `[useAuctionTimer] Watch triggered: auctionEndTime changed from ${oldEndTime} to ${newEndTime}. Restarting timer.`,
+      )
+      startTimer()
+    },
+  )
 
-  // Start the timer when the component mounts
   onMounted(() => {
+    console.log('[useAuctionTimer] Component Mounted. Starting timer.')
     startTimer()
   })
 
-  // Clean up on unmount
   onBeforeUnmount(() => {
+    console.log('[useAuctionTimer] Component Unmounting. Stopping timer.')
     stopTimer()
   })
 
   return {
     remainingTime,
-    startTimer,
-    stopTimer,
   }
 }
