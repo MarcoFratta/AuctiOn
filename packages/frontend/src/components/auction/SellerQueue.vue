@@ -6,7 +6,7 @@
     <!-- InnerCard with ScrollableContainer -->
     <InnerCard class="flex-grow flex flex-col overflow-y-auto scrollbar-hide">
       <ScrollableContainer show-scroll-indicator>
-        <ul v-if="sortedSellerQueue.length" class="grid gap-1.5">
+        <ul v-if="sortedSellerQueue.length" class="grid gap-1">
           <li
             v-for="(sellerId, index) in sortedSellerQueue"
             :key="sellerId"
@@ -28,8 +28,8 @@
               class="w-2 h-2 rounded-full absolute top-1.5 right-1.5"
             ></span>
 
+            <!-- Username section -->
             <div class="flex items-center gap-1.5">
-              <!-- Username -->
               <span
                 :class="{
                   'text-violet-700 dark:text-app-violet-300': sellerId === userStore?.user?.id,
@@ -49,17 +49,51 @@
               </span>
             </div>
 
-            <!-- Seller Status Text - Under username but more compact -->
-            <div class="ml-0.5 text-xs">
-              <span
-                :class="{
-                  'text-green-600 dark:text-green-400': index === 0,
-                  'text-zinc-600 dark:text-zinc-400': index !== 0,
-                }"
+            <!-- Status and action row - aligned on same line -->
+            <div class="flex justify-between items-center">
+              <!-- Seller Status Text -->
+              <div class="text-xs h-full">
+                <span
+                  :class="{
+                    'text-green-600 dark:text-green-400': index === 0,
+                    'text-zinc-600 dark:text-zinc-400': index !== 0,
+                  }"
+                  class="align-bottom"
+                >
+                  <span v-if="index === 0" class="align-bottom">Current Seller</span>
+                  <span v-else class="align-bottom"
+                    >Seller in {{ index }} round{{ index > 1 ? 's' : '' }}</span
+                  >
+                </span>
+              </div>
+
+              <!-- Kick/Leave Button -->
+              <LoadingButton
+                v-if="amIAdmin && sellerId !== userStore.user?.id"
+                :confirm-message="`Are you sure you want to kick ${lobbyStore.getUser(sellerId)?.username ?? ''}?`"
+                btn-style="px-2 py-0.5 text-white bg-red-500 hover:bg-red-600 rounded-md transition-colors text-xs font-medium"
+                confirm-button-text="Kick"
+                confirm-title="Kick Player"
+                custom-style
+                require-confirm
+                title="Kick Player"
+                @click="kick(sellerId)"
               >
-                <span v-if="index === 0">Current Seller</span>
-                <span v-else>Seller in {{ index }} round{{ index > 1 ? 's' : '' }}</span>
-              </span>
+                Kick
+              </LoadingButton>
+              <LoadingButton
+                v-else-if="sellerId === userStore.user?.id"
+                btn-style="px-2 py-0.5 text-white bg-red-500 hover:bg-red-600 rounded-md transition-colors text-xs font-medium"
+                confirm-button-text="Leave"
+                confirm-message="Are you sure you want to leave the game?"
+                confirm-title="Leave Game"
+                custom-style
+                require-confirm
+                title="Leave the game"
+                @click="leave()"
+              >
+                Leave
+              </LoadingButton>
             </div>
           </li>
         </ul>
@@ -87,11 +121,21 @@ import InnerCard from '@/components/common/InnerCard.vue'
 import AppIcons from '@/components/icons/AppIcons.vue'
 import SectionHeader from '@/components/common/SectionHeader.vue'
 import ScrollableContainer from '@/components/common/ScrollableContainer.vue'
+import LoadingButton from '@/components/common/LoadingButton.vue'
+import { useLobbyService } from '@/composables/useLobbyService.ts'
 
 const lobbyStore = useLobbyStore()
+const lobbyService = useLobbyService()
 const userStore = useUserStore()
-
+const amIAdmin = computed(() => lobbyStore.lobby?.creatorId == userStore.user?.id)
 // Sort the seller queue to always have the current seller at the top
+function kick(userId: string) {
+  lobbyService.kickPlayer(userId)
+}
+
+function leave() {
+  lobbyService.leaveLobby()
+}
 const sortedSellerQueue = computed(() => {
   if (!lobbyStore.lobby?.sellerQueue || !lobbyStore.lobby.sellerQueue.length) {
     return []
