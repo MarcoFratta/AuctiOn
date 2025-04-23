@@ -222,6 +222,21 @@ export class AuthServiceImpl implements AuthService {
     return resetToken
   }
 
+  hasExpiration(token: string): boolean {
+    try {
+      const decoded = this.generator.verifyRefreshToken(token)
+      return !!decoded.exp
+    } catch (error) {
+      if (error instanceof jwt.TokenExpiredError) {
+        return false
+      }
+      if (error instanceof jwt.JsonWebTokenError) {
+        return false
+      }
+      throw error
+    }
+  }
+
   private async comparePasswords(data: LoginInputData, account: Account) {
     return await bcrypt.compare(data.password, account.pHash)
   }

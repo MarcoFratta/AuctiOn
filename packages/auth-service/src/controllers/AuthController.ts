@@ -28,7 +28,7 @@ export class AuthController {
       logger.debug(`Token refreshed successfully`)
 
       // Check if the original cookie had an expiration
-      const hasExpiration = !!(req.cookies['refreshToken'] && req.cookies['refreshToken'].expires)
+      const hasExpiration = this.authService.hasExpiration(refreshToken)
 
       // Use the extracted method
       this.setRefreshTokenCookie(res, user.refreshToken, { hasExpiration })
@@ -127,7 +127,7 @@ export class AuthController {
   ): void {
     const cookieOptions = {
       httpOnly: true,
-      secure: config.env === 'production',
+      secure: false,
       sameSite: 'lax' as const,
       path: '/',
     }
