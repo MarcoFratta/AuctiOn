@@ -17,6 +17,7 @@ interface LobbyState {
   users: Player[]
   playerInfo: AuctionMsg['playerInfo'] | undefined
   timerStart: Date | undefined
+  serverTimeOffset: number
 }
 
 export const useLobbyStore = defineStore('lobby', {
@@ -25,6 +26,7 @@ export const useLobbyStore = defineStore('lobby', {
     users: [],
     playerInfo: undefined,
     timerStart: undefined,
+    serverTimeOffset: 0,
   }),
   getters: {
     weights() {
@@ -39,12 +41,13 @@ export const useLobbyStore = defineStore('lobby', {
         },
       ]
     },
-    timeLeft(state) {
-      if (!state.timerStart || !state.lobby?.bidTime) return 0
-      const now = new Date()
-      const elapsedMs = now.getTime() - state.timerStart.getTime()
-      const bidTimeMs = state.lobby.bidTime * 1000 // Convert seconds to milliseconds
-      return Math.max(0, Math.floor((bidTimeMs - elapsedMs) / 1000))
+    auctionEndTime(state): number | null {
+      if (!state.timerStart || !state.lobby?.bidTime) {
+        return null
+      }
+      const timerStartTime = state.timerStart.getTime()
+      const bidTimeMs = state.lobby.bidTime * 1000
+      return timerStartTime + bidTimeMs
     },
     currentUser(state) {
       const userId = useUserStore().user?.id
@@ -90,6 +93,12 @@ export const useLobbyStore = defineStore('lobby', {
       Object.assign(user, update)
     },
     removeUser(id: Player['id']) {
+      if (this.lobby?.startTimestamp) {
+        const us = this.users.find((u) => u.id === id)
+        if (!us) return
+        us.connected = false
+        return
+      }
       this.users = this.users.filter((u) => u.id !== id)
     },
     setPlayerInfo(playerInfo: AuctionMsg['playerInfo']) {
@@ -100,6 +109,10 @@ export const useLobbyStore = defineStore('lobby', {
     },
     updateTimer(date: Date) {
       this.timerStart = date
+      console.log('[LobbyStore] Timer start updated:', this.timerStart)
+    },
+    setTimeOffset(offset: number) {
+      this.serverTimeOffset = offset
     },
     resetTimer() {
       this.timerStart = undefined
