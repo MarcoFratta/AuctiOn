@@ -28,19 +28,26 @@ const router = createRouter({
     },
   ],
 })
-
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
   const { refresh } = useAuth()
+  if (authStore.isAuthenticated) {
+    next()
+  } else {
+    try {
+      await refresh()
+      next()
+    } catch (_error) {
+      next()
+    }
+  }
+})
+router.beforeEach(async (to, from, next) => {
+  const authStore = useAuthStore()
 
   if (to.meta.requiresAuth) {
     if (!authStore.isAuthenticated) {
-      try {
-        await refresh()
-        next()
-      } catch (_error) {
-        next({ name: 'login', query: { redirect: to.fullPath } })
-      }
+      next({ name: 'login', query: { redirect: to.fullPath } })
     } else {
       next()
     }

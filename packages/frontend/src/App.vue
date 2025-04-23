@@ -1,8 +1,7 @@
 <script lang="ts" setup>
-import { onBeforeMount, onMounted, ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useAuthStore } from '@/stores/authStore.ts'
 import AppHeader from '@/components/common/AppHeader.vue'
-import { useAuth } from '@/composables/useAuth.ts'
 import { useAuctionConnection } from '@/composables/useAuctionConnection.ts'
 import { useSettingsStore } from '@/stores/settingsStore'
 import NavigationDrawer from '@/components/common/NavigationDrawer.vue'
@@ -14,8 +13,6 @@ const isDrawerOpen = ref(false)
 const toggleDrawer = () => {
   isDrawerOpen.value = !isDrawerOpen.value
 }
-
-onBeforeMount(() => useAuth().refresh().catch())
 
 const settingsStore = useSettingsStore()
 settingsStore.init()
@@ -38,9 +35,7 @@ onMounted(() => {
     useAuctionConnection()
       .connect()
       .then(undefined)
-      .catch(() => {
-        console.log('no active auction found for user')
-      })
+      .catch(() => {})
   }
 })
 </script>
