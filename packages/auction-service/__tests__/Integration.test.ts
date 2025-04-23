@@ -199,7 +199,7 @@ describe('Auction System Integration Test', () => {
   })
 
   async function waitToReceiveMessage() {
-    await new Promise(resolve => setTimeout(resolve, 100))
+    await new Promise(resolve => setTimeout(resolve, 150))
   }
 
   async function waitToEndRound(auctionId: string) {

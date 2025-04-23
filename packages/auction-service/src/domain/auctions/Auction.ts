@@ -123,6 +123,10 @@ export class AuctionImpl implements Auction {
 
   leave(playerId: string): void {
     this.players = this.players.filter(player => player.id !== playerId)
+    if (this.players.length < 2) {
+      this.endTimestamp = new Date().toISOString()
+    }
+    this.sellerQueue = this.sellerQueue.filter(player => player !== playerId)
   }
 
   sale(sale: Sale): void {

@@ -57,9 +57,8 @@ describe('AuctionService', () => {
     it('should handle player leaving an auction', async () => {
       await service.createAuction(defaultConfig)
       await service.playerJoin('player1', defaultConfig.id)
-      await service.playerLeave('player1', defaultConfig.id)
+      const auction = await service.playerLeave('player1', defaultConfig.id)
 
-      const auction = await service.getAuction(defaultConfig.id)
       expect(auction.players).toHaveLength(0)
     })
 
