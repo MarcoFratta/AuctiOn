@@ -101,6 +101,10 @@ export const playerInfoMsgSchema = z.object({
   playerInfo: playerLobbyInfoSchema,
   old: z.boolean().default(false),
 })
+export const timeSyncMsgSchema = z.object({
+  type: z.literal('time-sync'),
+  time: z.string().datetime(),
+})
 
 export const typedMessageSchema = z.object({
   type: z.enum([
@@ -119,6 +123,7 @@ export const typedMessageSchema = z.object({
     'auction-start',
     'auction-deleted',
     'timer-start',
+    'time-sync',
   ]),
 })
 
@@ -127,6 +132,7 @@ export const playerActionsTypeSchema = z.enum(['sell', 'bid'])
 export type NewBidMsg = z.infer<typeof newBidMsgSchema>
 export type NewSaleMsg = z.infer<typeof newSaleMsgSchema>
 export type ErrorMsg = z.infer<typeof errorMsgSchema>
+export type TimeSyncMsg = z.infer<typeof timeSyncMsgSchema>
 export type AuctionMsg = z.infer<typeof auctionMsgSchema>
 export type BidUpdateMsg = z.infer<typeof bidUpdateMsgSchema>
 export type SaleUpdateMsg = z.infer<typeof saleUpdateMsgSchema>
@@ -160,3 +166,4 @@ export type AuctionMessage =
   | AuctionStartMsg
   | AuctionDeletedMsg
   | TimerStartMsg
+  | TimeSyncMsg
