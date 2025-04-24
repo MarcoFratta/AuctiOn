@@ -21,7 +21,13 @@ export function useAuctionStats() {
             const event = validateSchema(m.bidUpdateMsgSchema, msg)
             statsStore.storeBid(event.bid)
           })
+          .with('auction', () => {
+            const event = validateSchema(m.auctionMsgSchema, msg)
+            statsStore.setAuction(event.auction.id)
+          })
           .with('auction-start', () => {
+            const event = validateSchema(m.auctionStartMsgSchema, msg)
+            statsStore.setAuction(event.auction.id)
             statsStore.reset()
           })
           .with('auction-end', () => {
