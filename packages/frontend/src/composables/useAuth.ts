@@ -38,7 +38,6 @@ export function useAuth() {
   async function login(email: string, password: string) {
     try {
       const e = validateEmail(email)
-      console.log('login in with', e)
       const data = await loginApi(e, password)
       tokens.setTokens(data.user.token)
       delete data.user.token
@@ -73,9 +72,7 @@ export function useAuth() {
         connection
           .connect()
           .then(undefined)
-          .catch((_err) => {
-            console.log('no active lobby found')
-          })
+          .catch((_err) => {})
       })
       .catch((error) => {
         handleError(error)
