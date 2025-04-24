@@ -54,6 +54,7 @@ const menuItems = [
 
 const handleLogout = async () => {
   await auth.logout()
+  closeDrawer()
   router.push('/login')
 }
 
