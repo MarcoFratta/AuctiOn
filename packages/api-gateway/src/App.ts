@@ -9,10 +9,16 @@ import { healthChecker } from './controllers/HealthChecker'
 import { config } from './configs/Config'
 
 const app = express()
+const allowedOrigins = ['http://frontend:5173']
+if (config.nodeEnv != 'production') {
+  allowedOrigins.push('http://localhost:5174')
+}
 app.use(
   cors({
-    origin: ['http://localhost:5173', 'http://192.168.1.20:5173'],
-    credentials: true, // Allow cookies (needed for refresh tokens)
+    origin: allowedOrigins,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key'],
   })
 )
 
@@ -39,6 +45,8 @@ const loginLimiter = rateLimit({
 
 // Apply login rate limit only to login and register
 if (config.nodeEnv === 'production') {
+  app.use('/auth/forget', loginLimiter)
+  app.use('/auth/reset', loginLimiter)
   app.use('/auth/login', loginLimiter)
   app.use('/auth/register', loginLimiter)
 }
