@@ -33,14 +33,6 @@ export function useAuctionNotifications() {
             notifier.info(`${bidderName} placed a bid of ${event.bid.amount}`)
           }
         })
-        .with('timer-start', () => {
-          const event = validateSchema(m.timerStartMsgSchema, msg)
-          const timeLeft = Math.floor((new Date(event.time).getTime() - Date.now()) / 1000)
-
-          if (timeLeft > 0) {
-            notifier.warning(`Bidding ends in ${timeLeft} seconds!`)
-          }
-        })
         .with('round-end', () => {
           const event = validateSchema(m.roundEndMsgSchema, msg)
           const currentRound = event.auction.currentRound
