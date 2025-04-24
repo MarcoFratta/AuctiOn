@@ -19,8 +19,6 @@ const props = defineProps<{
   compact?: boolean
 }>()
 
-defineSlots(['header'])
-
 const emits = defineEmits<{
   (event: 'update:items', value: EntryType): void
 }>()
