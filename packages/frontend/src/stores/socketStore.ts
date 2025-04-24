@@ -72,7 +72,9 @@ export const useSocketStore = defineStore('socket', {
 
       const { onOpen, onMessage, onClose, onError } = listener
 
-      if (onOpen) this.socket.on('connect', onOpen)
+      if (onOpen) {
+        onOpen()
+      }
 
       if (onMessage) {
         this.socket.onAny((event, msg) => {
