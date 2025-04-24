@@ -1,13 +1,22 @@
 import { Leaderboard, LeaderboardEntry, leaderboardSchema } from '../../schemas/Leaderboard'
-import { InventoryOutput } from '../../schemas/Item'
+import { InventoryOutput, ItemWeights } from '../../schemas/Item'
 import { validateSchema } from '@auction/common/validation'
+import { AuctionInfo } from '../../schemas/Auction'
 
 export interface LeaderboardModifier {
   apply: (leaderboard: Leaderboard) => Leaderboard
 }
 
+export interface AuctionModifier {
+  apply: (auctionInfo: AuctionInfo) => AuctionInfo
+}
+
 export class Modifiers {
-  static modify(modifiers: LeaderboardModifier[], leaderboard: Leaderboard): Leaderboard {
+  static modifyAuction(modifiers: AuctionModifier[], auctionInfo: AuctionInfo): AuctionInfo {
+    return modifiers.reduce((auction, modifier) => modifier.apply(auction), auctionInfo)
+  }
+
+  static modifyLeaderboard(modifiers: LeaderboardModifier[], leaderboard: Leaderboard): Leaderboard {
     return modifiers.reduce((leaderboard, modifier) => modifier.apply(leaderboard), leaderboard)
   }
   static noMostItems(): LeaderboardModifier {
@@ -35,6 +44,21 @@ export class Modifiers {
         // Find all players who have zero items
         const playersToRemove = leaderboard.leaderboard.filter(player => this.inventorySize(player.inventory) === 0)
         return this.updateLeaderboard(playersToRemove, leaderboard)
+      },
+    }
+  }
+
+  static withSetCollection(): AuctionModifier {
+    return {
+      apply: (auctionInfo: AuctionInfo) => {
+        const setSize = 3
+        auctionInfo.players = auctionInfo.players.map(p => {
+          p.money += Array(...p.inventory.entries())
+            .map(([k, v]) => Math.floor(v / setSize) * 10 * ItemWeights[k])
+            .reduce((acc, v) => acc + v, 0)
+          return p
+        })
+        return auctionInfo
       },
     }
   }

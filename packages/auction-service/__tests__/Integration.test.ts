@@ -281,7 +281,7 @@ describe('Auction System Integration Test', () => {
         { id: 'player3', money: 115, inventory: { items: [{ item: 'square', quantity: 2 }] }, position: 2 },
       ],
       removed: [
-        { id: 'player2', money: 30, inventory: { items: [{ item: 'square', quantity: 3 }] } },
+        { id: 'player2', money: 40, inventory: { items: [{ item: 'square', quantity: 3 }] } },
       ],
     })
 
@@ -341,7 +341,7 @@ describe('Auction System Integration Test', () => {
         { id: 'player2', money: 100, inventory: { items: [{ item: 'triangle', quantity: 2 }] }, position: 2 },
       ],
       removed: [
-        { id: 'player3', money: 50, inventory: { items: [{ item: 'triangle', quantity: 3 }] } },
+        { id: 'player3', money: 100, inventory: { items: [{ item: 'triangle', quantity: 3 }] } },
       ],
     })
 
@@ -417,7 +417,7 @@ describe('Auction System Integration Test', () => {
         { id: 'player3', money: 100, inventory: { items: [{ item: 'triangle', quantity: 2 }] }, position: 1 },
       ],
       removed: [
-        { id: 'player2', money: 0, inventory: { items: [{ item: 'triangle', quantity: 4 }] } },
+        { id: 'player2', money: 50, inventory: { items: [{ item: 'triangle', quantity: 4 }] } },
         { id: 'player1', money: 200, inventory: { items: [{ item: 'triangle', quantity: 0 }] } },
       ],
     })

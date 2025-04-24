@@ -11,6 +11,7 @@ import { WinStrategyFactory } from './WinStrategyFactory'
 import { Modifiers } from './Modifier'
 import { validateSchema } from '@auction/common/validation'
 import { cloneDeep } from 'lodash'
+import { config } from '../../configs/config'
 
 export interface Auction extends AuctionConfig {
   bid: (bid: Bid) => void
@@ -84,8 +85,9 @@ export class AuctionImpl implements Auction {
   }
 
   computeLeaderboard(): Leaderboard {
-    let leaderBoard = WinStrategyFactory.byMoney().computeLeaderboard(this)
-    leaderBoard = Modifiers.modify(this.modifiers, leaderBoard)
+    const auctionInfo = Modifiers.modifyAuction([Modifiers.withSetCollection()], this.toInfo())
+    let leaderBoard = WinStrategyFactory.byMoney().computeLeaderboard(auctionInfo)
+    leaderBoard = Modifiers.modifyLeaderboard(this.modifiers, leaderBoard)
     return leaderBoard
   }
 
@@ -154,7 +156,11 @@ export class AuctionImpl implements Auction {
 
   start(): void {
     this.startTimestamp = new Date().toISOString()
-    this.sellerQueue = PlayOrderStrategy.sameOrder(this.players.map(player => player.id))
+    if (config.env == 'production') {
+      this.sellerQueue = PlayOrderStrategy.random(this.players.map(player => player.id))
+    } else {
+      this.sellerQueue = PlayOrderStrategy.sameOrder(this.players.map(player => player.id))
+    }
     this.skipDisconnectedPlayers()
   }
 
