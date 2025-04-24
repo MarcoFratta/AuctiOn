@@ -16,8 +16,6 @@ export function useAuctionConnection() {
   let connectionPromise: Promise<void> | null = null
 
   function connect(): Promise<void> {
-    console.log('Connecting to auction...')
-
     // Return existing connection promise if one is in progress
     if (connectionPromise) {
       return connectionPromise
@@ -39,7 +37,6 @@ export function useAuctionConnection() {
             auctionNotifications.attach()
             auctionStats.attach()
             socketStore.connect(() => {
-              console.log('Connected to auction')
               resolve()
             })
           } catch (_error) {

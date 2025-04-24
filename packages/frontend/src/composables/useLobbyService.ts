@@ -29,6 +29,7 @@ export function useLobbyService() {
   async function checkActiveLobby(): Promise<unknown> {
     try {
       await lobbyService.checkActiveLobby()
+      console.log('Active lobby check passed')
       return true
     } catch (error) {
       handleError(error)

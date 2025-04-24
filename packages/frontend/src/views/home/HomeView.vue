@@ -47,7 +47,6 @@ const settingsStore = useSettingsStore()
 // Fix the infinite redirection by using onMounted and checking the current route
 onMounted(() => {
   if (lobbyStore.lobby && socketStore.isConnected && router.currentRoute.value.path !== '/lobby') {
-    console.log('forwarding to lobby from home')
     router.push('/lobby')
   }
 })

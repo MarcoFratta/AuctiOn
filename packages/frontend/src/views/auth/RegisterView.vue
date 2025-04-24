@@ -69,10 +69,8 @@ const handleForm = async () => {
     if (!canSubmit.value) throw new InvalidData()
     waitingResponse.value = true
     await register(values.name!, values.email!, values.password!)
-    console.log('logged in')
     router.push(redirectTo)
   } catch (error) {
-    console.error(error)
     const e = errorHandler
       .create(error)
       .unknownError('Error', 'An error occurred')

@@ -90,7 +90,6 @@ const handleForm = async () => {
     await new Promise((resolve) => setTimeout(resolve, 200))
     await router.replace('/lobby')
   } catch (e) {
-    console.log('Error', e)
     const err = errorsHandler
       .create(e)
       .unknownError()

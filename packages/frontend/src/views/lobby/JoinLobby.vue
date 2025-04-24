@@ -19,12 +19,10 @@ onMounted(() => {
         .then(() => router.push(`/lobby`))
     })
     .catch((e) => {
-      console.log('Joining lobby error', e)
       const err = errorsHandler
         .create(e)
         .alreadyInLobby('You already joined a lobby', () => router.push('/lobby'))
         .authenticationError(undefined, () => {
-          console.log('Joining lobby error', err)
           router.push(`/login?redirect=${route.fullPath}`)
         })
         .invalidData('Lobby not found', 'Please try again', () => {
@@ -36,5 +34,3 @@ onMounted(() => {
     })
 })
 </script>
-
-<template></template>

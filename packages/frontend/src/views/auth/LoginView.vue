@@ -53,7 +53,6 @@ const redirectTo = (
 ) as string
 const handleForm = async () => {
   try {
-    console.log('canSubmit', canSubmit.value)
     if (!canSubmit.value) throw new Error('Invalid form')
     waitingResponse.value = true
     await login(values.email!, values.password!)
