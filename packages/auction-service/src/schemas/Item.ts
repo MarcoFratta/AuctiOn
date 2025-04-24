@@ -4,7 +4,7 @@ export const ItemSchema = z.enum(['square', 'triangle', 'circle'])
 
 export const ItemWeights: Record<string, number> = {
   [ItemSchema.enum.square]: 1,
-  [ItemSchema.enum.triangle]: 2,
+  [ItemSchema.enum.triangle]: 5,
   [ItemSchema.enum.circle]: 3,
 }
 const ItemQuantitySchema = z.object({
