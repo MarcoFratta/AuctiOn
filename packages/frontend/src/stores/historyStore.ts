@@ -5,14 +5,20 @@ type Sale = SaleUpdateMsg['sale']
 type Bid = BidUpdateMsg['bid']
 export const useHistoryStore = defineStore('history', {
   state: () => ({
+    auctionId: '' as string,
     sales: [] as Sale[],
     bids: [] as Bid[],
     lastSaleIndex: 0 as number,
   }),
   actions: {
+    setAuction(id: string) {
+      if (this.auctionId != id) {
+        this.auctionId = id
+        this.reset()
+      }
+    },
     storeSale(s: Sale) {
       this.sales.push(s)
-      console.log(`updating last sale index to ${this.bids.length}`)
       this.lastSaleIndex = this.bids.length
     },
     storeBid(b: Bid) {
