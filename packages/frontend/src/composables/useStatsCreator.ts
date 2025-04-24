@@ -130,12 +130,7 @@ export function useStatsCreator() {
     if (!lobbyStore.lobby) return 0
 
     // Get total items from starting inventory
-    const startingItemsCount = utils.getItemsCount(lobbyStore.lobby.startInventory.items)
-
-    // Get player count from seller queue (assuming all players are in the queue)
-    const playerCount = lobbyStore.lobby.sellerQueue.length
-
-    return playerCount > 0 ? Math.round(startingItemsCount / playerCount) : 0
+    return utils.getItemsCount(lobbyStore.lobby.startInventory.items)
   })
 
   // Check if player is at risk of having the most items
@@ -147,7 +142,7 @@ export function useStatsCreator() {
     const potentialItemsAfterWin = playerItemsCount.value + estimatedItemsInSale.value
 
     // If player would have significantly more than average, they're at risk (using 2x threshold)
-    return potentialItemsAfterWin > averageItemsPerPlayer.value * 2
+    return potentialItemsAfterWin > averageItemsPerPlayer.value * 1.5
   })
 
   // Get price trend analysis based on momentum
