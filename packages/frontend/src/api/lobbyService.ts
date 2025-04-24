@@ -1,6 +1,6 @@
 import type { LobbyConfig } from '@/schemas/LobbySchema.ts'
 import apiClient from '@/api/apiClient.ts'
-import { io } from 'socket.io-client'
+import { io, Socket } from 'socket.io-client'
 
 export async function start() {
   const response = await apiClient.post('/lobbies/start')
@@ -39,18 +39,22 @@ export async function setState(state: string): Promise<unknown> {
   return response.data!
 }
 
-export function connectToLobby(token: string) {
-  return io(import.meta.env.NODE_ENV == 'production' ? '/' : 'http://192.168.1.20:8080', {
-    path:
-      import.meta.env.NODE_ENV == 'production'
-        ? `/${import.meta.env.FRONTEND_API_URL || 'http://192.168.1.20:8080'}/auction`
-        : '/auction',
+export function connectToLobby(token: string): Socket {
+  // Define the base URL based on the environment
+  const url = apiClient.defaults.baseURL
+
+  const baseUrl = import.meta.env.PROD ? '/' : url
+  const path = import.meta.env.PROD ? url : ''
+
+  return io(baseUrl, {
+    path: path + '/auction',
     auth: {
-      token, // Pass token for authentication
+      token,
     },
+    transports: ['websocket', 'polling'],
     autoConnect: true,
-    reconnection: true, // Auto-reconnect on disconnection
+    reconnection: true,
     reconnectionAttempts: 5,
-    reconnectionDelay: 1000, // Wait 2s before retrying
+    reconnectionDelay: 1000,
   })
 }

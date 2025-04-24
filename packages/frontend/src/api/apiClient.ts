@@ -2,8 +2,14 @@ import axios from 'axios'
 import { useAuthStore } from '@/stores/authStore.ts'
 import { UnauthenticatedError } from '@/api/Errors.ts'
 
+// Define the base URL based on the environment
+const devApiUrl = window.location.origin.replace(':5174', ':8080') // Your local API Gateway port
+const prodApiUrl = import.meta.env.VITE_FRONTEND_API_URL || '/api' // Use env var in prod, fallback to relative /api
+
+const apiBaseUrl = import.meta.env.PROD ? prodApiUrl : devApiUrl
+
 const apiClient = axios.create({
-  baseURL: import.meta.env.FRONTEND_API_URL || 'http://192.168.1.20:8080', // Replace with your API URL
+  baseURL: apiBaseUrl,
   headers: { 'Content-Type': 'application/json' },
   timeout: 5000,
   withCredentials: true, // Allows sending cookies (refresh token)
@@ -35,7 +41,6 @@ apiClient.interceptors.response.use(
     // Check if the request is already the refresh request
     const originalRequest = error.config
     if (originalRequest.url === '/auth/refresh') {
-      console.error('Refresh token request failed:', error)
       authStore.clearTokens()
       throw new UnauthenticatedError()
     }
@@ -44,10 +49,8 @@ apiClient.interceptors.response.use(
       if (!isRefreshing) {
         isRefreshing = true
         try {
-          console.log('Refreshing access token...')
           const res = await apiClient.post('/auth/refresh', {}, { withCredentials: true })
           const accessToken = res.data.token
-          console.log('Access token refreshed:', accessToken)
           authStore.setTokens(accessToken)
 
           // Notify all queued requests
@@ -55,8 +58,7 @@ apiClient.interceptors.response.use(
 
           // Retry the failed request
           return apiClient(originalRequest)
-        } catch (refreshError) {
-          console.error('Failed to refresh access token:', refreshError)
+        } catch (_refreshError) {
           authStore.clearTokens()
           throw new UnauthenticatedError()
         } finally {
