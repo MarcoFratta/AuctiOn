@@ -7,11 +7,13 @@ import InnerCard from '@/components/common/InnerCard.vue'
 import AppIcons from '@/components/icons/AppIcons.vue'
 import SectionHeader from '@/components/common/SectionHeader.vue'
 import ScrollableContainer from '@/components/common/ScrollableContainer.vue'
+import { useInventoryUtils } from '@/composables/useInventoryUtils.ts'
+import { useLobbyInfo } from '@/composables/useLobbyInfo.ts'
 
+const utils = useInventoryUtils()
 const lobbyStore = useLobbyStore()
 const playerInfo = computed(() => lobbyStore.playerInfo)
 
-// Sort functionality - removed 'name' option
 const sortOptions = ['quantity', 'weight'] as const
 type SortOption = (typeof sortOptions)[number]
 const sortBy = ref<SortOption>('quantity')
@@ -43,24 +45,9 @@ const toggleSort = (option: SortOption) => {
   }
 }
 
-// Calculate total inventory weight
-const totalInventoryWeight = computed(() => {
-  if (!playerInfo.value?.inventory.items) return 0
-
-  return playerInfo.value.inventory.items.reduce((total, item) => {
-    const weight = lobbyStore.weights.find((w) => w.item === item.item)?.weight || 0
-    return total + weight * item.quantity
-  }, 0)
-})
-
-// Calculate total items count
-const totalItemsCount = computed(() => {
-  if (!playerInfo.value?.inventory.items) return 0
-
-  return playerInfo.value.inventory.items.reduce((total, item) => {
-    return total + item.quantity
-  }, 0)
-})
+const { userCollectionTotalGains } = utils
+const lobbyInfo = useLobbyInfo()
+const { totalUserWeight, userItemsCount } = lobbyInfo
 </script>
 
 <template>
@@ -70,22 +57,21 @@ const totalItemsCount = computed(() => {
       <!-- Inventory Summary - Always visible, more compact -->
       <div class="flex items-center gap-2 text-xs">
         <div class="flex items-center">
-          <span class="text-gray-500 dark:text-gray-400 mr-1">Items:</span>
-          <span class="font-bold text-gray-900 dark:text-white">{{ totalItemsCount }}</span>
+          <span class="text-neutral-500 dark:text-neutral-400 mr-1">Items:</span>
+          <span class="font-bold text-neutral-900 dark:text-white">{{ userItemsCount }}</span>
         </div>
         <div class="flex items-center">
-          <span class="text-gray-500 dark:text-gray-400 mr-1">Weight:</span>
-          <span class="font-bold text-orange-600 dark:text-orange-400">{{
-            totalInventoryWeight
-          }}</span>
+          <span class="text-neutral-500 dark:text-neutral-400 mr-1">Weight:</span>
+          <span class="font-bold text-orange-600 dark:text-orange-400">{{ totalUserWeight }}</span>
         </div>
       </div>
     </SectionHeader>
 
-    <!-- Sort Controls - Integrated with header -->
-    <div class="flex justify-start items-center mb-1 px-1">
-      <span class="text-xs text-gray-600 dark:text-gray-400 mr-1">Sort:</span>
+    <!-- Sort Controls & Total Collection Gain Row -->
+    <div class="flex justify-between items-center mb-1">
+      <!-- Sort Controls -->
       <div class="flex items-center gap-1">
+        <span class="text-xs text-neutral-600 dark:text-neutral-400 mr-1">Sort:</span>
         <button
           v-for="option in sortOptions"
           :key="option"
@@ -100,6 +86,17 @@ const totalItemsCount = computed(() => {
           {{ option }}
           <span v-if="sortBy === option">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
         </button>
+      </div>
+
+      <!-- Total Collection Gain -->
+      <div
+        class="flex items-center text-xs"
+        title="Total coins earned from collections at match end"
+      >
+        <span class="text-neutral-600 dark:text-neutral-400 mr-1">Collection Bonus:</span>
+        <span class="font-bold text-emerald-600 dark:text-emerald-400">
+          ${{ userCollectionTotalGains }}
+        </span>
       </div>
     </div>
 
@@ -121,7 +118,7 @@ const totalItemsCount = computed(() => {
         <!-- Empty State - More compact -->
         <div v-else class="flex flex-col items-center justify-center h-full py-2">
           <div class="bg-zinc-100 dark:bg-zinc-700/50 p-2 rounded-full mb-1">
-            <AppIcons color="gray" name="empty" size="md" />
+            <AppIcons color="neutral" name="empty" size="md" />
           </div>
           <p class="text-zinc-600 dark:text-zinc-400 text-xs text-center">
             Your inventory is empty
@@ -143,16 +140,5 @@ const totalItemsCount = computed(() => {
 .list-leave-to {
   opacity: 0;
   transform: translateX(20px);
-}
-
-/* Hide scrollbar for Chrome, Safari and Opera */
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-
-/* Hide scrollbar for IE, Edge and Firefox */
-.scrollbar-hide {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
 }
 </style>

@@ -178,12 +178,13 @@
             <span class="mr-2">🏆</span> Victory Conditions
           </h2>
 
-          <InnerCard>
+          <InnerCard class="mb-6">
             <p class="text-gray-700 dark:text-app-white mb-4">
-              When all turns are completed, players count their remaining coins. The player with the
-              most coins, who also meets the item requirements, wins.
+              When all turns are completed, players first calculate their Set Collection Bonus (see
+              below), which is added to their coin total. Then, the player with the most coins, who
+              also meets the item requirements, wins.
             </p>
-
+            <!-- Existing Win Conditions Box -->
             <div
               class="bg-violet-50 dark:bg-neutral-800 p-4 rounded-lg border border-violet-200 dark:border-app-fuchsia-600/30"
             >
@@ -193,9 +194,67 @@
               <ul class="list-disc list-inside text-gray-700 dark:text-app-white space-y-2">
                 <li>Have at least one item</li>
                 <li>Not have the most items among all players</li>
-                <li>Have the highest number of coins among eligible players</li>
+                <li>
+                  Have the highest number of coins (including Set Bonus) among eligible players
+                </li>
               </ul>
             </div>
+          </InnerCard>
+
+          <!-- New Set Collection Bonus Card -->
+          <InnerCard>
+            <div class="flex items-center mb-3">
+              <div class="bg-violet-100 dark:bg-app-fuchsia-900/20 p-2 rounded-full mr-3">
+                <span class="text-xl">🎁</span>
+                <!-- Using a gift box icon for bonus -->
+              </div>
+              <h3 class="text-xl text-zinc-900 dark:text-white font-semibold">
+                Set Collection Bonus
+              </h3>
+            </div>
+            <p class="text-gray-700 dark:text-app-white mb-4">
+              At the end of the game, after all rounds are complete, players earn bonus coins for
+              collecting sets of identical items. A 'set' consists of exactly
+              <strong>3</strong> identical items.
+            </p>
+            <p class="text-gray-700 dark:text-app-white mb-4">
+              For each complete set you possess, you gain bonus coins equal to
+              <strong>10 times the item's weight</strong>. Only complete sets count; leftover items
+              do not contribute to this bonus.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <div
+                class="text-center p-3 bg-gray-50 dark:bg-neutral-800 rounded border border-gray-200 dark:border-gray-700"
+              >
+                <GameShapes class="mx-auto mb-1" size="md" type="square" />
+                <p class="font-semibold text-zinc-800 dark:text-gray-200">1 Set of Squares</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400">(3 items)</p>
+                <p class="text-lg font-bold text-violet-600 dark:text-app-violet-400">+10 Coins</p>
+                <p class="text-xs text-gray-500 dark:text-gray-500">(10 x 1 weight)</p>
+              </div>
+              <div
+                class="text-center p-3 bg-gray-50 dark:bg-neutral-800 rounded border border-gray-200 dark:border-gray-700"
+              >
+                <GameShapes class="mx-auto mb-1" size="md" type="triangle" />
+                <p class="font-semibold text-zinc-800 dark:text-gray-200">1 Set of Triangles</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400">(3 items)</p>
+                <p class="text-lg font-bold text-violet-600 dark:text-app-violet-400">+50 Coins</p>
+                <p class="text-xs text-gray-500 dark:text-gray-500">(10 x 5 weight)</p>
+              </div>
+              <div
+                class="text-center p-3 bg-gray-50 dark:bg-neutral-800 rounded border border-gray-200 dark:border-gray-700"
+              >
+                <GameShapes class="mx-auto mb-1" size="md" type="circle" />
+                <p class="font-semibold text-zinc-800 dark:text-gray-200">1 Set of Circles</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400">(3 items)</p>
+                <p class="text-lg font-bold text-violet-600 dark:text-app-violet-400">+30 Coins</p>
+                <p class="text-xs text-gray-500 dark:text-gray-500">(10 x 3 weight)</p>
+              </div>
+            </div>
+            <StrategyTip>
+              Collecting sets, especially high-weight ones like Triangles, can significantly boost
+              your final score! Balance set collection with the standard item requirements.
+            </StrategyTip>
           </InnerCard>
         </BaseCard>
       </section>

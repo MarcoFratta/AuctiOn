@@ -15,6 +15,7 @@ export type Lobby = AuctionMsg['auction']
 interface LobbyState {
   lobby: Lobby | undefined
   users: Player[]
+  collectionSize: number
   playerInfo: AuctionMsg['playerInfo'] | undefined
   timerStart: Date | undefined
   serverTimeOffset: number
@@ -24,6 +25,7 @@ export const useLobbyStore = defineStore('lobby', {
   state: (): LobbyState => ({
     lobby: undefined,
     users: [],
+    collectionSize: 3,
     playerInfo: undefined,
     timerStart: undefined,
     serverTimeOffset: 0,

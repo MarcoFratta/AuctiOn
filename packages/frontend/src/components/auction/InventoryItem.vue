@@ -1,8 +1,9 @@
 <script lang="ts" setup>
-import { useLobbyStore } from '@/stores/lobbyStore.ts'
 import { computed } from 'vue'
 import GameShapes from '@/components/icons/GameShapes.vue'
 import AppIcons from '@/components/icons/AppIcons.vue'
+import { useInventoryUtils } from '@/composables/useInventoryUtils.ts'
+import ValueBadge from '@/components/common/ValueBadge.vue'
 
 const props = defineProps<{
   item: {
@@ -11,17 +12,21 @@ const props = defineProps<{
   }
 }>()
 
-const lobbyStore = useLobbyStore()
+const { getItemWeight, getCollectionGain } = useInventoryUtils()
 
 // Calculate the total weight of this item
 const totalWeight = computed(() => {
-  const weight = lobbyStore.weights.find((w) => w.item === props.item.item)?.weight || 0
-  return weight * props.item.quantity
+  return getItemWeight(props.item.item) * props.item.quantity
 })
 
 // Get the individual weight of this item
 const itemWeight = computed(() => {
-  return lobbyStore.weights.find((w) => w.item === props.item.item)?.weight || 0
+  return getItemWeight(props.item.item)
+})
+
+// Calculate the collection gain for this item
+const collectionGain = computed(() => {
+  return getCollectionGain(props.item.item, props.item.quantity)
 })
 </script>
 
@@ -47,24 +52,25 @@ const itemWeight = computed(() => {
       </div>
     </div>
 
-    <!-- Right side: Quantity and total weight with labels -->
+    <!-- Right side: Quantity, total weight, and collection gain -->
     <div class="flex items-center gap-2">
       <div class="flex flex-col items-center">
         <div class="text-[10px] text-gray-500 dark:text-gray-400 mb-0.5">QTY</div>
-        <div
-          class="bg-violet-50 dark:bg-app-violet-500/10 px-1.5 py-0.5 rounded text-xs font-medium text-violet-700 dark:text-app-violet-300 min-w-[1.75rem] text-center"
-        >
-          {{ item.quantity }}
-        </div>
+        <ValueBadge :value="item.quantity" color-theme="violet" tooltip="Quantity" />
       </div>
 
       <div class="flex flex-col items-center">
         <div class="text-[10px] text-gray-500 dark:text-gray-400 mb-0.5">TW</div>
-        <div
-          class="bg-orange-50 dark:bg-orange-500/10 px-1.5 py-0.5 rounded text-xs font-medium text-orange-600 dark:text-orange-400 min-w-[1.75rem] text-center"
-        >
-          {{ totalWeight }}
-        </div>
+        <ValueBadge :value="totalWeight" color-theme="orange" tooltip="Total Weight" />
+      </div>
+
+      <div class="flex flex-col items-center">
+        <div class="text-[10px] text-gray-500 dark:text-gray-400 mb-0.5">CB</div>
+        <ValueBadge
+          :value="`$${collectionGain}`"
+          color-theme="emerald"
+          tooltip="Collection Bonus"
+        />
       </div>
     </div>
   </div>
