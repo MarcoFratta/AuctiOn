@@ -7,7 +7,7 @@ services:
     environment:
       - DB_URI=${LOBBY_S_DB_URI:-mongodb://test:27017/lobby}
       - PORT=${LOBBY_S_C_PORT:-3000}
-      - NODE_ENV=${LOBBY_S_NODE_ENV:-production}
+      - NODE_ENV=production
       - AUTH_SERVICE_URI=${LOBBY_S_AUTH_SERVICE_URI:-http://auth-service:3000/auth}
       - USER_SERVICE_URI=${LOBBY_S_USER_SERVICE_URI:-http://user-service:3000/users}
       - KAFKA_BROKERS=${LOBBY_S_KAFKA_BROKERS:-kafka:9092}
@@ -20,10 +20,8 @@ services:
       - kafka-broker
   lobby-mongodb:
     image: 'mongo:${MONGO_VERSION:-6.0}' # Default to MongoDB 6.0
-    ports:
-      - '27018:27017'
     volumes:
-      - test_data:/data/lobby-db
+      - mongo_lobby_data:/data/db
     networks:
       - lobby-network
 
@@ -32,6 +30,7 @@ services:
       context: .
       dockerfile: packages/auth-service/Dockerfile
     restart: always
+    dns: [ "8.8.8.8", "1.1.1.1" ]
     environment:
       - DB_URI=${AUTH_S_DB_URI:-mongodb://test:27017/auth}
       - PORT=${AUTH_S_C_PORT:-3000}
@@ -41,10 +40,12 @@ services:
       - REFRESH_EXPIRATION_DAYS=${AUTH_S_REFRESH_EXPIRATION_DAYS:-7d}
       - REDIS_URL=${AUTH_S_REDIS_URI:-redis://redis:6379}
       - REDIS_PORT=${AUTH_S_REDIS_PORT:-6379}
-      - NODE_ENV=${AUTH_S_NODE_ENV:-production}
-      - EMAIL_USER=${AUTH_S_EMAIL_USER}
-      - EMAIL_PASS=${AUTH_S_EMAIL_PASS}
+      - NODE_ENV=test
       - USER_SERVICE_URI=${AUTH_S_USER_SERVICE_URI:-http://user-service:3000/users}
+      - EMAIL_HOST=mailhog
+      - EMAIL_PORT=1025
+      - EMAIL_USER=
+      - EMAIL_PASS=
     networks:
       - auth-network
       - redis-network
@@ -52,10 +53,11 @@ services:
     depends_on:
       - auth-mongodb
       - redis
+      - mailhog
   auth-mongodb:
     image: 'mongo:${MONGO_VERSION:-6.0}' # Default to MongoDB 6.0
     volumes:
-      - test_data:/data/auth-db
+      - mongo_auth_data:/data/db
     networks:
       - auth-network
 
@@ -68,7 +70,7 @@ services:
     restart: always
     environment:
       - PORT=${USER_S_C_PORT:-3000}
-      - NODE_ENV=${USER_S_NODE_ENV:-production}
+      - NODE_ENV=production
       - DB_URI=${USER_S_DB_URI:-mongodb://localhost:27017/users}
     networks:
       - user-network
@@ -76,7 +78,7 @@ services:
   user-mongodb:
     image: 'mongo:${MONGO_VERSION:-6.0}' # Default to MongoDB 6.0
     volumes:
-      - test_data:/data/user-db
+      - mongo_user_data:/data/db
     networks:
       - user-network
   api-gateway:
@@ -88,7 +90,7 @@ services:
       - '${GATEWAY_S_H_PORT:-3000}:${GATEWAY_S_C_PORT:-3000}' # Default to 3000 if PORT is not defined
     environment:
       - PORT=${GATEWAY_S_C_PORT:-3000}
-      - NODE_ENV=test
+      - NODE_ENV=production
       - LOBBY_SERVICE_URI=${GATEWAY_S_LOBBY_SERVICE_URI:-http://lobby-service:3000/lobby}
       - USER_SERVICE_URI=${GATEWAY_S_USER_SERVICE_URI:-http://user-service:3000/users}
       - AUTH_SERVICE_URI=${GATEWAY_S_AUTH_SERVICE_URI:-http://auth-service:3000/auth}
@@ -103,7 +105,7 @@ services:
     restart: always
     environment:
       - PORT=${AUCTION_S_C_PORT:-3000}
-      - NODE_ENV=${AUCTION_S_NODE_ENV:-production}
+      - NODE_ENV=production
       - KAFKA_BROKERS=${AUCTION_S_KAFKA_BROKERS:-kafka:9092}
       - REDIS_URL=${AUCTION_S_REDIS_URI:-redis://redis:6379}
       - REDIS_PORT=${AUCTION_S_REDIS_PORT:-6379}
@@ -119,13 +121,11 @@ services:
     container_name: redis
     restart: always
     volumes:
-      - test_data:/redis-data
+      - redis-data:/data
     networks:
       - redis-network
   kafka-broker:
     image: apache/kafka:latest
-    ports:
-      - '9092:9092'
     restart: always
     environment:
       KAFKA_NODE_ID: 1
@@ -143,7 +143,15 @@ services:
     networks:
       - kafka-network
 
-
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: mailhog
+    restart: always
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - auth-network
 
 networks:
   kafka-network:
@@ -157,10 +165,9 @@ networks:
   redis-network:
     driver: bridge
   microservices-network:
-    external: true
+    driver: bridge
 volumes:
-  test_data:
-    driver: local
-    driver_opts:
-      type: tmpfs
-      device: tmpfs
+  mongo_user_data:
+  mongo_auth_data:
+  mongo_lobby_data:
+  redis-data:

@@ -1,8 +1,6 @@
 {
   "name": "integration-tests",
   "scripts": {
-    "build": "tsc",
-    "dev": "ts-node src/server.ts",
     "test": "./scripts/run-tests.sh"
   },
   "devDependencies": {
