@@ -91,11 +91,9 @@ export class AuthController {
     const inputData: RegisterInputData = req.body
     try {
       const user = await this.authService.register(inputData)
-      if (config.env == 'production') {
-        this.mailService.sendRegisterMail(user.email).then(() => {
-          logger.debug(`Welcome email sent to user's email`)
-        })
-      }
+      this.mailService.sendRegisterMail(user.email).then(() => {
+        logger.debug(`Welcome email sent to user's email`)
+      })
 
       logger.debug(`User ${inputData.email} registered successfully`)
 
@@ -146,16 +144,14 @@ export class AuthController {
     try {
       const email: string = req.params.email
       const token = await this.authService.forgotPassword(email)
-      if (config.env == 'production') {
-        this.mailService
-          .sendResetMail(email, token)
-          .then(() => {
-            logger.debug(`Password reset link sent to user's email`)
-          })
-          .catch(error => {
-            logger.error(`Error sending password reset email: ${error}`)
-          })
-      }
+      this.mailService
+        .sendResetMail(email, token)
+        .then(() => {
+          logger.debug(`Password reset link sent to user's email`)
+        })
+        .catch(error => {
+          logger.error(`Error sending password reset email: ${error}`)
+        })
       res.status(200).json({
         message: "Password reset link sent to user's email",
       })

@@ -15,4 +15,6 @@ export const config = {
   resetTokenExpireMinutes: parseInt(process.env.RESET_EXPIRATION_MINUTES ?? '15'),
   emailUser: process.env.EMAIL_USER ?? 'test-user',
   emailPass: process.env.EMAIL_PASS ?? 'test-pass',
+  emailHost: process.env.EMAIL_HOST ?? 'smtp.test.com',
+  emailPort: parseInt(process.env.EMAIL_PORT ?? '587'),
 }

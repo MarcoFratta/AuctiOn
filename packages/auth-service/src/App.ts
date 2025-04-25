@@ -13,7 +13,7 @@ import logger from '@auction/common/logger'
 import { RedisTokenRepo } from './repositories/RedisTokenRepo'
 import Redis from 'ioredis'
 import { MailClientImpl } from './services/MailClientImpl'
-import nodemailer from 'nodemailer'
+import nodemailer, { Transporter } from 'nodemailer'
 import { emailConfig } from './configs/emailConfig'
 
 export class App {
@@ -60,16 +60,43 @@ export class App {
 
     const service = new AuthServiceImpl(tokenGenerator, accountRepo, tokensRepo, config.userServiceUrl)
 
-    const mailer = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: config.emailUser,
-        pass: config.emailPass,
-      },
-    })
+    let mailer: Transporter
+
+    if (config.env === 'test') {
+      logger.info(`Running in test environment. Configuring MailHog transport.`)
+      mailer = nodemailer.createTransport({
+        host: config.emailHost,
+        port: config.emailPort,
+      })
+      mailer.verify(function (error, _success) {
+        if (error) {
+          logger.error(`MailHog connection error: ${error}`)
+        } else {
+          logger.info('MailHog server is ready to take our messages')
+        }
+      })
+    } else {
+      logger.info(`Running in ${config.env} environment. Configuring default (Gmail) transport.`)
+      mailer = nodemailer.createTransport({
+        host: config.emailHost,
+        port: config.emailPort,
+        service: 'gmail',
+        auth: {
+          user: config.emailUser,
+          pass: config.emailPass,
+        },
+      })
+      mailer.verify(function (error, _success) {
+        if (error) {
+          logger.error(`Default mailer connection error: ${error}`)
+        } else {
+          logger.info('Default mailer server is ready to take our messages')
+        }
+      })
+    }
 
     const mailService = new MailClientImpl(mailer, emailConfig)
-    const controller = new AuthController(service, mailService) // Use the router
+    const controller = new AuthController(service, mailService)
     const router = createRouter(controller)
     this.app.use('/auth', router)
   }

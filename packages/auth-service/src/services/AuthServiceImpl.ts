@@ -92,8 +92,13 @@ export class AuthServiceImpl implements AuthService {
 
   async resetPassword(token: string, password: string): Promise<void> {
     // verify token
-    const decoded = this.generator.verifyResetToken(token)
-    if (!decoded) {
+    let decoded
+    try {
+      decoded = this.generator.verifyResetToken(token)
+    } catch (_e) {
+      throw new TokenExpiredError()
+    }
+    if (!decoded || !decoded.id) {
       throw new InvalidTokenError()
     }
     const user = await this.accountRepo.findById(decoded.id)

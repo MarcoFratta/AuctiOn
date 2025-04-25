@@ -6,6 +6,7 @@ import { AccountRepository } from '../src/repositories/AccountRepository'
 import { JWTTokenGenerator } from '../src/domain/JWTTokenGenerator'
 import mockRedis from 'ioredis-mock'
 import { RedisTokenRepo } from '../src/repositories/RedisTokenRepo'
+import { MailClientImpl } from '../src/services/MailClientImpl'
 
 // Mock dependencies
 jest.mock('../src/services/AuthServiceImpl');
@@ -26,8 +27,14 @@ describe('AuthController', () => {
       '',
     ) as jest.Mocked<AuthServiceImpl>;
 
+
     // Instantiate controller with mocked service
-    authController = new AuthController(authService, {} as any)
+    authController = new AuthController(authService, {
+      async sendResetMail(email: string, token: string): Promise<void> {
+      },
+      async sendRegisterMail(email: string): Promise<void> {
+      },
+    } as MailClientImpl)
 
     // Mock request, response, and next
     req = {};
@@ -103,14 +110,14 @@ describe('AuthController', () => {
       })
 
       await authController.register(req as Request, res as Response, next);
-
+      expect(next).not.toHaveBeenCalled()
       expect(authService.register).toHaveBeenCalledWith(req.body);
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith({
         message: 'User registered successfully',
         user: { ...token, ...user },
       });
-      expect(next).not.toHaveBeenCalled();
+
     });
     it('should refresh token', async () => {
       const token = { token: 'mocked-token' }
