@@ -75,7 +75,7 @@
               <InnerCard class="mb-3">
                 <CopyCard :url="lobbyUrl" />
               </InnerCard>
-              <ShareCard :url="lobbyUrl" />
+              <ShareCard :lobby-id="lobbyStore.lobby?.id ?? ''" :url="lobbyUrl" />
             </div>
           </BaseCard>
         </div>
