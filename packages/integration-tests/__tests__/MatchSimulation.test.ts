@@ -1,5 +1,6 @@
 import { connectToServer } from './Connection'
 import { Client } from './Client'
+import logger from '@auction/common/logger'
 
 
 const API_GATEWAY_URL = 'http://localhost:8080'
@@ -10,14 +11,13 @@ beforeAll(async () => {
 
 jest.setTimeout(90000)
 describe('Match simulation', () => {
-  it('should simulate a match with 4 players', async () => {
-    const creator = await c.registerUser('player1@email.com', 'Password123', 'Player 1')
-    const player2 = await c.registerUser('player2@email.com', 'Password123', 'Player 2')
-    const player3 = await c.registerUser('player3@email.com', 'Password123', 'Player 3')
-    const player4 = await c.registerUser('player4@email.com', 'Password123', 'Player 4')
+  it('should simulate a match with 4 players and random seller order', async () => {
+    const creator = await c.registerUser('player1@email.com', 'Password123', 'Player1')
+    const player2 = await c.registerUser('player2@email.com', 'Password123', 'Player2')
+    const player3 = await c.registerUser('player3@email.com', 'Password123', 'Player3')
+    const player4 = await c.registerUser('player4@email.com', 'Password123', 'Player4')
     const bidTime = 10
-    const bidMs = 2 * (bidTime * 1000)
-
+    logger.info(`Creator token: ${creator.token}`)
     // Create a lobby
     const lobby = await c.createLobby(creator.token, {
       rounds: 3,
@@ -36,7 +36,21 @@ describe('Match simulation', () => {
     await c.joinLobby(player2.token, lobby.id)
     await c.joinLobby(player3.token, lobby.id)
     await c.joinLobby(player4.token, lobby.id)
-    await c.createMatch(creator.token)
+
+    const messages: Record<string, any[]> = { creator: [], player2: [], player3: [], player4: [] }
+    // Connect players
+    const wsCreator = await c.connectPlayer(creator.token, 'creator', messages)
+    const wsPlayer2 = await c.connectPlayer(player2.token, 'player2', messages)
+    const wsPlayer3 = await c.connectPlayer(player3.token, 'player3', messages)
+    const wsPlayer4 = await c.connectPlayer(player4.token, 'player4', messages)
+
+    // Map player IDs to their details for easy access
+    const players: Record<string, any> = {
+      [creator.id]: { user: creator, ws: wsCreator, token: creator.token, name: 'creator', messages: messages.creator },
+      [player2.id]: { user: player2, ws: wsPlayer2, token: player2.token, name: 'player2', messages: messages.player2 },
+      [player3.id]: { user: player3, ws: wsPlayer3, token: player3.token, name: 'player3', messages: messages.player3 },
+      [player4.id]: { user: player4, ws: wsPlayer4, token: player4.token, name: 'player4', messages: messages.player4 },
+    }
 
     await c.setReady(creator.token, 'ready')
     await c.setReady(player2.token, 'ready')
@@ -45,78 +59,129 @@ describe('Match simulation', () => {
 
     await c.startMatch(creator.token)
 
-    const messages: Record<string, any[]> = { creator: [], player2: [], player3: [], player4: [] }
-    // Connect players
-    const wsCreator = await c.connectPlayer(creator.token, 'creator', messages)
-    const wsPlayer2 = await c.connectPlayer(player2.token, 'player2', messages)
-    const wsPlayer3 = await c.connectPlayer(player3.token, 'player3', messages)
-    const wsPlayer4 = await c.connectPlayer(player4.token, 'player4', messages)
-    // Start a sale
-    await c.saleItem(wsCreator, [
+    // Wait for the auction-start event to get the seller queue
+    // Use the creator's websocket connection (wsCreator)
+    const matchStartedEvent = await c.waitForMessage(wsCreator, 'auction-start')
+    const sq: string[] = matchStartedEvent.auction.sellerQueue
+    logger.info(`Seller queue determined: ${sq.map(id => players[id].name).join(', ')}`)
+
+    expect(sq).toHaveLength(4) // Ensure queue length matches players length
+
+    // --- Round 1 ---
+    const sellerId1 = sq[0]
+    const seller1 = players[sellerId1]
+    logger.info(`Round 1: Seller is ${seller1.name}`)
+    await c.saleItem(seller1.ws, [
       { item: 'triangle', quantity: 1 },
       { item: 'square', quantity: 1 },
-    ])
-    await c.placeBid(wsPlayer2, 100, 1)
-    await c.placeBid(wsPlayer3, 200, 1)
-    await c.placeBid(wsPlayer4, 300, 1)
-    // wait for the round to end
-    await c.waitFor(bidMs)
+    ], sellerId1)
 
-    // Start a sale
-    await c.saleItem(wsPlayer2, [
+    // Other players bid
+    await c.placeBid(players[sq[1]].ws, 50, 1, sq[1])
+    await c.placeBid(players[sq[2]].ws, 100, 1, sq[2])
+    // player 2 wins: 400,
+    await c.waitForMessage(wsCreator, 'round-end')
+    // --- Round 2 ---
+    const sellerId2 = sq[1]
+    const seller2 = players[sellerId2]
+    logger.info(`Round 2: Seller is ${seller2.name}`)
+    await c.saleItem(seller2.ws, [
       { item: 'triangle', quantity: 1 },
-    ])
-    await c.placeBid(wsCreator, 100, 2)
-    await c.placeBid(wsPlayer3, 200, 2)
-    // wait for the round to end
-    await c.waitFor(bidMs)
+    ], sellerId2)
+    // Other players bid
+    await c.placeBid(players[sq[2]].ws, 50, 2, sq[2])
+    await c.placeBid(players[sq[0]].ws, 100, 2, sq[0])
+    await c.placeBid(players[sq[3]].ws, 150, 2, sq[3])
+    // player 3 wins: 350,
+    await c.waitForMessage(wsCreator, 'round-end')
 
-    //last round
-    await c.saleItem(wsPlayer3, [
+    // --- Round 3 ---
+    const sellerId3 = sq[2]
+    const seller3 = players[sellerId3]
+    logger.info(`Round 3: Seller is ${seller3.name}`)
+    await c.saleItem(seller3.ws, [
       { item: 'circle', quantity: 1 },
-    ])
-    await c.placeBid(wsCreator, 100, 3)
-    // wait for the round to end
-    await c.waitFor(bidMs)
+    ], sellerId3)
+    // Other players bid
+    await c.placeBid(players[sq[0]].ws, 50, 3, sq[0])
+    // should be ignored
+    await c.placeBid(players[sq[0]].ws, 100, 3, sq[0])
+    await c.placeBid(players[sq[1]].ws, 150, 3, sq[1])
 
-    // Check the final state
-    expect(messages.creator.pop().leaderboard).toEqual({
-      leaderboard: [
+    // --- Check Final State ---
+    // Wait for the auction-end event on the creator's websocket
+    const leaderboard = await c.waitForMessage(wsCreator, 'auction-end') // Increased timeout
+
+    logger.info(`Match ended event received: ${JSON.stringify(leaderboard)}`)
+
+    // Basic structural checks for the leaderboard
+    expect(leaderboard).toBeDefined()
+    // Assuming the event structure is { type: 'auction-end', leaderboard: { ... } }
+    expect(leaderboard.leaderboard).toBeDefined()
+    expect(leaderboard.leaderboard.leaderboard).toBeInstanceOf(Array)
+    expect(leaderboard.leaderboard.removed).toBeInstanceOf(Array)
+
+    // Check the final state (Keep the specific checks as they were)
+    expect(leaderboard.leaderboard).toEqual({
+      'leaderboard': [
         {
-          id: creator.id, money: 700, position: 1, inventory: {
-            items: [
-              { item: 'triangle', quantity: 2 },
-              { item: 'square', quantity: 2 },
-              { item: 'circle', quantity: 4 }],
+          'id': sq[0],
+          'money': 630,
+          'position': 1,
+          'inventory': {
+            'items': [
+              { 'item': 'triangle', 'quantity': 2 },
+              { 'item': 'square', 'quantity': 2 },
+              { 'item': 'circle', 'quantity': 3 },
+            ],
           },
         },
         {
-          id: player2.id, money: 700, position: 1, inventory: {
-            items: [
-              { item: 'triangle', quantity: 2 },
-              { item: 'square', quantity: 3 },
-              { item: 'circle', quantity: 3 }],
+          'id': sq[1],
+          'money': 540,
+          'position': 2,
+          'inventory': {
+            'items': [
+              { 'item': 'triangle', 'quantity': 2 },
+              { 'item': 'square', 'quantity': 3 },
+              { 'item': 'circle', 'quantity': 4 },
+            ],
           },
-        },
-        {
-          id: player3.id, money: 400, position: 3, inventory: {
-            items: [
-              { item: 'triangle', quantity: 4 },
-              { item: 'square', quantity: 3 },
-              { item: 'circle', quantity: 2 }],
-          },
-        },
+        }
       ],
-      removed: [
+      'removed': [
         {
-          id: player4.id, money: 200, inventory: {
-            items: [
-              { item: 'triangle', quantity: 4 },
-              { item: 'square', quantity: 4 },
-              { item: 'circle', quantity: 3 }],
+          'id': sq[2],
+          'money': 610,
+          'inventory': {
+            'items': [
+              { 'item': 'triangle', 'quantity': 4 },
+              { 'item': 'square', 'quantity': 4 },
+              { 'item': 'circle', 'quantity': 2 },
+            ],
           },
         },
-      ],
+        {
+          'id': sq[3],
+          'money': 440,
+          'inventory': {
+            'items': [
+              { 'item': 'triangle', 'quantity': 4 },
+              { 'item': 'square', 'quantity': 3 },
+              { 'item': 'circle', 'quantity': 3 },
+            ],
+          },
+        },
+      ]
     })
+
+
+    // Close connections
+    wsCreator.close()
+    wsPlayer2.close()
+    wsPlayer3.close()
+    wsPlayer4.close()
+    // Add a small delay to allow sockets to close gracefully before jest exits
+    await c.waitFor(500)
   })
 })
