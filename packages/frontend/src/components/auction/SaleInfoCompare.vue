@@ -78,8 +78,8 @@ const getAfterTheme = (
       >
         <div class="w-1/3">Item</div>
         <div class="w-2/3 flex justify-end">
-          <div class="text-right pr-12">Before</div>
-          <div class="pr-3">After</div>
+          <div class="text-right mr-16">Before</div>
+          <div class="pr-5">After</div>
         </div>
       </div>
 
