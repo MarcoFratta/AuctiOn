@@ -18,7 +18,7 @@
     "lint": "run-s lint:*",
     "format": "prettier --write src/",
     "tailwind:init": "npx tailwindcss init",
-    "local-deploy": "ngrok http http://192.168.1.120:5173"
+    "local-deploy": "ngrok http http://localhost:5173"
   },
   "dependencies": {
     "@auction/common": "^1.0.0",
