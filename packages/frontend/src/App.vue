@@ -5,6 +5,10 @@ import AppHeader from '@/components/common/AppHeader.vue'
 import { useAuctionConnection } from '@/composables/useAuctionConnection.ts'
 import { useSettingsStore } from '@/stores/settingsStore'
 import NavigationDrawer from '@/components/common/NavigationDrawer.vue'
+import { useLobbyMsgHandler } from '@/composables/useLobbyMsgHandler.ts'
+import { useLobbyNotifications } from '@/composables/useLobbyNotifications.ts'
+import { useAuctionNotifications } from '@/composables/useAuctionNotifications.ts'
+import { useAuctionStats } from '@/composables/useAuctionStats.ts'
 
 const authStore = useAuthStore()
 const isDrawerOpen = ref(false)
@@ -16,6 +20,14 @@ const toggleDrawer = () => {
 
 const settingsStore = useSettingsStore()
 settingsStore.init()
+const lobbyMsgHandler = useLobbyMsgHandler()
+const lobbyNotifications = useLobbyNotifications()
+const auctionNotifications = useAuctionNotifications()
+const auctionStats = useAuctionStats()
+lobbyNotifications.attach()
+lobbyMsgHandler.attach()
+auctionNotifications.attach()
+auctionStats.attach()
 // Watch for changes to the darkMode setting and update the HTML class
 watch(
   () => settingsStore.darkMode,
