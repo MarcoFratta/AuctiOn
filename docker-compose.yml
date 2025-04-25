@@ -20,8 +20,6 @@ services:
       - kafka-broker
   lobby-mongodb:
     image: 'mongo:${MONGO_VERSION:-6.0}' # Default to MongoDB 6.0
-    ports:
-      - '27018:27017'
     volumes:
       - mongo_lobby_data:/data/db
     networks:
@@ -103,8 +101,6 @@ services:
       context: .
       dockerfile: packages/auction-service/Dockerfile
     restart: always
-    ports:
-      - '${AUCTION_S_H_PORT:-3000}:${AUCTION_S_C_PORT:-3000}' # Default to 3000 if PORT is not defined
     environment:
       - PORT=${AUCTION_S_C_PORT:-3000}
       - NODE_ENV=${AUCTION_S_NODE_ENV:-production}
@@ -128,8 +124,6 @@ services:
       - redis-network
   kafka-broker:
     image: apache/kafka:latest
-    ports:
-      - '9092:9092'
     restart: always
     environment:
       KAFKA_NODE_ID: 1
