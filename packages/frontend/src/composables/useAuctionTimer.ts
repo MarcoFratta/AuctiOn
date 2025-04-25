@@ -19,28 +19,21 @@ export function useAuctionTimer() {
   }
 
   const startTimer = () => {
-    console.log('[useAuctionTimer] Attempting to start timer...')
     stopTimer()
 
     if (lobbyStore.auctionEndTime !== null) {
-      console.log('[useAuctionTimer] Conditions met (auctionEndTime exists). Starting timer.')
       remainingTime.value = calculateRemainingTime()
 
       timerInterval = window.setInterval(() => {
         remainingTime.value = calculateRemainingTime()
       }, 1000)
-      console.log('[useAuctionTimer] Interval timer started with ID:', timerInterval)
     } else {
-      console.log(
-        '[useAuctionTimer] Conditions not met (auctionEndTime is null). Setting remainingTime to 0.',
-      )
       remainingTime.value = 0
     }
   }
 
   const stopTimer = () => {
     if (timerInterval) {
-      console.log('[useAuctionTimer] Stopping timer interval ID:', timerInterval)
       window.clearInterval(timerInterval)
       timerInterval = undefined
     }
@@ -48,21 +41,16 @@ export function useAuctionTimer() {
 
   watch(
     () => lobbyStore.auctionEndTime,
-    (newEndTime, oldEndTime) => {
-      console.log(
-        `[useAuctionTimer] Watch triggered: auctionEndTime changed from ${oldEndTime} to ${newEndTime}. Restarting timer.`,
-      )
+    () => {
       startTimer()
     },
   )
 
   onMounted(() => {
-    console.log('[useAuctionTimer] Component Mounted. Starting timer.')
     startTimer()
   })
 
   onBeforeUnmount(() => {
-    console.log('[useAuctionTimer] Component Unmounting. Stopping timer.')
     stopTimer()
   })
 
