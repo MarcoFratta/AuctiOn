@@ -57,7 +57,7 @@
           </div>
           <CurrentBidCard
             v-else
-            :highest-bid="highestBid"
+            :highest-bid="currentBid"
             :highest-bidder="highestBidder"
             :remaining-time="remainingTime"
             class="h-full"
@@ -97,7 +97,7 @@
           />
           <CurrentBidCard
             v-else
-            :highest-bid="highestBid"
+            :highest-bid="currentBid"
             :highest-bidder="highestBidder"
             :remaining-time="remainingTime"
             class="h-full"
@@ -138,7 +138,7 @@
 <script lang="ts" setup>
 import { useLobbyStore } from '@/stores/lobbyStore.ts'
 import { useSettingsStore } from '@/stores/settingsStore.ts'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import GameHeader from '@/components/auction/GameHeader.vue'
 import CurrentBidCard from '@/components/auction/CurrentBidCard.vue'
@@ -160,20 +160,16 @@ import MobileBottomBar from '@/components/auction/MobileBottomBar.vue'
 import { useAlert } from '@/composables/useAlert.ts'
 import { useResultsStore } from '@/stores/resultsStore.ts'
 import { useSocketStore } from '@/stores/socketStore.ts'
+import { useLobbyInfo } from '@/composables/useLobbyInfo.ts'
 
 const lobbyStore = useLobbyStore()
 const auctionService = useAuctionService()
 const settingsStore = useSettingsStore()
+const lobbyInfo = useLobbyInfo()
 const router = useRouter()
 // Use our auction timer composable
 const { remainingTime } = useAuctionTimer()
-
-// Auction state
-const highestBid = computed(() => lobbyStore.lobby?.currentBid?.amount || 0)
-const highestBidder = computed(() => {
-  if (!lobbyStore.lobby?.currentBid) return undefined
-  return lobbyStore.users.find((p) => p.id === lobbyStore.lobby?.currentBid?.playerId)
-})
+const { currentBid, highestBidder, isCurrentUserSeller } = lobbyInfo
 
 // Sale items
 const sellingItems = ref([])
@@ -188,10 +184,6 @@ const handleSale = (items: NewSaleMsg['sale']['items']) => {
   auctionService.sellItems(items)
 }
 
-// Check if current user is the seller
-const isCurrentUserSeller = computed(() => {
-  return lobbyStore.userIsTheSeller
-})
 const connection = useAuctionConnection()
 if (!lobbyStore.lobby) {
   connection
@@ -221,7 +213,6 @@ watch(
   (connected) => {
     if (!connected && (!resultsStore.leaderboard || resultsStore.auctionId !== lobbyId.value)) {
       alerts.error('Disconnected', `You have been disconnected from the game`)
-      router.push('/join')
     }
   },
 )

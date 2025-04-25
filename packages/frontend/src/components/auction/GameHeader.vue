@@ -1,9 +1,10 @@
 <script lang="ts" setup>
 import { useLobbyStore } from '@/stores/lobbyStore.ts'
-import { computed } from 'vue'
+import { useLobbyInfo } from '@/composables/useLobbyInfo.ts'
 
 const lobbyStore = useLobbyStore()
-const playerMoney = computed(() => lobbyStore.playerInfo?.money || 0)
+const lobbyInfo = useLobbyInfo()
+const { userMoney } = lobbyInfo
 </script>
 
 <template>
@@ -14,7 +15,7 @@ const playerMoney = computed(() => lobbyStore.playerInfo?.money || 0)
       class="bg-white dark:bg-neutral-900 px-3 py-1.5 rounded-lg border border-app-violet-900/30 dark:border-neutral-800/50 flex items-center gap-1.5 shadow-sm"
     >
       <span class="text-yellow-500 text-sm">💰</span>
-      <span class="font-medium text-sm text-green-600 dark:text-green-400">${{ playerMoney }}</span>
+      <span class="font-medium text-sm text-green-600 dark:text-green-400">${{ userMoney }}</span>
     </div>
 
     <!-- Status -->

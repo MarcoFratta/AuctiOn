@@ -69,7 +69,7 @@
 
               <!-- Kick/Leave Button -->
               <LoadingButton
-                v-if="amIAdmin && sellerId !== userStore.user?.id"
+                v-if="userIsAdmin && sellerId !== userStore.user?.id"
                 :confirm-message="`Are you sure you want to kick ${lobbyStore.getUser(sellerId)?.username ?? ''}?`"
                 btn-style="px-2 py-0.5 text-white bg-red-500 hover:bg-red-600 rounded-md transition-colors text-xs font-medium"
                 confirm-button-text="Kick"
@@ -123,11 +123,13 @@ import SectionHeader from '@/components/common/SectionHeader.vue'
 import ScrollableContainer from '@/components/common/ScrollableContainer.vue'
 import LoadingButton from '@/components/common/LoadingButton.vue'
 import { useLobbyService } from '@/composables/useLobbyService.ts'
+import { useLobbyInfo } from '@/composables/useLobbyInfo.ts'
 
 const lobbyStore = useLobbyStore()
 const lobbyService = useLobbyService()
 const userStore = useUserStore()
-const amIAdmin = computed(() => lobbyStore.lobby?.creatorId == userStore.user?.id)
+const lobbyInfo = useLobbyInfo()
+const { userIsAdmin } = lobbyInfo
 // Sort the seller queue to always have the current seller at the top
 function kick(userId: string) {
   lobbyService.kickPlayer(userId)

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, watch } from 'vue'
 import BaseCard from '@/components/common/BaseCard.vue'
 import InnerCard from '@/components/common/InnerCard.vue'
 import AppIcons from '@/components/icons/AppIcons.vue'
@@ -10,6 +10,7 @@ import { Chart, registerables } from 'chart.js'
 import { Line } from 'vue-chartjs'
 import { useLobbyStore } from '@/stores/lobbyStore.ts'
 import { useStatsCreator } from '@/composables/useStatsCreator.ts'
+import { useSettingsStore } from '@/stores/settingsStore.ts'
 
 // Register Chart.js components
 Chart.register(...registerables)
@@ -89,33 +90,20 @@ const chartOptions = {
   },
 }
 
-// For dark mode detection
-const isDarkMode = ref(false)
+const settingsStore = useSettingsStore()
 
-onMounted(() => {
-  // Check if dark mode is enabled
-  isDarkMode.value = document.documentElement.classList.contains('dark')
-
-  // Listen for dark mode changes
-  const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      if (mutation.attributeName === 'class') {
-        isDarkMode.value = document.documentElement.classList.contains('dark')
-
-        // Update chart colors for dark mode
-        if (isDarkMode.value) {
-          chartOptions.scales.y.ticks.color = '#a0aec0'
-          chartOptions.scales.x.ticks.color = '#a0aec0'
-        } else {
-          chartOptions.scales.y.ticks.color = '#718096'
-          chartOptions.scales.x.ticks.color = '#718096'
-        }
-      }
-    })
-  })
-
-  observer.observe(document.documentElement, { attributes: true })
-})
+watch(
+  () => settingsStore.darkMode,
+  (darkMode) => {
+    if (darkMode) {
+      chartOptions.scales.y.ticks.color = '#a0aec0'
+      chartOptions.scales.x.ticks.color = '#a0aec0'
+    } else {
+      chartOptions.scales.y.ticks.color = '#718096'
+      chartOptions.scales.x.ticks.color = '#718096'
+    }
+  },
+)
 
 const lobbyStore = useLobbyStore()
 

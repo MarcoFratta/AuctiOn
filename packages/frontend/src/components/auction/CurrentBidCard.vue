@@ -1,46 +1,30 @@
 <script lang="ts" setup>
 import { useLobbyStore } from '@/stores/lobbyStore.ts'
-import { useUserStore } from '@/stores/userStore.ts'
 import { computed, ref, watch } from 'vue'
 import BaseCard from '@/components/common/BaseCard.vue'
 import InnerCard from '@/components/common/InnerCard.vue'
 import AuctionTimer from '@/components/auction/AuctionTimer.vue'
 import SectionHeader from '@/components/common/SectionHeader.vue'
+import { useLobbyInfo } from '@/composables/useLobbyInfo.ts'
 
-const userStore = useUserStore()
 const lobbyStore = useLobbyStore()
-
+const lobbyInfo = useLobbyInfo()
 const props = defineProps<{
   remainingTime: number
 }>()
-const highestBidder = computed(() =>
-  lobbyStore.getUser(lobbyStore.lobby?.currentBid?.playerId ?? ''),
-)
+
 const emits = defineEmits(['bid'])
-const highestBid = computed(() => lobbyStore.lobby?.currentBid?.amount ?? 0)
 
-// Get user's current money
-const userMoney = computed(() => lobbyStore.playerInfo?.money || 0)
-
-// Check if current user is the highest bidder
-const isHighestBidder = computed(() => {
-  return highestBidder.value?.id === userStore.user?.id
-})
-
-// Check if user is the seller
-const isCurrentSeller = computed(() => {
-  return lobbyStore.userIsTheSeller
-})
-
+const { currentBid, highestBidder, isCurrentUserSeller, isHighestBidder, userMoney } = lobbyInfo
 // Calculate future balance after sale (for seller)
 const futureBalance = computed(() => {
-  if (!isCurrentSeller.value) return userMoney.value
-  return userMoney.value + highestBid.value
+  if (!isCurrentUserSeller.value) return userMoney.value
+  return userMoney.value + (currentBid.value?.amount ?? 0)
 })
 
 // Check if user can bid (time remaining, not seller, not highest bidder)
 const canBid = computed(() => {
-  return props.remainingTime > 0 && !isCurrentSeller.value && !isHighestBidder.value
+  return props.remainingTime > 0 && !isCurrentUserSeller.value && !isHighestBidder.value
 })
 
 // Custom bid amount
@@ -52,7 +36,7 @@ const showInputFlash = ref(false)
 
 // Reset custom bid amount when highest bid changes
 watch(
-  () => highestBid,
+  () => currentBid.value,
   () => {
     customBidAmount.value = null
     customBidError.value = ''
@@ -71,7 +55,7 @@ const handleCustomBid = () => {
     return
   }
 
-  if (bidAmount <= highestBid.value) {
+  if (bidAmount <= (currentBid.value?.amount ?? 0)) {
     customBidError.value = 'Bid must be higher than current bid'
     return
   }
@@ -102,24 +86,24 @@ const setQuickBidAmount = (amount: number) => {
 
 // Check if a quick bid amount is valid (user has enough money)
 const isValidBid = (amount: number) => {
-  return amount > highestBid.value && amount <= userMoney.value
+  return amount > (currentBid.value?.amount ?? 0) && amount <= userMoney.value
 }
 
 // Quick bid options
 const quickBidOptions = computed(() => {
-  const currentBid = highestBid.value
+  const currentBidValue = currentBid.value?.amount ?? 0
 
   // If there are no bids yet (currentBid is 0), provide default starting bid options
-  if (currentBid === 0) {
+  if (currentBidValue === 0) {
     return [5, 10, 15, 20]
   }
 
   // Otherwise, calculate proportional bids based on current highest bid
   return [
-    Math.round(currentBid * 1.1), // +10%
-    Math.round(currentBid * 1.25), // +25%
-    Math.round(currentBid * 1.5), // +50%
-    Math.round(currentBid * 2), // +100%
+    Math.round(currentBidValue * 1.1), // +10%
+    Math.round(currentBidValue * 1.25), // +25%
+    Math.round(currentBidValue * 1.5), // +50%
+    Math.round(currentBidValue * 2), // +100%
   ]
 })
 </script>
@@ -146,7 +130,7 @@ const quickBidOptions = computed(() => {
       >
         <!-- Current Bid Amount -->
         <span class="text-app-violet-600 dark:text-app-violet-400 font-bold text-xl xl:text-2xl">
-          ${{ highestBid }}
+          ${{ currentBid?.amount ?? 0 }}
         </span>
 
         <!-- Bidder Info -->
@@ -166,13 +150,13 @@ const quickBidOptions = computed(() => {
 
         <!-- Status indicator -->
         <div
-          v-if="isHighestBidder || isCurrentSeller || remainingTime <= 0"
+          v-if="isHighestBidder || isCurrentUserSeller || remainingTime <= 0"
           class="mt-1 text-center text-xs font-medium"
         >
           <span v-if="isHighestBidder" class="text-green-600 dark:text-green-300">
             You are the highest bidder
           </span>
-          <span v-else-if="isCurrentSeller" class="text-blue-700 dark:text-blue-300">
+          <span v-else-if="isCurrentUserSeller" class="text-blue-700 dark:text-blue-300">
             You are the seller
           </span>
           <span v-else-if="remainingTime <= 0" class="text-neutral-700 dark:text-neutral-300">
@@ -182,14 +166,14 @@ const quickBidOptions = computed(() => {
       </div>
 
       <!-- Seller View - Show when user is the seller -->
-      <div v-if="isCurrentSeller" class="flex flex-col px-2">
+      <div v-if="isCurrentUserSeller" class="flex flex-col px-2">
         <div class="flex flex-col h-full justify-between">
           <!-- Current Bid Status -->
           <div class="space-y-2">
             <div class="flex justify-between items-center">
               <span class="text-neutral-600 dark:text-neutral-400 text-xs">Current Bid:</span>
               <span class="text-app-violet-600 dark:text-app-violet-400 font-bold">
-                ${{ highestBid }}
+                ${{ currentBid?.amount ?? 0 }}
               </span>
             </div>
 
@@ -213,7 +197,7 @@ const quickBidOptions = computed(() => {
                 <span class="text-green-600 dark:text-green-400 font-bold">
                   ${{ futureBalance }}
                   <span class="text-green-500 dark:text-green-300 text-xs ml-1">
-                    (+${{ highestBid }})
+                    (+${{ currentBid?.amount ?? 0 }})
                   </span>
                 </span>
               </div>
@@ -223,7 +207,7 @@ const quickBidOptions = computed(() => {
       </div>
 
       <!-- Quick Bid Options - Only show when not seller -->
-      <div v-if="!isCurrentSeller" class="mb-2">
+      <div v-if="!isCurrentUserSeller" class="mb-2">
         <div class="grid grid-cols-2 gap-1.5">
           <button
             v-for="(amount, index) in quickBidOptions"
@@ -237,7 +221,7 @@ const quickBidOptions = computed(() => {
             :disabled="!canBid || !isValidBid(amount)"
             :title="
               !canBid
-                ? isCurrentSeller
+                ? isCurrentUserSeller
                   ? 'You are the seller'
                   : isHighestBidder
                     ? 'You are the highest bidder'
@@ -254,7 +238,7 @@ const quickBidOptions = computed(() => {
       </div>
 
       <!-- Bottom section: Custom bid input - Only show when not seller -->
-      <div v-if="!isCurrentSeller" class="mt-auto">
+      <div v-if="!isCurrentUserSeller" class="mt-auto">
         <!-- Money available indicator -->
         <div
           class="flex justify-between items-center text-xs text-neutral-500 dark:text-neutral-400 mb-1"
@@ -268,7 +252,7 @@ const quickBidOptions = computed(() => {
           <span v-if="canBid"
             >Min:
             <span class="text-app-violet-600 dark:text-app-violet-400 font-medium"
-              >${{ highestBid + 1 }}</span
+              >${{ (currentBid?.amount ?? 0) + 1 }}</span
             ></span
           >
         </div>
@@ -291,7 +275,7 @@ const quickBidOptions = computed(() => {
               ]"
               :disabled="!canBid"
               :max="userMoney"
-              :placeholder="(highestBid + 1).toString()"
+              :placeholder="((currentBid?.amount ?? 0) + 1).toString()"
               min="1"
               type="number"
               @keyup.enter="canBid && handleCustomBid()"

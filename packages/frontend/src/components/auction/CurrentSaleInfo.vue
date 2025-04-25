@@ -5,23 +5,16 @@ import BaseCard from '@/components/common/BaseCard.vue'
 import InnerCard from '@/components/common/InnerCard.vue'
 import AppIcons from '@/components/icons/AppIcons.vue'
 import SectionHeader from '@/components/common/SectionHeader.vue'
+import { useLobbyInfo } from '@/composables/useLobbyInfo.ts'
 
 const lobbyStore = useLobbyStore()
-const currentSale = computed(() => lobbyStore.lobby?.currentSale)
-const seller = computed(() => {
-  if (!currentSale.value) return undefined
-  return lobbyStore.users.find((p) => p.id === currentSale.value?.sellerId)
-})
-
-// Calculate total weight of items in sale
-const totalWeight = computed(() => currentSale.value?.info.weight ?? 0)
+const lobbyInfo = useLobbyInfo()
+const { currentSale, currentSeller, userMoney, currentBid, totalUserWeight } = lobbyInfo
 
 const bidPercentage = computed(() => {
   if (!currentSale.value || !lobbyStore.currentUser) return 0
-  const currentBid = lobbyStore.lobby?.currentBid?.amount || 0
-  const userMoney = lobbyStore.playerInfo?.money || 0
-  if (userMoney === 0) return 100
-  return Math.min(Math.round((currentBid / userMoney) * 100), 100)
+  if (userMoney.value === 0) return 100
+  return Math.min(Math.round(((currentBid.value?.amount ?? 0) / userMoney.value) * 100), 100)
 })
 
 const percentageColor = computed(() => {
@@ -59,12 +52,12 @@ const percentageTextColor = computed(() => {
         <div
           class="w-7 h-7 md:w-8 md:h-8 rounded-full bg-green-100 dark:bg-green-500/20 flex items-center justify-center text-green-600 dark:text-green-400 font-medium text-sm md:text-base mr-2 md:mr-3"
         >
-          {{ seller?.username?.substring(0, 1).toUpperCase() || '?' }}
+          {{ currentSeller?.username?.substring(0, 1).toUpperCase() || '?' }}
         </div>
         <div>
           <div class="text-xs md:text-sm text-gray-500 dark:text-gray-400">Seller</div>
           <div class="text-sm md:text-base font-medium text-gray-900 dark:text-white">
-            {{ seller?.username || 'Unknown' }}
+            {{ currentSeller?.username || 'Unknown' }}
           </div>
         </div>
       </div>
@@ -77,7 +70,7 @@ const percentageTextColor = computed(() => {
           <div class="flex flex-row justify-start items-center gap-2">
             <h2 class="text-md font-medium text-gray-600 dark:text-gray-300">Total Weight:</h2>
             <div class="text-orange-600 dark:text-orange-400 font-bold text-md">
-              {{ totalWeight }}
+              {{ totalUserWeight }}
             </div>
           </div>
         </div>
