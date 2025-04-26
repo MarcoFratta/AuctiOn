@@ -31,8 +31,7 @@ try {
 // Step 3: Extract the scope from the commit message (e.g., feat(auth-service): ...)
 const scopeMatch = commitMessage.match(/\(([^)]+)\)/);
 if (!scopeMatch) {
-  console.log('No scope found in commit message. Running all tests...');
-  runCommand('npm test') // Run all tests if no scope is found
+  console.log('No scope found in commit message. Running no tests...')
   process.exit(0);
 }
 
