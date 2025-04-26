@@ -56,7 +56,6 @@ describe('WinStrategyFactory', () => {
 
     it('handles a single-player auction correctly', () => {
       const auction = createAuction([createPlayer('p1', 500, new Map([['triangle', 10]]))])
-
       const strategy = WinStrategyFactory.byMoney()
       const leaderboard = strategy.computeLeaderboard(auction)
 
