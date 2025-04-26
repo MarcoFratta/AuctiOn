@@ -92,9 +92,10 @@ test:api-gateway:
 test:integration-tests: # Matches the script name in package.json
   stage: test
   needs: [ install_dependencies ]
+  before_script:
+    - apt-get update && apt-get install -y docker.io docker-compose-v2
+    - docker info # Check connection to host daemon
   script:
-    # E2E tests might require services to be running. This just runs the script.
-    # Consider using GitLab 'services' or Docker Compose here.
     - echo "Running integration tests..."
     - npm run test:integration-tests # Run the specific script from root
   rules:
