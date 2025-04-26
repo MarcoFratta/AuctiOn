@@ -2,6 +2,7 @@ image: node:18
 
 stages:
   - install
+  - common
   - build
   - test
 # - deploy # Add deployment stages later if needed
@@ -28,7 +29,7 @@ install_dependencies:
 
 # Define build jobs explicitly for services and frontend
 build:common:
-  stage: build
+  stage: common
   needs: [ install_dependencies ]
   script:
     - echo "Building common package..."
