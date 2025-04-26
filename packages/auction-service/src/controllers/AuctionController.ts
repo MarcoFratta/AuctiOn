@@ -113,10 +113,10 @@ export class AuctionController {
             .getUser(p.id)
             .then(info => {
               if (info) {
-                logger.info(`Sending player ${p.id} join message to player ${playerId}`)
+                logger.debug(`Sending player ${p.id} join message to player ${playerId}`)
                 this.playerChannel.sendToPlayer(playerId, playerJoinMessage(p.id, info, true))
                 if (p.status == 'connected') {
-                  logger.info(`Sending player ${p.id} connect message to player ${playerId}`)
+                  logger.debug(`Sending player ${p.id} connect message to player ${playerId}`)
                   this.playerChannel.sendToPlayer(playerId, playerConnectedMessage(p.id, true))
                 }
                 this.playerChannel.sendToPlayer(playerId, playerInfoMessage(p.id, info, true))
@@ -125,7 +125,7 @@ export class AuctionController {
             .catch(err => logger.error(`Error getting user info: ${err}`))
         })
 
-        logger.info(`Broadcasting player connected message to auction players`)
+        logger.debug(`Broadcasting player connected message to auction players`)
         this.lobbyBroadcast(
           auction.players.filter(p => p.id !== playerId),
           playerConnectedMessage(playerId)

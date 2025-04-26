@@ -38,7 +38,7 @@ export class KafkaConsumer {
           const type: LobbyEventType = validateSchema(lobbyEventTypeSchema, message)
           await this.handleLobbyEvent(message, type)
         } catch (error) {
-          logger.error('Error processing message:', error)
+          logger.debug('Error processing message:', error)
         }
       },
     })
@@ -91,7 +91,7 @@ export class KafkaConsumer {
           await this.userService.updateUser(event.playerId, { status: event.status })
         })
         .otherwise(() => {
-          logger.info(`[KafkaConsumer] Unknown lobby event type: ${type}`)
+          logger.debug(`[KafkaConsumer] Unknown lobby event type: ${type}`)
         })
     } catch (e) {
       logger.warn(`[KafkaConsumer] Error handling message: ${e}`)

@@ -19,19 +19,19 @@ export class TimerController {
 
   private subscribeToEvents(): void {
     this.auctionService.onNewSale(auction => {
-      logger.info(`Starting timer for auction ${auction.id}`)
+      logger.debug(`Starting timer for auction ${auction.id}`)
       this.startTimer(auction.id, auction.bidTime * 1000)
       this.sendTimeUpdate(auction)
     })
 
     this.auctionService.onNewBid(auction => {
-      logger.info(`Refreshing timer for auction ${auction.id}`)
+      logger.debug(`Refreshing timer for auction ${auction.id}`)
       this.getTimer(auction.id)?.refresh()
       this.sendTimeUpdate(auction)
     })
 
     this.auctionService.onAuctionEnd(() => {
-      logger.info('Auction ended, clearing timers')
+      logger.debug('Auction ended, clearing timers')
       this.clearAllTimers()
     })
     this.playerEventSource.onPlayerConnect(playerId => {
@@ -50,7 +50,7 @@ export class TimerController {
           }
         })
         .catch(error => {
-          logger.error(`[TimerController] Failed to get auction for player ${playerId}: ${error}`)
+          logger.debug(`[TimerController] Failed to get auction for player ${playerId}: ${error}`)
         })
     })
   }
@@ -70,10 +70,10 @@ export class TimerController {
   private startTimer(auctionId: string, duration: number): void {
     const timer = new AuctionTimer(auctionId, duration, async () => {
       try {
-        logger.info(`[Timer] Ending round for auction ${auctionId}`)
+        logger.debug(`[Timer] Ending round for auction ${auctionId}`)
         await this.auctionService.endRound(auctionId)
       } catch (error) {
-        logger.error(`Error ending round for auction ${auctionId}:`, error)
+        logger.warn(`Error ending round for auction ${auctionId}:`, error)
       }
     })
 
