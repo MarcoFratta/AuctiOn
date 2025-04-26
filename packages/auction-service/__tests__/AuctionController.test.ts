@@ -31,9 +31,7 @@ describe('AuctionController', () => {
 
   beforeEach(() => {
     mockAuctionService = mock<AuctionServiceImpl>()
-
     mockWebSocketAdapter = mock<WebSocketAdapter>()
-
     redis = new redisMock()
     userService = new UserServiceImpl(redis)
     controller = new AuctionController(mockAuctionService, mockWebSocketAdapter, mockWebSocketAdapter, userService)
