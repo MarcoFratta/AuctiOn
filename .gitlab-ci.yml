@@ -13,6 +13,7 @@ cache:
       - package-lock.json # Or yarn.lock / pnpm-lock.yaml
   paths:
     - node_modules/
+    - packages/common/
 # --- Global Scripts ---
 
 # Install dependencies once before any jobs run in the 'install' stage
