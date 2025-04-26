@@ -1,0 +1,213 @@
+image: node:18
+
+stages:
+  - install
+  - test
+  - build
+# - deploy # Add deployment stages later if needed
+
+# Cache node_modules to speed up subsequent runs
+cache:
+  key:
+    files:
+      - package-lock.json # Or yarn.lock / pnpm-lock.yaml
+  paths:
+    - node_modules/
+# --- Global Scripts ---
+
+# Install dependencies once before any jobs run in the 'install' stage
+install_dependencies:
+  stage: install
+  script:
+    - echo "Installing dependencies..."
+    # Use 'npm ci' for faster, reliable installs based on lock file
+    # Use '--ignore-scripts' if you have problematic postinstall scripts during CI
+    - npm ci
+  # No artifacts needed if using cache
+
+# --- Testing ---
+
+# Template for running tests in a specific workspace using root npm script
+.test_template: &test_definition
+  stage: test
+  needs: [ install_dependencies ]
+  script:
+    # Run the specific workspace test script from the root
+    - echo "Running tests for $CI_JOB_NAME..."
+    - npm run $CI_JOB_NAME # Assumes job name matches root script e.g., test:auth-service
+  variables:
+    # Define PACKAGE_PATH for rules:changes, not needed for script if running from root
+    PACKAGE_PATH: packages/$PACKAGE_NAME
+
+# Define test jobs for each service based on package.json scripts
+test:auth-service:
+  <<: *test_definition
+  variables:
+    PACKAGE_NAME: auth-service # Used to construct PACKAGE_PATH for rules
+  rules:
+    - changes:
+        - packages/auth-service/**/*
+        - packages/common/**/* # Also run if common changes
+
+test:lobby-service:
+  <<: *test_definition
+  variables:
+    PACKAGE_NAME: lobby-service
+  rules:
+    - changes:
+        - packages/lobby-service/**/*
+        - packages/common/**/*
+
+test:user-service:
+  <<: *test_definition
+  variables:
+    PACKAGE_NAME: user-service
+  rules:
+    - changes:
+        - packages/user-service/**/*
+        - packages/common/**/*
+
+test:auction-service:
+  <<: *test_definition
+  variables:
+    PACKAGE_NAME: auction-service
+  rules:
+    - changes:
+        - packages/auction-service/**/*
+        - packages/common/**/*
+
+test:api-gateway:
+  <<: *test_definition
+  variables:
+    PACKAGE_NAME: api-gateway
+  rules:
+    - changes:
+        - packages/api-gateway/**/*
+        - packages/common/**/*
+
+# Note: test:common and test:frontend have "echo" scripts, so no CI jobs needed unless tests are added.
+
+# Job for Integration (E2E) tests
+test:integration-tests: # Matches the script name in package.json
+  stage: test
+  needs: [ install_dependencies ]
+  script:
+    # E2E tests might require services to be running. This just runs the script.
+    # Consider using GitLab 'services' or Docker Compose here.
+    - echo "Running integration tests..."
+    - npm run test:integration-tests # Run the specific script from root
+  rules:
+    # Run when integration tests change OR when any backend service or common code changes
+    - changes:
+        - packages/integration-tests/**/*
+        - packages/auth-service/**/*
+        - packages/lobby-service/**/*
+        - packages/user-service/**/*
+        - packages/auction-service/**/*
+        - packages/api-gateway/**/*
+        - packages/common/**/*
+
+# --- Building ---
+
+# Template for building a specific workspace
+.build_template: &build_definition
+  stage: build
+  needs: [ install_dependencies ] # Ensure dependencies are installed
+  script:
+    # Navigate to the specific package and run its build script
+    # Assumes each package needing build has 'npm run build' defined in its own package.json
+    - echo "Building packages/$PACKAGE_NAME..."
+    - npm run build --workspace=$PACKAGE_NAME
+  artifacts:
+    # Define artifacts to be saved from the build (e.g., dist folder)
+    paths:
+      - packages/$PACKAGE_NAME/dist # Adjust artifact path as needed (e.g., build, public)
+    expire_in: 1 week # Optional: how long to keep artifacts
+  variables:
+    PACKAGE_PATH: packages/$PACKAGE_NAME # For rules:changes
+
+# Define build jobs for services and frontend
+build:auth-service:
+  <<: *build_definition
+  variables:
+    PACKAGE_NAME: auth-service
+  rules:
+    - changes:
+        - packages/auth-service/**/*
+        - packages/common/**/* # Rebuild if common changes
+    # - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH || $CI_COMMIT_TAG'
+
+build:lobby-service:
+  <<: *build_definition
+  variables:
+    PACKAGE_NAME: lobby-service
+  rules:
+    - changes:
+        - packages/lobby-service/**/*
+        - packages/common/**/*
+
+build:user-service:
+  <<: *build_definition
+  variables:
+    PACKAGE_NAME: user-service
+  rules:
+    - changes:
+        - packages/user-service/**/*
+        - packages/common/**/*
+
+build:auction-service:
+  <<: *build_definition
+  variables:
+    PACKAGE_NAME: auction-service
+  rules:
+    - changes:
+        - packages/auction-service/**/*
+        - packages/common/**/*
+
+build:api-gateway:
+  <<: *build_definition
+  variables:
+    PACKAGE_NAME: api-gateway
+  rules:
+    - changes:
+        - packages/api-gateway/**/*
+        - packages/common/**/*
+
+build:frontend:
+  <<: *build_definition
+  variables:
+    PACKAGE_NAME: frontend
+  rules:
+    - changes:
+        - packages/frontend/**/*
+        - packages/common/**/* # Rebuild frontend if common changes
+
+build:docs: # Assuming docs uses vitepress or similar build process
+  <<: *build_definition
+  variables:
+    PACKAGE_NAME: docs
+  # Adjust script if docs build command is different (e.g., npm run docs:build)
+  # script:
+  #   - cd packages/docs
+  #   - npm run docs:build # Example if script is named differently
+  artifacts:
+    paths:
+      # Adjust path based on VitePress output (e.g., .vitepress/dist)
+      - packages/docs/.vitepress/dist
+    expire_in: 1 week
+  rules:
+    - changes:
+        - packages/docs/**/*
+
+# --- Deployment (Placeholder) ---
+# Add deployment jobs here, potentially triggered only on the main branch or tags
+# deploy:production:
+#   stage: deploy
+#   script:
+#     - echo "Deploying to production..."
+#     # Add your deployment commands here
+#   rules:
+#     - if: '$CI_COMMIT_BRANCH == "main"' # Or your default branch name
+#   needs:
+#     - build:auth-service # Depend on necessary build jobs
+#     - build:frontend 
