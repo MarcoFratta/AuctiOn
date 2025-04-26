@@ -237,11 +237,6 @@ test:integration-tests: # Matches the script name in package.json
 
   needs:
     - install_dependencies
-    - build:auth-service
-    - build:lobby-service
-    - build:user-service
-    - build:auction-service
-    - build:api-gateway
   before_script:
     - apk add --update nodejs npm git
   script:
@@ -259,14 +254,12 @@ test:integration-tests: # Matches the script name in package.json
         - packages/common/**/*
 
 # --- Deployment (Placeholder) ---
-# Add deployment jobs here, potentially triggered only on the main branch or tags
 # deploy:production:
 #   stage: deploy
 #   script:
 #     - echo "Deploying to production..."
-#     # Add your deployment commands here
 #   rules:
-#     - if: '$CI_COMMIT_BRANCH == "main"' # Or your default branch name
+#     - if: '$CI_COMMIT_BRANCH == "main"' 
 #   needs:
 #     - build:auth-service # Depend on necessary build jobs
 #     - build:frontend 
