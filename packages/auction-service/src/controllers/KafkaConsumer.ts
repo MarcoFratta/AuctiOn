@@ -30,7 +30,6 @@ export class KafkaConsumer {
   async connect(): Promise<void> {
     await this.consumer.connect()
     await this.consumer.subscribe({ topic: 'lobby-events', fromBeginning: true })
-
     await this.consumer.run({
       eachMessage: async (payload: EachMessagePayload) => {
         try {
