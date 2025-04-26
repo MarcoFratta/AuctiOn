@@ -82,7 +82,6 @@ describe('Modifiers tests', () => {
         ],
         removed: [],
       }
-
       const modifier = Modifiers.noMostItems()
       const updated = modifier.apply(leaderboard)
 
