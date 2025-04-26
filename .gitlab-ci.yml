@@ -21,8 +21,6 @@ install_dependencies:
   stage: install
   script:
     - echo "Installing dependencies..."
-    # Use 'npm ci' for faster, reliable installs based on lock file
-    # Use '--ignore-scripts' if you have problematic postinstall scripts during CI
     - npm ci
     - npm run build --workspace=@auction/common
 
@@ -150,7 +148,6 @@ build:docs:
 # Define test jobs for each service based on package.json scripts
 test:auth-service:
   stage: test
-  image: node:18 # Assuming auth tests don't need Docker
   needs: [ install_dependencies ]
   script:
     - echo "Running tests for test:auth-service..."
@@ -164,12 +161,7 @@ test:auth-service:
 
 test:lobby-service:
   stage: test
-  image: docker:latest
   needs: [ install_dependencies ]
-  services:
-    - docker:dind # This is required for Docker-in-Docker
-  before_script:
-    - apk add --update nodejs npm git # Assuming lobby tests don't need Docker
   script:
     - echo "Running tests for test:lobby-service..."
     - npm run test:lobby-service
@@ -182,7 +174,6 @@ test:lobby-service:
 
 test:user-service:
   stage: test
-  image: node:18 # Assuming user tests don't need Docker
   needs: [ install_dependencies ]
   script:
     - echo "Running tests for test:user-service..."
@@ -197,14 +188,9 @@ test:user-service:
 test:auction-service:
   stage: test
   needs: [ install_dependencies ]
-  image: docker:latest
-  services:
-    - docker:dind # This is required for Docker-in-Docker
-  before_script:
-    - apk add --update nodejs npm git
   script:
     - echo "Running tests for auction-service…"
-    - npm run test --workspace=auction-service
+    - npm run test:auction-service
   rules:
     - changes:
         - packages/auction-service/**/*
@@ -214,7 +200,6 @@ test:auction-service:
 
 test:api-gateway:
   stage: test
-  image: node:18
   needs: [ install_dependencies ]
   script:
     - echo "Running tests for test:api-gateway..."
@@ -231,14 +216,11 @@ test:api-gateway:
 # Job for Integration (E2E) tests
 test:integration-tests: # Matches the script name in package.json
   stage: test
-  image: docker:latest
-  services:
-    - docker:dind # This is required for Docker-in-Docker
-
   needs:
     - install_dependencies
   before_script:
-    - apk add --update nodejs npm git
+    - apk add --update docker docker-cli-compose docker-compose-plugin
+    - docker info
   script:
     - echo "Running integration tests..."
     - npm run test:integration-tests
