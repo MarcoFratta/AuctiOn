@@ -2,7 +2,6 @@ image: node:18
 
 stages:
   - install
-  - common
   - build
   - test
 # - deploy # Add deployment stages later if needed
@@ -14,6 +13,7 @@ cache:
       - package-lock.json # Or yarn.lock / pnpm-lock.yaml
   paths:
     - node_modules/
+    - packages/common/dist/
 # --- Global Scripts ---
 
 # Install dependencies once before any jobs run in the 'install' stage
@@ -24,29 +24,13 @@ install_dependencies:
     # Use 'npm ci' for faster, reliable installs based on lock file
     # Use '--ignore-scripts' if you have problematic postinstall scripts during CI
     - npm ci
-
-# --- Building ---
-
-# Define build jobs explicitly for services and frontend
-build:common:
-  stage: common
-  needs: [ install_dependencies ]
-  script:
-    - echo "Building common package..."
     - npm run build --workspace=common
-  artifacts:
-    paths:
-      - packages/common/dist # Adjust based on your build output
-    expire_in: 1 week
-  rules:
-    - changes:
-        - packages/common/**/*
-    # Optional: Always build common on main branch pushes or tags
-    # - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH || $CI_COMMIT_TAG'
+
+
 
 build:auth-service:
   stage: build
-  needs: [ install_dependencies, build:common ]
+  needs: [ install_dependencies ]
   script:
     - echo "Building packages/auth-service..."
     - npm run build --workspace=auth-service
@@ -61,7 +45,7 @@ build:auth-service:
 
 build:lobby-service:
   stage: build
-  needs: [ install_dependencies, build:common ]
+  needs: [ install_dependencies ]
   script:
     - echo "Building packages/lobby-service..."
     - npm run build --workspace=lobby-service
@@ -76,7 +60,7 @@ build:lobby-service:
 
 build:user-service:
   stage: build
-  needs: [ install_dependencies, build:common ]
+  needs: [ install_dependencies ]
   script:
     - echo "Building packages/user-service..."
     - npm run build --workspace=user-service
@@ -91,7 +75,7 @@ build:user-service:
 
 build:auction-service:
   stage: build
-  needs: [ install_dependencies, build:common ]
+  needs: [ install_dependencies ]
   script:
     - echo "Building packages/auction-service..."
     - npm run build --workspace=auction-service
@@ -106,7 +90,7 @@ build:auction-service:
 
 build:api-gateway:
   stage: build
-  needs: [ install_dependencies, build:common ]
+  needs: [ install_dependencies ]
   script:
     - echo "Building packages/api-gateway..."
     - npm run build --workspace=api-gateway
@@ -121,7 +105,7 @@ build:api-gateway:
 
 build:frontend:
   stage: build
-  needs: [ install_dependencies, build:common ]
+  needs: [ install_dependencies ]
   script:
     - echo "Building packages/frontend..."
     - npm run build --workspace=frontend
@@ -136,7 +120,7 @@ build:frontend:
 
 build:docs:
   stage: build
-  needs: [ install_dependencies, build:common ]
+  needs: [ install_dependencies ]
   script:
     # Assuming the build script is correctly named in packages/docs/package.json
     - echo "Building packages/docs..."
@@ -167,7 +151,7 @@ build:docs:
 test:auth-service:
   stage: test
   image: node:18 # Assuming auth tests don't need Docker
-  needs: [ install_dependencies, build:common ]
+  needs: [ install_dependencies ]
   script:
     - echo "Running tests for test:auth-service..."
     - npm run test:auth-service
@@ -181,7 +165,7 @@ test:auth-service:
 test:lobby-service:
   stage: test
   image: docker:latest
-  needs: [ install_dependencies, build:common ]
+  needs: [ install_dependencies ]
   services:
     - docker:dind # This is required for Docker-in-Docker
   before_script:
@@ -199,7 +183,7 @@ test:lobby-service:
 test:user-service:
   stage: test
   image: node:18 # Assuming user tests don't need Docker
-  needs: [ install_dependencies, build:common ]
+  needs: [ install_dependencies ]
   script:
     - echo "Running tests for test:user-service..."
     - npm run test:user-service
@@ -212,7 +196,7 @@ test:user-service:
 
 test:auction-service:
   stage: test
-  needs: [ install_dependencies, build:common ]
+  needs: [ install_dependencies ]
   image: docker:latest
   services:
     - docker:dind # This is required for Docker-in-Docker
@@ -231,7 +215,7 @@ test:auction-service:
 test:api-gateway:
   stage: test
   image: node:18
-  needs: [ install_dependencies, build:common ]
+  needs: [ install_dependencies ]
   script:
     - echo "Running tests for test:api-gateway..."
     - npm run test:api-gateway
@@ -253,7 +237,6 @@ test:integration-tests: # Matches the script name in package.json
 
   needs:
     - install_dependencies
-    - build:common
     - build:auth-service
     - build:lobby-service
     - build:user-service
