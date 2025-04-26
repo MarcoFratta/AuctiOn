@@ -199,7 +199,7 @@ describe('Auction System Integration Test', () => {
   })
 
   async function waitToReceiveMessage() {
-    await new Promise(resolve => setTimeout(resolve, 150))
+    await new Promise(resolve => setTimeout(resolve, 500))
   }
 
   async function waitToEndRound(auctionId: string) {
@@ -318,6 +318,7 @@ describe('Auction System Integration Test', () => {
 
     // Player 1 starts a sale
     player1.emit('sell', sale([{ item: 'triangle', quantity: 1 }]))
+    await waitToReceiveMessage()
     player2.emit('bid', bid(50, 1))
 
     await waitToEndRound(config.id)
@@ -329,7 +330,8 @@ describe('Auction System Integration Test', () => {
     await connectPlayer(player2Reconnect, { id: 'player2', name: 'player2', email: 'e@email.com' }, messages)
 
     player2Reconnect.emit('sell', sale([{ item: 'triangle', quantity: 1 }]))
-    player3.emit('sell', bid(50, 2))
+    await waitToReceiveMessage()
+    player3.emit('bid', bid(50, 2))
 
     await waitToEndRound(config.id)
     player3.emit('sell', sale([{ item: 'triangle', quantity: 1 }]))
