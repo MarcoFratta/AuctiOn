@@ -23,6 +23,7 @@ install_dependencies:
     # Use 'npm ci' for faster, reliable installs based on lock file
     # Use '--ignore-scripts' if you have problematic postinstall scripts during CI
     - npm ci
+    - npm run build --workspace=@auction/common   
   # No artifacts needed if using cache
 
 # --- Testing ---
