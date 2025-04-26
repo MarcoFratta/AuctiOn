@@ -91,7 +91,6 @@ describe('AuctionService', () => {
       await service.createAuction(defaultConfig)
       await joinAndConnectPlayer('player1', defaultConfig.id)
       await joinAndConnectPlayer('player2', defaultConfig.id)
-
       await service.startAuction(defaultConfig.id)
 
       const auction = await service.getAuction(defaultConfig.id)
