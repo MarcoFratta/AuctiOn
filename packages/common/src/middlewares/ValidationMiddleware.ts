@@ -7,7 +7,7 @@ const validate = (schema: ZodTypeAny, source: 'body' | 'params' | 'query'): Requ
     try {
       validateSchema(schema, req[source])
       next()
-    } catch (err: any) {
+    } catch (err) {
       if (err instanceof ValidationError) {
         res.status(400).json({
           message: `Invalid ${source}`,
