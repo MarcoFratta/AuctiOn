@@ -19,7 +19,7 @@ export const authMiddleware = async (req: AuthenticatedRequest, res: Response, n
     }
     req.user = user
     next()
-  } catch (error) {
+  } catch (_error) {
     next(new UserNotAuthenticatedError())
   }
 }

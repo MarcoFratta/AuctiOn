@@ -1,3 +1,3 @@
 export interface Converter<Input, Output> {
-  convert(input: Input): Output;
+  convert(input: Input): Output
 }
