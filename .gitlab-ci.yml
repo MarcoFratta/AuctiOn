@@ -159,6 +159,7 @@ build:docs:
         echo "Cache hit. Skipping npm ci."
       fi
   script:
+    - npm i
     - echo "Running tests for $PACKAGE_NAME..."
     # Assumes root package.json has "test:<package_name>": "npm test -w <package_name>"
     - npm run test:$PACKAGE_NAME
