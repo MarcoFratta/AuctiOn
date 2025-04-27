@@ -3,7 +3,7 @@ import { NextFunction, Request, RequestHandler, Response } from 'express'
 import logger from '@auction/common/logger'
 
 export const healthChecker = (services: string[]): RequestHandler => {
-  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  return async (req: Request, res: Response, _next: NextFunction): Promise<void> => {
     try {
       logger.debug('Health check requested')
 
