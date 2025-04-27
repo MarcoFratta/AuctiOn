@@ -1,13 +1,15 @@
+import jwt from 'jsonwebtoken'
+
 export interface TokenGenerator {
-  generateAccessToken(payload: any): string
+  generateAccessToken(payload: string | Buffer | object): string
 
-  generateRefreshToken(payload: any): string
+  generateRefreshToken(payload: string | Buffer | object): string
 
-  generateResetToken(payload: any): string
+  generateResetToken(payload: string | Buffer | object): string
 
-  verifyAccessToken(token: string): any
+  verifyAccessToken(token: string): jwt.JwtPayload | string
 
-  verifyRefreshToken(token: string): any
+  verifyRefreshToken(token: string): jwt.JwtPayload | string
 
-  verifyResetToken(token: string): any
+  verifyResetToken(token: string): jwt.JwtPayload | string
 }

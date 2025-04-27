@@ -11,7 +11,7 @@ export class JWTTokenGenerator implements TokenGenerator {
     private readonly resetExpireMinutes: number = 15
   ) {}
 
-  generateResetToken(payload: any): string {
+  generateResetToken(payload: string | Buffer | object): string {
     return jwt.sign(payload, this.resetTokenSecret, { expiresIn: `${this.resetExpireMinutes}m` })
   }
 
@@ -19,19 +19,19 @@ export class JWTTokenGenerator implements TokenGenerator {
     return jwt.verify(token, this.resetTokenSecret)
   }
 
-  generateAccessToken(payload: any): string {
+  generateAccessToken(payload: string | Buffer | object): string {
     return jwt.sign(payload, this.accessTokenSecret, { expiresIn: `${this.accessExpireMinutes}m` })
   }
 
-  generateRefreshToken(payload: any): string {
+  generateRefreshToken(payload: string | Buffer | object): string {
     return jwt.sign(payload, this.refreshTokenSecret, { expiresIn: `${this.refreshExpireDays}d` })
   }
 
-  verifyAccessToken(token: string): any {
+  verifyAccessToken(token: string): jwt.JwtPayload | string {
     return jwt.verify(token, this.accessTokenSecret)
   }
 
-  verifyRefreshToken(token: string): any {
+  verifyRefreshToken(token: string): jwt.JwtPayload | string {
     return jwt.verify(token, this.refreshTokenSecret)
   }
 }

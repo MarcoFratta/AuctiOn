@@ -76,14 +76,14 @@ export class AuthServiceImpl implements AuthService {
 
   async logout(token: Token): Promise<void> {
     try {
-      const decoded = this.generator.verifyRefreshToken(token.refreshToken)
-      const accessDecode = this.generator.verifyAccessToken(token.accessToken)
-      if (decoded.id !== accessDecode.id) {
+      const decoded = this.generator.verifyRefreshToken(token.refreshToken) as jwt.JwtPayload
+      const accessDecode = this.generator.verifyAccessToken(token.accessToken) as jwt.JwtPayload
+      if (!decoded || decoded.id !== accessDecode.id) {
         throw new InvalidTokenError()
       }
       await this.tokenRepo.deleteRefreshToken(decoded.id)
       await this.tokenRepo.deleteResetToken(decoded.id)
-      await this.tokenRepo.blacklistToken(token.accessToken, decoded.exp)
+      await this.tokenRepo.blacklistToken(token.accessToken, decoded.exp || 0)
     } catch (_error) {
       logger.error(_error)
       throw new InvalidTokenError()
@@ -94,7 +94,7 @@ export class AuthServiceImpl implements AuthService {
     // verify token
     let decoded
     try {
-      decoded = this.generator.verifyResetToken(token)
+      decoded = this.generator.verifyResetToken(token) as jwt.JwtPayload
     } catch (_e) {
       throw new TokenExpiredError()
     }
@@ -123,7 +123,7 @@ export class AuthServiceImpl implements AuthService {
 
   async refreshToken(token: Omit<Token, 'accessToken'>): Promise<Token & { user: User }> {
     try {
-      const decoded = this.generator.verifyRefreshToken(token.refreshToken)
+      const decoded = this.generator.verifyRefreshToken(token.refreshToken) as jwt.JwtPayload
       const storedToken = await this.tokenRepo.findRefreshToken(decoded.id)
 
       if (!storedToken || storedToken !== token.refreshToken) {
@@ -229,7 +229,7 @@ export class AuthServiceImpl implements AuthService {
 
   hasExpiration(token: string): boolean {
     try {
-      const decoded = this.generator.verifyRefreshToken(token)
+      const decoded = this.generator.verifyRefreshToken(token) as jwt.JwtPayload
       return !!decoded.exp
     } catch (error) {
       if (error instanceof jwt.TokenExpiredError) {
