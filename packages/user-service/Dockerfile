@@ -1,48 +1,44 @@
-# Use the official Node.js image as a base
-FROM node:18
+# Stage 1: Build stage
+FROM node:20.19.0-alpine AS builder
 
-# Set the working directory
 WORKDIR /app
 
-# Copy the root package.json and package-lock.json
-COPY package*.json ./
-COPY package-lock.json ./
+# Copy root package files AND package sources BEFORE installing
+COPY package.json package-lock.json ./
+COPY packages/common ./packages/common
+COPY packages/user-service ./packages/user-service
 
-# Install the root dependencies (including common package)
-RUN npm install
-
-# Copy the shared tsconfig.base.json
+# Install ALL monorepo dependencies (including workspace linking)
+RUN npm install --production
+RUN npm install typescript
+# Copy shared config (can be done after install)
 COPY tsconfig.base.json ./
 
-# Now, copy the common package
-COPY packages/common/package*.json ./packages/common/
-COPY packages/common/tsconfig.json ./packages/common/
-COPY packages/common/tsconfig.cjs.json ./packages/common/
-COPY packages/common/src ./packages/common/src
+# Build the common package
+RUN npm run build:cjs -w @auction/common
 
-# Install the common package's dependencies
-WORKDIR /app/packages/common
-RUN npm install
-RUN npm run build:cjs
+# Build the user-service and docs
+RUN npm run build -w user-service
 
-# Copy the user service package files
-WORKDIR /app/packages/user-service
-COPY packages/user-service/package*.json ./
-COPY packages/user-service/tsconfig.json ./
-COPY packages/user-service/src ./src
-COPY packages/user-service/docs ./docs
+# Stage 2: Production stage
+FROM node:20.19.0-alpine
 
-# Install the user service dependencies
 WORKDIR /app
-RUN npm install
+
+# Copy production node_modules from the builder stage
+COPY --from=builder /app/node_modules ./node_modules
+
+# Copy built common package artifacts
+COPY --from=builder /app/packages/common/dist ./packages/common/dist
+COPY --from=builder /app/packages/common/package.json ./packages/common/package.json
+
+# Copy user-service built code, package.json, and docs
+COPY --from=builder /app/packages/user-service/dist ./dist
+COPY --from=builder /app/packages/user-service/package.json ./package.json
+COPY --from=builder /app/packages/user-service/docs ./docs
 
 # Expose the port the application will run on
 EXPOSE 3000
-
-# Build the application
-WORKDIR /app/packages/user-service
-RUN npm run build
-RUN npm run doc
 
 # Start the application
 CMD ["npm", "start"]

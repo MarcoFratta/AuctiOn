@@ -11,6 +11,7 @@
     "test:integration-tests": "npm test --workspace=integration-tests",
     "test:common": "echo \"No tests for common package\"",
     "test:frontend": "echo \"No tests for frontend package\"",
+    "test:docs": "echo \"No tests for docs package\"",
     "build:common": "npm run build --workspace=@auction/common",
     "build:frontend": "npm run build --workspace=frontend",
     "build:auction-service": "npm run build --workspace=auction-service",

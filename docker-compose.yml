@@ -30,6 +30,8 @@ services:
       context: .
       dockerfile: packages/auth-service/Dockerfile
     restart: always
+    ports:
+      - "3000:3000"
     dns: [ "8.8.8.8", "1.1.1.1" ]
     environment:
       - DB_URI=${AUTH_S_DB_URI:-mongodb://test:27017/auth}
@@ -41,6 +43,7 @@ services:
       - REDIS_URL=${AUTH_S_REDIS_URI:-redis://redis:6379}
       - REDIS_PORT=${AUTH_S_REDIS_PORT:-6379}
       - NODE_ENV=${AUTH_S_NODE_ENV:-production}
+      - APP_BASE_URL=${AUTH_S_APP_BASE_URL:-http://localhost:3000}
       - EMAIL_USER=${AUTH_S_EMAIL_USER}
       - EMAIL_PASS=${AUTH_S_EMAIL_PASS}
       - USER_SERVICE_URI=${AUTH_S_USER_SERVICE_URI:-http://user-service:3000/users}
