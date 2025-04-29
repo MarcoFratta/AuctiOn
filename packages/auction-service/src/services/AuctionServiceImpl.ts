@@ -9,7 +9,7 @@ import { createAuctionFromConfig, createFromInfo } from '../domain/auctions/Auct
 import { AuctionRepo } from '../repositories/AuctionRepo'
 import { Leaderboard } from '../schemas/Leaderboard'
 import { CallbacksService } from './CallbacksService'
-import { Auction } from 'domain/auctions/Auction'
+import { Auction } from '../domain/auctions/Auction'
 
 export class AuctionServiceImpl extends CallbacksService implements AuctionService {
   private auctions: Map<string, Auction> = new Map()
@@ -100,13 +100,14 @@ export class AuctionServiceImpl extends CallbacksService implements AuctionServi
     logger.debug(`Player ${playerId} left auction ${auction.id}`)
     this.saveAuction(auction)
     this.notifyPlayerUpdate(auctionId, playerId, 'onPlayerLeave')
+    const res = auction.toInfo()
     if (auction.isTerminated()) {
       await this.deleteAuction(auction)
       const leaderboard = auction.computeLeaderboard()
       this.notifyLeaderBoardUpdate(leaderboard, auctionId)
-      return auction.toInfo()
+      return res
     }
-    return auction.toInfo()
+    return res
   }
 
   async removeAuction(auctionId: Auction['id']): Promise<void> {

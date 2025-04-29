@@ -483,4 +483,20 @@ describe('AuctionService', () => {
     expect(info.currentRound).toBe(4)
     expect(info.sellerQueue[0]).toBe('player2')
   })
+
+  it('should skip the seller if he leaves the game', async () => {
+    await service.createAuction(defaultConfig)
+    await joinAndConnectPlayer('player1', defaultConfig.id)
+    await joinAndConnectPlayer('player2', defaultConfig.id)
+    await joinAndConnectPlayer('player3', defaultConfig.id)
+    const auction = await service.startAuction(defaultConfig.id)
+
+    expect(auction.sellerQueue[0]).toBe('player1')
+    const r1 = await service.endRound(defaultConfig.id) as AuctionInfo
+    expect(r1.sellerQueue[1]).toBe('player2')
+    const info = await service.playerLeave('player2', defaultConfig.id)
+    expect(info.sellerQueue).toEqual(['player1', 'player3'])
+    expect(info.currentRound).toBe(2)
+
+  })
 })

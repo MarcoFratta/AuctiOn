@@ -17,7 +17,7 @@ import {
   PlayerActionsType,
   playerActionsTypeSchema,
 } from '@auction/common/messages'
-import { Player, PlayerInfo } from 'schemas/Player'
+import { Player, PlayerInfo } from '../schemas/Player'
 import {
   auctionDeletedMessage,
   auctionEndMessage,
@@ -186,6 +186,11 @@ export class AuctionController {
       .getAuction(auctionId)
       .then(auction => {
         this.lobbyBroadcast(auction.players, playerLeaveMessage(playerId))
+        if (!auction.currentSale) {
+          auction.players.forEach(player => {
+            this.playerChannel.sendToPlayer(player.id, auctionMessage(auction, player.id))
+          })
+        }
       })
       .catch(err => {
         logger.warn(`Error handling player leave: ${err}`)
