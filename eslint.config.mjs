@@ -51,6 +51,6 @@ export default tseslint.config(
     },
   },
   {
-    ignores: ['**/__tests__/**/*', '**/*.{js,cjs,mjs}'],
+    ignores: ['**/__tests__/**/*', '**/dist/**/*', '**/*.{js,cjs,mjs}'],
   }
 )

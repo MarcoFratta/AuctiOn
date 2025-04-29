@@ -9,6 +9,7 @@ module.exports = {
       'integration-tests',
       'auction-service',
       'frontend',
+      'docs',
       'common']],
     'type-enum': [
       2,
