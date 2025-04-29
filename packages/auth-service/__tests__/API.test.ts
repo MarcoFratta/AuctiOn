@@ -34,7 +34,7 @@ describe('Auth Service Integration Tests with Axios Mock', () => {
     mockedAxios.get.mockRejectedValueOnce(new UserNotFoundError(user.email));
     mockedAxios.post.mockResolvedValue({
       data: { ...user, id: '123456789012345678901234' },
-    });
+    } as any);
     // Perform the request
     return await request(app).post('/auth/register').send({
       email: 'test@example.com',
@@ -79,7 +79,7 @@ describe('Auth Service Integration Tests with Axios Mock', () => {
       const r = await register({ ...user, password: 'Password1' });
       console.log(r.body);
       const id = r.body.user.id;
-      mockedAxios.get.mockResolvedValueOnce({ data: { ...user, id: id } });
+      mockedAxios.get.mockResolvedValueOnce({ data: { ...user, id: id } } as any)
       const response = await request(app).post('/auth/login').send({
         email: 'test@example.com',
         password: 'Password1',
