@@ -5,12 +5,12 @@ export const userId = z.object({
 })
 
 export const userEmail = z.object({
-  email: z.string().email().openapi({ example: 'john@doe.com' }),
+  email: z.string().email(),
 })
 
 export const userSchema = z.object({
   id: userId.shape.id,
-  name: z.string().min(1).openapi({ example: 'John Doe' }),
+  name: z.string().min(1),
   email: userEmail.shape.email,
 })
 

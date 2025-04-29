@@ -37,7 +37,7 @@ export class MongooseUserRepository implements UserRepository {
       if (error instanceof Error.ValidationError) {
         throw new ValidationError(error.message)
       } else if ((error as MongoError).code === 11000) {
-        throw new EmailAlreadyExistsError(userData.email)
+        throw new EmailAlreadyExistsError(userData.email!)
       } else {
         throw error
       }
