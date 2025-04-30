@@ -21,6 +21,20 @@ export class RedisAuctionRepo implements AuctionRepo {
     }
   }
 
+  async getAuction(auctionId: string): Promise<AuctionInfo | null> {
+    const key = `auction:${auctionId}`
+    const auction = await this.redisClient.get(key)
+    if (auction === null) {
+      return null
+    }
+    try {
+      return toAuction.convert(JSON.parse(auction))
+    } catch (error) {
+      logger.error(error)
+      throw new Error(`Error parsing auction ${JSON.parse(auction)}`)
+    }
+  }
+
   async getAuctions(): Promise<AuctionInfo[]> {
     const keys = await this.redisClient.keys('auction:*')
     return await Promise.all(

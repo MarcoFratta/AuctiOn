@@ -100,8 +100,7 @@ describe('Auction System Integration Test', () => {
       })
 
       player.onAny((type: any, msg: any) => {
-        logger.info(`Received message ${type} from ${user.id}:
-         ${JSON.stringify(msg)}`)
+        logger.info(`[${user.id}:${type}]:${JSON.stringify(msg)}`)
         if (type === 'timer-start') {
           return // Ignore timer-start messages
         }
@@ -388,6 +387,10 @@ describe('Auction System Integration Test', () => {
     const player2Reconnect = io(`http://localhost:${port}`, { path: '/auction', auth: { token: 'player2' } })
     await connectPlayer(player2Reconnect, { id: 'player2', name: 'player2', email: 'e@email.com' }, messages)
     // Player 2 cannot start a new sale now because he should be skipped
+    expect(messages.player2.pop().playerInfo).toEqual({
+      money: 50,
+      inventory: { items: [{ item: 'triangle', quantity: 3 }] },
+    })
     player2Reconnect.emit('sell', sale([{ item: 'triangle', quantity: 1 }]))
     // Player 3 can start a sale
     await waitToReceiveMessage()
@@ -407,7 +410,7 @@ describe('Auction System Integration Test', () => {
       money: 0,
       inventory: { items: [{ item: 'triangle', quantity: 4 }] },
     })
-
+    expect((await service.getAuction(config.id)).currentRound === 3)
     // Now player 1 can sell
     player1.emit('sell', sale([{ item: 'triangle', quantity: 1 }]))
     // Player 3 can bid

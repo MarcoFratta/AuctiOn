@@ -96,6 +96,33 @@ describe('RedisAuctionRepo', () => {
       expect(auctions).toHaveLength(2)
       expect(auctions).toEqual(expect.arrayContaining([auction1, auction2]))
     })
+    it('should return an auction if it exists', async () => {
+      const auction1: AuctionInfo = {
+        id: '123456789012345678901234',
+        creatorId: '11111111111111111111111',
+        players: [],
+        maxRound: 3,
+        sellerQueue: [],
+        currentRound: 1,
+        currentSale: undefined,
+        currentBid: undefined,
+        startTimestamp: new Date().toISOString(),
+        maxPlayers: 4,
+        startAmount: 100,
+        startInventory: {
+          items: [
+            { item: 'triangle', quantity: 1 },
+          ],
+        },
+        bidTime: 10,
+      }
+      await auctionRepo.saveAuction(auction1)
+      const res = await auctionRepo.getAuction(auction1.id)
+      expect(res).toEqual(auction1)
+    })
+    it('should return null if the auction does not exist', async () => {
+      await expect(auctionRepo.getAuction('non-existent-id')).resolves.toBeNull()
+    })
 
     it('should return an empty array if no auctions exist', async () => {
       const auctions = await auctionRepo.getAuctions()

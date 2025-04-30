@@ -34,6 +34,11 @@ z.object({
 })
 export const StoredAuctionSchema = AuctionSchema.merge(
   z.object({
+    currentSale: SaleSchema.merge(
+      z.object({
+        items: InventoryOutputSchema,
+      })
+    ).optional(),
     players: z.array(
       PlayerSchema.merge(
         z.object({

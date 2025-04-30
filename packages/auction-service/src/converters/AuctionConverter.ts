@@ -37,6 +37,12 @@ export const toStoredAuction: Converter<AuctionInfo, StoredAuction> = {
   convert: (auction: AuctionInfo): StoredAuction => {
     return validateSchema(StoredAuctionSchema, {
       ...auction,
+      currentSale: auction.currentSale
+        ? {
+            ...auction.currentSale,
+            items: toInventory.convert(auction.currentSale.items),
+          }
+        : undefined,
       players: auction.players.map(player => ({
         ...player,
         inventory: toInventory.convert(player.inventory),
@@ -48,6 +54,12 @@ export const toAuction: Converter<StoredAuction, AuctionInfo> = {
   convert: (storedAuction: StoredAuction): AuctionInfo => {
     return validateSchema(AuctionSchema, {
       ...storedAuction,
+      currentSale: storedAuction.currentSale
+        ? {
+            ...storedAuction.currentSale,
+            items: toInventoryMap.convert(storedAuction.currentSale!.items),
+          }
+        : undefined,
       players: storedAuction.players.map(player => ({
         ...player,
         inventory: toInventoryMap.convert(player.inventory),
