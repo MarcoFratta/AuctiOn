@@ -7,7 +7,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 COPY packages/common ./packages/common
 COPY packages/user-service ./packages/user-service
-
+RUN rm -rf packages/user-service/__tests__
 # Install ALL monorepo dependencies (including workspace linking)
 RUN npm install --production
 RUN npm install typescript
