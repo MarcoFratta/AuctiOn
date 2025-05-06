@@ -45,11 +45,11 @@ export const leaderboardSchema = z.object({
 })
 export const auctionConfigSchema = z.object({
   id: z.string(),
-  maxPlayers: z.number().min(2).max(50),
-  maxRound: z.number().min(1).max(20),
-  startAmount: z.number().min(0).max(5000),
+  maxPlayers: z.number(),
+  maxRound: z.number(),
+  startAmount: z.number(),
   startInventory: inventorySchema,
-  bidTime: z.number().min(10).max(60),
+  bidTime: z.number(),
 })
 export const auctionSchema = z
   .object({
