@@ -43,7 +43,6 @@ export class LobbyServiceImpl implements LobbyService {
       throw new Error('Failed to create lobby')
     }
     this.notifyLobbyCallbacks('lobby-created', lobby)
-    this.notifyPlayerCallbacks('lobby-joined', lobby, lobby.creator)
     return lobby
   }
 
