@@ -9,7 +9,7 @@ cleanup() {
 trap cleanup EXIT  # Run cleanup on exit, even if tests fail
 
 # Start containers
-docker compose -f ../../docker-compose.test.yml up -d --build
+docker compose -f ../../docker-compose.test.yml up -d --force-recreate --build
 
 # Run tests
 npx jest --runInBand
