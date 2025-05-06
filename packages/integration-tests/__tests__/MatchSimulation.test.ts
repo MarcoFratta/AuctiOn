@@ -12,10 +12,10 @@ beforeAll(async () => {
 jest.setTimeout(90000)
 describe('Match simulation', () => {
   it('should simulate a match with 4 players and random seller order', async () => {
-    const creator = await c.registerUser('player1@email.com', 'Password123', 'Player1')
-    const player2 = await c.registerUser('player2@email.com', 'Password123', 'Player2')
-    const player3 = await c.registerUser('player3@email.com', 'Password123', 'Player3')
-    const player4 = await c.registerUser('player4@email.com', 'Password123', 'Player4')
+    const creator = await c.registerUser(`player1-${Date.now()}@email.com`, 'Password123', 'Player1')
+    const player2 = await c.registerUser(`player2-${Date.now()}@email.com`, 'Password123', 'Player2')
+    const player3 = await c.registerUser(`player3-${Date.now()}@email.com`, 'Password123', 'Player3')
+    const player4 = await c.registerUser(`player4-${Date.now()}@email.com`, 'Password123', 'Player4')
     const bidTime = 10
     logger.info(`Creator token: ${creator.token}`)
     // Create a lobby
