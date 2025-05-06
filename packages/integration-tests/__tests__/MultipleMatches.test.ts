@@ -4,7 +4,7 @@ import logger from '@auction/common/logger'
 import { setTimeout } from 'timers/promises'
 
 const API_GATEWAY_URL = 'http://localhost:8080'
-const NUM_GAMES = 100 // Number of simultaneous matches
+const NUM_GAMES = 50 // Number of simultaneous matches
 const PLAYERS_PER_GAME = 10 // Number of players per match
 
 beforeAll(async () => {

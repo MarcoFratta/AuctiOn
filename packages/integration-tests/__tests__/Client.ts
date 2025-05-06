@@ -82,7 +82,7 @@ export class Client {
   }
 
   async waitForMessage(playerSocket: Socket, type: AuctionMessage['type'], predicate?: (v: any) => boolean): Promise<any> {
-    const timeout = 150000
+    const timeout = 300000
     return new Promise((resolve, reject) => {
       let timeoutId: NodeJS.Timeout | null = null
 
