@@ -89,9 +89,9 @@ export class App {
   public async start(port: number): Promise<void> {
     try {
       await Promise.all([
-        this.kafkaProducer.connect().then(() => logger.info('Kafka producer connected')),
-        this.kafkaConsumer.connect().then(() => logger.info('Kafka consumer connected')),
-        this.auctionConsumer.connect().then(() => logger.info('Auction consumer running')),
+        this.kafkaProducer.connect().then(() => logger.info('Kafka lobby producer connected')),
+        this.kafkaConsumer.connect().then(() => logger.info('Kafka lobby consumer connected')),
+        this.auctionConsumer.connect().then(() => logger.info('Kafka auction consumer running')),
       ])
       this.server.listen(port)
       //this.express.listen(3006)
