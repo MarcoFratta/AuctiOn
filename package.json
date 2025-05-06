@@ -50,10 +50,6 @@
     "lint-staged": "^15.2.11",
     "prettier": "^3.4.2",
     "ts-jest": "^29.3.2",
-    "typescript-eslint": "^8.22.0",
-    "vitepress": "^1.6.3"
-  },
-  "dependencies": {
-    "@auction/common": "^1.0.0"
+    "typescript-eslint": "^8.22.0"
   }
 }

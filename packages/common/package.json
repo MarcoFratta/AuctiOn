@@ -76,7 +76,7 @@
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^7.3.0",
     "express": "^4.21.2",
-    "ioredis": "^5.4.2",
+    "ioredis": "^5.6.1",
     "mongoose": "^8.9.6",
     "winston": "^3.17.0",
     "zod": "^3.24.1",
