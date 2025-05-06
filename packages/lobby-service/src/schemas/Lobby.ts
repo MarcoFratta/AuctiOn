@@ -18,11 +18,11 @@ export const playerInfoSchema = z.object({
   username: z.string().min(1).max(30),
 })
 export const lobbyConfigSchema = z.object({
-  maxPlayers: z.number().min(1).max(10),
-  rounds: z.number().min(1).max(10),
-  startAmount: z.number().min(1),
+  maxPlayers: z.number().min(1).max(100),
+  rounds: z.number().min(1).max(20),
+  startAmount: z.number().min(1).max(10000),
   startInventory: InventoryInputSchema,
-  bidTime: z.number().min(1),
+  bidTime: z.number().min(1).max(60),
 })
 export const lobbyStatusSchema = z.enum(['waiting', 'in-progress', 'completed'])
 export const lobbySchema = lobbyIdSchema
