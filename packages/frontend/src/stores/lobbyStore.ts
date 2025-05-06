@@ -95,7 +95,7 @@ export const useLobbyStore = defineStore('lobby', {
       Object.assign(user, update)
     },
     removeUser(id: Player['id']) {
-      if (this.lobby?.startTimestamp) {
+      if (!this.lobby?.currentSale && this.lobby?.sellerQueue[this.sellerIndex] === id) {
         const us = this.users.find((u) => u.id === id)
         if (!us) return
         us.connected = false
