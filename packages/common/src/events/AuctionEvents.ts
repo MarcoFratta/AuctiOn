@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { bidSchema, inventorySchema, leaderboardSchema } from './Auction.js'
+import { bidSchema, inventorySchema, leaderboardSchema, playerLobbyInfoSchema } from './Auction.js'
 
 const withAuctionId = z.object({
   auctionId: z.string(),
@@ -21,15 +21,6 @@ export const playerConnectedEventSchema = z
 export const playerDisconnectedEventSchema = z
   .object({
     type: z.literal('player-disconnected'),
-  })
-  .merge(withAuctionId)
-  .merge(withPlayerId)
-  .merge(withTimestamp)
-
-export const PlayerStatusChangeEventSchema = z
-  .object({
-    type: z.literal('player-status-change'),
-    status: z.string(),
   })
   .merge(withAuctionId)
   .merge(withPlayerId)
@@ -57,6 +48,12 @@ export const saleEventSchema = z
   .merge(withAuctionId)
   .merge(withPlayerId)
   .merge(withTimestamp)
+export const playerUpdateEventSchema = z
+  .object({
+    type: z.literal('player-update'),
+    playerId: z.string(),
+  })
+  .merge(playerLobbyInfoSchema)
 
 export const bidEventSchema = z
   .object({
@@ -66,10 +63,18 @@ export const bidEventSchema = z
   .merge(withAuctionId)
   .merge(withPlayerId)
   .merge(withTimestamp)
+export const timerStartSchema = z
+  .object({
+    type: z.literal('timer-start'),
+    timer: z.number(),
+  })
+  .merge(withAuctionId)
+
 export const auctionEventTypeSchema = z.enum([
   'player-connected',
   'player-disconnected',
-  'player-status-change',
+  'player-update',
+  'timer-start',
   'end-round',
   'end-auction',
   'sale',
@@ -78,16 +83,18 @@ export const auctionEventTypeSchema = z.enum([
 export type AuctionEventType = z.infer<typeof auctionEventTypeSchema>
 export type PlayerConnectedEvent = z.infer<typeof playerConnectedEventSchema>
 export type PlayerDisconnectedEvent = z.infer<typeof playerDisconnectedEventSchema>
-export type PlayerStatusChangeEvent = z.infer<typeof PlayerStatusChangeEventSchema>
 export type EndRoundEvent = z.infer<typeof endRoundEventSchema>
 export type EndAuctionEvent = z.infer<typeof endAuctionEventSchema>
 export type SaleEvent = z.infer<typeof saleEventSchema>
 export type BidEvent = z.infer<typeof bidEventSchema>
+export type PlayerUpdateEvent = z.infer<typeof playerUpdateEventSchema>
+export type TimerStartEvent = z.infer<typeof timerStartSchema>
 export type AuctionEvent =
   | SaleEvent
+  | PlayerUpdateEvent
   | BidEvent
   | PlayerConnectedEvent
   | PlayerDisconnectedEvent
-  | PlayerStatusChangeEvent
   | EndRoundEvent
   | EndAuctionEvent
+  | TimerStartEvent
