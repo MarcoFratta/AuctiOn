@@ -30,7 +30,9 @@ const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   limit: 100, // Max 100 requests per IP
 })
-app.use(globalLimiter)
+if (config.nodeEnv === 'production') {
+  app.use(globalLimiter)
+}
 
 // 🌟 **Login-Specific Rate Limiter** (Prevents Brute Force Attacks)
 const loginLimiter = rateLimit({
