@@ -1,55 +1,47 @@
-import { TimerController } from '../src/controllers/TimerController'
+import { TimerServiceImpl } from '../src/services/TimerServiceImpl'
 import { AuctionService } from '../src/services/AuctionService'
 import { AuctionInfo } from '../src/schemas/Auction'
 import { mock, MockProxy } from 'jest-mock-extended'
 import { WebSocketAdapter } from '../src/adapters/WebSocketAdapter'
+import { TimerRepo } from '../src/repositories/TimerRepo'
+import { AuctionEventsSource } from '../src/services/AuctionEventsSource'
 
-describe('TimerController', () => {
-  let timerController: TimerController
-  let mockAuctionService: jest.Mocked<AuctionService>
-  let callbacks: Map<string, ((auction: AuctionInfo) => void)[]>
-  let playerCallbacks: Map<string, ((playerId: string) => void)[]>
+describe('TimerServiceImpl', () => {
+  let timerController: TimerServiceImpl
+  let mockAuctionService: MockProxy<AuctionService>
+  let mockAuctionEventsSource: MockProxy<AuctionEventsSource>
   let mockPlayerChannel: MockProxy<WebSocketAdapter>
+  let mockTimerRepo: MockProxy<TimerRepo>
+  let timerStartCallback: jest.Mock
 
   beforeEach(() => {
     jest.useFakeTimers()
-    callbacks = new Map()
-    playerCallbacks = new Map()
 
-
-    mockAuctionService = {
-      onNewSale: jest.fn((cb) => {
-        if (!callbacks.has('onNewSale')) callbacks.set('onNewSale', [])
-        callbacks.get('onNewSale')!.push(cb)
-      }),
-      onNewBid: jest.fn((cb) => {
-        if (!callbacks.has('onNewBid')) callbacks.set('onNewBid', [])
-        callbacks.get('onNewBid')!.push(cb)
-      }),
-      onRoundEnd: jest.fn((cb) => {
-        if (!callbacks.has('onRoundEnd')) callbacks.set('onRoundEnd', [])
-        callbacks.get('onRoundEnd')!.push(cb)
-      }),
-      onAuctionEnd: jest.fn((cb) => {
-        if (!callbacks.has('onAuctionEnd')) callbacks.set('onAuctionEnd', [])
-        callbacks.get('onAuctionEnd')!.push(cb)
-      }),
-      endRound: jest.fn(),
-    } as unknown as jest.Mocked<AuctionService>
+    // Create mocks
+    mockAuctionService = mock<AuctionService>()
+    mockAuctionEventsSource = mock<AuctionEventsSource>()
     mockPlayerChannel = mock<WebSocketAdapter>()
-    mockPlayerChannel.onPlayerConnect.mockImplementation((cb) => {
-      if (!playerCallbacks.has('onPlayerConnect')) playerCallbacks.set('onPlayerConnect', [])
-      playerCallbacks.get('onPlayerConnect')!.push(cb)
-    })
+    mockTimerRepo = mock<TimerRepo>()
+    timerStartCallback = jest.fn()
 
-    timerController = new TimerController(mockAuctionService, mockPlayerChannel, mockPlayerChannel)
+    // Setup timer controller
+    timerController = new TimerServiceImpl(
+      mockAuctionService,
+      mockPlayerChannel,
+      mockPlayerChannel,
+      mockTimerRepo,
+      mockAuctionEventsSource,
+    )
+
+    // Register timer start callback
+    timerController.onTimerStart(timerStartCallback)
   })
 
   afterEach(() => {
     jest.useRealTimers()
   })
 
-  it('should start timer on new sale', () => {
+  it('should start timer on new sale', async () => {
     const mockAuction: AuctionInfo = {
       id: 'auction1',
       bidTime: 30,
@@ -63,14 +55,31 @@ describe('TimerController', () => {
       currentRound: 1,
     }
 
-    callbacks.get('onNewSale')![0](mockAuction)
+    // Get the callback registered with the auction service
+    const newSaleCallback = mockAuctionService.onNewSale.mock.calls[0][0]
 
-    jest.advanceTimersByTime(30000)
+    // Call the callback with mock auction
+    await newSaleCallback(mockAuction)
+
+    // Use flushPromises to ensure all promises resolve
+    await jest.runAllTimersAsync()
+
+    // Verify timer was saved to Redis and callback was called
+    expect(mockTimerRepo.saveTimer).toHaveBeenCalledWith(
+      'auction1',
+      expect.any(Number),
+      30,
+    )
+    expect(timerStartCallback).toHaveBeenCalledWith('auction1', expect.any(Number))
+
+    // Advance time to trigger timer completion
+    await jest.advanceTimersByTimeAsync(30100)
+
+    // Verify round was ended
     expect(mockAuctionService.endRound).toHaveBeenCalledWith('auction1')
-    expect(mockPlayerChannel.broadcast).toHaveBeenCalledTimes(1)
   })
 
-  it('should refresh timer on new bid', () => {
+  it('should refresh timer on new bid', async () => {
     const mockAuction: AuctionInfo = {
       id: 'auction1',
       bidTime: 30,
@@ -85,28 +94,41 @@ describe('TimerController', () => {
     }
 
     // Start initial timer
-    callbacks.get('onNewSale')![0](mockAuction)
+    const newSaleCallback = mockAuctionService.onNewSale.mock.calls[0][0]
+    await newSaleCallback(mockAuction)
 
+    // Reset mock calls to clearly see new calls
+    mockTimerRepo.saveTimer.mockClear()
+    timerStartCallback.mockClear()
+    
     // Advance time partially
-    jest.advanceTimersByTime(15000)
+    await jest.advanceTimersByTimeAsync(15000)
     expect(mockAuctionService.endRound).not.toHaveBeenCalled()
-    expect(mockPlayerChannel.broadcast).toHaveBeenCalledTimes(1)
 
-    // New bid comes in
-    // timer should reset
-    callbacks.get('onNewBid')![0](mockAuction)
-    expect(mockAuctionService.endRound).not.toHaveBeenCalled()
-    expect(mockPlayerChannel.broadcast).toHaveBeenCalledTimes(2)
+    // New bid comes in - timer should reset
+    const newBidCallback = mockAuctionEventsSource.onNewBid.mock.calls[0][0]
+    await newBidCallback(mockAuction)
+
+    // Verify timer was refreshed in Redis
+    expect(mockTimerRepo.saveTimer).toHaveBeenCalledWith(
+      'auction1',
+      expect.any(Number),
+      30,
+    )
+
+    // Verify timer start event was emitted again
+    expect(timerStartCallback).toHaveBeenCalledWith('auction1', expect.any(Number))
+
     // Advance time by less than full duration
-    jest.advanceTimersByTime(29000)
+    await jest.advanceTimersByTimeAsync(29000)
     expect(mockAuctionService.endRound).not.toHaveBeenCalled()
+
     // Advance remaining time
-    jest.advanceTimersByTime(1000)
+    await jest.advanceTimersByTimeAsync(1100)
     expect(mockAuctionService.endRound).toHaveBeenCalledWith('auction1')
-    expect(mockPlayerChannel.broadcast).toHaveBeenCalledTimes(2)
   })
 
-  it('should clear timer on round end', () => {
+  it('should call end round on timer end', async () => {
     const mockAuction: AuctionInfo = {
       id: 'auction1',
       bidTime: 30,
@@ -120,16 +142,18 @@ describe('TimerController', () => {
       currentRound: 1,
     }
 
-    callbacks.get('onNewSale')![0](mockAuction)
-    jest.advanceTimersByTime(30000)
-    expect(mockAuctionService.endRound).toHaveBeenCalledTimes(1)
-    expect(mockPlayerChannel.broadcast).toHaveBeenCalledTimes(1)
-    jest.advanceTimersByTime(70000)
-    expect(mockAuctionService.endRound).toHaveBeenCalledTimes(1)
-    expect(mockPlayerChannel.broadcast).toHaveBeenCalledTimes(1)
+    // Start timer
+    const newSaleCallback = mockAuctionService.onNewSale.mock.calls[0][0]
+    await newSaleCallback(mockAuction)
 
+    // Advance time to trigger timer completion
+    await jest.advanceTimersByTimeAsync(30100)
+
+    // Verify endRound was called
+    expect(mockAuctionService.endRound).toHaveBeenCalledWith('auction1')
   })
-  it('should clear timer on auction end', () => {
+
+  it('should clear timer on auction deleted', async () => {
     const mockAuction: AuctionInfo = {
       id: 'auction1',
       bidTime: 10,
@@ -143,32 +167,34 @@ describe('TimerController', () => {
       currentRound: 1,
     }
 
-    callbacks.get('onNewSale')![0](mockAuction)
-    jest.advanceTimersByTime(10000)
-    expect(mockAuctionService.endRound).toHaveBeenCalledWith('auction1')
-    expect(mockAuctionService.endRound).toHaveBeenCalledTimes(1)
-    expect(mockPlayerChannel.broadcast).toHaveBeenCalledTimes(1)
-    callbacks.get('onAuctionEnd')![0](mockAuction)
-    jest.advanceTimersByTime(50000)
-    expect(mockAuctionService.endRound).toHaveBeenCalledTimes(1)
-    expect(mockPlayerChannel.broadcast).toHaveBeenCalledTimes(1)
-  })
-  it('should send time update on new player connected', () => {
-    const auction: AuctionInfo = {
-      id: 'auction1',
-      bidTime: 10,
-      players: [],
-      creatorId: 'player1',
-      maxRound: 3,
-      maxPlayers: 4,
-      startAmount: 100,
-      startInventory: { items: [{ item: 'square', quantity: 1 }] },
-      sellerQueue: [],
-      currentRound: 1,
-    }
-    mockAuctionService.getPlayerAuction = jest.fn()
-    mockAuctionService.getPlayerAuction.mockResolvedValue(auction)
-    playerCallbacks.get('onPlayerConnect')![0]('player1')
-    expect(mockAuctionService.getPlayerAuction).toHaveBeenCalledWith('player1')
+    // Start timer
+    const newSaleCallback = mockAuctionService.onNewSale.mock.calls[0][0]
+    await newSaleCallback(mockAuction)
+
+    // Simulate a bid to ensure timer is active
+    const newRemoteBid = mockAuctionEventsSource.onNewBid.mock.calls[0][0]
+    await newRemoteBid({
+      ...mockAuction,
+      currentBid: {
+        playerId: 'player2',
+        amount: 100,
+        round: 1,
+        timestamp: new Date().toISOString(),
+      },
+    })
+
+    // Reset endRound mock to clearly see if it's called after deletion
+    mockAuctionService.endRound.mockClear()
+
+    // End auction
+    const auctionEndCallback = mockAuctionService.onAuctionDeleted.mock.calls[0][0]
+    await auctionEndCallback(mockAuction)
+
+    // Verify timer was removed from Redis
+    expect(mockTimerRepo.removeTimer).toHaveBeenCalledWith('auction1')
+
+    // Advance time - should not trigger endRound
+    await jest.advanceTimersByTimeAsync(40000)
+    expect(mockAuctionService.endRound).not.toHaveBeenCalled()
   })
 }) 

@@ -5,9 +5,11 @@ import { ItemsMap } from '../src/schemas/Player'
 import { Bid } from '../src/schemas/Bid'
 import { RedisAuctionRepo } from '../src/repositories/RedisAuctionRepo'
 import MockRedis from 'ioredis-mock'
-import Redis from 'ioredis'
 import { Leaderboard } from '../src/schemas/Leaderboard'
 import { Sale } from '../src/schemas/Sale'
+import { RedisLock } from '../src/services/RedisLock'
+import Redis from 'ioredis'
+import { RedisPlayerAuctionMapRepo } from '../src/repositories/PlayerAuctionMapRepo'
 
 describe('AuctionService', () => {
   let service: AuctionService
@@ -16,7 +18,8 @@ describe('AuctionService', () => {
   beforeEach(async () => {
     redis = new MockRedis()
     await redis.flushall()
-    service = new AuctionServiceImpl(new RedisAuctionRepo(redis))
+    const redlock = new RedisLock(redis)
+    service = new AuctionServiceImpl(new RedisAuctionRepo(redis), new RedisPlayerAuctionMapRepo(redis), redlock)
 
   })
   afterAll(async () => {

@@ -2,12 +2,12 @@ import express, { Express } from 'express'
 import http from 'http'
 import { Kafka } from 'kafkajs'
 import logger from '@auction/common/logger'
-import { KafkaProducer } from './controllers/KafkaProducer'
+import { LobbyProducer } from './controllers/LobbyProducer'
 import { AuctionServiceImpl } from './services/AuctionServiceImpl'
 import { WebSocketAdapter } from './adapters/WebSocketAdapter'
-import { AuctionController } from './controllers/AuctionController'
-import { TimerController } from './controllers/TimerController'
-import { KafkaConsumer } from './controllers/KafkaConsumer'
+import { MessageHandler } from './controllers/MessageHandler'
+import { TimerServiceImpl } from './services/TimerServiceImpl'
+import { LobbyConsumer } from './controllers/LobbyConsumer'
 import { RedisAuctionRepo } from './repositories/RedisAuctionRepo'
 import Redis from 'ioredis'
 import * as process from 'node:process'
@@ -18,32 +18,60 @@ import { userSchema } from './schemas/User'
 import { config } from './configs/config'
 import { UserService } from './services/UserService'
 import { UserServiceImpl } from './services/UserServiceImpl'
+import { RedisLock } from './services/RedisLock'
+import { RedisPlayerAuctionMapRepo } from './repositories/PlayerAuctionMapRepo'
+import { RedisTimerRepo } from './repositories/TimerRepo'
+import { AuctionConsumer } from './controllers/AuctionConsumer'
+import { MessageSender } from './controllers/MessageSender'
+import { TimerEventSource } from './services/TimerEventSource'
 
 export class App {
   public wsAdapter: WebSocketAdapter
   public auctionService: AuctionServiceImpl
-  public kafkaProducer: KafkaProducer
-  public kafkaConsumer: KafkaConsumer
-  public auctionController: AuctionController
-  public timerController: TimerController
+  public kafkaProducer: LobbyProducer
+  public kafkaConsumer: LobbyConsumer
+  public auctionController: MessageHandler
+  public timerController: TimerEventSource
   public redis: Redis
   readonly server: http.Server
   private readonly app: Server
   private readonly express: Express
   private readonly userService: UserService
+  private readonly auctionConsumer: AuctionConsumer
+  private messageSender: MessageSender
 
-  constructor(kafka: Kafka, redis: Redis) {
+  constructor(kafka: Kafka, redis: Redis, redlock: RedisLock) {
     this.redis = redis
     this.express = this.setupMiddlewares()
     this.server = http.createServer(this.express)
     this.app = this.setupWebSocket()
-    this.auctionService = new AuctionServiceImpl(new RedisAuctionRepo(redis))
+    const redisAuctionRepo = new RedisAuctionRepo(redis)
+    const playersRepo = new RedisPlayerAuctionMapRepo(redis)
+    const timerRepo = new RedisTimerRepo(redis)
+    this.auctionService = new AuctionServiceImpl(redisAuctionRepo, playersRepo, redlock)
     this.wsAdapter = new WebSocketAdapter(this.app)
     this.userService = new UserServiceImpl(redis)
-    this.auctionController = new AuctionController(this.auctionService, this.wsAdapter, this.wsAdapter, this.userService)
-    this.timerController = new TimerController(this.auctionService, this.wsAdapter, this.wsAdapter)
-    this.kafkaProducer = new KafkaProducer(kafka, this.auctionService, this.wsAdapter)
-    this.kafkaConsumer = new KafkaConsumer(kafka, this.auctionService, 'auction-events', this.userService)
+    this.auctionConsumer = new AuctionConsumer(kafka, this.auctionService, 'auction-events-consumer', this.userService)
+    this.auctionController = new MessageHandler(this.wsAdapter, this.wsAdapter, this.auctionService)
+    this.timerController = new TimerServiceImpl(this.auctionService, this.wsAdapter, this.wsAdapter, timerRepo, this.auctionConsumer)
+    this.kafkaProducer = new LobbyProducer(
+      kafka,
+      this.auctionService,
+      this.auctionService,
+      this.wsAdapter,
+      this.userService,
+      this.timerController
+    )
+    this.messageSender = new MessageSender(
+      this.auctionService,
+      this.auctionConsumer,
+      this.wsAdapter,
+      this.auctionConsumer,
+      this.userService,
+      this.auctionConsumer,
+      this.auctionConsumer
+    )
+    this.kafkaConsumer = new LobbyConsumer(kafka, this.auctionService, 'auction-events', this.userService)
     this.server.on('upgrade', (req, _socket, _head) => {
       logger.info(`WebSocket server upgrade request received: ${req.url}`)
     })
@@ -63,7 +91,7 @@ export class App {
       await Promise.all([
         this.kafkaProducer.connect().then(() => logger.info('Kafka producer connected')),
         this.kafkaConsumer.connect().then(() => logger.info('Kafka consumer connected')),
-        this.auctionService.loadAuctions().then(() => logger.info('Auctions loaded')),
+        this.auctionConsumer.connect().then(() => logger.info('Auction consumer running')),
       ])
       this.server.listen(port)
       //this.express.listen(3006)
@@ -124,6 +152,7 @@ export class App {
 
   private setupMiddlewares = () => {
     const app = express()
+    app.use(express.json())
 
     app.head('/health', (req, res) => {
       logger.info('Health check requested')

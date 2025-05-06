@@ -16,13 +16,13 @@ import { match } from 'ts-pattern'
 import { auctionConfigSchema } from '../schemas/Auction'
 import { UserService } from '../services/UserService'
 
-export class KafkaConsumer {
+export class LobbyConsumer {
   private consumer: Consumer
   private auctionService: AuctionService
   private userService: UserService
 
   constructor(kafka: Kafka, auctionService: AuctionService, groupId: string, userService: UserService) {
-    this.consumer = kafka.consumer({ groupId })
+    this.consumer = kafka.consumer({ groupId: groupId })
     this.auctionService = auctionService
     this.userService = userService
   }
@@ -51,7 +51,7 @@ export class KafkaConsumer {
   }
 
   private async handleLobbyEvent(msg: unknown, type: LobbyEventType): Promise<void> {
-    logger.debug(`Processing lobby event: ${JSON.stringify(type)}`)
+    logger.info(`Processing lobby event: ${JSON.stringify(type)}`)
     try {
       match(type.type)
         .with('lobby-started', async () => {

@@ -72,6 +72,7 @@ export class WebSocketAdapter implements PlayerEventSource, PlayerChannel {
     }
   }
 
+  // Ignore if a client is not connected
   sendToPlayer(playerId: string, msg: AuctionMessage): void {
     const socket = this.clients.get(playerId)
     if (socket) {

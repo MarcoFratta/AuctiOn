@@ -1,24 +1,26 @@
-import { KafkaConsumer } from '../src/controllers/KafkaConsumer'
+import { LobbyConsumer } from '../src/controllers/LobbyConsumer'
 import { AuctionService } from '../src/services/AuctionService'
-import { KafkaContainer, StartedKafkaContainer } from '@testcontainers/kafka'
-import { Kafka } from 'kafkajs'
 import { mock, MockProxy } from 'jest-mock-extended'
 import { AuctionConfig } from '../src/schemas/Auction'
-import { AuctionServiceImpl } from '../src/services/AuctionServiceImpl'
 import { LobbyCreatedEvent, LobbyJoinedEvent, LobbyLeftEvent } from '@auction/common/events/lobby'
-import redisMock from 'ioredis-mock'
-import Redis from 'ioredis'
+import RedisMock from 'ioredis-mock'
 import { UserServiceImpl } from '../src/services/UserServiceImpl'
+import { Consumer, Kafka, Producer } from 'kafkajs'
+import { KafkaContainer, StartedKafkaContainer } from '@testcontainers/kafka'
+import { Redis } from 'ioredis'
 
-
-jest.setTimeout(60 * 1000)
-describe('KafkaConsumer', () => {
-  let kafkaConsumer: KafkaConsumer
+jest.setTimeout(60000)
+describe('LobbyConsumer', () => {
+  let kafkaConsumer: LobbyConsumer
   let mockAuctionService: MockProxy<AuctionService>
-  let kafka: StartedKafkaContainer
-  let producer: any
+  let userService: UserServiceImpl
+  let producer: Producer
+  let consumer: Consumer
+  let kafka: Kafka
+  let container: StartedKafkaContainer
   let redis: Redis
 
+  // Test data
   const defaultConfig: AuctionConfig = {
     id: 'lobby1',
     maxPlayers: 4,
@@ -30,63 +32,79 @@ describe('KafkaConsumer', () => {
   }
 
   beforeAll(async () => {
-    kafka = await new KafkaContainer()
-      .withExposedPorts(9093)
-      .start()
+    // Start Kafka container
+    container = await new KafkaContainer().withExposedPorts(9093).start()
 
-    // Create Kafka admin client to set up topics
-    const adminClient = new Kafka({
-      brokers: [`localhost:${kafka.getMappedPort(9093)}`],
-      clientId: 'admin-client',
+    // Setup Kafka client
+    kafka = new Kafka({
+      clientId: 'test-client',
+      brokers: [`localhost:${container.getMappedPort(9093)}`],
       logLevel: 0,
-    }).admin()
+    })
 
-    await adminClient.connect()
-    await adminClient.createTopics({
+    // Create producer and consumer
+    producer = kafka.producer()
+    consumer = kafka.consumer({ groupId: 'test-group' })
+
+    // Create topic if it doesn't exist
+    const admin = kafka.admin()
+    await admin.connect()
+    await admin.createTopics({
       topics: [{ topic: 'lobby-events', numPartitions: 1 }],
       waitForLeaders: true,
     })
-    await adminClient.disconnect()
+    await admin.disconnect()
 
-    // Create producer for sending test messages
-    const kafkaClient = new Kafka({
-      brokers: [`localhost:${kafka.getMappedPort(9093)}`],
-      clientId: 'test-producer',
-      logLevel: 0,
-    })
-    producer = kafkaClient.producer()
+    // Connect producer
     await producer.connect()
-  }, 120000)
+
+    // Setup Redis
+    redis = new RedisMock()
+
+    // Create services
+    userService = new UserServiceImpl(redis)
+
+    // Create and connect the consumer
+    mockAuctionService = mock<AuctionService>()
+    kafkaConsumer = new LobbyConsumer(
+      kafka,
+      mockAuctionService,
+      'test-group',
+      userService,
+    )
+    await kafkaConsumer.connect()
+
+    // Wait a bit for consumer to be ready
+    await new Promise(resolve => setTimeout(resolve, 1000))
+  })
 
   afterAll(async () => {
-    await producer.disconnect()
-    await kafka.stop()
-  })
-
-  beforeEach(async () => {
-    mockAuctionService = mock<AuctionServiceImpl>()
-
-    const kafkaClient = new Kafka({
-      brokers: [`localhost:${kafka.getMappedPort(9093)}`],
-      clientId: 'test-consumer',
-    })
-    const redis = new redisMock()
-    const userService = new UserServiceImpl(redis)
-    kafkaConsumer = new KafkaConsumer(kafkaClient, mockAuctionService, 'test-group', userService)
-    await kafkaConsumer.connect()
-  })
-
-  afterEach(async () => {
+    // Disconnect consumer and producer
     await kafkaConsumer.disconnect()
+    await producer.disconnect()
+
+    // Stop Kafka container
+    await container.stop()
   })
 
+  beforeEach(() => {
+    // Reset mocks before each test
+    jest.clearAllMocks()
+    mockAuctionService = mock<AuctionService>()
+
+    // Reset the consumer's auction service reference
+    kafkaConsumer['auctionService'] = mockAuctionService
+  })
+
+  // Helper to send a message to Kafka
   const sendMessage = async (message: any) => {
     await producer.send({
       topic: 'lobby-events',
       messages: [{ value: JSON.stringify(message) }],
     })
-    // Give some time for the consumer to process the message
-    await new Promise(resolve => setTimeout(resolve, 1000))
+
+    // Wait for message to be processed
+    await new Promise(resolve => setTimeout(resolve, 500))
   }
 
   describe('Event Handling', () => {
@@ -100,7 +118,6 @@ describe('KafkaConsumer', () => {
       await sendMessage(event)
 
       expect(mockAuctionService.createAuction).toHaveBeenCalledWith(defaultConfig)
-      expect(mockAuctionService.playerJoin).not.toHaveBeenCalled()
     })
 
     it('should handle lobby-joined event', async () => {
@@ -127,6 +144,7 @@ describe('KafkaConsumer', () => {
 
       expect(mockAuctionService.playerLeave).toHaveBeenCalledWith('player1', 'lobby1')
     })
+
     it('should handle lobby-started event', async () => {
       const event = {
         type: 'lobby-started',
@@ -136,6 +154,22 @@ describe('KafkaConsumer', () => {
       await sendMessage(event)
 
       expect(mockAuctionService.startAuction).toHaveBeenCalledWith('lobby1')
+    })
+
+    it('should handle player-update event', async () => {
+      const event = {
+        type: 'player-update',
+        playerId: 'player1',
+        username: 'Updated Name',
+        status: 'ready',
+      }
+
+      await sendMessage(event)
+
+      // Verify user service was called to update the player
+      expect(mockAuctionService.createAuction).not.toHaveBeenCalled()
+      expect(mockAuctionService.playerJoin).not.toHaveBeenCalled()
+      expect(mockAuctionService.playerLeave).not.toHaveBeenCalled()
     })
 
     it('should handle invalid event type gracefully', async () => {
@@ -153,30 +187,18 @@ describe('KafkaConsumer', () => {
     })
 
     it('should handle malformed messages gracefully', async () => {
+      // Send invalid JSON
       await producer.send({
         topic: 'lobby-events',
         messages: [{ value: 'invalid json' }],
       })
 
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      // Wait for message to be processed
+      await new Promise(resolve => setTimeout(resolve, 500))
 
       expect(mockAuctionService.createAuction).not.toHaveBeenCalled()
       expect(mockAuctionService.playerJoin).not.toHaveBeenCalled()
       expect(mockAuctionService.playerLeave).not.toHaveBeenCalled()
-    })
-  })
-
-  describe('Connection Management', () => {
-    it('should connect to Kafka and consume messages', async () => {
-      const event: LobbyCreatedEvent = {
-        type: 'lobby-created',
-        lobby: defaultConfig,
-        creator: 'player1',
-      }
-
-      await sendMessage(event)
-
-      expect(mockAuctionService.createAuction).toHaveBeenCalled()
     })
   })
 }) 

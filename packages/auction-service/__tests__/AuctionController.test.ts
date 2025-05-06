@@ -1,4 +1,4 @@
-import { AuctionController } from '../src/controllers/AuctionController'
+import { MessageHandler } from '../src/controllers/MessageHandler'
 import { AuctionService } from '../src/services/AuctionService'
 import { WebSocketAdapter } from '../src/adapters/WebSocketAdapter'
 import { AuctionConfig } from '../src/schemas/Auction'
@@ -12,8 +12,8 @@ import { UserService } from '../src/services/UserService'
 import { UserServiceImpl } from '../src/services/UserServiceImpl'
 import Redis from 'ioredis'
 
-describe('AuctionController', () => {
-  let controller: AuctionController
+describe('MessageHandler', () => {
+  let controller: MessageHandler
   let mockAuctionService: MockProxy<AuctionService>
   let mockWebSocketAdapter: MockProxy<WebSocketAdapter>
   let redis: Redis
@@ -34,7 +34,8 @@ describe('AuctionController', () => {
     mockWebSocketAdapter = mock<WebSocketAdapter>()
     redis = new redisMock()
     userService = new UserServiceImpl(redis)
-    controller = new AuctionController(mockAuctionService, mockWebSocketAdapter, mockWebSocketAdapter, userService)
+    controller = new MessageHandler(mockWebSocketAdapter, mockWebSocketAdapter
+      , mockAuctionService)
   })
   afterAll(() => {
     redis.flushall()
@@ -49,7 +50,7 @@ describe('AuctionController', () => {
       currentRound: 1,
     })
 
-    controller.handlePlayerConnect(playerId)
+    controller['handlePlayerConnect'](playerId)
 
     expect(mockAuctionService.setPlayerState).toHaveBeenCalledWith(playerId, 'connected')
   })
@@ -63,7 +64,7 @@ describe('AuctionController', () => {
       currentRound: 1,
     })
 
-    controller.handlePlayerDisconnect(playerId)
+    controller['handlePlayerDisconnect'](playerId)
 
     expect(mockAuctionService.setPlayerState).toHaveBeenCalledWith(playerId, 'not-connected')
   })
@@ -95,7 +96,7 @@ describe('AuctionController', () => {
       startTimestamp: new Date().toISOString(),
     })
 
-    await controller.handlePlayerMessage(playerId, message)
+    await controller['handlePlayerMessage'](playerId, message)
 
     expect(mockAuctionService.playerBid).toHaveBeenCalledWith({
       playerId,
@@ -145,7 +146,7 @@ describe('AuctionController', () => {
       startTimestamp: new Date().toISOString(),
     })
 
-    await controller.handlePlayerMessage(playerId, message)
+    await controller['handlePlayerMessage'](playerId, message)
 
     expect(mockAuctionService.playerSale).toHaveBeenCalledWith({ sellerId: playerId, items: itemsMap })
   })
