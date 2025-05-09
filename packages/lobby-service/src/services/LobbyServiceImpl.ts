@@ -11,7 +11,7 @@ import {
   UserAlreadyInLobby,
 } from '../errors/LobbyErrors'
 import { LobbyService } from './LobbyService'
-import { UserLobbyRepo } from '../repositories/UserLobbyRepo'
+import { UserLobbyRepository } from '../repositories/UserLobbyRepository'
 import logger from '@auction/common/logger'
 import { config } from '../configs/config'
 import axios from 'axios'
@@ -19,11 +19,11 @@ import { validateSchema } from '@auction/common/validation'
 
 export class LobbyServiceImpl implements LobbyService {
   private readonly lobbyRepository: LobbyRepository
-  private userLobbyRepo: UserLobbyRepo
+  private userLobbyRepo: UserLobbyRepository
   private lobbyCallbacks: Map<string, ((lobby: Lobby) => void)[]>
   private playerCallbacks: Map<string, ((lobbyId: Lobby, playerId: string) => void)[]>
 
-  constructor(lobbyRepository: LobbyRepository, userLobbyRepo: UserLobbyRepo) {
+  constructor(lobbyRepository: LobbyRepository, userLobbyRepo: UserLobbyRepository) {
     this.lobbyRepository = lobbyRepository
     this.userLobbyRepo = userLobbyRepo
     this.lobbyCallbacks = new Map()

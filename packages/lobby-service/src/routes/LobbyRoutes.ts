@@ -2,15 +2,12 @@ import express from 'express'
 import { validateRequestBody, validateRequestParams } from '@auction/common/middlewares'
 import { lobbyConfigSchema, lobbyIdSchema, playerStatusSchema } from '../schemas/Lobby'
 import { LobbyController } from '../controllers/LobbyController'
-import { UserLobbyRepo } from '../repositories/UserLobbyRepo'
 import { ActiveLobbyMiddleware } from '../middlewares/ActiveLobbyMiddleware'
+import { UserLobbyRepository } from '../repositories/UserLobbyRepository'
 
-const userLobbyRepo = new UserLobbyRepo()
-const activeLobbyMiddleware = new ActiveLobbyMiddleware(userLobbyRepo)
-
-export const createLobbyRouter = (controller: LobbyController): express.Router => {
+export const createLobbyRouter = (controller: LobbyController, userLobbyRepo: UserLobbyRepository): express.Router => {
   const router = express.Router()
-
+  const activeLobbyMiddleware = new ActiveLobbyMiddleware(userLobbyRepo)
   // Define routes without error handlers
   router.post('/create', activeLobbyMiddleware.checkNoActiveLobby, validateRequestBody(lobbyConfigSchema), controller.createLobby)
 

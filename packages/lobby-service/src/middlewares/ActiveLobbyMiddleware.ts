@@ -1,10 +1,10 @@
 import { NextFunction, Response } from 'express'
-import { UserLobbyRepo } from '../repositories/UserLobbyRepo'
 import { UserAlreadyInLobby, UserNotAuthenticatedError, UserNotInActiveLobby } from '../errors/LobbyErrors'
 import { AuthenticatedRequest } from '../types/Index'
+import { UserLobbyRepository } from '../repositories/UserLobbyRepository'
 
 export class ActiveLobbyMiddleware {
-  constructor(private userLobbyRepo: UserLobbyRepo) {}
+  constructor(private userLobbyRepo: UserLobbyRepository) {}
 
   checkNoActiveLobby = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {

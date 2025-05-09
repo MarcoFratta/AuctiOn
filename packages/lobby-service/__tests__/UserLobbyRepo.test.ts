@@ -1,4 +1,4 @@
-import { UserLobbyRepo } from '../src/repositories/UserLobbyRepo'
+import { MongoUserLobbyRepo } from '../src/repositories/MongoUserLobbyRepo'
 import { UserLobbyModel } from '../src/models/UserLobbyModel'
 import mongoose from 'mongoose'
 import { MongoMemoryServer } from 'mongodb-memory-server'
@@ -6,7 +6,7 @@ import { MongoMemoryServer } from 'mongodb-memory-server'
 jest.setTimeout(60000)
 describe('UserLobbyRepo', () => {
   let mongoServer: MongoMemoryServer;
-  let repo: UserLobbyRepo;
+  let repo: MongoUserLobbyRepo
 
   beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
@@ -21,7 +21,7 @@ describe('UserLobbyRepo', () => {
 
   beforeEach(async () => {
     await UserLobbyModel.deleteMany({});
-    repo = new UserLobbyRepo();
+    repo = new MongoUserLobbyRepo()
   });
 
   describe('addUserToLobby', () => {

@@ -1,23 +1,23 @@
 import { LobbyServiceImpl } from '../src/services/LobbyServiceImpl'
 import { MongoLobbyRepo } from '../src/repositories/MongoLobbyRepo'
-import { UserLobbyRepo } from '../src/repositories/UserLobbyRepo'
+import { MongoUserLobbyRepo } from '../src/repositories/MongoUserLobbyRepo'
 import { mock, MockProxy } from 'jest-mock-extended'
 import { Lobby, lobbySchema } from '../src/schemas/Lobby'
 import axios from 'axios'
 import { PlayerNotFoundError } from '../src/errors/LobbyErrors'
 
 jest.mock('../src/repositories/MongoLobbyRepo');
-jest.mock('../src/repositories/UserLobbyRepo');
+jest.mock('../src/repositories/MongoUserLobbyRepo')
 jest.mock('axios')
 
 describe('LobbyService', () => {
     let mockLobbyRepo: MockProxy<MongoLobbyRepo>;
-    let mockUserLobbyRepo: MockProxy<UserLobbyRepo>;
+    let mockUserLobbyRepo: MockProxy<MongoUserLobbyRepo>
     let lobbyService: LobbyServiceImpl;
 
     beforeEach(() => {
         mockLobbyRepo = mock<MongoLobbyRepo>();
-        mockUserLobbyRepo = mock<UserLobbyRepo>();
+        mockUserLobbyRepo = mock<MongoUserLobbyRepo>()
         lobbyService = new LobbyServiceImpl(mockLobbyRepo, mockUserLobbyRepo);
     });
 

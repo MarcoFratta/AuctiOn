@@ -6,7 +6,7 @@ import { LobbyServiceImpl } from './services/LobbyServiceImpl'
 import { LobbyController } from './controllers/LobbyController'
 import { createLobbyRouter } from './routes/LobbyRoutes'
 import { MongoLobbyRepo } from './repositories/MongoLobbyRepo'
-import { UserLobbyRepo } from './repositories/UserLobbyRepo'
+import { MongoUserLobbyRepo } from './repositories/MongoUserLobbyRepo'
 import { ErrorLoggerMiddleware, GenericErrorMiddleware, LobbyErrorMiddleware } from './middlewares/ErrorsMiddleware'
 import { authMiddleware } from './middlewares/AuthMiddleware'
 import { KafkaProducer } from './controllers/KafkaProducer'
@@ -14,6 +14,7 @@ import { Kafka } from 'kafkajs'
 import { KafkaConsumer } from './controllers/KafkaConsumer'
 import { LobbyService } from './services/LobbyService'
 import logger from '@auction/common/logger'
+import { UserLobbyRepository } from './repositories/UserLobbyRepository'
 
 export class App {
   public app: Application
@@ -21,12 +22,13 @@ export class App {
   private readonly kafkaConsumer: KafkaConsumer
   private readonly service: LobbyService
   private readonly controller: LobbyController
+  private readonly userLobbyRepo: UserLobbyRepository
 
   constructor(kafka: Kafka) {
     this.app = express()
     const repo = new MongoLobbyRepo()
-    const userLobbyRepo = new UserLobbyRepo()
-    this.service = new LobbyServiceImpl(repo, userLobbyRepo)
+    this.userLobbyRepo = new MongoUserLobbyRepo()
+    this.service = new LobbyServiceImpl(repo, this.userLobbyRepo)
     this.controller = new LobbyController(this.service)
     this.kafkaProducer = new KafkaProducer(kafka, this.service)
     this.kafkaConsumer = new KafkaConsumer(kafka, this.service, 'lobby-service')
@@ -85,7 +87,7 @@ export class App {
   }
 
   private setupRoutes(): void {
-    this.app.use('/lobbies', createLobbyRouter(this.controller))
+    this.app.use('/lobbies', createLobbyRouter(this.controller, this.userLobbyRepo))
   }
 
   private setupErrorHandling(): void {

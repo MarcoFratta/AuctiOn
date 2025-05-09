@@ -1,8 +1,9 @@
 import { UserLobby } from '../schemas/UserLobby'
 import { UserLobbyModel } from '../models/UserLobbyModel'
 import { toUserLobby } from '../converters/UserLobbyConverter'
+import { UserLobbyRepository } from './UserLobbyRepository'
 
-export class UserLobbyRepo {
+export class MongoUserLobbyRepo implements UserLobbyRepository {
   private readonly converter = toUserLobby
 
   async addUserToLobby(userId: string, lobbyId: string): Promise<UserLobby> {

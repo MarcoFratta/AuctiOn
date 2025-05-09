@@ -1,5 +1,5 @@
 import { ActiveLobbyMiddleware } from '../src/middlewares/ActiveLobbyMiddleware'
-import { UserLobbyRepo } from '../src/repositories/UserLobbyRepo'
+import { MongoUserLobbyRepo } from '../src/repositories/MongoUserLobbyRepo'
 import { Response } from 'express'
 import { AuthenticatedRequest } from '../src/types/Index'
 import { UserAlreadyInLobby, UserNotAuthenticatedError, UserNotInActiveLobby } from '../src/errors/LobbyErrors'
@@ -7,14 +7,14 @@ import { mock, MockProxy } from 'jest-mock-extended'
 import { UserLobby } from '../src/schemas/UserLobby'
 
 describe('ActiveLobbyMiddleware', () => {
-  let mockUserLobbyRepo: MockProxy<UserLobbyRepo>;
+  let mockUserLobbyRepo: MockProxy<MongoUserLobbyRepo>
   let middleware: ActiveLobbyMiddleware;
   let mockRequest: MockProxy<AuthenticatedRequest>;
   let mockResponse: MockProxy<Response>;
   let mockNext: jest.Mock;
 
   beforeEach(() => {
-    mockUserLobbyRepo = mock<UserLobbyRepo>();
+    mockUserLobbyRepo = mock<MongoUserLobbyRepo>()
     middleware = new ActiveLobbyMiddleware(mockUserLobbyRepo);
     mockRequest = mock<AuthenticatedRequest>();
     mockResponse = mock<Response>();
