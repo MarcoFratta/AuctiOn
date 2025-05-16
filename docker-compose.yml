@@ -8,7 +8,6 @@ services:
       - DB_URI=${LOBBY_S_DB_URI:-mongodb://test:27017/lobby}
       - PORT=${LOBBY_S_C_PORT:-3000}
       - NODE_ENV=${LOBBY_S_NODE_ENV:-production}
-      - AUTH_SERVICE_URI=${LOBBY_S_AUTH_SERVICE_URI:-http://auth-service:3000/auth}
       - USER_SERVICE_URI=${LOBBY_S_USER_SERVICE_URI:-http://user-service:3000/users}
       - KAFKA_BROKERS=${LOBBY_S_KAFKA_BROKERS:-kafka:9092}
     networks:
@@ -96,16 +95,11 @@ services:
       - USER_SERVICE_URI=${GATEWAY_S_USER_SERVICE_URI:-http://user-service:3000}
       - AUTH_SERVICE_URI=${GATEWAY_S_AUTH_SERVICE_URI:-http://auth-service:3000}
       - AUCTION_SERVICE_URI=${GATEWAY_S_AUCTION_SERVICE_URI:-http://auction-service:3000} # Base URL for discovery
-      # Redis and Kafka Config
-      - REDIS_URL=${GATEWAY_S_REDIS_URI:-redis://redis:6379}
-      - KAFKA_BROKERS=${GATEWAY_S_KAFKA_BROKERS:-kafka-broker:9092}
       # CORS Config
       - CORS_ALLOWED_ORIGINS=${GATEWAY_S_CORS_ORIGINS:-http://localhost:8080} # Adjust for your frontend URL in production
     networks:
       - microservices-network
       - out-network
-      - redis-network # Add access to Redis
-      - kafka-network # Add access to Kafka
     depends_on: # Optional, but helps with startup order
       - redis
       - kafka-broker

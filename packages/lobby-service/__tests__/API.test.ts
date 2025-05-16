@@ -1,7 +1,6 @@
 import request from 'supertest'
 import axios from 'axios'
 import { App } from '../src/App'
-import { config } from '../src/configs/config'
 import { MongoMemoryServer } from 'mongodb-memory-server'
 import { closeLocalMongoConnection, localMongoConnection } from './common'
 import { Lobby, LobbyConfig, PlayerStatus } from '../src/schemas/Lobby'
@@ -14,7 +13,6 @@ import { Kafka } from 'kafkajs'
 jest.setTimeout(90000)
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
-const authServiceUrl = config.authServiceUri;
 const validToken = 'Bearer validToken123';
 const user = {
   id: '123456789012345678901234',
