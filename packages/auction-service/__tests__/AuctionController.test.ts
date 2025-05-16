@@ -11,6 +11,7 @@ import redisMock from 'ioredis-mock'
 import { UserService } from '../src/services/UserService'
 import { UserServiceImpl } from '../src/services/UserServiceImpl'
 import Redis from 'ioredis'
+import { RedisUserInfoRepository } from '../src/repositories/RedisUserInfoRepository'
 
 describe('MessageHandler', () => {
   let controller: MessageHandler
@@ -33,7 +34,7 @@ describe('MessageHandler', () => {
     mockAuctionService = mock<AuctionServiceImpl>()
     mockWebSocketAdapter = mock<WebSocketAdapter>()
     redis = new redisMock()
-    userService = new UserServiceImpl(redis)
+    userService = new UserServiceImpl(mock<RedisUserInfoRepository>())
     controller = new MessageHandler(mockWebSocketAdapter, mockWebSocketAdapter
       , mockAuctionService)
   })

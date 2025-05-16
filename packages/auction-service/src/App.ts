@@ -24,6 +24,7 @@ import { RedisTimerRepo } from './repositories/TimerRepo'
 import { AuctionConsumer } from './controllers/AuctionConsumer'
 import { MessageSender } from './controllers/MessageSender'
 import { TimerEventSource } from './services/TimerEventSource'
+import { RedisUserInfoRepository } from './repositories/RedisUserInfoRepository'
 
 export class App {
   public wsAdapter: WebSocketAdapter
@@ -47,10 +48,11 @@ export class App {
     this.app = this.setupWebSocket()
     const redisAuctionRepo = new RedisAuctionRepo(redis)
     const playersRepo = new RedisPlayerAuctionMapRepo(redis)
+    const userInfoRepo = new RedisUserInfoRepository(redis)
     const timerRepo = new RedisTimerRepo(redis)
     this.auctionService = new AuctionServiceImpl(redisAuctionRepo, playersRepo, redlock)
     this.wsAdapter = new WebSocketAdapter(this.app)
-    this.userService = new UserServiceImpl(redis)
+    this.userService = new UserServiceImpl(userInfoRepo)
     this.auctionConsumer = new AuctionConsumer(kafka, this.auctionService, 'auction-events-consumer', this.userService)
     this.auctionController = new MessageHandler(this.wsAdapter, this.wsAdapter, this.auctionService)
     this.timerController = new TimerServiceImpl(this.auctionService, this.wsAdapter, this.wsAdapter, timerRepo, this.auctionConsumer)

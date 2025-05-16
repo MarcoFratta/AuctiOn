@@ -8,6 +8,7 @@ import { UserServiceImpl } from '../src/services/UserServiceImpl'
 import { Consumer, Kafka, Producer } from 'kafkajs'
 import { KafkaContainer, StartedKafkaContainer } from '@testcontainers/kafka'
 import { Redis } from 'ioredis'
+import { RedisUserInfoRepository } from '../src/repositories/RedisUserInfoRepository'
 
 jest.setTimeout(60000)
 describe('LobbyConsumer', () => {
@@ -62,7 +63,7 @@ describe('LobbyConsumer', () => {
     redis = new RedisMock()
 
     // Create services
-    userService = new UserServiceImpl(redis)
+    userService = new UserServiceImpl(mock<RedisUserInfoRepository>())
 
     // Create and connect the consumer
     mockAuctionService = mock<AuctionService>()
