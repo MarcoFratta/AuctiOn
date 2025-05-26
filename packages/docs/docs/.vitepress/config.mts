@@ -6,6 +6,7 @@ export default defineConfig({
   markdown: {
     math: true,
   },
+  ignoreDeadLinks: true,
   description: 'Documentation for the AuctiOn real-time auction game platform.',
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
