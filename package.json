@@ -8,7 +8,7 @@
     "test:user-service": "npm test --workspace=user-service",
     "test:auction-service": "npm test --workspace=auction-service",
     "test:api-gateway": "npm test --workspace=api-gateway",
-    "test:integration-tests": "npm test --workspace=integration-tests",
+    "test:e2e-tests": "npm test --workspace=e2e-tests",
     "test:common": "echo \"No tests for common package\"",
     "test:frontend": "echo \"No tests for frontend package\"",
     "test:docs": "echo \"No tests for docs package\"",
@@ -19,17 +19,27 @@
     "build:auth-service": "npm run build --workspace=auth-service",
     "build:lobby-service": "npm run build --workspace=lobby-service",
     "build:user-service": "npm run build --workspace=user-service",
-    "test": "npm-run-all test:*",
+    "doc:user-service": "npm run doc --workspace=user-service",
+    "doc:auth-service": "npm run doc --workspace=auth-service",
+    "doc:lobby-service": "npm run doc --workspace=lobby-service",
+    "test": "npm-run-all test:* --parallel",
+    "build": "npm-run-all build:* --parallel",
     "lint": "npx eslint --max-warnings=0 --fix --config eslint.config.mjs",
     "prettier": "npx prettier --write .",
-    "husky": "husky"
+    "init": "husky",
+    "start": "docker-compose up -d",
+    "stop": "docker-compose down",
+    "docs": "npm run build && npm-run-all doc:* --parallel"
+
+
+
   },
   "repository": {
     "type": "git",
-    "url": "https://dvcs.apice.unibo.it/pika-lab/courses/ds/projects/ds-project-frattarola-ay2223.git"
+    "url": "https://github.com/MarcoFratta/AuctiOn"
   },
   "author": "marco frattarola",
-  "license": "ISC",
+  "license": "MIT",
   "description": "",
   "workspaces": [
     "packages/*"
