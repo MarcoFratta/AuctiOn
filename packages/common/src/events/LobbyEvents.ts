@@ -10,6 +10,7 @@ export const lobbyCreatedEventSchema = z.object({
   type: z.literal('lobby-created'),
   lobby: auctionConfigSchema,
   creator: playerSchema.shape.id,
+  username: z.string(),
 })
 export const lobbyJoinedEventSchema = z.object({
   type: z.literal('lobby-joined'),
