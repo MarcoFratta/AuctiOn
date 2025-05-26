@@ -12,7 +12,7 @@ import { Player, PlayerInfo } from '../schemas/Player'
 import { AuctionEventsSource } from '../services/AuctionEventsSource'
 import { TimerEventSource } from '../services/TimerEventSource'
 
-export class LobbyProducer {
+export class AuctionProducer {
   private kafkaProducer: Producer
 
   constructor(

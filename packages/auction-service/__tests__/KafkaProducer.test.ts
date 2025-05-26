@@ -1,4 +1,4 @@
-import { LobbyProducer } from '../src/controllers/LobbyProducer'
+import { AuctionProducer } from '../src/controllers/AuctionProducer'
 import { AuctionService } from '../src/services/AuctionService'
 import { PlayerEventSource } from '../src/adapters/PlayerEventSource'
 import { Kafka } from 'kafkajs'
@@ -22,7 +22,7 @@ describe('LobbyProducer', () => {
   let auctionEventsSource: MockProxy<AuctionEventsSource>
   let timerEventSource: MockProxy<TimerEventSource>
   let kafkaClient: Kafka
-  let kafkaProducer: LobbyProducer
+  let kafkaProducer: AuctionProducer
   let container: StartedKafkaContainer
   let producerSendSpy: jest.SpyInstance
 
@@ -110,7 +110,7 @@ describe('LobbyProducer', () => {
     userService.getUser.mockResolvedValue(mockPlayerInfo)
 
     // Create producer for each test
-    kafkaProducer = new LobbyProducer(
+    kafkaProducer = new AuctionProducer(
       kafkaClient,
       auctionService,
       auctionEventsSource,

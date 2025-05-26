@@ -12,24 +12,19 @@ export class RedisLock {
   }
 
   async runWithLock<T>(lockKey: string, ttlMs: number, task: () => Promise<T>, retryDelayMs = 100): Promise<T> {
-    return this.asyncLock.acquire(lockKey, async () => {
-      const lockId = await this.acquireDistributedLockWithRetry(lockKey, ttlMs, retryDelayMs)
-
-      if (!lockId) {
-        throw new Error(`Failed to acquire distributed lock for ${lockKey}`)
-      }
-
-      try {
-        return await task()
-      } finally {
-        await this.releaseDistributedLock(lockKey, lockId)
-      }
-    })
+    const lockId = await this.acquireLock(lockKey, ttlMs, retryDelayMs)
+    if (!lockId) {
+      throw new Error(`Failed to acquire distributed lock for ${lockKey}`)
+    }
+    try {
+      return await task()
+    } finally {
+      await this.releaseLock(lockKey, lockId)
+    }
   }
 
-  private async acquireDistributedLockWithRetry(lockKey: string, ttlMs: number, retryDelayMs: number): Promise<string | null> {
+  private async acquireLock(lockKey: string, ttlMs: number, retryDelayMs: number): Promise<string | null> {
     const lockId = randomUUID()
-
     while (true) {
       const success = await this.redis.set(lockKey, lockId, 'PX', ttlMs, 'NX')
       if (success) return lockId
@@ -38,7 +33,7 @@ export class RedisLock {
     }
   }
 
-  private async releaseDistributedLock(lockKey: string, lockId: string): Promise<void> {
+  private async releaseLock(lockKey: string, lockId: string): Promise<void> {
     const luaScript = `
       if redis.call("GET", KEYS[1]) == ARGV[1]
       then

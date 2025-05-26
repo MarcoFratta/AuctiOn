@@ -2,7 +2,7 @@ import express, { Express } from 'express'
 import http from 'http'
 import { Kafka } from 'kafkajs'
 import logger from '@auction/common/logger'
-import { LobbyProducer } from './controllers/LobbyProducer'
+import { AuctionProducer } from './controllers/AuctionProducer'
 import { AuctionServiceImpl } from './services/AuctionServiceImpl'
 import { WebSocketAdapter } from './adapters/WebSocketAdapter'
 import { MessageHandler } from './controllers/MessageHandler'
@@ -29,7 +29,7 @@ import { RedisUserInfoRepository } from './repositories/RedisUserInfoRepository'
 export class App {
   public wsAdapter: WebSocketAdapter
   public auctionService: AuctionServiceImpl
-  public kafkaProducer: LobbyProducer
+  public kafkaProducer: AuctionProducer
   public kafkaConsumer: LobbyConsumer
   public auctionController: MessageHandler
   public timerController: TimerEventSource
@@ -56,7 +56,7 @@ export class App {
     this.auctionConsumer = new AuctionConsumer(kafka, this.auctionService, 'auction-events-consumer', this.userService)
     this.auctionController = new MessageHandler(this.wsAdapter, this.wsAdapter, this.auctionService)
     this.timerController = new TimerServiceImpl(this.auctionService, this.wsAdapter, this.wsAdapter, timerRepo, this.auctionConsumer)
-    this.kafkaProducer = new LobbyProducer(
+    this.kafkaProducer = new AuctionProducer(
       kafka,
       this.auctionService,
       this.auctionService,
