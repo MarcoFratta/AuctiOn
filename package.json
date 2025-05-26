@@ -23,7 +23,7 @@
     "doc:auth-service": "npm run doc --workspace=auth-service",
     "doc:lobby-service": "npm run doc --workspace=lobby-service",
     "test": "npm-run-all test:* --parallel",
-    "build": "npm-run-all build:* --parallel",
+    "build": "npm run build:common && npm-run-all build:* --parallel",
     "lint": "npx eslint --max-warnings=0 --fix --config eslint.config.mjs",
     "prettier": "npx prettier --write .",
     "init": "husky",
