@@ -153,3 +153,5 @@ docs/*
 /init.bash
 packages/frontend/.vscode
 /packages/docs/docs/.vitepress/cache
+**/coverage/**
+**/docs/specs
