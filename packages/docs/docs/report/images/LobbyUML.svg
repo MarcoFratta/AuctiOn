@@ -1,0 +1,271 @@
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" contentStyleType="text/css"
+     data-diagram-type="CLASS" height="885px" preserveAspectRatio="none"
+     style="width:482px;height:885px;background:#FFFFFF;" version="1.1" viewBox="0 0 482 885" width="482px"
+     zoomAndPan="magnify">
+    <defs/>
+    <g><!--cluster services-->
+        <g class="cluster" data-entity="services" data-source-line="2" data-uid="ent0002" id="cluster_services">
+            <path d="M8.5,392 L74.2842,392 A3.75,3.75 0 0 1 76.7842,394.5 L83.7842,414.2969 L447.19,414.2969 A2.5,2.5 0 0 1 449.69,416.7969 L449.69,669.5 A2.5,2.5 0 0 1 447.19,672 L8.5,672 A2.5,2.5 0 0 1 6,669.5 L6,394.5 A2.5,2.5 0 0 1 8.5,392"
+                  fill="none" style="stroke:#000000;stroke-width:1.5;"/>
+            <line style="stroke:#000000;stroke-width:1.5;" x1="6" x2="83.7842" y1="414.2969" y2="414.2969"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing"
+                  textLength="64.7842" x="10" y="406.9951">services
+            </text>
+        </g><!--cluster repositories-->
+        <g class="cluster" data-entity="repositories" data-source-line="28" data-uid="ent0008"
+           id="cluster_repositories">
+            <path d="M9.46,6 L105.4727,6 A3.75,3.75 0 0 1 107.9727,8.5 L114.9727,28.2969 L473.27,28.2969 A2.5,2.5 0 0 1 475.77,30.7969 L475.77,365.5 A2.5,2.5 0 0 1 473.27,368 L9.46,368 A2.5,2.5 0 0 1 6.96,365.5 L6.96,8.5 A2.5,2.5 0 0 1 9.46,6"
+                  fill="none" style="stroke:#000000;stroke-width:1.5;"/>
+            <line style="stroke:#000000;stroke-width:1.5;" x1="6.96" x2="114.9727" y1="28.2969" y2="28.2969"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing"
+                  textLength="95.0127" x="10.96" y="20.9951">repositories
+            </text>
+        </g><!--cluster controllers-->
+        <g class="cluster" data-entity="controllers" data-source-line="51" data-uid="ent0015" id="cluster_controllers">
+            <path d="M32.21,696 L118.6387,696 A3.75,3.75 0 0 1 121.1387,698.5 L128.1387,718.2969 L451.28,718.2969 A2.5,2.5 0 0 1 453.78,720.7969 L453.78,875.5 A2.5,2.5 0 0 1 451.28,878 L32.21,878 A2.5,2.5 0 0 1 29.71,875.5 L29.71,698.5 A2.5,2.5 0 0 1 32.21,696"
+                  fill="none" style="stroke:#000000;stroke-width:1.5;"/>
+            <line style="stroke:#000000;stroke-width:1.5;" x1="29.71" x2="128.1387" y1="718.2969" y2="718.2969"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing"
+                  textLength="85.4287" x="33.71" y="710.9951">controllers
+            </text>
+        </g><!--class LobbyEventsSource-->
+        <g class="entity" data-entity="LobbyEventsSource" data-source-line="3" data-uid="ent0003"
+           id="entity_LobbyEventsSource">
+            <rect fill="#F1F1F1" height="145.7813" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;"
+                  width="191.0264" x="22" y="510.11"/>
+            <ellipse cx="46.3647" cy="526.11" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M42.2866,521.8756 L42.2866,519.7194 L49.6772,519.7194 L49.6772,521.8756 L47.2085,521.8756 L47.2085,529.9538 L49.6772,529.9538 L49.6772,532.11 L42.2866,532.11 L42.2866,529.9538 L44.7554,529.9538 L44.7554,521.8756 L42.2866,521.8756 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing"
+                  textLength="138.2158" x="62.4458" y="530.9567">LobbyEventsSource
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="23" x2="212.0264" y1="542.11" y2="542.11"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="23" x2="212.0264" y1="550.11" y2="550.11"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="126.499"
+                  x="28" y="567.1051">onLobbyCreated()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="125.6719"
+                  x="28" y="583.402">onLobbyDeleted()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="113.7432"
+                  x="28" y="599.6989">onLobbyJoined()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="97.6172"
+                  x="28" y="615.9957">onLobbyLeft()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="179.0264"
+                  x="28" y="632.2926">onPlayerStatusChanged()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="122.4863"
+                  x="28" y="648.5895">onLobbyStarted()
+            </text>
+        </g><!--class LobbyService-->
+        <g class="entity" data-entity="LobbyService" data-source-line="12" data-uid="ent0004" id="entity_LobbyService">
+            <rect fill="#F1F1F1" height="210.9688" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;"
+                  width="134.582" x="299.11" y="436.52"/>
+            <ellipse cx="317.8976" cy="452.52" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M313.8195,448.2856 L313.8195,446.1294 L321.2101,446.1294 L321.2101,448.2856 L318.7414,448.2856 L318.7414,456.3638 L321.2101,456.3638 L321.2101,458.52 L313.8195,458.52 L313.8195,456.3638 L316.2883,456.3638 L316.2883,448.2856 L313.8195,448.2856 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing"
+                  textLength="94.165" x="332.7393" y="457.3667">LobbyService
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="300.11" x2="432.692" y1="468.52" y2="468.52"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="300.11" x2="432.692" y1="476.52" y2="476.52"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="98.0957"
+                  x="305.11" y="493.5151">createLobby()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="97.4531"
+                  x="305.11" y="509.812">deleteLobby()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="78.5654"
+                  x="305.11" y="526.1089">joinLobby()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="91.3281"
+                  x="305.11" y="542.4057">leaveLobby()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="82.291"
+                  x="305.11" y="558.7026">kickPlayer()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="76.9316"
+                  x="305.11" y="574.9995">setStatus()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="86.249"
+                  x="305.11" y="591.2964">startMatch()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="77.4785"
+                  x="305.11" y="607.5932">getPlayer()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="76.3369"
+                  x="305.11" y="623.8901">getLobby()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="122.582"
+                  x="305.11" y="640.187">terminateMatch()
+            </text>
+        </g><!--class LobbyServiceImpl-->
+        <g class="entity" data-entity="LobbyServiceImpl" data-source-line="24" data-uid="ent0006"
+           id="entity_LobbyServiceImpl">
+            <rect fill="#F1F1F1" height="48" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="156.708"
+                  x="39.16" y="427"/>
+            <ellipse cx="54.16" cy="443" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M57.1288,448.6406 Q56.5506,448.9375 55.91,449.0781 Q55.2694,449.2344 54.5663,449.2344 Q52.0663,449.2344 50.7381,447.5938 Q49.4256,445.9375 49.4256,442.8125 Q49.4256,439.6875 50.7381,438.0313 Q52.0663,436.375 54.5663,436.375 Q55.2694,436.375 55.91,436.5313 Q56.5663,436.6875 57.1288,436.9844 L57.1288,439.7031 Q56.5038,439.125 55.91,438.8594 Q55.3163,438.5781 54.6913,438.5781 Q53.3475,438.5781 52.66,439.6563 Q51.9725,440.7188 51.9725,442.8125 Q51.9725,444.9063 52.66,445.9844 Q53.3475,447.0469 54.6913,447.0469 Q55.3163,447.0469 55.91,446.7813 Q56.5038,446.5 57.1288,445.9219 L57.1288,448.6406 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="124.708"
+                  x="68.16" y="447.8467">LobbyServiceImpl
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="40.16" x2="194.868" y1="459" y2="459"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="40.16" x2="194.868" y1="467" y2="467"/>
+        </g><!--class LobbyRepository-->
+        <g class="entity" data-entity="LobbyRepository" data-source-line="29" data-uid="ent0009"
+           id="entity_LobbyRepository">
+            <rect fill="#F1F1F1" height="113.1875" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;"
+                  width="149.4961" x="291.65" y="238.41"/>
+            <ellipse cx="306.65" cy="254.41" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M302.5719,250.1756 L302.5719,248.0194 L309.9625,248.0194 L309.9625,250.1756 L307.4938,250.1756 L307.4938,258.2537 L309.9625,258.2537 L309.9625,260.41 L302.5719,260.41 L302.5719,258.2537 L305.0406,258.2537 L305.0406,250.1756 L302.5719,250.1756 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing"
+                  textLength="117.4961" x="320.65" y="259.2567">LobbyRepository
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="292.65" x2="440.1461" y1="270.41" y2="270.41"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="292.65" x2="440.1461" y1="278.41" y2="278.41"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="55.6719"
+                  x="297.65" y="295.4051">create()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="55.0293"
+                  x="297.65" y="311.702">delete()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="68.4072"
+                  x="297.65" y="327.9989">findById()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="60.252"
+                  x="297.65" y="344.2957">update()
+            </text>
+        </g><!--class MongoLobbyRepo-->
+        <g class="entity" data-entity="MongoLobbyRepo" data-source-line="35" data-uid="ent0010"
+           id="entity_MongoLobbyRepo">
+            <rect fill="#F1F1F1" height="48" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="157.1865"
+                  x="38.92" y="271"/>
+            <ellipse cx="53.92" cy="287" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M56.8888,292.6406 Q56.3106,292.9375 55.67,293.0781 Q55.0294,293.2344 54.3263,293.2344 Q51.8263,293.2344 50.4981,291.5938 Q49.1856,289.9375 49.1856,286.8125 Q49.1856,283.6875 50.4981,282.0313 Q51.8263,280.375 54.3263,280.375 Q55.0294,280.375 55.67,280.5313 Q56.3263,280.6875 56.8888,280.9844 L56.8888,283.7031 Q56.2638,283.125 55.67,282.8594 Q55.0763,282.5781 54.4513,282.5781 Q53.1075,282.5781 52.42,283.6563 Q51.7325,284.7188 51.7325,286.8125 Q51.7325,288.9063 52.42,289.9844 Q53.1075,291.0469 54.4513,291.0469 Q55.0763,291.0469 55.67,290.7813 Q56.2638,290.5 56.8888,289.9219 L56.8888,292.6406 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="125.1865"
+                  x="67.92" y="291.8467">MongoLobbyRepo
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="39.92" x2="195.1065" y1="303" y2="303"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="39.92" x2="195.1065" y1="311" y2="311"/>
+        </g><!--class UserLobbyRepository-->
+        <g class="entity" data-entity="UserLobbyRepository" data-source-line="38" data-uid="ent0012"
+           id="entity_UserLobbyRepository">
+            <rect fill="#F1F1F1" height="162.0781" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;"
+                  width="186.7402" x="273.03" y="40.96"/>
+            <ellipse cx="290.4303" cy="56.96" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M286.3522,52.7256 L286.3522,50.5694 L293.7428,50.5694 L293.7428,52.7256 L291.274,52.7256 L291.274,60.8038 L293.7428,60.8038 L293.7428,62.96 L286.3522,62.96 L286.3522,60.8038 L288.8209,60.8038 L288.8209,52.7256 L286.3522,52.7256 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing"
+                  textLength="149.4063" x="304.9637" y="61.8067">UserLobbyRepository
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="274.03" x2="458.7702" y1="72.96" y2="72.96"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="274.03" x2="458.7702" y1="80.96" y2="80.96"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="128.7275"
+                  x="279.03" y="97.9551">addUserToLobby()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="151.7988"
+                  x="279.03" y="114.252">getUserActiveLobby()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="86.249"
+                  x="279.03" y="130.5489">startMatch()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="174.7402"
+                  x="279.03" y="146.8457">removeUserFromLobby()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="146.0225"
+                  x="279.03" y="163.1426">removeLobbyUsers()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="91.3281"
+                  x="279.03" y="179.4395">leaveLobby()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="122.582"
+                  x="279.03" y="195.7364">terminateMatch()
+            </text>
+        </g><!--class MongoUserLobbyRepo-->
+        <g class="entity" data-entity="MongoUserLobbyRepo" data-source-line="47" data-uid="ent0013"
+           id="entity_MongoUserLobbyRepo">
+            <rect fill="#F1F1F1" height="48" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="189.0967"
+                  x="22.96" y="98"/>
+            <ellipse cx="37.96" cy="114" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M40.9288,119.6406 Q40.3506,119.9375 39.71,120.0781 Q39.0694,120.2344 38.3663,120.2344 Q35.8663,120.2344 34.5381,118.5938 Q33.2256,116.9375 33.2256,113.8125 Q33.2256,110.6875 34.5381,109.0313 Q35.8663,107.375 38.3663,107.375 Q39.0694,107.375 39.71,107.5313 Q40.3663,107.6875 40.9288,107.9844 L40.9288,110.7031 Q40.3038,110.125 39.71,109.8594 Q39.1163,109.5781 38.4913,109.5781 Q37.1475,109.5781 36.46,110.6563 Q35.7725,111.7188 35.7725,113.8125 Q35.7725,115.9063 36.46,116.9844 Q37.1475,118.0469 38.4913,118.0469 Q39.1163,118.0469 39.71,117.7813 Q40.3038,117.5 40.9288,116.9219 L40.9288,119.6406 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="157.0967"
+                  x="51.96" y="118.8467">MongoUserLobbyRepo
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="23.96" x2="211.0567" y1="130" y2="130"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="23.96" x2="211.0567" y1="138" y2="138"/>
+        </g><!--class LobbyController-->
+        <g class="entity" data-entity="LobbyController" data-source-line="52" data-uid="ent0016"
+           id="entity_LobbyController">
+            <rect fill="#F1F1F1" height="48" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="143.5967"
+                  x="45.71" y="814"/>
+            <ellipse cx="60.71" cy="830" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M63.6788,835.6406 Q63.1006,835.9375 62.46,836.0781 Q61.8194,836.2344 61.1163,836.2344 Q58.6163,836.2344 57.2881,834.5938 Q55.9756,832.9375 55.9756,829.8125 Q55.9756,826.6875 57.2881,825.0313 Q58.6163,823.375 61.1163,823.375 Q61.8194,823.375 62.46,823.5313 Q63.1163,823.6875 63.6788,823.9844 L63.6788,826.7031 Q63.0538,826.125 62.46,825.8594 Q61.8663,825.5781 61.2413,825.5781 Q59.8975,825.5781 59.21,826.6563 Q58.5225,827.7188 58.5225,829.8125 Q58.5225,831.9063 59.21,832.9844 Q59.8975,834.0469 61.2413,834.0469 Q61.8663,834.0469 62.46,833.7813 Q63.0538,833.5 63.6788,832.9219 L63.6788,835.6406 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="111.5967"
+                  x="74.71" y="834.8467">LobbyController
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="46.71" x2="188.3067" y1="846" y2="846"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="46.71" x2="188.3067" y1="854" y2="854"/>
+        </g><!--class KafkaProducer-->
+        <g class="entity" data-entity="KafkaProducer" data-source-line="53" data-uid="ent0017"
+           id="entity_KafkaProducer">
+            <rect fill="#F1F1F1" height="48" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="133.9648"
+                  x="50.53" y="731"/>
+            <ellipse cx="65.53" cy="747" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M68.4988,752.6406 Q67.9206,752.9375 67.28,753.0781 Q66.6394,753.2344 65.9363,753.2344 Q63.4363,753.2344 62.1081,751.5938 Q60.7956,749.9375 60.7956,746.8125 Q60.7956,743.6875 62.1081,742.0313 Q63.4363,740.375 65.9363,740.375 Q66.6394,740.375 67.28,740.5313 Q67.9363,740.6875 68.4988,740.9844 L68.4988,743.7031 Q67.8738,743.125 67.28,742.8594 Q66.6863,742.5781 66.0613,742.5781 Q64.7175,742.5781 64.03,743.6563 Q63.3425,744.7188 63.3425,746.8125 Q63.3425,748.9063 64.03,749.9844 Q64.7175,751.0469 66.0613,751.0469 Q66.6863,751.0469 67.28,750.7813 Q67.8738,750.5 68.4988,749.9219 L68.4988,752.6406 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="101.9648"
+                  x="79.53" y="751.8467">KafkaProducer
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="51.53" x2="183.4948" y1="763" y2="763"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="51.53" x2="183.4948" y1="771" y2="771"/>
+        </g><!--class KafkaConsumer-->
+        <g class="entity" data-entity="KafkaConsumer" data-source-line="54" data-uid="ent0018"
+           id="entity_KafkaConsumer">
+            <rect fill="#F1F1F1" height="48" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="142.7627"
+                  x="295.02" y="814"/>
+            <ellipse cx="310.02" cy="830" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M312.9888,835.6406 Q312.4106,835.9375 311.77,836.0781 Q311.1294,836.2344 310.4263,836.2344 Q307.9263,836.2344 306.5981,834.5938 Q305.2856,832.9375 305.2856,829.8125 Q305.2856,826.6875 306.5981,825.0313 Q307.9263,823.375 310.4263,823.375 Q311.1294,823.375 311.77,823.5313 Q312.4263,823.6875 312.9888,823.9844 L312.9888,826.7031 Q312.3638,826.125 311.77,825.8594 Q311.1763,825.5781 310.5513,825.5781 Q309.2075,825.5781 308.52,826.6563 Q307.8325,827.7188 307.8325,829.8125 Q307.8325,831.9063 308.52,832.9844 Q309.2075,834.0469 310.5513,834.0469 Q311.1763,834.0469 311.77,833.7813 Q312.3638,833.5 312.9888,832.9219 L312.9888,835.6406 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="110.7627"
+                  x="324.02" y="834.8467">KafkaConsumer
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="296.02" x2="436.7827" y1="846" y2="846"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="296.02" x2="436.7827" y1="854" y2="854"/>
+        </g><!--reverse link LobbyEventsSource to LobbyService-->
+        <g class="link" data-entity-1="LobbyEventsSource" data-entity-2="LobbyService" data-source-line="13"
+           data-uid="lnk5" id="link_LobbyEventsSource_LobbyService">
+            <path d="M231.0159,564.3159 C259.5659,559.5659 272.54,557.42 298.85,553.05" fill="none"
+                  id="LobbyEventsSource-backto-LobbyService" style="stroke:#181818;stroke-width:1;"/>
+            <polygon fill="none" points="213.26,567.27,232.0006,570.2345,230.0312,558.3972,213.26,567.27"
+                     style="stroke:#181818;stroke-width:1;"/>
+        </g><!--link LobbyServiceImpl to LobbyService-->
+        <g class="link" data-entity-1="LobbyServiceImpl" data-entity-2="LobbyService" data-source-line="25"
+           data-uid="lnk7" id="link_LobbyServiceImpl_LobbyService">
+            <path codeLine="25" d="M184.67,475.39 C219.95,488.39 246.3612,498.1235 281.7312,511.1635" fill="none"
+                  id="LobbyServiceImpl-to-LobbyService" style="stroke:#181818;stroke-width:1;"/>
+            <polygon fill="none" points="298.62,517.39,283.8067,505.5339,279.6557,516.7931,298.62,517.39"
+                     style="stroke:#181818;stroke-width:1;"/>
+        </g><!--link MongoLobbyRepo to LobbyRepository-->
+        <g class="link" data-entity-1="MongoLobbyRepo" data-entity-2="LobbyRepository" data-source-line="36"
+           data-uid="lnk11" id="link_MongoLobbyRepo_LobbyRepository">
+            <path codeLine="36" d="M196.29,295 C226.68,295 243.36,295 273.38,295" fill="none"
+                  id="MongoLobbyRepo-to-LobbyRepository" style="stroke:#181818;stroke-width:1;"/>
+            <polygon fill="none" points="291.38,295,273.38,289,273.38,301,291.38,295"
+                     style="stroke:#181818;stroke-width:1;"/>
+        </g><!--link MongoUserLobbyRepo to UserLobbyRepository-->
+        <g class="link" data-entity-1="MongoUserLobbyRepo" data-entity-2="UserLobbyRepository" data-source-line="48"
+           data-uid="lnk14" id="link_MongoUserLobbyRepo_UserLobbyRepository">
+            <path codeLine="48" d="M212.55,122 C232.31,122 235.14,122 254.84,122" fill="none"
+                  id="MongoUserLobbyRepo-to-UserLobbyRepository" style="stroke:#181818;stroke-width:1;"/>
+            <polygon fill="none" points="272.84,122,254.84,116,254.84,128,272.84,122"
+                     style="stroke:#181818;stroke-width:1;"/>
+        </g><!--SRC=[VP9DJiCm48NtEON52XQz0X8Ka0gjL54uW6jFKXF74zbEH0IzEvFVscdB8elvtiH-CyyQKiyyCgkoWsTIMH1UeKbABdAU0RjnO6ibmDsmduGnPJpOb0jWQzplc-SQZ7Sxh2oHLcSCJQSiBN0FylOkX4-WuGo-eZ9pjYPN4zbgte3TUUuhjpnmaysxIRBZiSVatEMk7u71jmSZtLNhelFSgSC5iZCSaYzo6zOQU1qrv4halUC1EF2zzx5ktMwu5uS1PE2Z7wWE3wHH2cN8sEcV8tr2S-UY-LP5gKcO8xPO_Dv7DA4bJVbQAD4fZrPToVXzR6YYDKKR6efK6VdOhCPugbAEZIV76pGPJWSJZa7WzdHndEadFSdBphYKhVY1uVvedIrye7ST9tKMX8K2QsYRNomMOMklTAILtRNm_ysg6pGoFquVmNu35uQCOXDel4MjoKoVMl0UbfCsyJUUvdnhKLPYJgdRLGNHuny0]-->
+    </g>
+</svg>

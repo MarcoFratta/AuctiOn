@@ -1,7 +1,17 @@
 {
   "scripts": {
-    "docs:dev": "vitepress dev docs",
-    "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs"
+    "docs:generate": "node scripts/generateDocs.js",
+    "docs:dev": "npm run generate-coverage && vitepress dev docs",
+    "docs:build": "npm run docs:generate && npm run generate-coverage && vitepress build docs",
+    "docs:preview": "vitepress preview docs",
+    "generate-coverage": "node scripts/generateCoverageSummary.js"
+  },
+  "dependencies": {
+    "vitepress": "^1.6.3",
+    "vitepress-openapi": "^0.0.3-alpha.80"
+  },
+  "devDependencies": {
+    "fs-extra": "^11.2.0",
+    "markdown-it-mathjax3": "^4.3.2"
   }
 }

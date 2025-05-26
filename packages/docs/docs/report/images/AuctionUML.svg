@@ -1,0 +1,693 @@
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" contentStyleType="text/css"
+     data-diagram-type="CLASS" height="2380px" preserveAspectRatio="none"
+     style="width:539px;height:2380px;background:#FFFFFF;" version="1.1" viewBox="0 0 539 2380" width="539px"
+     zoomAndPan="magnify">
+    <defs/>
+    <g><!--cluster services-->
+        <g class="cluster" data-entity="services" data-source-line="2" data-uid="ent0002" id="cluster_services">
+            <path d="M41.02,1443 L106.8042,1443 A3.75,3.75 0 0 1 109.3042,1445.5 L116.3042,1465.2969 L509.55,1465.2969 A2.5,2.5 0 0 1 512.05,1467.7969 L512.05,2081.5 A2.5,2.5 0 0 1 509.55,2084 L41.02,2084 A2.5,2.5 0 0 1 38.52,2081.5 L38.52,1445.5 A2.5,2.5 0 0 1 41.02,1443"
+                  fill="none" style="stroke:#000000;stroke-width:1.5;"/>
+            <line style="stroke:#000000;stroke-width:1.5;" x1="38.52" x2="116.3042" y1="1465.2969" y2="1465.2969"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing"
+                  textLength="64.7842" x="42.52" y="1457.9951">services
+            </text>
+        </g><!--cluster repositories-->
+        <g class="cluster" data-entity="repositories" data-source-line="43" data-uid="ent0016"
+           id="cluster_repositories">
+            <path d="M8.5,810 L104.5127,810 A3.75,3.75 0 0 1 107.0127,812.5 L114.0127,832.2969 L530.37,832.2969 A2.5,2.5 0 0 1 532.87,834.7969 L532.87,1416.5 A2.5,2.5 0 0 1 530.37,1419 L8.5,1419 A2.5,2.5 0 0 1 6,1416.5 L6,812.5 A2.5,2.5 0 0 1 8.5,810"
+                  fill="none" style="stroke:#000000;stroke-width:1.5;"/>
+            <line style="stroke:#000000;stroke-width:1.5;" x1="6" x2="114.0127" y1="832.2969" y2="832.2969"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing"
+                  textLength="95.0127" x="10" y="824.9951">repositories
+            </text>
+        </g><!--cluster adapters-->
+        <g class="cluster" data-entity="adapters" data-source-line="81" data-uid="ent0029" id="cluster_adapters">
+            <path d="M41.39,507 L112.7523,507 A3.75,3.75 0 0 1 115.2523,509.5 L122.2523,529.2969 L511.11,529.2969 A2.5,2.5 0 0 1 513.61,531.7969 L513.61,783.5 A2.5,2.5 0 0 1 511.11,786 L41.39,786 A2.5,2.5 0 0 1 38.89,783.5 L38.89,509.5 A2.5,2.5 0 0 1 41.39,507"
+                  fill="none" style="stroke:#000000;stroke-width:1.5;"/>
+            <line style="stroke:#000000;stroke-width:1.5;" x1="38.89" x2="122.2523" y1="529.2969" y2="529.2969"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing"
+                  textLength="70.3623" x="42.89" y="521.9951">adapters
+            </text>
+        </g><!--cluster domain-->
+        <g class="cluster" data-entity="domain" data-source-line="97" data-uid="ent0035" id="cluster_domain">
+            <path d="M37.84,6 L97.2804,6 A3.75,3.75 0 0 1 99.7804,8.5 L106.7804,28.2969 L517.84,28.2969 A2.5,2.5 0 0 1 520.34,30.7969 L520.34,480.5 A2.5,2.5 0 0 1 517.84,483 L37.84,483 A2.5,2.5 0 0 1 35.34,480.5 L35.34,8.5 A2.5,2.5 0 0 1 37.84,6"
+                  fill="none" style="stroke:#000000;stroke-width:1.5;"/>
+            <line style="stroke:#000000;stroke-width:1.5;" x1="35.34" x2="106.7804" y1="28.2969" y2="28.2969"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing"
+                  textLength="58.4404" x="39.34" y="20.9951">domain
+            </text>
+        </g><!--cluster controllers-->
+        <g class="cluster" data-entity="controllers" data-source-line="130" data-uid="ent0045" id="cluster_controllers">
+            <path d="M46.46,2108 L132.8887,2108 A3.75,3.75 0 0 1 135.3887,2110.5 L142.3887,2130.2969 L501.98,2130.2969 A2.5,2.5 0 0 1 504.48,2132.7969 L504.48,2370.5 A2.5,2.5 0 0 1 501.98,2373 L46.46,2373 A2.5,2.5 0 0 1 43.96,2370.5 L43.96,2110.5 A2.5,2.5 0 0 1 46.46,2108"
+                  fill="none" style="stroke:#000000;stroke-width:1.5;"/>
+            <line style="stroke:#000000;stroke-width:1.5;" x1="43.96" x2="142.3887" y1="2130.2969" y2="2130.2969"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing"
+                  textLength="85.4287" x="47.96" y="2122.9951">controllers
+            </text>
+        </g><!--class AuctionService-->
+        <g class="entity" data-entity="AuctionService" data-source-line="3" data-uid="ent0003"
+           id="entity_AuctionService">
+            <rect fill="#F1F1F1" height="227.2656" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;"
+                  width="142.4434" x="344.35" y="1840.37"/>
+            <ellipse cx="361.9318" cy="1856.37" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M357.8537,1852.1356 L357.8537,1849.9794 L365.2443,1849.9794 L365.2443,1852.1356 L362.7755,1852.1356 L362.7755,1860.2138 L365.2443,1860.2138 L365.2443,1862.37 L357.8537,1862.37 L357.8537,1860.2138 L360.3224,1860.2138 L360.3224,1852.1356 L357.8537,1852.1356 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing"
+                  textLength="104.7061" x="376.5055" y="1861.2167">AuctionService
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="345.35" x2="485.7934" y1="1872.37" y2="1872.37"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="345.35" x2="485.7934" y1="1880.37" y2="1880.37"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="108.6367"
+                  x="350.35" y="1897.3651">createAuction()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="86.8779"
+                  x="350.35" y="1913.662">getAuction()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="130.4434"
+                  x="350.35" y="1929.9589">getPlayerAuction()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="112.9434"
+                  x="350.35" y="1946.2557">setPlayerState()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="80.3906"
+                  x="350.35" y="1962.5526">playerJoin()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="96.8242"
+                  x="350.35" y="1978.8495">playerLeave()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="77.3145"
+                  x="350.35" y="1995.1464">playerBid()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="84.9023"
+                  x="350.35" y="2011.4432">playerSale()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="82.2227"
+                  x="350.35" y="2027.7401">endRound()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="96.4961"
+                  x="350.35" y="2044.037">startAuction()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="117.3594"
+                  x="350.35" y="2060.3339">removeAuction()
+            </text>
+        </g><!--class AuctionServiceImpl-->
+        <g class="entity" data-entity="AuctionServiceImpl" data-source-line="16" data-uid="ent0004"
+           id="entity_AuctionServiceImpl">
+            <rect fill="#F1F1F1" height="48" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="167.249"
+                  x="54.52" y="1930"/>
+            <ellipse cx="69.52" cy="1946" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M72.4888,1951.6406 Q71.9106,1951.9375 71.27,1952.0781 Q70.6294,1952.2344 69.9263,1952.2344 Q67.4263,1952.2344 66.0981,1950.5938 Q64.7856,1948.9375 64.7856,1945.8125 Q64.7856,1942.6875 66.0981,1941.0313 Q67.4263,1939.375 69.9263,1939.375 Q70.6294,1939.375 71.27,1939.5313 Q71.9263,1939.6875 72.4888,1939.9844 L72.4888,1942.7031 Q71.8638,1942.125 71.27,1941.8594 Q70.6763,1941.5781 70.0513,1941.5781 Q68.7075,1941.5781 68.02,1942.6563 Q67.3325,1943.7188 67.3325,1945.8125 Q67.3325,1947.9063 68.02,1948.9844 Q68.7075,1950.0469 70.0513,1950.0469 Q70.6763,1950.0469 71.27,1949.7813 Q71.8638,1949.5 72.4888,1948.9219 L72.4888,1951.6406 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="135.249"
+                  x="83.52" y="1950.8467">AuctionServiceImpl
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="55.52" x2="220.769" y1="1962" y2="1962"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="55.52" x2="220.769" y1="1970" y2="1970"/>
+        </g><!--class UserService-->
+        <g class="entity" data-entity="UserService" data-source-line="19" data-uid="ent0006" id="entity_UserService">
+            <rect fill="#F1F1F1" height="129.4844" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;"
+                  width="137.5283" x="346.81" y="1676.26"/>
+            <ellipse cx="371.6546" cy="1692.26" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M367.5765,1688.0256 L367.5765,1685.8694 L374.9671,1685.8694 L374.9671,1688.0256 L372.4984,1688.0256 L372.4984,1696.1038 L374.9671,1696.1038 L374.9671,1698.26 L367.5765,1698.26 L367.5765,1696.1038 L370.0453,1696.1038 L370.0453,1688.0256 L367.5765,1688.0256 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing"
+                  textLength="83.6514" x="387.8423" y="1697.1067">UserService
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="347.81" x2="483.3383" y1="1708.26" y2="1708.26"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="347.81" x2="483.3383" y1="1716.26" y2="1716.26"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="69.1865"
+                  x="352.81" y="1733.2551">addUser()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="92.1621"
+                  x="352.81" y="1749.552">updateUser()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="96.3047"
+                  x="352.81" y="1765.8489">removeUser()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="65.8232"
+                  x="352.81" y="1782.1457">getUser()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="125.5283"
+                  x="352.81" y="1798.4426">onPlayerChange()
+            </text>
+        </g><!--class UserServiceImpl-->
+        <g class="entity" data-entity="UserServiceImpl" data-source-line="26" data-uid="ent0007"
+           id="entity_UserServiceImpl">
+            <rect fill="#F1F1F1" height="48" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="146.1943"
+                  x="65.04" y="1717"/>
+            <ellipse cx="80.04" cy="1733" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M83.0088,1738.6406 Q82.4306,1738.9375 81.79,1739.0781 Q81.1494,1739.2344 80.4463,1739.2344 Q77.9463,1739.2344 76.6181,1737.5938 Q75.3056,1735.9375 75.3056,1732.8125 Q75.3056,1729.6875 76.6181,1728.0313 Q77.9463,1726.375 80.4463,1726.375 Q81.1494,1726.375 81.79,1726.5313 Q82.4463,1726.6875 83.0088,1726.9844 L83.0088,1729.7031 Q82.3838,1729.125 81.79,1728.8594 Q81.1963,1728.5781 80.5713,1728.5781 Q79.2275,1728.5781 78.54,1729.6563 Q77.8525,1730.7188 77.8525,1732.8125 Q77.8525,1734.9063 78.54,1735.9844 Q79.2275,1737.0469 80.5713,1737.0469 Q81.1963,1737.0469 81.79,1736.7813 Q82.3838,1736.5 83.0088,1735.9219 L83.0088,1738.6406 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="114.1943"
+                  x="94.04" y="1737.8467">UserServiceImpl
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="66.04" x2="210.2343" y1="1749" y2="1749"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="66.04" x2="210.2343" y1="1757" y2="1757"/>
+        </g><!--class TimerEventSource-->
+        <g class="entity" data-entity="TimerEventSource" data-source-line="29" data-uid="ent0009"
+           id="entity_TimerEventSource">
+            <rect fill="#F1F1F1" height="64.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;"
+                  width="160.9463" x="335.1" y="1576.85"/>
+            <ellipse cx="350.1" cy="1592.85" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M346.0219,1588.6156 L346.0219,1586.4594 L353.4125,1586.4594 L353.4125,1588.6156 L350.9438,1588.6156 L350.9438,1596.6938 L353.4125,1596.6938 L353.4125,1598.85 L346.0219,1598.85 L346.0219,1596.6938 L348.4906,1596.6938 L348.4906,1588.6156 L346.0219,1588.6156 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing"
+                  textLength="128.9463" x="364.1" y="1597.6967">TimerEventSource
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="336.1" x2="495.0463" y1="1608.85" y2="1608.85"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="336.1" x2="495.0463" y1="1616.85" y2="1616.85"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="103.0107"
+                  x="341.1" y="1633.8451">onTimerStart()
+            </text>
+        </g><!--class TimerServiceImpl-->
+        <g class="entity" data-entity="TimerServiceImpl" data-source-line="32" data-uid="ent0010"
+           id="entity_TimerServiceImpl">
+            <rect fill="#F1F1F1" height="48" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="154.7324"
+                  x="60.77" y="1585"/>
+            <ellipse cx="75.77" cy="1601" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M78.7388,1606.6406 Q78.1606,1606.9375 77.52,1607.0781 Q76.8794,1607.2344 76.1763,1607.2344 Q73.6763,1607.2344 72.3481,1605.5938 Q71.0356,1603.9375 71.0356,1600.8125 Q71.0356,1597.6875 72.3481,1596.0313 Q73.6763,1594.375 76.1763,1594.375 Q76.8794,1594.375 77.52,1594.5313 Q78.1763,1594.6875 78.7388,1594.9844 L78.7388,1597.7031 Q78.1138,1597.125 77.52,1596.8594 Q76.9263,1596.5781 76.3013,1596.5781 Q74.9575,1596.5781 74.27,1597.6563 Q73.5825,1598.7188 73.5825,1600.8125 Q73.5825,1602.9063 74.27,1603.9844 Q74.9575,1605.0469 76.3013,1605.0469 Q76.9263,1605.0469 77.52,1604.7813 Q78.1138,1604.5 78.7388,1603.9219 L78.7388,1606.6406 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="122.7324"
+                  x="89.77" y="1605.8467">TimerServiceImpl
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="61.77" x2="214.5024" y1="1617" y2="1617"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="61.77" x2="214.5024" y1="1625" y2="1625"/>
+        </g><!--class UserEventSource-->
+        <g class="entity" data-entity="UserEventSource" data-source-line="35" data-uid="ent0012"
+           id="entity_UserEventSource">
+            <rect fill="#F1F1F1" height="64.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;"
+                  width="152.4082" x="339.37" y="1477.85"/>
+            <ellipse cx="354.37" cy="1493.85" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M350.2919,1489.6156 L350.2919,1487.4594 L357.6825,1487.4594 L357.6825,1489.6156 L355.2138,1489.6156 L355.2138,1497.6938 L357.6825,1497.6938 L357.6825,1499.85 L350.2919,1499.85 L350.2919,1497.6938 L352.7606,1497.6938 L352.7606,1489.6156 L350.2919,1489.6156 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing"
+                  textLength="120.4082" x="368.37" y="1498.6967">UserEventSource
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="340.37" x2="490.7782" y1="1509.85" y2="1509.85"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="340.37" x2="490.7782" y1="1517.85" y2="1517.85"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="125.5283"
+                  x="345.37" y="1534.8451">onPlayerChange()
+            </text>
+        </g><!--class AuctionConsumer-->
+        <g class="entity" data-entity="AuctionConsumer" data-source-line="38" data-uid="ent0013"
+           id="entity_AuctionConsumer">
+            <rect fill="#F1F1F1" height="48" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="156.3525"
+                  x="59.96" y="1494"/>
+            <ellipse cx="74.96" cy="1510" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M77.9288,1515.6406 Q77.3506,1515.9375 76.71,1516.0781 Q76.0694,1516.2344 75.3663,1516.2344 Q72.8663,1516.2344 71.5381,1514.5938 Q70.2256,1512.9375 70.2256,1509.8125 Q70.2256,1506.6875 71.5381,1505.0313 Q72.8663,1503.375 75.3663,1503.375 Q76.0694,1503.375 76.71,1503.5313 Q77.3663,1503.6875 77.9288,1503.9844 L77.9288,1506.7031 Q77.3038,1506.125 76.71,1505.8594 Q76.1163,1505.5781 75.4913,1505.5781 Q74.1475,1505.5781 73.46,1506.6563 Q72.7725,1507.7188 72.7725,1509.8125 Q72.7725,1511.9063 73.46,1512.9844 Q74.1475,1514.0469 75.4913,1514.0469 Q76.1163,1514.0469 76.71,1513.7813 Q77.3038,1513.5 77.9288,1512.9219 L77.9288,1515.6406 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="124.3525"
+                  x="88.96" y="1514.8467">AuctionConsumer
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="60.96" x2="215.3125" y1="1526" y2="1526"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="60.96" x2="215.3125" y1="1534" y2="1534"/>
+        </g><!--class AuctionRepo-->
+        <g class="entity" data-entity="AuctionRepo" data-source-line="44" data-uid="ent0017" id="entity_AuctionRepo">
+            <rect fill="#F1F1F1" height="113.1875" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;"
+                  width="120.7578" x="355.2" y="1289.41"/>
+            <ellipse cx="370.2" cy="1305.41" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M366.1219,1301.1756 L366.1219,1299.0194 L373.5125,1299.0194 L373.5125,1301.1756 L371.0438,1301.1756 L371.0438,1309.2538 L373.5125,1309.2538 L373.5125,1311.41 L366.1219,1311.41 L366.1219,1309.2538 L368.5906,1309.2538 L368.5906,1301.1756 L366.1219,1301.1756 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing"
+                  textLength="88.7578" x="384.2" y="1310.2567">AuctionRepo
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="356.2" x2="474.9578" y1="1321.41" y2="1321.41"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="356.2" x2="474.9578" y1="1329.41" y2="1329.41"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="96.6602"
+                  x="361.2" y="1346.4051">saveAuction()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="86.8779"
+                  x="361.2" y="1362.702">getAuction()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="94.1719"
+                  x="361.2" y="1378.9989">getAuctions()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="107.9941"
+                  x="361.2" y="1395.2957">deleteAuction()
+            </text>
+        </g><!--class RedisAuctionRepo-->
+        <g class="entity" data-entity="RedisAuctionRepo" data-source-line="50" data-uid="ent0018"
+           id="entity_RedisAuctionRepo">
+            <rect fill="#F1F1F1" height="48" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="159.1689"
+                  x="58.56" y="1322"/>
+            <ellipse cx="73.56" cy="1338" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M76.5288,1343.6406 Q75.9506,1343.9375 75.31,1344.0781 Q74.6694,1344.2344 73.9663,1344.2344 Q71.4663,1344.2344 70.1381,1342.5938 Q68.8256,1340.9375 68.8256,1337.8125 Q68.8256,1334.6875 70.1381,1333.0313 Q71.4663,1331.375 73.9663,1331.375 Q74.6694,1331.375 75.31,1331.5313 Q75.9663,1331.6875 76.5288,1331.9844 L76.5288,1334.7031 Q75.9038,1334.125 75.31,1333.8594 Q74.7163,1333.5781 74.0913,1333.5781 Q72.7475,1333.5781 72.06,1334.6563 Q71.3725,1335.7188 71.3725,1337.8125 Q71.3725,1339.9063 72.06,1340.9844 Q72.7475,1342.0469 74.0913,1342.0469 Q74.7163,1342.0469 75.31,1341.7813 Q75.9038,1341.5 76.5288,1340.9219 L76.5288,1343.6406 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="127.1689"
+                  x="87.56" y="1342.8467">RedisAuctionRepo
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="59.56" x2="216.7289" y1="1354" y2="1354"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="59.56" x2="216.7289" y1="1362" y2="1362"/>
+        </g><!--class UserInfoRepository-->
+        <g class="entity" data-entity="UserInfoRepository" data-source-line="53" data-uid="ent0020"
+           id="entity_UserInfoRepository">
+            <rect fill="#F1F1F1" height="113.1875" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;"
+                  width="165.4785" x="332.84" y="1141.41"/>
+            <ellipse cx="347.84" cy="1157.41" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M343.7619,1153.1756 L343.7619,1151.0194 L351.1525,1151.0194 L351.1525,1153.1756 L348.6838,1153.1756 L348.6838,1161.2538 L351.1525,1161.2538 L351.1525,1163.41 L343.7619,1163.41 L343.7619,1161.2538 L346.2306,1161.2538 L346.2306,1153.1756 L343.7619,1153.1756 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing"
+                  textLength="133.4785" x="361.84" y="1162.2567">UserInfoRepository
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="333.84" x2="497.3185" y1="1173.41" y2="1173.41"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="333.84" x2="497.3185" y1="1181.41" y2="1181.41"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="69.1865"
+                  x="338.84" y="1198.4051">addUser()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="96.3047"
+                  x="338.84" y="1214.702">removeUser()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="65.8232"
+                  x="338.84" y="1230.9989">getUser()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="92.1621"
+                  x="338.84" y="1247.2957">updateUser()
+            </text>
+        </g><!--class RedisUserInfoRepository-->
+        <g class="entity" data-entity="RedisUserInfoRepository" data-source-line="59" data-uid="ent0021"
+           id="entity_RedisUserInfoRepository">
+            <rect fill="#F1F1F1" height="48" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="203.8896"
+                  x="36.19" y="1174"/>
+            <ellipse cx="51.19" cy="1190" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M54.1588,1195.6406 Q53.5806,1195.9375 52.94,1196.0781 Q52.2994,1196.2344 51.5963,1196.2344 Q49.0963,1196.2344 47.7681,1194.5938 Q46.4556,1192.9375 46.4556,1189.8125 Q46.4556,1186.6875 47.7681,1185.0313 Q49.0963,1183.375 51.5963,1183.375 Q52.2994,1183.375 52.94,1183.5313 Q53.5963,1183.6875 54.1588,1183.9844 L54.1588,1186.7031 Q53.5338,1186.125 52.94,1185.8594 Q52.3463,1185.5781 51.7213,1185.5781 Q50.3775,1185.5781 49.69,1186.6563 Q49.0025,1187.7188 49.0025,1189.8125 Q49.0025,1191.9063 49.69,1192.9844 Q50.3775,1194.0469 51.7213,1194.0469 Q52.3463,1194.0469 52.94,1193.7813 Q53.5338,1193.5 54.1588,1192.9219 L54.1588,1195.6406 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="171.8896"
+                  x="65.19" y="1194.8467">RedisUserInfoRepository
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="37.19" x2="239.0796" y1="1206" y2="1206"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="37.19" x2="239.0796" y1="1214" y2="1214"/>
+        </g><!--class PlayerAuctionMapRepo-->
+        <g class="entity" data-entity="PlayerAuctionMapRepo" data-source-line="62" data-uid="ent0023"
+           id="entity_PlayerAuctionMapRepo">
+            <rect fill="#F1F1F1" height="113.1875" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;"
+                  width="202.5928" x="314.28" y="993.41"/>
+            <ellipse cx="333.2061" cy="1009.41" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M329.1279,1005.1756 L329.1279,1003.0194 L336.5186,1003.0194 L336.5186,1005.1756 L334.0498,1005.1756 L334.0498,1013.2538 L336.5186,1013.2538 L336.5186,1015.41 L329.1279,1015.41 L329.1279,1013.2538 L331.5967,1013.2538 L331.5967,1005.1756 L329.1279,1005.1756 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing"
+                  textLength="161.8682" x="348.0785" y="1014.2567">PlayerAuctionMapRepo
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="315.28" x2="515.8728" y1="1025.41" y2="1025.41"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="315.28" x2="515.8728" y1="1033.41" y2="1033.41"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="128.8506"
+                  x="320.28" y="1050.4051">setPlayerAuction()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="130.4434"
+                  x="320.28" y="1066.702">getPlayerAuction()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="107.96"
+                  x="320.28" y="1082.9989">removePlayer()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="190.5928"
+                  x="320.28" y="1099.2957">removePlayersForAuction()
+            </text>
+        </g><!--class RedisPlayerAuctionMapRepo-->
+        <g class="entity" data-entity="RedisPlayerAuctionMapRepo" data-source-line="68" data-uid="ent0024"
+           id="entity_RedisPlayerAuctionMapRepo">
+            <rect fill="#F1F1F1" height="48" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="232.2793"
+                  x="22" y="1026"/>
+            <ellipse cx="37" cy="1042" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M39.9688,1047.6406 Q39.3906,1047.9375 38.75,1048.0781 Q38.1094,1048.2344 37.4063,1048.2344 Q34.9063,1048.2344 33.5781,1046.5938 Q32.2656,1044.9375 32.2656,1041.8125 Q32.2656,1038.6875 33.5781,1037.0313 Q34.9063,1035.375 37.4063,1035.375 Q38.1094,1035.375 38.75,1035.5313 Q39.4063,1035.6875 39.9688,1035.9844 L39.9688,1038.7031 Q39.3438,1038.125 38.75,1037.8594 Q38.1563,1037.5781 37.5313,1037.5781 Q36.1875,1037.5781 35.5,1038.6563 Q34.8125,1039.7188 34.8125,1041.8125 Q34.8125,1043.9063 35.5,1044.9844 Q36.1875,1046.0469 37.5313,1046.0469 Q38.1563,1046.0469 38.75,1045.7813 Q39.3438,1045.5 39.9688,1044.9219 L39.9688,1047.6406 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="200.2793"
+                  x="51" y="1046.8467">RedisPlayerAuctionMapRepo
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="23" x2="253.2793" y1="1058" y2="1058"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="23" x2="253.2793" y1="1066" y2="1066"/>
+        </g><!--class TimerRepo-->
+        <g class="entity" data-entity="TimerRepo" data-source-line="71" data-uid="ent0026" id="entity_TimerRepo">
+            <rect fill="#F1F1F1" height="113.1875" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;"
+                  width="116.8428" x="357.15" y="845.41"/>
+            <ellipse cx="376.0207" cy="861.41" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M371.9426,857.1756 L371.9426,855.0194 L379.3332,855.0194 L379.3332,857.1756 L376.8645,857.1756 L376.8645,865.2538 L379.3332,865.2538 L379.3332,867.41 L371.9426,867.41 L371.9426,865.2538 L374.4113,865.2538 L374.4113,857.1756 L371.9426,857.1756 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing"
+                  textLength="76.2412" x="390.8809" y="866.2567">TimerRepo
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="358.15" x2="472.9928" y1="877.41" y2="877.41"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="358.15" x2="472.9928" y1="885.41" y2="885.41"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="84.1436"
+                  x="363.15" y="902.4051">saveTimer()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="74.3613"
+                  x="363.15" y="918.702">getTimer()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="104.8428"
+                  x="363.15" y="934.9989">removeTimer()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="99.0117"
+                  x="363.15" y="951.2957">getAllTimers()
+            </text>
+        </g><!--class RedisTimerRepo-->
+        <g class="entity" data-entity="RedisTimerRepo" data-source-line="77" data-uid="ent0027"
+           id="entity_RedisTimerRepo">
+            <rect fill="#F1F1F1" height="48" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="146.6523"
+                  x="64.81" y="878"/>
+            <ellipse cx="79.81" cy="894" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M82.7788,899.6406 Q82.2006,899.9375 81.56,900.0781 Q80.9194,900.2344 80.2163,900.2344 Q77.7163,900.2344 76.3881,898.5938 Q75.0756,896.9375 75.0756,893.8125 Q75.0756,890.6875 76.3881,889.0313 Q77.7163,887.375 80.2163,887.375 Q80.9194,887.375 81.56,887.5313 Q82.2163,887.6875 82.7788,887.9844 L82.7788,890.7031 Q82.1538,890.125 81.56,889.8594 Q80.9663,889.5781 80.3413,889.5781 Q78.9975,889.5781 78.31,890.6563 Q77.6225,891.7188 77.6225,893.8125 Q77.6225,895.9063 78.31,896.9844 Q78.9975,898.0469 80.3413,898.0469 Q80.9663,898.0469 81.56,897.7813 Q82.1538,897.5 82.7788,896.9219 L82.7788,899.6406 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="114.6523"
+                  x="93.81" y="898.8467">RedisTimerRepo
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="65.81" x2="210.4623" y1="910" y2="910"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="65.81" x2="210.4623" y1="918" y2="918"/>
+        </g><!--class PlayerEventSource-->
+        <g class="entity" data-entity="PlayerEventSource" data-source-line="82" data-uid="ent0030"
+           id="entity_PlayerEventSource">
+            <rect fill="#F1F1F1" height="96.8906" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;"
+                  width="164.0635" x="333.54" y="673.55"/>
+            <ellipse cx="348.54" cy="689.55" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M344.4619,685.3156 L344.4619,683.1594 L351.8525,683.1594 L351.8525,685.3156 L349.3838,685.3156 L349.3838,693.3938 L351.8525,693.3938 L351.8525,695.55 L344.4619,695.55 L344.4619,693.3938 L346.9306,693.3938 L346.9306,685.3156 L344.4619,685.3156 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing"
+                  textLength="132.0635" x="362.54" y="694.3967">PlayerEventSource
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="334.54" x2="496.6035" y1="705.55" y2="705.55"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="334.54" x2="496.6035" y1="713.55" y2="713.55"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="129.8145"
+                  x="339.54" y="730.5451">onPlayerConnect()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="133.2871"
+                  x="339.54" y="746.842">onPlayerMessage()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="149.7002"
+                  x="339.54" y="763.1389">onPlayerDisconnect()
+            </text>
+        </g><!--class PlayerChannel-->
+        <g class="entity" data-entity="PlayerChannel" data-source-line="87" data-uid="ent0031"
+           id="entity_PlayerChannel">
+            <rect fill="#F1F1F1" height="96.8906" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;"
+                  width="138.1982" x="346.48" y="541.55"/>
+            <ellipse cx="363.8003" cy="557.55" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M359.7222,553.3156 L359.7222,551.1594 L367.1128,551.1594 L367.1128,553.3156 L364.6441,553.3156 L364.6441,561.3938 L367.1128,561.3938 L367.1128,563.55 L359.7222,563.55 L359.7222,561.3938 L362.1909,561.3938 L362.1909,553.3156 L359.7222,553.3156 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing"
+                  textLength="101.042" x="378.3159" y="562.3967">PlayerChannel
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="347.48" x2="483.6782" y1="573.55" y2="573.55"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="347.48" x2="483.6782" y1="581.55" y2="581.55"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="105.2734"
+                  x="352.48" y="598.5451">sendToPlayer()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="80.6572"
+                  x="352.48" y="614.842">broadcast()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="126.1982"
+                  x="352.48" y="631.1389">closeConnection()
+            </text>
+        </g><!--class WebSocketAdapter-->
+        <g class="entity" data-entity="WebSocketAdapter" data-source-line="92" data-uid="ent0032"
+           id="entity_WebSocketAdapter">
+            <rect fill="#F1F1F1" height="48" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="166.4902"
+                  x="54.89" y="632"/>
+            <ellipse cx="69.89" cy="648" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M72.8588,653.6406 Q72.2806,653.9375 71.64,654.0781 Q70.9994,654.2344 70.2963,654.2344 Q67.7963,654.2344 66.4681,652.5938 Q65.1556,650.9375 65.1556,647.8125 Q65.1556,644.6875 66.4681,643.0313 Q67.7963,641.375 70.2963,641.375 Q70.9994,641.375 71.64,641.5313 Q72.2963,641.6875 72.8588,641.9844 L72.8588,644.7031 Q72.2338,644.125 71.64,643.8594 Q71.0463,643.5781 70.4213,643.5781 Q69.0775,643.5781 68.39,644.6563 Q67.7025,645.7188 67.7025,647.8125 Q67.7025,649.9063 68.39,650.9844 Q69.0775,652.0469 70.4213,652.0469 Q71.0463,652.0469 71.64,651.7813 Q72.2338,651.5 72.8588,650.9219 L72.8588,653.6406 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="134.4902"
+                  x="83.89" y="652.8467">WebSocketAdapter
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="55.89" x2="220.3802" y1="664" y2="664"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="55.89" x2="220.3802" y1="672" y2="672"/>
+        </g><!--class Auction-->
+        <g class="entity" data-entity="Auction" data-source-line="98" data-uid="ent0036" id="entity_Auction">
+            <rect fill="#F1F1F1" height="227.2656" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;"
+                  width="173.6084" x="328.77" y="239.37"/>
+            <ellipse cx="384.8418" cy="255.37" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M380.7637,251.1356 L380.7637,248.9794 L388.1543,248.9794 L388.1543,251.1356 L385.6855,251.1356 L385.6855,259.2137 L388.1543,259.2137 L388.1543,261.37 L380.7637,261.37 L380.7637,259.2137 L383.2324,259.2137 L383.2324,251.1356 L380.7637,251.1356 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing"
+                  textLength="52.9648" x="405.3418" y="260.2167">Auction
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="329.77" x2="501.3784" y1="271.37" y2="271.37"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="329.77" x2="501.3784" y1="279.37" y2="279.37"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="32.5869"
+                  x="334.77" y="296.3651">bid()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="39.2998"
+                  x="334.77" y="312.662">sale()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="82.2227"
+                  x="334.77" y="328.9589">endRound()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="161.6084"
+                  x="334.77" y="345.2557">computeLeaderboard()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="91.9912"
+                  x="334.77" y="361.5526">playerState()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="43.5313"
+                  x="334.77" y="377.8495">start()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="36.1416"
+                  x="334.77" y="394.1464">join()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="48.9043"
+                  x="334.77" y="410.4432">leave()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="102.9971"
+                  x="334.77" y="426.7401">isTerminated()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="73.8076"
+                  x="334.77" y="443.037">isStarted()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="51.4746"
+                  x="334.77" y="459.3339">toInfo()
+            </text>
+        </g><!--class AuctionImpl-->
+        <g class="entity" data-entity="AuctionImpl" data-source-line="111" data-uid="ent0037" id="entity_AuctionImpl">
+            <rect fill="#F1F1F1" height="48" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="115.5078"
+                  x="80.39" y="329"/>
+            <ellipse cx="95.39" cy="345" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M98.3588,350.6406 Q97.7806,350.9375 97.14,351.0781 Q96.4994,351.2344 95.7963,351.2344 Q93.2963,351.2344 91.9681,349.5938 Q90.6556,347.9375 90.6556,344.8125 Q90.6556,341.6875 91.9681,340.0313 Q93.2963,338.375 95.7963,338.375 Q96.4994,338.375 97.14,338.5313 Q97.7963,338.6875 98.3588,338.9844 L98.3588,341.7031 Q97.7338,341.125 97.14,340.8594 Q96.5463,340.5781 95.9213,340.5781 Q94.5775,340.5781 93.89,341.6563 Q93.2025,342.7188 93.2025,344.8125 Q93.2025,346.9063 93.89,347.9844 Q94.5775,349.0469 95.9213,349.0469 Q96.5463,349.0469 97.14,348.7813 Q97.7338,348.5 98.3588,347.9219 L98.3588,350.6406 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="83.5078"
+                  x="109.39" y="349.8467">AuctionImpl
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="81.39" x2="194.8978" y1="361" y2="361"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="81.39" x2="194.8978" y1="369" y2="369"/>
+        </g><!--class AuctionModifier-->
+        <g class="entity" data-entity="AuctionModifier" data-source-line="114" data-uid="ent0039"
+           id="entity_AuctionModifier">
+            <rect fill="#F1F1F1" height="64.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;"
+                  width="141.5732" x="344.79" y="139.85"/>
+            <ellipse cx="359.79" cy="155.85" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M355.7119,151.6156 L355.7119,149.4594 L363.1025,149.4594 L363.1025,151.6156 L360.6338,151.6156 L360.6338,159.6937 L363.1025,159.6937 L363.1025,161.85 L355.7119,161.85 L355.7119,159.6937 L358.1806,159.6937 L358.1806,151.6156 L355.7119,151.6156 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing"
+                  textLength="109.5732" x="373.79" y="160.6967">AuctionModifier
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="345.79" x2="485.3632" y1="171.85" y2="171.85"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="345.79" x2="485.3632" y1="179.85" y2="179.85"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="49.4512"
+                  x="350.79" y="196.8451">apply()
+            </text>
+        </g><!--class Modifiers-->
+        <g class="entity" data-entity="Modifiers" data-source-line="117" data-uid="ent0040" id="entity_Modifiers">
+            <rect fill="#F1F1F1" height="48" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="95.9023"
+                  x="90.19" y="146"/>
+            <ellipse cx="105.19" cy="162" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M108.1588,167.6406 Q107.5806,167.9375 106.94,168.0781 Q106.2994,168.2344 105.5963,168.2344 Q103.0963,168.2344 101.7681,166.5938 Q100.4556,164.9375 100.4556,161.8125 Q100.4556,158.6875 101.7681,157.0313 Q103.0963,155.375 105.5963,155.375 Q106.2994,155.375 106.94,155.5313 Q107.5963,155.6875 108.1588,155.9844 L108.1588,158.7031 Q107.5338,158.125 106.94,157.8594 Q106.3463,157.5781 105.7213,157.5781 Q104.3775,157.5781 103.69,158.6563 Q103.0025,159.7188 103.0025,161.8125 Q103.0025,163.9063 103.69,164.9844 Q104.3775,166.0469 105.7213,166.0469 Q106.3463,166.0469 106.94,165.7813 Q107.5338,165.5 108.1588,164.9219 L108.1588,167.6406 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="63.9023"
+                  x="119.19" y="166.8467">Modifiers
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="91.19" x2="185.0923" y1="178" y2="178"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="91.19" x2="185.0923" y1="186" y2="186"/>
+        </g><!--class LeaderboardModifier-->
+        <g class="entity" data-entity="LeaderboardModifier" data-source-line="120" data-uid="ent0042"
+           id="entity_LeaderboardModifier">
+            <rect fill="#F1F1F1" height="64.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;"
+                  width="177.5303" x="326.81" y="40.85"/>
+            <ellipse cx="341.81" cy="56.85" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M337.7319,52.6156 L337.7319,50.4594 L345.1225,50.4594 L345.1225,52.6156 L342.6538,52.6156 L342.6538,60.6937 L345.1225,60.6937 L345.1225,62.85 L337.7319,62.85 L337.7319,60.6937 L340.2006,60.6937 L340.2006,52.6156 L337.7319,52.6156 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing"
+                  textLength="145.5303" x="355.81" y="61.6967">LeaderboardModifier
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="327.81" x2="503.3403" y1="72.85" y2="72.85"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="327.81" x2="503.3403" y1="80.85" y2="80.85"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="49.4512"
+                  x="332.81" y="97.8451">apply()
+            </text>
+        </g><!--class WinStrategy-->
+        <g class="entity" data-entity="WinStrategy" data-source-line="125" data-uid="ent0044" id="entity_WinStrategy">
+            <rect fill="#F1F1F1" height="64.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;"
+                  width="173.6084" x="51.34" y="42.85"/>
+            <ellipse cx="91.0979" cy="58.85" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M87.0198,54.6156 L87.0198,52.4594 L94.4104,52.4594 L94.4104,54.6156 L91.9417,54.6156 L91.9417,62.6937 L94.4104,62.6937 L94.4104,64.85 L87.0198,64.85 L87.0198,62.6937 L89.4885,62.6937 L89.4885,54.6156 L87.0198,54.6156 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing"
+                  textLength="86.5908" x="110.5997" y="63.6967">WinStrategy
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="52.34" x2="223.9484" y1="74.85" y2="74.85"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="52.34" x2="223.9484" y1="82.85" y2="82.85"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="161.6084"
+                  x="57.34" y="99.8451">computeLeaderboard()
+            </text>
+        </g><!--class AuctionProducer-->
+        <g class="entity" data-entity="AuctionProducer" data-source-line="131" data-uid="ent0046"
+           id="entity_AuctionProducer">
+            <rect fill="#F1F1F1" height="48" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="147.5547"
+                  x="64.36" y="2309"/>
+            <ellipse cx="79.36" cy="2325" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M82.3288,2330.6406 Q81.7506,2330.9375 81.11,2331.0781 Q80.4694,2331.2344 79.7663,2331.2344 Q77.2663,2331.2344 75.9381,2329.5938 Q74.6256,2327.9375 74.6256,2324.8125 Q74.6256,2321.6875 75.9381,2320.0313 Q77.2663,2318.375 79.7663,2318.375 Q80.4694,2318.375 81.11,2318.5313 Q81.7663,2318.6875 82.3288,2318.9844 L82.3288,2321.7031 Q81.7038,2321.125 81.11,2320.8594 Q80.5163,2320.5781 79.8913,2320.5781 Q78.5475,2320.5781 77.86,2321.6563 Q77.1725,2322.7188 77.1725,2324.8125 Q77.1725,2326.9063 77.86,2327.9844 Q78.5475,2329.0469 79.8913,2329.0469 Q80.5163,2329.0469 81.11,2328.7813 Q81.7038,2328.5 82.3288,2327.9219 L82.3288,2330.6406 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="115.5547"
+                  x="93.36" y="2329.8467">AuctionProducer
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="65.36" x2="210.9147" y1="2341" y2="2341"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="65.36" x2="210.9147" y1="2349" y2="2349"/>
+        </g><!--class AuctionConsumer-->
+        <g class="entity" data-entity="AuctionConsumer" data-source-line="132" data-uid="ent0047"
+           id="entity_AuctionConsumer">
+            <rect fill="#F1F1F1" height="48" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="156.3525"
+                  x="59.96" y="2226"/>
+            <ellipse cx="74.96" cy="2242" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M77.9288,2247.6406 Q77.3506,2247.9375 76.71,2248.0781 Q76.0694,2248.2344 75.3663,2248.2344 Q72.8663,2248.2344 71.5381,2246.5938 Q70.2256,2244.9375 70.2256,2241.8125 Q70.2256,2238.6875 71.5381,2237.0313 Q72.8663,2235.375 75.3663,2235.375 Q76.0694,2235.375 76.71,2235.5313 Q77.3663,2235.6875 77.9288,2235.9844 L77.9288,2238.7031 Q77.3038,2238.125 76.71,2237.8594 Q76.1163,2237.5781 75.4913,2237.5781 Q74.1475,2237.5781 73.46,2238.6563 Q72.7725,2239.7188 72.7725,2241.8125 Q72.7725,2243.9063 73.46,2244.9844 Q74.1475,2246.0469 75.4913,2246.0469 Q76.1163,2246.0469 76.71,2245.7813 Q77.3038,2245.5 77.9288,2244.9219 L77.9288,2247.6406 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="124.3525"
+                  x="88.96" y="2246.8467">AuctionConsumer
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="60.96" x2="215.3125" y1="2258" y2="2258"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="60.96" x2="215.3125" y1="2266" y2="2266"/>
+        </g><!--class MessageHandler-->
+        <g class="entity" data-entity="MessageHandler" data-source-line="133" data-uid="ent0048"
+           id="entity_MessageHandler">
+            <rect fill="#F1F1F1" height="48" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="148.4844"
+                  x="63.9" y="2143"/>
+            <ellipse cx="78.9" cy="2159" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M81.8688,2164.6406 Q81.2906,2164.9375 80.65,2165.0781 Q80.0094,2165.2344 79.3063,2165.2344 Q76.8063,2165.2344 75.4781,2163.5938 Q74.1656,2161.9375 74.1656,2158.8125 Q74.1656,2155.6875 75.4781,2154.0313 Q76.8063,2152.375 79.3063,2152.375 Q80.0094,2152.375 80.65,2152.5313 Q81.3063,2152.6875 81.8688,2152.9844 L81.8688,2155.7031 Q81.2438,2155.125 80.65,2154.8594 Q80.0563,2154.5781 79.4313,2154.5781 Q78.0875,2154.5781 77.4,2155.6563 Q76.7125,2156.7188 76.7125,2158.8125 Q76.7125,2160.9063 77.4,2161.9844 Q78.0875,2163.0469 79.4313,2163.0469 Q80.0563,2163.0469 80.65,2162.7813 Q81.2438,2162.5 81.8688,2161.9219 L81.8688,2164.6406 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="116.4844"
+                  x="92.9" y="2163.8467">MessageHandler
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="64.9" x2="211.3844" y1="2175" y2="2175"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="64.9" x2="211.3844" y1="2183" y2="2183"/>
+        </g><!--class LobbyConsumer-->
+        <g class="entity" data-entity="LobbyConsumer" data-source-line="134" data-uid="ent0049"
+           id="entity_LobbyConsumer">
+            <rect fill="#F1F1F1" height="48" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="145.8115"
+                  x="342.67" y="2309"/>
+            <ellipse cx="357.67" cy="2325" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M360.6388,2330.6406 Q360.0606,2330.9375 359.42,2331.0781 Q358.7794,2331.2344 358.0763,2331.2344 Q355.5763,2331.2344 354.2481,2329.5938 Q352.9356,2327.9375 352.9356,2324.8125 Q352.9356,2321.6875 354.2481,2320.0313 Q355.5763,2318.375 358.0763,2318.375 Q358.7794,2318.375 359.42,2318.5313 Q360.0763,2318.6875 360.6388,2318.9844 L360.6388,2321.7031 Q360.0138,2321.125 359.42,2320.8594 Q358.8263,2320.5781 358.2013,2320.5781 Q356.8575,2320.5781 356.17,2321.6563 Q355.4825,2322.7188 355.4825,2324.8125 Q355.4825,2326.9063 356.17,2327.9844 Q356.8575,2329.0469 358.2013,2329.0469 Q358.8263,2329.0469 359.42,2328.7813 Q360.0138,2328.5 360.6388,2327.9219 L360.6388,2330.6406 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="113.8115"
+                  x="371.67" y="2329.8467">LobbyConsumer
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="343.67" x2="487.4815" y1="2341" y2="2341"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="343.67" x2="487.4815" y1="2349" y2="2349"/>
+        </g><!--class MessageSender-->
+        <g class="entity" data-entity="MessageSender" data-source-line="135" data-uid="ent0050"
+           id="entity_MessageSender">
+            <rect fill="#F1F1F1" height="48" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="142.9883"
+                  x="344.08" y="2226"/>
+            <ellipse cx="359.08" cy="2242" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M362.0488,2247.6406 Q361.4706,2247.9375 360.83,2248.0781 Q360.1894,2248.2344 359.4863,2248.2344 Q356.9863,2248.2344 355.6581,2246.5938 Q354.3456,2244.9375 354.3456,2241.8125 Q354.3456,2238.6875 355.6581,2237.0313 Q356.9863,2235.375 359.4863,2235.375 Q360.1894,2235.375 360.83,2235.5313 Q361.4863,2235.6875 362.0488,2235.9844 L362.0488,2238.7031 Q361.4238,2238.125 360.83,2237.8594 Q360.2363,2237.5781 359.6113,2237.5781 Q358.2675,2237.5781 357.58,2238.6563 Q356.8925,2239.7188 356.8925,2241.8125 Q356.8925,2243.9063 357.58,2244.9844 Q358.2675,2246.0469 359.6113,2246.0469 Q360.2363,2246.0469 360.83,2245.7813 Q361.4238,2245.5 362.0488,2244.9219 L362.0488,2247.6406 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="110.9883"
+                  x="373.08" y="2246.8467">MessageSender
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="345.08" x2="486.0683" y1="2258" y2="2258"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="345.08" x2="486.0683" y1="2266" y2="2266"/>
+        </g><!--link AuctionServiceImpl to AuctionService-->
+        <g class="link" data-entity-1="AuctionServiceImpl" data-entity-2="AuctionService" data-source-line="17"
+           data-uid="lnk5" id="link_AuctionServiceImpl_AuctionService">
+            <path codeLine="17" d="M222.15,1954 C261.12,1954 289.06,1954 326.28,1954" fill="none"
+                  id="AuctionServiceImpl-to-AuctionService" style="stroke:#181818;stroke-width:1;"/>
+            <polygon fill="none" points="344.28,1954,326.28,1948,326.28,1960,344.28,1954"
+                     style="stroke:#181818;stroke-width:1;"/>
+        </g><!--link UserServiceImpl to UserService-->
+        <g class="link" data-entity-1="UserServiceImpl" data-entity-2="UserService" data-source-line="27"
+           data-uid="lnk8" id="link_UserServiceImpl_UserService">
+            <path codeLine="27" d="M211.51,1741 C253.27,1741 287.46,1741 328.48,1741" fill="none"
+                  id="UserServiceImpl-to-UserService" style="stroke:#181818;stroke-width:1;"/>
+            <polygon fill="none" points="346.48,1741,328.48,1735,328.48,1747,346.48,1741"
+                     style="stroke:#181818;stroke-width:1;"/>
+        </g><!--link TimerServiceImpl to TimerEventSource-->
+        <g class="link" data-entity-1="TimerServiceImpl" data-entity-2="TimerEventSource" data-source-line="33"
+           data-uid="lnk11" id="link_TimerServiceImpl_TimerEventSource">
+            <path codeLine="33" d="M215.86,1609 C252.95,1609 279.44,1609 316.91,1609" fill="none"
+                  id="TimerServiceImpl-to-TimerEventSource" style="stroke:#181818;stroke-width:1;"/>
+            <polygon fill="none" points="334.91,1609,316.91,1603,316.91,1615,334.91,1609"
+                     style="stroke:#181818;stroke-width:1;"/>
+        </g><!--link AuctionConsumer to UserEventSource-->
+        <g class="link" data-entity-1="AuctionConsumer" data-entity-2="UserEventSource" data-source-line="39"
+           data-uid="lnk14" id="link_AuctionConsumer_UserEventSource">
+            <path codeLine="39" d="M216.6,1515.75 C254.94,1514.64 283.0676,1513.8246 321.1376,1512.7146" fill="none"
+                  id="AuctionConsumer-to-UserEventSource" style="stroke:#181818;stroke-width:1;"/>
+            <polygon fill="none" points="339.13,1512.19,320.9628,1506.7171,321.3125,1518.7121,339.13,1512.19"
+                     style="stroke:#181818;stroke-width:1;"/>
+        </g><!--link AuctionConsumer to TimerEventSource-->
+        <g class="link" data-entity-1="AuctionConsumer" data-entity-2="TimerEventSource" data-source-line="40"
+           data-uid="lnk15" id="link_AuctionConsumer_TimerEventSource">
+            <path codeLine="40" d="M212.95,1542.39 C250.56,1554.81 279.2391,1564.2819 317.6691,1576.9819" fill="none"
+                  id="AuctionConsumer-to-TimerEventSource" style="stroke:#181818;stroke-width:1;"/>
+            <polygon fill="none" points="334.76,1582.63,319.5518,1571.285,315.7864,1582.6789,334.76,1582.63"
+                     style="stroke:#181818;stroke-width:1;"/>
+        </g><!--link RedisAuctionRepo to AuctionRepo-->
+        <g class="link" data-entity-1="RedisAuctionRepo" data-entity-2="AuctionRepo" data-source-line="51"
+           data-uid="lnk19" id="link_RedisAuctionRepo_AuctionRepo">
+            <path codeLine="51" d="M218.07,1346 C261.63,1346 296.84,1346 336.9,1346" fill="none"
+                  id="RedisAuctionRepo-to-AuctionRepo" style="stroke:#181818;stroke-width:1;"/>
+            <polygon fill="none" points="354.9,1346,336.9,1340,336.9,1352,354.9,1346"
+                     style="stroke:#181818;stroke-width:1;"/>
+        </g><!--link RedisUserInfoRepository to UserInfoRepository-->
+        <g class="link" data-entity-1="RedisUserInfoRepository" data-entity-2="UserInfoRepository" data-source-line="60"
+           data-uid="lnk22" id="link_RedisUserInfoRepository_UserInfoRepository">
+            <path codeLine="60" d="M240.53,1198 C270.9,1198 285.81,1198 314.75,1198" fill="none"
+                  id="RedisUserInfoRepository-to-UserInfoRepository" style="stroke:#181818;stroke-width:1;"/>
+            <polygon fill="none" points="332.75,1198,314.75,1192,314.75,1204,332.75,1198"
+                     style="stroke:#181818;stroke-width:1;"/>
+        </g><!--link RedisPlayerAuctionMapRepo to PlayerAuctionMapRepo-->
+        <g class="link" data-entity-1="RedisPlayerAuctionMapRepo" data-entity-2="PlayerAuctionMapRepo"
+           data-source-line="69" data-uid="lnk25" id="link_RedisPlayerAuctionMapRepo_PlayerAuctionMapRepo">
+            <path codeLine="69" d="M254.75,1050 C274.48,1050 276.83,1050 296.12,1050" fill="none"
+                  id="RedisPlayerAuctionMapRepo-to-PlayerAuctionMapRepo" style="stroke:#181818;stroke-width:1;"/>
+            <polygon fill="none" points="314.12,1050,296.12,1044,296.12,1056,314.12,1050"
+                     style="stroke:#181818;stroke-width:1;"/>
+        </g><!--link RedisTimerRepo to TimerRepo-->
+        <g class="link" data-entity-1="RedisTimerRepo" data-entity-2="TimerRepo" data-source-line="78" data-uid="lnk28"
+           id="link_RedisTimerRepo_TimerRepo">
+            <path codeLine="78" d="M211.87,902 C257.13,902 296.55,902 338.71,902" fill="none"
+                  id="RedisTimerRepo-to-TimerRepo" style="stroke:#181818;stroke-width:1;"/>
+            <polygon fill="none" points="356.71,902,338.71,896,338.71,908,356.71,902"
+                     style="stroke:#181818;stroke-width:1;"/>
+        </g><!--link WebSocketAdapter to PlayerEventSource-->
+        <g class="link" data-entity-1="WebSocketAdapter" data-entity-2="PlayerEventSource" data-source-line="93"
+           data-uid="lnk33" id="link_WebSocketAdapter_PlayerEventSource">
+            <path codeLine="93" d="M221.78,675.8 C257.12,684.27 280.7355,689.9255 315.9155,698.3555" fill="none"
+                  id="WebSocketAdapter-to-PlayerEventSource" style="stroke:#181818;stroke-width:1;"/>
+            <polygon fill="none" points="333.42,702.55,317.3137,692.5207,314.5174,704.1903,333.42,702.55"
+                     style="stroke:#181818;stroke-width:1;"/>
+        </g><!--link WebSocketAdapter to PlayerChannel-->
+        <g class="link" data-entity-1="WebSocketAdapter" data-entity-2="PlayerChannel" data-source-line="94"
+           data-uid="lnk34" id="link_WebSocketAdapter_PlayerChannel">
+            <path codeLine="94" d="M221.78,636.2 C261.55,626.67 291.1551,619.5728 328.8551,610.5428" fill="none"
+                  id="WebSocketAdapter-to-PlayerChannel" style="stroke:#181818;stroke-width:1;"/>
+            <polygon fill="none" points="346.36,606.35,327.4575,604.7079,330.2527,616.3778,346.36,606.35"
+                     style="stroke:#181818;stroke-width:1;"/>
+        </g><!--link AuctionImpl to Auction-->
+        <g class="link" data-entity-1="AuctionImpl" data-entity-2="Auction" data-source-line="112" data-uid="lnk38"
+           id="link_AuctionImpl_Auction">
+            <path codeLine="112" d="M196.21,353 C234.42,353 267.42,353 310.53,353" fill="none"
+                  id="AuctionImpl-to-Auction" style="stroke:#181818;stroke-width:1;"/>
+            <polygon fill="none" points="328.53,353,310.53,347,310.53,359,328.53,353"
+                     style="stroke:#181818;stroke-width:1;"/>
+        </g><!--link Modifiers to AuctionModifier-->
+        <g class="link" data-entity-1="Modifiers" data-entity-2="AuctionModifier" data-source-line="118"
+           data-uid="lnk41" id="link_Modifiers_AuctionModifier">
+            <path codeLine="118" d="M186.49,170.34 C229.94,170.66 276.8805,170.9991 326.3705,171.3591" fill="none"
+                  id="Modifiers-to-AuctionModifier" style="stroke:#181818;stroke-width:1;stroke-dasharray:7.0,7.0;"/>
+            <polygon fill="none" points="344.37,171.49,326.4141,165.3592,326.3268,177.3589,344.37,171.49"
+                     style="stroke:#181818;stroke-width:1;"/>
+        </g><!--link Modifiers to LeaderboardModifier-->
+        <g class="link" data-entity-1="Modifiers" data-entity-2="LeaderboardModifier" data-source-line="123"
+           data-uid="lnk43" id="link_Modifiers_LeaderboardModifier">
+            <path codeLine="123" d="M186.49,153.33 C224.86,139.81 263.0223,126.3697 309.4723,110.0097" fill="none"
+                  id="Modifiers-to-LeaderboardModifier"
+                  style="stroke:#181818;stroke-width:1;stroke-dasharray:7.0,7.0;"/>
+            <polygon fill="none" points="326.45,104.03,307.479,104.3504,311.4655,115.6689,326.45,104.03"
+                     style="stroke:#181818;stroke-width:1;"/>
+        </g><!--SRC=[ZLLDRzim3BtdLmWzROVs9mpekWthq015tA5dnM9ShR9eI7A0OCj_dw8FMvBbR8S0yICbFZvIf8238GQ9ujsR8OmhQ0r7kHbe-qux83SQr96te6_8xmqXN1fG1ze2kH-TO-FDpaX8gu0Q2AOF7ntMWLa0puAUGEMmZd1Zx1q171po0xdCW2UWnzpbCsVPTqD5T039TZZAQDU6geAHWXwF6Usp_RM2Qbta-TWFmfgM8Bcz_VEfm3UPO3-jahbQbB4B64YC0xDv9u1dbG1MkEGBfPVhuOtA3WhMIR10kK0ytmJCoRxm7jJN8qZJuAWcnYYTeRb8M4JqXYna2VcOvTLBbMfnh-GQH7z0gKTxzLoUYCovfc5Nt1RqpflvCIWOK7E3Ygy-Y9rr2QmrFVx7MmY03WW30MQb5tV0k4xYM4C9PNteV1RoFie3xc8Yfsel_gFrYbOj22vZH9wLw5DfYXCPwsnSREcGQbmV9YipnkVbBHL8VqDrHVaQZPXQbQ9Bhdfg-TYAld7Od4pwwHaN3lT2E4JNY4y18jivujpppfusEsLqi1GNZUuJkl98KKgxHOenjGMjQGS5-eNhDd4_Lm9Tthm4CTLRiXVCAhXNI5bBTOpO2jGGI2mh-Ghx1jjtgvXFpnfAAArRFZ6kUGQUcOGCUyhbogG86UsdpQLNTrQB_J0Qi6kFWTeZLSMoIpQcdcOp8R_clIcIZMdh3whdqXvY4-Hc-lHjyF8UwuCstu6BvRUfvRf5nW_S2XQcpJ28Kt5xTD4McVwJkxlvveZc4H9HhaOfxgmSo-zzvR8nochKnHcvKeLpLdBRpaQX4DF3oRHxLiZ6rdNTsl8AQlZdyfrA9XBu2VVxqvfpOxl6ekU_]-->
+    </g>
+</svg>

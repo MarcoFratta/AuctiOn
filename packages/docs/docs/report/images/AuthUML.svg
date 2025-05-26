@@ -1,0 +1,300 @@
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" contentStyleType="text/css"
+     data-diagram-type="CLASS" height="1103px" preserveAspectRatio="none"
+     style="width:460px;height:1103px;background:#FFFFFF;" version="1.1" viewBox="0 0 460 1103" width="460px"
+     zoomAndPan="magnify">
+    <defs/>
+    <g><!--cluster services-->
+        <g class="cluster" data-entity="services" data-source-line="2" data-uid="ent0002" id="cluster_services">
+            <path d="M21.12,752 L86.9042,752 A3.75,3.75 0 0 1 89.4042,754.5 L96.4042,774.2969 L430.91,774.2969 A2.5,2.5 0 0 1 433.41,776.7969 L433.41,1093.5 A2.5,2.5 0 0 1 430.91,1096 L21.12,1096 A2.5,2.5 0 0 1 18.62,1093.5 L18.62,754.5 A2.5,2.5 0 0 1 21.12,752"
+                  fill="none" style="stroke:#000000;stroke-width:1.5;"/>
+            <line style="stroke:#000000;stroke-width:1.5;" x1="18.62" x2="96.4042" y1="774.2969" y2="774.2969"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing"
+                  textLength="64.7842" x="22.62" y="766.9951">services
+            </text>
+        </g><!--cluster repositories-->
+        <g class="cluster" data-entity="repositories" data-source-line="24" data-uid="ent0009"
+           id="cluster_repositories">
+            <path d="M8.9,350 L104.9127,350 A3.75,3.75 0 0 1 107.4127,352.5 L114.4127,372.2969 L441.18,372.2969 A2.5,2.5 0 0 1 443.68,374.7969 L443.68,725.5 A2.5,2.5 0 0 1 441.18,728 L8.9,728 A2.5,2.5 0 0 1 6.4,725.5 L6.4,352.5 A2.5,2.5 0 0 1 8.9,350"
+                  fill="none" style="stroke:#000000;stroke-width:1.5;"/>
+            <line style="stroke:#000000;stroke-width:1.5;" x1="6.4" x2="114.4127" y1="372.2969" y2="372.2969"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing"
+                  textLength="95.0127" x="10.4" y="364.9951">repositories
+            </text>
+        </g><!--cluster domain-->
+        <g class="cluster" data-entity="domain" data-source-line="48" data-uid="ent0016" id="cluster_domain">
+            <path d="M8.5,129 L67.9404,129 A3.75,3.75 0 0 1 70.4404,131.5 L77.4404,151.2969 L450.69,151.2969 A2.5,2.5 0 0 1 453.19,153.7969 L453.19,323.5 A2.5,2.5 0 0 1 450.69,326 L8.5,326 A2.5,2.5 0 0 1 6,323.5 L6,131.5 A2.5,2.5 0 0 1 8.5,129"
+                  fill="none" style="stroke:#000000;stroke-width:1.5;"/>
+            <line style="stroke:#000000;stroke-width:1.5;" x1="6" x2="77.4404" y1="151.2969" y2="151.2969"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing"
+                  textLength="58.4404" x="10" y="143.9951">domain
+            </text>
+        </g><!--cluster controllers-->
+        <g class="cluster" data-entity="controllers" data-source-line="61" data-uid="ent0020" id="cluster_controllers">
+            <path d="M27.67,6 L114.0987,6 A3.75,3.75 0 0 1 116.5987,8.5 L123.5987,28.2969 L188.66,28.2969 A2.5,2.5 0 0 1 191.16,30.7969 L191.16,102.5 A2.5,2.5 0 0 1 188.66,105 L27.67,105 A2.5,2.5 0 0 1 25.17,102.5 L25.17,8.5 A2.5,2.5 0 0 1 27.67,6"
+                  fill="none" style="stroke:#000000;stroke-width:1.5;"/>
+            <line style="stroke:#000000;stroke-width:1.5;" x1="25.17" x2="123.5987" y1="28.2969" y2="28.2969"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing"
+                  textLength="85.4287" x="29.17" y="20.9951">controllers
+            </text>
+        </g><!--class AuthService-->
+        <g class="entity" data-entity="AuthService" data-source-line="3" data-uid="ent0003" id="entity_AuthService">
+            <rect fill="#F1F1F1" height="178.375" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;"
+                  width="131.3828" x="280.07" y="901.81"/>
+            <ellipse cx="301.7431" cy="917.81" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M297.665,913.5756 L297.665,911.4194 L305.0556,911.4194 L305.0556,913.5756 L302.5868,913.5756 L302.5868,921.6538 L305.0556,921.6538 L305.0556,923.81 L297.665,923.81 L297.665,921.6538 L300.1337,921.6538 L300.1337,913.5756 L297.665,913.5756 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing"
+                  textLength="84.5537" x="317.226" y="922.6567">AuthService
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="281.07" x2="410.4528" y1="933.81" y2="933.81"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="281.07" x2="410.4528" y1="941.81" y2="941.81"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="65.2217"
+                  x="286.07" y="958.8051">register()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="45.0283"
+                  x="286.07" y="975.102">login()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="55.1934"
+                  x="286.07" y="991.3989">logout()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="103.4688"
+                  x="286.07" y="1007.6957">refreshToken()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="109.8467"
+                  x="286.07" y="1023.9926">validateToken()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="119.3828"
+                  x="286.07" y="1040.2895">forgotPassword()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="112.957"
+                  x="286.07" y="1056.5864">resetPassword()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="106.7295"
+                  x="286.07" y="1072.8832">hasExpiration()
+            </text>
+        </g><!--class AuthServiceImpl-->
+        <g class="entity" data-entity="AuthServiceImpl" data-source-line="13" data-uid="ent0004"
+           id="entity_AuthServiceImpl">
+            <rect fill="#F1F1F1" height="48" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="147.0967"
+                  x="34.62" y="967"/>
+            <ellipse cx="49.62" cy="983" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M52.5888,988.6406 Q52.0106,988.9375 51.37,989.0781 Q50.7294,989.2344 50.0263,989.2344 Q47.5263,989.2344 46.1981,987.5938 Q44.8856,985.9375 44.8856,982.8125 Q44.8856,979.6875 46.1981,978.0313 Q47.5263,976.375 50.0263,976.375 Q50.7294,976.375 51.37,976.5313 Q52.0263,976.6875 52.5888,976.9844 L52.5888,979.7031 Q51.9638,979.125 51.37,978.8594 Q50.7763,978.5781 50.1513,978.5781 Q48.8075,978.5781 48.12,979.6563 Q47.4325,980.7188 47.4325,982.8125 Q47.4325,984.9063 48.12,985.9844 Q48.8075,987.0469 50.1513,987.0469 Q50.7763,987.0469 51.37,986.7813 Q51.9638,986.5 52.5888,985.9219 L52.5888,988.6406 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="115.0967"
+                  x="63.62" y="987.8467">AuthServiceImpl
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="35.62" x2="180.7167" y1="999" y2="999"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="35.62" x2="180.7167" y1="1007" y2="1007"/>
+        </g><!--class MailClient-->
+        <g class="entity" data-entity="MailClient" data-source-line="16" data-uid="ent0006" id="entity_MailClient">
+            <rect fill="#F1F1F1" height="80.5938" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;"
+                  width="143.2979" x="274.11" y="786.7"/>
+            <ellipse cx="308.1585" cy="802.7" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M304.0804,798.4656 L304.0804,796.3094 L311.471,796.3094 L311.471,798.4656 L309.0023,798.4656 L309.0023,806.5438 L311.471,806.5438 L311.471,808.7 L304.0804,808.7 L304.0804,806.5438 L306.5492,806.5438 L306.5492,798.4656 L304.0804,798.4656 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing"
+                  textLength="68.9678" x="326.3915" y="807.5467">MailClient
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="275.11" x2="416.4079" y1="818.7" y2="818.7"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="275.11" x2="416.4079" y1="826.7" y2="826.7"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="112.7656"
+                  x="280.11" y="843.6951">sendResetMail()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="131.2979"
+                  x="280.11" y="859.992">sendRegisterMail()
+            </text>
+        </g><!--class MailClientImpl-->
+        <g class="entity" data-entity="MailClientImpl" data-source-line="20" data-uid="ent0007"
+           id="entity_MailClientImpl">
+            <rect fill="#F1F1F1" height="48" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="131.5107"
+                  x="42.41" y="803"/>
+            <ellipse cx="57.41" cy="819" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M60.3788,824.6406 Q59.8006,824.9375 59.16,825.0781 Q58.5194,825.2344 57.8163,825.2344 Q55.3163,825.2344 53.9881,823.5938 Q52.6756,821.9375 52.6756,818.8125 Q52.6756,815.6875 53.9881,814.0313 Q55.3163,812.375 57.8163,812.375 Q58.5194,812.375 59.16,812.5313 Q59.8163,812.6875 60.3788,812.9844 L60.3788,815.7031 Q59.7538,815.125 59.16,814.8594 Q58.5663,814.5781 57.9413,814.5781 Q56.5975,814.5781 55.91,815.6563 Q55.2225,816.7188 55.2225,818.8125 Q55.2225,820.9063 55.91,821.9844 Q56.5975,823.0469 57.9413,823.0469 Q58.5663,823.0469 59.16,822.7813 Q59.7538,822.5 60.3788,821.9219 L60.3788,824.6406 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="99.5107"
+                  x="71.41" y="823.8467">MailClientImpl
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="43.41" x2="172.9207" y1="835" y2="835"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="43.41" x2="172.9207" y1="843" y2="843"/>
+        </g><!--class TokensRepo-->
+        <g class="entity" data-entity="TokensRepo" data-source-line="25" data-uid="ent0010" id="entity_TokensRepo">
+            <rect fill="#F1F1F1" height="178.375" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;"
+                  width="163.5459" x="263.99" y="533.81"/>
+            <ellipse cx="299.5766" cy="549.81" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M295.4985,545.5756 L295.4985,543.4194 L302.8891,543.4194 L302.8891,545.5756 L300.4204,545.5756 L300.4204,553.6538 L302.8891,553.6538 L302.8891,555.81 L295.4985,555.81 L295.4985,553.6538 L297.9672,553.6538 L297.9672,545.5756 L295.4985,545.5756 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing"
+                  textLength="85.7979" x="318.1514" y="554.6567">TokensRepo
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="264.99" x2="426.5359" y1="565.81" y2="565.81"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="264.99" x2="426.5359" y1="573.81" y2="573.81"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="140.2119"
+                  x="269.99" y="590.8051">saveRefreshToken()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="151.5459"
+                  x="269.99" y="607.102">deleteRefreshToken()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="134.0186"
+                  x="269.99" y="623.3989">findRefreshToken()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="126.1436"
+                  x="269.99" y="639.6957">saveResetToken()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="119.9502"
+                  x="269.99" y="655.9926">findResetToken()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="137.4775"
+                  x="269.99" y="672.2895">deleteResetToken()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="111.3574"
+                  x="269.99" y="688.5864">blacklistToken()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="140.7588"
+                  x="269.99" y="704.8832">isTokenBlacklisted()
+            </text>
+        </g><!--class RedisTokenRepo-->
+        <g class="entity" data-entity="RedisTokenRepo" data-source-line="35" data-uid="ent0011"
+           id="entity_RedisTokenRepo">
+            <rect fill="#F1F1F1" height="48" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="148.915"
+                  x="33.71" y="599"/>
+            <ellipse cx="48.71" cy="615" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M51.6788,620.6406 Q51.1006,620.9375 50.46,621.0781 Q49.8194,621.2344 49.1163,621.2344 Q46.6163,621.2344 45.2881,619.5938 Q43.9756,617.9375 43.9756,614.8125 Q43.9756,611.6875 45.2881,610.0313 Q46.6163,608.375 49.1163,608.375 Q49.8194,608.375 50.46,608.5313 Q51.1163,608.6875 51.6788,608.9844 L51.6788,611.7031 Q51.0538,611.125 50.46,610.8594 Q49.8663,610.5781 49.2413,610.5781 Q47.8975,610.5781 47.21,611.6563 Q46.5225,612.7188 46.5225,614.8125 Q46.5225,616.9063 47.21,617.9844 Q47.8975,619.0469 49.2413,619.0469 Q49.8663,619.0469 50.46,618.7813 Q51.0538,618.5 51.6788,617.9219 L51.6788,620.6406 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="116.915"
+                  x="62.71" y="619.8467">RedisTokenRepo
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="34.71" x2="181.625" y1="631" y2="631"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="34.71" x2="181.625" y1="639" y2="639"/>
+        </g><!--class AccountRepository-->
+        <g class="entity" data-entity="AccountRepository" data-source-line="38" data-uid="ent0013"
+           id="entity_AccountRepository">
+            <rect fill="#F1F1F1" height="113.1875" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;"
+                  width="163.8447" x="263.84" y="385.41"/>
+            <ellipse cx="278.84" cy="401.41" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M274.7619,397.1756 L274.7619,395.0194 L282.1525,395.0194 L282.1525,397.1756 L279.6838,397.1756 L279.6838,405.2537 L282.1525,405.2537 L282.1525,407.41 L274.7619,407.41 L274.7619,405.2537 L277.2306,405.2537 L277.2306,397.1756 L274.7619,397.1756 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing"
+                  textLength="131.8447" x="292.84" y="406.2567">AccountRepository
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="264.84" x2="426.6847" y1="417.41" y2="417.41"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="264.84" x2="426.6847" y1="425.41" y2="425.41"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="68.4072"
+                  x="269.84" y="442.4051">findById()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="55.6719"
+                  x="269.84" y="458.702">create()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="60.252"
+                  x="269.84" y="474.9989">update()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="55.0293"
+                  x="269.84" y="491.2957">delete()
+            </text>
+        </g><!--class MongoAccountRepo-->
+        <g class="entity" data-entity="MongoAccountRepo" data-source-line="44" data-uid="ent0014"
+           id="entity_MongoAccountRepo">
+            <rect fill="#F1F1F1" height="48" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="171.5352"
+                  x="22.4" y="418"/>
+            <ellipse cx="37.4" cy="434" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M40.3688,439.6406 Q39.7906,439.9375 39.15,440.0781 Q38.5094,440.2344 37.8063,440.2344 Q35.3063,440.2344 33.9781,438.5938 Q32.6656,436.9375 32.6656,433.8125 Q32.6656,430.6875 33.9781,429.0313 Q35.3063,427.375 37.8063,427.375 Q38.5094,427.375 39.15,427.5313 Q39.8063,427.6875 40.3688,427.9844 L40.3688,430.7031 Q39.7438,430.125 39.15,429.8594 Q38.5563,429.5781 37.9313,429.5781 Q36.5875,429.5781 35.9,430.6563 Q35.2125,431.7188 35.2125,433.8125 Q35.2125,435.9063 35.9,436.9844 Q36.5875,438.0469 37.9313,438.0469 Q38.5563,438.0469 39.15,437.7813 Q39.7438,437.5 40.3688,436.9219 L40.3688,439.6406 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="139.5352"
+                  x="51.4" y="438.8467">MongoAccountRepo
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="23.4" x2="192.9352" y1="450" y2="450"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="23.4" x2="192.9352" y1="458" y2="458"/>
+        </g><!--class TokenGenerator-->
+        <g class="entity" data-entity="TokenGenerator" data-source-line="49" data-uid="ent0017"
+           id="entity_TokenGenerator">
+            <rect fill="#F1F1F1" height="145.7813" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;"
+                  width="182.8643" x="254.33" y="164.11"/>
+            <ellipse cx="286.0068" cy="180.11" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M281.9287,175.8756 L281.9287,173.7194 L289.3193,173.7194 L289.3193,175.8756 L286.8506,175.8756 L286.8506,183.9538 L289.3193,183.9538 L289.3193,186.11 L281.9287,186.11 L281.9287,183.9538 L284.3974,183.9538 L284.3974,175.8756 L281.9287,175.8756 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing"
+                  textLength="113.8047" x="303.7128" y="184.9567">TokenGenerator
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="255.33" x2="436.1943" y1="196.11" y2="196.11"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="255.33" x2="436.1943" y1="204.11" y2="204.11"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="165.2314"
+                  x="260.33" y="221.1051">generateAccessToken()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="170.8643"
+                  x="260.33" y="237.402">generateRefreshToken()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="156.7959"
+                  x="260.33" y="253.6989">generateResetToken()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="141.5654"
+                  x="260.33" y="269.9957">verifyAccessToken()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="147.1982"
+                  x="260.33" y="286.2926">verifyRefreshToken()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="133.1299"
+                  x="260.33" y="302.5895">verifyResetToken()
+            </text>
+        </g><!--class JWTTokenGenerator-->
+        <g class="entity" data-entity="JWTTokenGenerator" data-source-line="57" data-uid="ent0018"
+           id="entity_JWTTokenGenerator">
+            <rect fill="#F1F1F1" height="48" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="172.3281"
+                  x="22" y="213"/>
+            <ellipse cx="37" cy="229" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M39.9688,234.6406 Q39.3906,234.9375 38.75,235.0781 Q38.1094,235.2344 37.4063,235.2344 Q34.9063,235.2344 33.5781,233.5938 Q32.2656,231.9375 32.2656,228.8125 Q32.2656,225.6875 33.5781,224.0313 Q34.9063,222.375 37.4063,222.375 Q38.1094,222.375 38.75,222.5313 Q39.4063,222.6875 39.9688,222.9844 L39.9688,225.7031 Q39.3438,225.125 38.75,224.8594 Q38.1563,224.5781 37.5313,224.5781 Q36.1875,224.5781 35.5,225.6563 Q34.8125,226.7188 34.8125,228.8125 Q34.8125,230.9063 35.5,231.9844 Q36.1875,233.0469 37.5313,233.0469 Q38.1563,233.0469 38.75,232.7813 Q39.3438,232.5 39.9688,231.9219 L39.9688,234.6406 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="140.3281"
+                  x="51" y="233.8467">JWTTokenGenerator
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="23" x2="193.3281" y1="245" y2="245"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="23" x2="193.3281" y1="253" y2="253"/>
+        </g><!--class AuthController-->
+        <g class="entity" data-entity="AuthController" data-source-line="62" data-uid="ent0021"
+           id="entity_AuthController">
+            <rect fill="#F1F1F1" height="48" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="133.9854"
+                  x="41.17" y="41"/>
+            <ellipse cx="56.17" cy="57" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M59.1388,62.6406 Q58.5606,62.9375 57.92,63.0781 Q57.2794,63.2344 56.5763,63.2344 Q54.0763,63.2344 52.7481,61.5938 Q51.4356,59.9375 51.4356,56.8125 Q51.4356,53.6875 52.7481,52.0313 Q54.0763,50.375 56.5763,50.375 Q57.2794,50.375 57.92,50.5313 Q58.5763,50.6875 59.1388,50.9844 L59.1388,53.7031 Q58.5138,53.125 57.92,52.8594 Q57.3263,52.5781 56.7013,52.5781 Q55.3575,52.5781 54.67,53.6563 Q53.9825,54.7188 53.9825,56.8125 Q53.9825,58.9063 54.67,59.9844 Q55.3575,61.0469 56.7013,61.0469 Q57.3263,61.0469 57.92,60.7813 Q58.5138,60.5 59.1388,59.9219 L59.1388,62.6406 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="101.9854"
+                  x="70.17" y="61.8467">AuthController
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="42.17" x2="174.1554" y1="73" y2="73"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="42.17" x2="174.1554" y1="81" y2="81"/>
+        </g><!--link AuthServiceImpl to AuthService-->
+        <g class="link" data-entity-1="AuthServiceImpl" data-entity-2="AuthService" data-source-line="14"
+           data-uid="lnk5" id="link_AuthServiceImpl_AuthService">
+            <path codeLine="14" d="M182.09,991 C213.31,991 231.47,991 261.76,991" fill="none"
+                  id="AuthServiceImpl-to-AuthService" style="stroke:#181818;stroke-width:1;"/>
+            <polygon fill="none" points="279.76,991,261.76,985,261.76,997,279.76,991"
+                     style="stroke:#181818;stroke-width:1;"/>
+        </g><!--link MailClientImpl to MailClient-->
+        <g class="link" data-entity-1="MailClientImpl" data-entity-2="MailClient" data-source-line="21" data-uid="lnk8"
+           id="link_MailClientImpl_MailClient">
+            <path codeLine="21" d="M174.17,827 C205.08,827 224.12,827 255.77,827" fill="none"
+                  id="MailClientImpl-to-MailClient" style="stroke:#181818;stroke-width:1;"/>
+            <polygon fill="none" points="273.77,827,255.77,821,255.77,833,273.77,827"
+                     style="stroke:#181818;stroke-width:1;"/>
+        </g><!--link RedisTokenRepo to TokensRepo-->
+        <g class="link" data-entity-1="RedisTokenRepo" data-entity-2="TokensRepo" data-source-line="36" data-uid="lnk12"
+           id="link_RedisTokenRepo_TokensRepo">
+            <path codeLine="36" d="M183.06,623 C208.7,623 219.58,623 245.76,623" fill="none"
+                  id="RedisTokenRepo-to-TokensRepo" style="stroke:#181818;stroke-width:1;"/>
+            <polygon fill="none" points="263.76,623,245.76,617,245.76,629,263.76,623"
+                     style="stroke:#181818;stroke-width:1;"/>
+        </g><!--link MongoAccountRepo to AccountRepository-->
+        <g class="link" data-entity-1="MongoAccountRepo" data-entity-2="AccountRepository" data-source-line="45"
+           data-uid="lnk15" id="link_MongoAccountRepo_AccountRepository">
+            <path codeLine="45" d="M194.22,442 C216.76,442 223.03,442 245.37,442" fill="none"
+                  id="MongoAccountRepo-to-AccountRepository" style="stroke:#181818;stroke-width:1;"/>
+            <polygon fill="none" points="263.37,442,245.37,436,245.37,448,263.37,442"
+                     style="stroke:#181818;stroke-width:1;"/>
+        </g><!--link JWTTokenGenerator to TokenGenerator-->
+        <g class="link" data-entity-1="JWTTokenGenerator" data-entity-2="TokenGenerator" data-source-line="58"
+           data-uid="lnk19" id="link_JWTTokenGenerator_TokenGenerator">
+            <path codeLine="58" d="M194.55,237 C213.91,237 216.53,237 236.1,237" fill="none"
+                  id="JWTTokenGenerator-to-TokenGenerator" style="stroke:#181818;stroke-width:1;"/>
+            <polygon fill="none" points="254.1,237,236.1,231,236.1,243,254.1,237"
+                     style="stroke:#181818;stroke-width:1;"/>
+        </g><!--SRC=[RLF1JiCm3BttAwATuC0l86q88P2GK47Y71AtivR5bPCD9jY_apRfqgOxJAhVyzpdzrm3ZHUU16ExzK8ZW_98jkgasiaMnCe17r61MudVIWYq7hYH2iJwuBVlaHiO8HXQT86-kHrAGotQ_4m7dmg6Xi5jFsW78t-K1hNqCCKQufRyctJkcrXV_kkWnBRIFVvqoB8NFc3dy5CcT4rLFkyx4_024NTtV_TJi9fj-IhHF1W4wzEI3gokUn4zamH4B2v_WRE6F2D9c0DHGSQgSvNTP-Z8eIV6PGA3MQuE7QCsUOHwQQu60_uQqM2lUm77CM75PMy1ZfCB-Ci4-IROCGNH3TLcv40NDjMWKq-_Ke3dGBGfxppFQQqK7QolHxjEoP9UzkRqF9wAOWXNbef3ftCHLocJ8zlIP7IVNG6b-obVFmjHqrwYlHhV4rW8XqkSzBQnXZ0Gd9lwDp9N0ijK4SGH69lJSbR4hqmQYTcSxCVBvyTSTM0Ms2Iet3UrGv7rJCO0fvFEd-h3XQhE_m00]-->
+    </g>
+</svg>

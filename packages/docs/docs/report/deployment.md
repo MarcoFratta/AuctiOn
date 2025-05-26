@@ -1,0 +1,232 @@
+# Deployment Instructions
+
+## Prerequisites
+
+- Node.js v18+
+- npm v8+
+- Docker & Docker Compose v2+
+- Git
+
+## Deployment Steps
+
+### 1. Clone Repository
+
+```bash
+git clone https://github.com/MarcoFratta/AuctiOn.git
+cd AuctiOn
+```
+
+### 2. Environment Configuration
+
+Create a `.env` file by renaming the provided template:
+
+```bash
+# Rename the template to .env file
+cp env.tempalte .env
+
+# Edit the .env file with your own values
+nano .env  # or use any text editor
+```
+
+For more details on configuring the environment variables,
+see the [Environment Configuration Details](#environment-configuration-details) section below.
+
+### 3. Run
+
+Start all services using Docker:
+
+```bash
+npm start
+```
+
+### 4. Accessing the Application
+
+- Frontend: http://localhost:8080
+- API Gateway: http://localhost:80/api
+
+### 5. Stopping the Application
+
+To stop the application, you can use:
+
+```bash
+npm stop
+```
+
+## Local Development
+
+The first step is to install the necessary dependencies for the project.
+
+```bash
+npm install
+```
+
+> Be sure to run this command in the root directory of the cloned repository.
+> This will install all necessary dependencies for the project.
+
+For local development without Docker, you can run each service individually.
+Start each service in development mode from its respective package directory:
+
+```bash
+npm run dev -w auth-service
+```
+
+When running services individually, make sure that the
+necessary services are running and accessible. For example, the `auth-service`
+uses **Redis** so make sure to start a `Redis server `before running the service:
+
+```bash
+docker run -p 6379:6379 redis
+```
+
+> Make sure to expose the ports. By default, the docker-compose file only exposes the frontend ports
+
+### Code Quality Tools
+
+The project is configured with ESLint and Prettier for code quality and formatting.
+To ensure your code follows the project's style guidelines:
+
+```bash
+# Run ESLint to check for code issues
+npm run lint
+
+# Format code using Prettier
+npm run prettier
+```
+
+#### Husky
+
+The project uses Husky to automatically run linting and formatting checks before commits.
+This ensures that all code committed to the repository meets quality standards.
+
+To set up Husky after cloning the repository:
+
+```bash
+# Initialize Husky
+npm run init
+```
+
+Husky will then:
+
+- Run ESLint before commits to catch potential issues
+- Run Prettier to ensure consistent code formatting
+- Validate commit messages according to conventional commit standards
+
+If a commit fails the quality checks, you'll need to fix the issues before you can commit your changes.
+
+### Building Documentation
+
+To build the openapi documentation for the API, you can use the following command:
+
+```bash
+npm run docs
+```
+
+To build and preview the `vitepress` documentation (including this deployment guide):
+
+```bash
+# Build the documentation
+npm run docs:build -w docs
+# Preview the documentation
+npm run docs:preview -w docs
+```
+
+Documentation will be available at http://localhost:5173.
+> Check the output of the command for the exact URL, as it may vary.
+
+### Testing
+
+The project includes comprehensive test suites for each service. You can run tests for individual services or run all
+tests at once.
+
+#### Running All Tests
+
+To run all tests across the project:
+
+```bash
+npm test
+```
+
+This will execute tests for all services in parallel and display the results.
+
+#### Testing Individual Services
+
+To test a specific service:
+
+```bash
+# Test the authentication service
+npm run test:auth-service
+
+# Test the user service
+npm run test:user-service
+
+# Test the lobby service
+npm run test:lobby-service
+
+# Test the auction service
+npm run test:auction-service
+
+# Test the API gateway
+npm run test:api-gateway
+```
+
+#### E2E Tests
+
+The project also includes end-to-end tests that verify the system as a whole:
+
+```bash
+npm run test:e2e
+```
+
+> Note: Integration tests require Docker to be running as they use containers to set up a test environment.
+
+## Continuous Integration and Deployment
+
+The project includes CI/CD configuration for automatically publishing documentation:
+
+### GitLab CI/CD
+
+The `.gitlab-ci.yml` file is configured to automatically build and deploy the VitePress
+documentation to GitLab Pages when changes are pushed to the main branch.
+The documentation will be available at `https://<your-gitlab-username>.gitlab.io/<repository-name>/`.
+
+### GitHub Actions
+
+For GitHub repositories, a GitHub Actions workflow (`.github/workflows/docs.yml`) is configured
+to build and deploy the VitePress documentation to GitHub Pages.
+The documentation will be available at `https://<your-github-username>.github.io/<repository-name>/`.
+
+To enable GitHub Pages:
+
+1. Go to your repository settings
+2. Navigate to "Pages"
+3. Select "GitHub Actions" as the source
+4. The workflow will automatically deploy your documentation when changes are pushed to the main branch
+
+## Environment Configuration Details
+
+### Email Server Configuration
+
+The authentication service requires email configuration for sending verification emails
+and password reset links. An easy way to set this up is by using a _Gmail_ account:
+
+1. Set `AUTH_S_EMAIL_USER` to your Gmail address (e.g., `your.email@gmail.com`)
+2. Set `AUTH_S_EMAIL_PASS` to an App Password generated for your Gmail account
+   > You can create an App Password by following Google's
+   instructions [here](https://support.google.com/accounts/answer/185833?hl=en)
+
+3. Set `AUTH_S_APP_BASE_URL` to the URL where your frontend application is accessible
+    - For local development: `http://localhost:5173`
+    - For Docker deployment: `http://localhost:8080`
+
+### JWT Secret Keys
+
+For security, you should set strong, unique secret keys:
+
+- `AUTH_S_ACCESS_SECRET`: Used to sign JWT access tokens
+- `AUTH_S_REFRESH_SECRET`: Used to sign JWT refresh tokens
+
+### Service URIs
+
+The default configuration assumes you're running with Docker Compose.
+If you're running services individually during development,
+you'll need to update the service URIs to use `localhost` with the appropriate ports. 

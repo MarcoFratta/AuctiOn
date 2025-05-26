@@ -1,0 +1,147 @@
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" contentStyleType="text/css"
+     data-diagram-type="CLASS" height="317px" preserveAspectRatio="none"
+     style="width:647px;height:317px;background:#FFFFFF;" version="1.1" viewBox="0 0 647 317" width="647px"
+     zoomAndPan="magnify">
+    <defs/>
+    <g><!--cluster services-->
+        <g class="cluster" data-entity="services" data-source-line="1" data-uid="ent0002" id="cluster_services">
+            <path d="M8.5,6 L74.2842,6 A3.75,3.75 0 0 1 76.7842,8.5 L83.7842,28.2969 L181.5,28.2969 A2.5,2.5 0 0 1 184,30.7969 L184,308.28 A2.5,2.5 0 0 1 181.5,310.78 L8.5,310.78 A2.5,2.5 0 0 1 6,308.28 L6,8.5 A2.5,2.5 0 0 1 8.5,6"
+                  fill="none" style="stroke:#000000;stroke-width:1.5;"/>
+            <line style="stroke:#000000;stroke-width:1.5;" x1="6" x2="83.7842" y1="28.2969" y2="28.2969"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing"
+                  textLength="64.7842" x="10" y="20.9951">services
+            </text>
+        </g><!--cluster repositories-->
+        <g class="cluster" data-entity="repositories" data-source-line="14" data-uid="ent0006"
+           id="cluster_repositories">
+            <path d="M210.5,6 L306.5127,6 A3.75,3.75 0 0 1 309.0127,8.5 L316.0127,28.2969 L447.5,28.2969 A2.5,2.5 0 0 1 450,30.7969 L450,308.28 A2.5,2.5 0 0 1 447.5,310.78 L210.5,310.78 A2.5,2.5 0 0 1 208,308.28 L208,8.5 A2.5,2.5 0 0 1 210.5,6"
+                  fill="none" style="stroke:#000000;stroke-width:1.5;"/>
+            <line style="stroke:#000000;stroke-width:1.5;" x1="208" x2="316.0127" y1="28.2969" y2="28.2969"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing"
+                  textLength="95.0127" x="212" y="20.9951">repositories
+            </text>
+        </g><!--cluster controllers-->
+        <g class="cluster" data-entity="controllers" data-source-line="27" data-uid="ent0010" id="cluster_controllers">
+            <path d="M476.5,6 L562.9287,6 A3.75,3.75 0 0 1 565.4287,8.5 L572.4287,28.2969 L637.5,28.2969 A2.5,2.5 0 0 1 640,30.7969 L640,102.5 A2.5,2.5 0 0 1 637.5,105 L476.5,105 A2.5,2.5 0 0 1 474,102.5 L474,8.5 A2.5,2.5 0 0 1 476.5,6"
+                  fill="none" style="stroke:#000000;stroke-width:1.5;"/>
+            <line style="stroke:#000000;stroke-width:1.5;" x1="474" x2="572.4287" y1="28.2969" y2="28.2969"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing"
+                  textLength="85.4287" x="478" y="20.9951">controllers
+            </text>
+        </g><!--class UserService-->
+        <g class="entity" data-entity="UserService" data-source-line="2" data-uid="ent0003" id="entity_UserService">
+            <rect fill="#F1F1F1" height="145.7813" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;"
+                  width="134.5547" x="27.72" y="149"/>
+            <ellipse cx="51.2265" cy="165" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M47.1484,160.7656 L47.1484,158.6094 L54.539,158.6094 L54.539,160.7656 L52.0702,160.7656 L52.0702,168.8437 L54.539,168.8437 L54.539,171 L47.1484,171 L47.1484,168.8437 L49.6171,168.8437 L49.6171,160.7656 L47.1484,160.7656 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing"
+                  textLength="83.6514" x="67.1168" y="169.8467">UserService
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="28.72" x2="161.2747" y1="181" y2="181"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="28.72" x2="161.2747" y1="189" y2="189"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="73.1172"
+                  x="33.72" y="205.9951">getUsers()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="96.7285"
+                  x="33.72" y="222.292">getUserById()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="87.582"
+                  x="33.72" y="238.5889">createUser()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="92.1621"
+                  x="33.72" y="254.8857">updateUser()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="86.9395"
+                  x="33.72" y="271.1826">deleteUser()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="122.5547"
+                  x="33.72" y="287.4795">getUserByEmail()
+            </text>
+        </g><!--class UserServiceImpl-->
+        <g class="entity" data-entity="UserServiceImpl" data-source-line="10" data-uid="ent0004"
+           id="entity_UserServiceImpl">
+            <rect fill="#F1F1F1" height="48" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="146.1943"
+                  x="21.9" y="41"/>
+            <ellipse cx="36.9" cy="57" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M39.8688,62.6406 Q39.2906,62.9375 38.65,63.0781 Q38.0094,63.2344 37.3063,63.2344 Q34.8063,63.2344 33.4781,61.5938 Q32.1656,59.9375 32.1656,56.8125 Q32.1656,53.6875 33.4781,52.0313 Q34.8063,50.375 37.3063,50.375 Q38.0094,50.375 38.65,50.5313 Q39.3063,50.6875 39.8688,50.9844 L39.8688,53.7031 Q39.2438,53.125 38.65,52.8594 Q38.0563,52.5781 37.4313,52.5781 Q36.0875,52.5781 35.4,53.6563 Q34.7125,54.7188 34.7125,56.8125 Q34.7125,58.9063 35.4,59.9844 Q36.0875,61.0469 37.4313,61.0469 Q38.0563,61.0469 38.65,60.7813 Q39.2438,60.5 39.8688,59.9219 L39.8688,62.6406 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="114.1943"
+                  x="50.9" y="61.8467">UserServiceImpl
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="22.9" x2="167.0943" y1="73" y2="73"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="22.9" x2="167.0943" y1="81" y2="81"/>
+        </g><!--class UserRepository-->
+        <g class="entity" data-entity="UserRepository" data-source-line="15" data-uid="ent0007"
+           id="entity_UserRepository">
+            <rect fill="#F1F1F1" height="145.7813" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;"
+                  width="138.9824" x="259.51" y="149"/>
+            <ellipse cx="274.51" cy="165" fill="#B4A7E5" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M270.4319,160.7656 L270.4319,158.6094 L277.8225,158.6094 L277.8225,160.7656 L275.3538,160.7656 L275.3538,168.8437 L277.8225,168.8437 L277.8225,171 L270.4319,171 L270.4319,168.8437 L272.9006,168.8437 L272.9006,160.7656 L270.4319,160.7656 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" font-style="italic" lengthAdjust="spacing"
+                  textLength="106.9824" x="288.51" y="169.8467">UserRepository
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="260.51" x2="397.4924" y1="181" y2="181"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="260.51" x2="397.4924" y1="189" y2="189"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="54.8584"
+                  x="265.51" y="205.9951">findAll()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="68.4072"
+                  x="265.51" y="222.292">findById()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="55.6719"
+                  x="265.51" y="238.5889">create()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="60.252"
+                  x="265.51" y="254.8857">update()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="55.0293"
+                  x="265.51" y="271.1826">delete()
+            </text>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="94.2334"
+                  x="265.51" y="287.4795">findByEmail()
+            </text>
+        </g><!--class MongooseUserRepository-->
+        <g class="entity" data-entity="MongooseUserRepository" data-source-line="23" data-uid="ent0008"
+           id="entity_MongooseUserRepository">
+            <rect fill="#F1F1F1" height="48" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="210.4248"
+                  x="223.79" y="41"/>
+            <ellipse cx="238.79" cy="57" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M241.7588,62.6406 Q241.1806,62.9375 240.54,63.0781 Q239.8994,63.2344 239.1963,63.2344 Q236.6963,63.2344 235.3681,61.5938 Q234.0556,59.9375 234.0556,56.8125 Q234.0556,53.6875 235.3681,52.0313 Q236.6963,50.375 239.1963,50.375 Q239.8994,50.375 240.54,50.5313 Q241.1963,50.6875 241.7588,50.9844 L241.7588,53.7031 Q241.1338,53.125 240.54,52.8594 Q239.9463,52.5781 239.3213,52.5781 Q237.9775,52.5781 237.29,53.6563 Q236.6025,54.7188 236.6025,56.8125 Q236.6025,58.9063 237.29,59.9844 Q237.9775,61.0469 239.3213,61.0469 Q239.9463,61.0469 240.54,60.7813 Q241.1338,60.5 241.7588,59.9219 L241.7588,62.6406 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="178.4248"
+                  x="252.79" y="61.8467">MongooseUserRepository
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="224.79" x2="433.2148" y1="73" y2="73"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="224.79" x2="433.2148" y1="81" y2="81"/>
+        </g><!--class UserController-->
+        <g class="entity" data-entity="UserController" data-source-line="28" data-uid="ent0011"
+           id="entity_UserController">
+            <rect fill="#F1F1F1" height="48" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="133.083"
+                  x="490.46" y="41"/>
+            <ellipse cx="505.46" cy="57" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1;"/>
+            <path d="M508.4288,62.6406 Q507.8506,62.9375 507.21,63.0781 Q506.5694,63.2344 505.8663,63.2344 Q503.3663,63.2344 502.0381,61.5938 Q500.7256,59.9375 500.7256,56.8125 Q500.7256,53.6875 502.0381,52.0313 Q503.3663,50.375 505.8663,50.375 Q506.5694,50.375 507.21,50.5313 Q507.8663,50.6875 508.4288,50.9844 L508.4288,53.7031 Q507.8038,53.125 507.21,52.8594 Q506.6163,52.5781 505.9913,52.5781 Q504.6475,52.5781 503.96,53.6563 Q503.2725,54.7188 503.2725,56.8125 Q503.2725,58.9063 503.96,59.9844 Q504.6475,61.0469 505.9913,61.0469 Q506.6163,61.0469 507.21,60.7813 Q507.8038,60.5 508.4288,59.9219 L508.4288,62.6406 Z "
+                  fill="#000000"/>
+            <text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="101.083"
+                  x="519.46" y="61.8467">UserController
+            </text>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="491.46" x2="622.543" y1="73" y2="73"/>
+            <line style="stroke:#181818;stroke-width:0.5;" x1="491.46" x2="622.543" y1="81" y2="81"/>
+        </g><!--link UserServiceImpl to UserService-->
+        <g class="link" data-entity-1="UserServiceImpl" data-entity-2="UserService" data-source-line="11"
+           data-uid="lnk5" id="link_UserServiceImpl_UserService">
+            <path codeLine="11" d="M95,89.19 C95,105.14 95,109.26 95,130.82" fill="none"
+                  id="UserServiceImpl-to-UserService" style="stroke:#181818;stroke-width:1;"/>
+            <polygon fill="none" points="95,148.82,101,130.82,89,130.82,95,148.82"
+                     style="stroke:#181818;stroke-width:1;"/>
+        </g><!--link MongooseUserRepository to UserRepository-->
+        <g class="link" data-entity-1="MongooseUserRepository" data-entity-2="UserRepository" data-source-line="24"
+           data-uid="lnk9" id="link_MongooseUserRepository_UserRepository">
+            <path codeLine="24" d="M329,89.19 C329,105.14 329,109.26 329,130.82" fill="none"
+                  id="MongooseUserRepository-to-UserRepository" style="stroke:#181818;stroke-width:1;"/>
+            <polygon fill="none" points="329,148.82,335,130.82,323,130.82,329,148.82"
+                     style="stroke:#181818;stroke-width:1;"/>
+        </g><!--SRC=[RP6n3i8W48PtdkBYf4DVmKIDGmSNZGz0uDeGAH10aqRxxjAMjg0T6ExxWRiF36KFMYDi7DgNOEWsy2O0Gdcq5MK8zn3Sncn806hqFNJRNLeUsv97mYnIZpsCu6bu3ZXApC1yoRcXGWwm2uj9wbmwGjaO6VWFWQBux5D8EaBCP6RHQ2UyjcBTxZhbRHIiXE87AUDeVVKdbubbKjcfDPkBLhNM3lFM8LuF5hTaSwh7jF9MInb-PBHR7kqqHwJx0W00]-->
+    </g>
+</svg>
