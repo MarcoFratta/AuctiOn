@@ -6,7 +6,7 @@ module.exports = {
       'auth-service',
       'api-gateway',
       'lobby-service',
-      'integration-tests',
+      'e2e-tests',
       'auction-service',
       'frontend',
       'docs',

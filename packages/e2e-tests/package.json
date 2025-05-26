@@ -1,5 +1,5 @@
 {
-  "name": "integration-tests",
+  "name": "e2e-tests",
   "scripts": {
     "test": "./scripts/run-tests.sh"
   },
