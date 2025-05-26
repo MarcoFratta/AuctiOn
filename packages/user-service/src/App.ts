@@ -1,6 +1,6 @@
 import express, { Application } from 'express'
 import { createUserRouter } from './routes/UserRoutes'
-import { UserService } from './services/UserService'
+import { UserService, UserServiceImpl } from './services/UserService'
 import { UserController } from './controllers/UserController'
 import { MongooseUserRepository } from './repositories/MongoUserRepo'
 import { reverseUserConverter, userConverter } from './utils/Converters'
@@ -17,7 +17,7 @@ export class App {
   constructor() {
     this.app = express()
     const repository = new MongooseUserRepository(userConverter, reverseUserConverter)
-    this.service = new UserService(repository)
+    this.service = new UserServiceImpl(repository)
     this.controller = new UserController(this.service)
 
     this.setupMiddlewares()

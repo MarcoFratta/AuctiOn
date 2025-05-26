@@ -1,7 +1,7 @@
-import {UserService} from "../src/services/UserService";
-import {User} from "../src/schemas/User";
-import {MockUserRepository} from "./MockUserRepository";
-import {DeleteUserError, UpdateUserError} from "../src/errors/UserErrors";
+import { UserService, UserServiceImpl } from '../src/services/UserService'
+import { User } from '../src/schemas/User'
+import { MockUserRepository } from './MockUserRepository'
+import { DeleteUserError, UpdateUserError } from '../src/errors/UserErrors'
 
 describe("UserService with Mock Repository", () => {
     let userService: UserService;
@@ -10,7 +10,7 @@ describe("UserService with Mock Repository", () => {
     beforeEach(() => {
         // Initialize the mock repository and inject it into the service
         mockRepository = new MockUserRepository();
-        userService = new UserService(mockRepository);
+      userService = new UserServiceImpl(mockRepository)
     });
 
     describe("getUsers", () => {

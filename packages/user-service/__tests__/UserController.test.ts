@@ -1,8 +1,8 @@
-import express from 'express';
-import request from 'supertest';
-import {UserController} from '../src/controllers/UserController';
-import {UserService} from '../src/services/UserService';
-import {User} from '../src/schemas/User';
+import express from 'express'
+import request from 'supertest'
+import { UserController } from '../src/controllers/UserController'
+import { UserService, UserServiceImpl } from '../src/services/UserService'
+import { User } from '../src/schemas/User'
 
 jest.mock('../src/services/UserService');
 
@@ -12,7 +12,7 @@ describe('UserController', () => {
     let controller: UserController;
 
     beforeEach(() => {
-        mockService = new UserService({} as any) as jest.Mocked<UserService>;
+      mockService = new UserServiceImpl({} as any) as jest.Mocked<UserServiceImpl>
 
         // Mocking the methods on the mockService
         mockService.getUsers = jest.fn();

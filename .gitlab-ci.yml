@@ -1,337 +1,43 @@
 image: node:18
 
 stages:
-  - install
   - build
-  - test
-# - deploy # Add deployment stages later if needed
+  - deploy
 
 # Cache node_modules to speed up subsequent runs
 cache:
   key:
     files:
-      - package-lock.json # Or yarn.lock / pnpm-lock.yaml
+      - package-lock.json
   paths:
     - node_modules/
-  policy: pull-push # Pull cache at start, push at end if job succeeds
+    - packages/docs/node_modules/
+  policy: pull-push
 
-# --- Global Scripts ---
-
-# Install dependencies once before any jobs run in the 'install' stage
-install_dependencies:
-  stage: install
-  script:
-    - echo "Installing dependencies..."
-    # Use 'npm ci' for faster, reliable installs based on lock file
-    - npm ci --ignore-scripts # Ignore scripts here, run them in specific build/test jobs if needed
-
-# --- Building ---
-# Build common first as other packages depend on it
-build:common:
+# Build the VitePress documentation
+build_docs:
   stage: build
-  # Add a check for node_modules in case cache is missed
-  before_script:
-    - |
-      if [ ! -d "node_modules" ]; then
-        echo "Cache miss or first run. Running npm ci..."
-        npm ci --ignore-scripts
-      else
-        echo "Cache hit. Skipping npm ci."
-      fi
   script:
-    - echo "Building common package..."
-    # Assuming root package.json has "build:common": "npm run build -w common"
-    - npm run build:common
+    - npm ci
+    - cd packages/docs
+    - npm run docs:build
   artifacts:
     paths:
-      - packages/common/dist
-    expire_in: 1 week
-
-# Build other packages, depending on common
-.build_service_template: &build_service_job
-  stage: build
-  # Needs the built common package artifacts. Implicitly depends on 'install' stage completion.
-  needs:
-    - job: build:common
-      artifacts: true
-  # Add a check for node_modules in case cache is missed
-  before_script:
-    - |
-      if [ ! -d "node_modules" ]; then
-        echo "Cache miss or first run. Running npm ci..."
-        npm ci --ignore-scripts
-      else
-        echo "Cache hit. Skipping npm ci."
-      fi
-  script:
-    - echo "Building $PACKAGE_NAME..."
-    # Assumes root package.json has "build:<package_name>": "npm run build -w <package_name>"
-    - npm run build:$PACKAGE_NAME
-  artifacts:
-    paths:
-      - packages/$PACKAGE_NAME/dist
-    expire_in: 1 week
-  # --- Add rules with only changes ---
-  rules:
-    - changes:
-        - package-lock.json
-        - packages/common/**/* # Rebuild if common changes
-        - packages/$PACKAGE_NAME/**/* # Rebuild if package itself changes
-  # --- End added rules ---
-
-build:auth-service:
-  <<: *build_service_job
-  variables:
-    PACKAGE_NAME: auth-service
-
-build:lobby-service:
-  <<: *build_service_job
-  variables:
-    PACKAGE_NAME: lobby-service
-
-build:user-service:
-  <<: *build_service_job
-  variables:
-    PACKAGE_NAME: user-service
-
-build:auction-service:
-  <<: *build_service_job
-  variables:
-    PACKAGE_NAME: auction-service
-
-build:api-gateway:
-  <<: *build_service_job
-  variables:
-    PACKAGE_NAME: api-gateway
-
-build:frontend:
-  <<: *build_service_job
-  variables:
-    PACKAGE_NAME: frontend
-  artifacts:
-    paths:
-      # Verify this is the correct output dir for frontend
-      - packages/frontend/dist
-
-build:docs:
-  stage: build
-  # Add a check for node_modules in case cache is missed
-  before_script:
-    - |
-      if [ ! -d "node_modules" ]; then
-        echo "Cache miss or first run. Running npm ci..."
-        npm ci --ignore-scripts
-      else
-        echo "Cache hit. Skipping npm ci."
-      fi
-  script:
-    - echo "Building packages/docs..."
-    - npm run build:docs # Assumes root package.json has "build:docs": "npm run build -w docs"
-  artifacts:
-    paths:
-      # Adjust path based on VitePress output
       - packages/docs/.vitepress/dist
     expire_in: 1 week
-  # --- Add rules with only changes ---
   rules:
-    - changes:
-        - package-lock.json
-        - packages/docs/**/*
-  # --- End added rules ---
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
-# --- Testing ---
-
-# Template for standard Node.js tests
-.test_node_template: &test_node_job
-  stage: test
-  image: node:18
-  # Needs built common. Implicitly depends on 'install' stage.
-  needs:
-    - job: build:common
-      artifacts: true
-  # Add a check for node_modules in case cache is missed
-  before_script:
-    - |
-      if [ ! -d "node_modules" ]; then
-        echo "Cache miss or first run. Running npm ci..."
-        npm ci --ignore-scripts
-      else
-        echo "Cache hit. Skipping npm ci."
-      fi
+# Deploy to GitLab Pages
+pages:
+  stage: deploy
+  dependencies:
+    - build_docs
   script:
-    - npm i
-    - echo "Running tests for $PACKAGE_NAME..."
-    # Assumes root package.json has "test:<package_name>": "npm test -w <package_name>"
-    - npm run test:$PACKAGE_NAME
-  # --- Add rules with only changes ---
+    - mkdir -p public
+    - cp -r packages/docs/.vitepress/dist/* public/
+  artifacts:
+    paths:
+      - public
   rules:
-    - changes:
-        - package-lock.json
-        - packages/common/**/* # Retest if common changes
-        - packages/$PACKAGE_NAME/**/* # Retest if package itself changes
-  # --- End added rules ---
-
-# Template for tests requiring Docker-in-Docker (Testcontainers)
-.test_dind_template: &test_dind_job
-  stage: test
-  image: docker:latest # Use docker image
-  services:
-    - name: docker:dind # Start Docker-in-Docker service
-      alias: docker # Alias it to 'docker' for DOCKER_HOST
-  variables:
-    # Configure Docker client inside the job container to connect to the dind service
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: "" # Disable TLS for dind
-    DOCKER_DRIVER: overlay2
-    # Optional: Increase Testcontainers timeout if startup is slow in CI
-    # TESTCONTAINERS_RYUK_STARTUP_TIMEOUT: 120
-  # Needs built common. Implicitly depends on 'install' stage.
-  needs:
-    - job: build:common
-      artifacts: true
-  before_script:
-    # Install Node.js, npm, git, curl in the docker:latest image
-    - apk add --update nodejs npm git curl
-    # Check for node_modules FIRST (important in dind where npm ci takes time)
-    - |
-      if [ ! -d "node_modules" ]; then
-        echo "Cache miss or first run. Running npm ci..."
-        npm ci --ignore-scripts
-      else
-        echo "Cache hit. Skipping npm ci."
-      fi
-    # Wait for Docker daemon provided by the dind service to be ready
-    - |
-      echo "Waiting for Docker daemon at $DOCKER_HOST..."
-      retry=0
-      max_retries=12 # Wait up to 60 seconds (12 * 5s)
-      until curl --silent --fail "$DOCKER_HOST/_ping" > /dev/null; do
-        retry=$((retry+1))
-        if [ $retry -ge $max_retries ]; then
-          echo "Docker daemon did not start within timeout."
-          exit 1
-        fi
-        echo "Docker not ready, retrying in 5 seconds... ($retry/$max_retries)"
-        sleep 5
-      done
-      echo "Docker daemon is ready."
-    # Verify docker client can connect and works
-    - docker info
-    # --- Debugging ---
-    - echo "Listing root node_modules/ (checking for jest/ts-jest):"
-    - ls -ld ./node_modules/jest ./node_modules/ts-jest || echo "!!! jest/ts-jest not found in ./node_modules !!!"
-    - echo "Listing common package artifacts (packages/common/dist):"
-    - ls -lR ./packages/common/dist || echo "!!! Common dist directory not found or empty !!!"
-    - echo "Listing $PACKAGE_NAME artifacts (packages/$PACKAGE_NAME/dist):"
-    - ls -lR ./packages/$PACKAGE_NAME/dist || echo "!!! $PACKAGE_NAME dist directory not found or empty !!!"
-    # --- End Debugging ---
-  script:
-    - echo "Running tests for $PACKAGE_NAME..."
-    # Assumes root package.json has "test:<package_name>": "npm test -w <package_name>"
-    - npm run test:$PACKAGE_NAME
-  # --- Add rules with only changes ---
-  rules:
-    - changes:
-        - package-lock.json
-        - packages/common/**/* # Retest if common changes
-        - packages/$PACKAGE_NAME/**/* # Retest if package itself changes
-  # --- End added rules ---
-
-# --- Specific Test Jobs ---
-
-test:auth-service:
-  <<: *test_node_job
-  variables:
-    PACKAGE_NAME: auth-service
-
-test:user-service:
-  <<: *test_node_job
-  variables:
-    PACKAGE_NAME: user-service
-
-test:api-gateway:
-  <<: *test_node_job
-  variables:
-    PACKAGE_NAME: api-gateway
-
-test:lobby-service:
-  <<: *test_dind_job
-  variables:
-    PACKAGE_NAME: lobby-service
-
-test:auction-service:
-  <<: *test_dind_job
-  variables:
-    PACKAGE_NAME: auction-service
-
-# Job for Integration (E2E) tests
-test:integration-tests:
-  stage: test
-  image: docker:latest
-  services:
-    - name: docker:dind
-      alias: docker
-  variables:
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: ""
-    DOCKER_DRIVER: overlay2
-    PACKAGE_NAME: integration-tests # Used for logging/rules
-  # Needs ALL the built backend services + common. Implicitly depends on 'install' stage.
-  needs:
-    - job: build:common
-      artifacts: true
-    # - job: build:frontend
-    #   artifacts: true
-  before_script:
-    # Install Node.js/npm, git, curl in the docker:latest image
-    - apk add --update nodejs npm git curl
-    # Check for node_modules FIRST
-    - |
-      if [ ! -d "node_modules" ]; then
-        echo "Cache miss or first run. Running npm ci..."
-        npm ci --ignore-scripts
-      else
-        echo "Cache hit. Skipping npm ci."
-      fi
-    # Wait for Docker daemon
-    - |
-      echo "Waiting for Docker daemon at $DOCKER_HOST..."
-      retry=0; max_retries=12;
-      until curl --silent --fail "$DOCKER_HOST/_ping" > /dev/null; do
-        retry=$((retry+1)); if [ $retry -ge $max_retries ]; then echo "Docker daemon timeout."; exit 1; fi
-        echo "Docker not ready, retrying in 5s... ($retry/$max_retries)"; sleep 5
-      done; echo "Docker daemon ready."
-    - docker info
-    # --- Debugging ---
-    - echo "Listing files in current directory:"
-    - ls -la
-    - echo "Listing downloaded artifacts:"
-    - ls -lR ./packages/*/dist || echo "No dist folders found"
-    # --- End Debugging ---
-  script:
-    - echo "Running integration tests..."
-    # Assumes root package.json has "test:integration-tests": "npm test -w integration-tests"
-    # OR potentially a script like "./packages/integration-tests/run-tests.sh"
-    - npm run test:integration-tests
-  # --- Add rules with only changes ---
-  rules:
-    - changes: # Run if integration tests OR any backend service/common code changes
-        - package-lock.json
-        - packages/common/**/*
-  # --- End added rules ---
-
-# --- Deployment (Placeholder) ---
-# deploy:production:
-#   stage: deploy
-#   script:
-#     - echo "Deploying to production..."
-#     # Add your deployment commands here
-#   rules:
-#     - if: '$CI_COMMIT_BRANCH == "main"' # Or your default branch name
-#   needs: # Depend on necessary build jobs that need to be deployed
-#     - build:auth-service
-#     - build:api-gateway
-#     - build:frontend
-#   environment:
-#     name: production
-#     url: https://your-production-url.com 
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH 

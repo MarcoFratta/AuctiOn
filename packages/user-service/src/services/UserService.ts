@@ -3,7 +3,21 @@ import { UserRepository } from '../repositories/UserRepository'
 import { UserNotFoundError } from '../errors/UserErrors'
 import logger from '@auction/common/logger'
 
-export class UserService {
+export interface UserService {
+  getUsers(): Promise<User[]>
+
+  getUserById(id: string): Promise<User | null>
+
+  createUser(userData: User): Promise<User>
+
+  updateUser(id: string, updateData: Partial<User>): Promise<User>
+
+  deleteUser(id: string): Promise<void>
+
+  getUserByEmail(email: string): Promise<User>
+}
+
+export class UserServiceImpl implements UserService {
   private userRepository: UserRepository
 
   constructor(userRepository: UserRepository) {
@@ -49,7 +63,7 @@ export class UserService {
     }
   }
 
-  async getUserByEmail(email: string) {
+  async getUserByEmail(email: string): Promise<User> {
     const user = await this.userRepository.findByEmail(email)
     if (!user) {
       logger.warn(`User with email ${email} not found.`)

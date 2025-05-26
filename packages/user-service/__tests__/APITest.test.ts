@@ -1,9 +1,9 @@
-import express from 'express';
-import request from 'supertest';
-import {createUserRouter} from '../src/routes/UserRoutes';
-import {UserController} from '../src/controllers/UserController';
-import {UserService} from '../src/services/UserService'; // Assuming the controller depends on a UserService
-import {MockUserRepository} from "./MockUserRepository";
+import express from 'express'
+import request from 'supertest'
+import { createUserRouter } from '../src/routes/UserRoutes'
+import { UserController } from '../src/controllers/UserController'
+import { UserService, UserServiceImpl } from '../src/services/UserService' // Assuming the controller depends on a UserService
+import { MockUserRepository } from './MockUserRepository'
 
 describe('UserRoutes - Integration Tests', () => {
     let app: express.Application;
@@ -14,7 +14,7 @@ describe('UserRoutes - Integration Tests', () => {
         app = express();
         app.use(express.json());
         const repo = new MockUserRepository();
-        userService = new UserService(repo); // Create the actual service
+      userService = new UserServiceImpl(repo) // Create the actual service
         userController = new UserController(userService); // Create the real controller
         app.use('/users', createUserRouter(userController)); // Add the real router
     });
