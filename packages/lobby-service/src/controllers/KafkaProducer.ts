@@ -85,7 +85,8 @@ export class KafkaProducer {
 
   private handleLobbyCreated = async (lobby: Lobby): Promise<void> => {
     try {
-      const event = lobbyCreatedEvent(lobby)
+      const playerInfo = await this.service.getPlayer(lobby.creator)
+      const event = lobbyCreatedEvent(lobby, playerInfo)
       await this.emitEvent('lobby-events', event)
     } catch (error) {
       logger.error(`Failed to handle lobby created event for lobby ${lobby.id}:`, error)

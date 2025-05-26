@@ -114,6 +114,9 @@ describe('KafkaProducer', () => {
 
   describe('Event Production', () => {
     it('should produce lobby-created event', async () => {
+      mockLobbyService.getPlayer.mockResolvedValue({
+        username: 'player1',
+      })
       callbacks.get('onLobbyCreated')![0](defaultLobby)
 
       await waitForMessages()
@@ -121,6 +124,7 @@ describe('KafkaProducer', () => {
       expect(receivedMessages[0]).toMatchObject({
         type: 'lobby-created',
         creator: defaultLobby.creator,
+        username: 'player1',
         lobby: {
           maxPlayers: defaultLobby.maxPlayers,
           maxRound: defaultLobby.rounds,

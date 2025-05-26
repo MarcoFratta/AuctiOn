@@ -15,10 +15,11 @@ import {
   playerStatusEventSchema,
 } from '@auction/common/events/lobby'
 
-export const lobbyCreatedEvent = (lobby: Lobby): LobbyCreatedEvent => {
+export const lobbyCreatedEvent = (lobby: Lobby, playerInfo: PlayerInfo): LobbyCreatedEvent => {
   return validateSchema(lobbyCreatedEventSchema, {
     type: 'lobby-created',
     creator: lobby.creator,
+    username: playerInfo.username,
     lobby: {
       id: lobby.id,
       players: lobby.players,
