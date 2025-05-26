@@ -34,8 +34,6 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-      - name: Build services
-        run: npm run build
 
       - name: Build VitePress site
         run: |

@@ -5,11 +5,11 @@ const fs = require('fs')
 const path = require('path')
 
 const services = ['auth', 'user', 'lobby']
-
+execSync(`npm run build --workspace=@auction/common`, { stdio: 'inherit' })
 services.forEach(service => {
   console.log(`Generating docs for ${service}-service...`)
-
   try {
+
     // Build the service
     execSync(`npm run build -w ${service}-service`, { stdio: 'inherit' })
 
@@ -17,13 +17,13 @@ services.forEach(service => {
     execSync(`npm run doc -w ${service}-service`, { stdio: 'inherit' })
 
     // Ensure the specs directory exists
-    const specsDir = path.join(__dirname, 'docs', 'specs')
+    const specsDir = path.join(__dirname, '..', 'docs', 'specs')
     if (!fs.existsSync(specsDir)) {
       fs.mkdirSync(specsDir, { recursive: true })
     }
 
     // Copy the generated swagger.json to the docs directory
-    const sourcePath = path.join(__dirname, '..', `${service}-service`, 'dist', 'docs', 'swagger.json')
+    const sourcePath = path.join(__dirname, '..', '..', `${service}-service`, 'dist', 'docs', 'swagger.json')
     const destPath = path.join(specsDir, `${service}.json`)
 
     fs.copyFileSync(sourcePath, destPath)
