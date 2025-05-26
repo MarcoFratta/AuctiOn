@@ -134,6 +134,22 @@ registry.registerPath({
   },
 })
 
+// 7. Get active lobby
+registry.registerPath({
+  method: 'get',
+  path: '/lobbies',
+  description: 'Get the current active lobby for the user',
+  summary: 'Retrieve active lobby information',
+  responses: {
+    200: {
+      description: 'Active lobby retrieved successfully',
+    },
+    404: {
+      description: 'No active lobby found',
+    },
+  },
+})
+
 const openApiSpec = generateOpenAPI()
 // Save the OpenAPI specification to a file
 const swaggerOutputPath = path.join(__dirname, '..', 'docs', 'swagger.json')
