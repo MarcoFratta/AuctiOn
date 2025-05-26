@@ -26,9 +26,8 @@ export function useTimeSync() {
 
       // Calculate offset considering the latency
       const serverTime = response.serverTime
-      const clientTime = requestTime + latency
 
-      lobbyStore.setTimeOffset(serverTime - clientTime)
+      lobbyStore.setTimeOffset(serverTime - (requestTime + latency))
       console.log('Time synchronized with server, offset:', lobbyStore.serverTimeOffset)
     })
   }
