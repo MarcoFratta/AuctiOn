@@ -586,13 +586,12 @@ auction system:
 
 ### WebSocket API
 
-- [WebSocket Events API Reference](/api-reference/websocket/) - Complete documentation of all WebSocket
-  events, including time synchronization, auction events, and player actions.
+- [WebSocket Events API Reference](../api-reference/websocket.md) - Complete documentation of all WebSocket
+  events.
 
 ### Service APIs
 
-- [Auth Service API](/docs/api-reference/auth-api/) - RESTful API for user authentication, registration, and profile
+- [Auth Service API](../api-reference/auth-api) - RESTful API for user authentication
   management.
-- [Auction Service API](/docs/api-reference/auction-service/) - RESTful API for auction management and administration.
-- [Player Service API](/docs/api-reference/player-service/) - API for player registration, authentication, and profile
-  management.
+- [Lobby Service API](../api-reference/lobby-api) - RESTful API for lobby management.
+- [User Service API](../api-reference/user-api) - API for users profile management.

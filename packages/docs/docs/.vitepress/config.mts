@@ -6,8 +6,21 @@ export default defineConfig({
   markdown: {
     math: true,
   },
-  ignoreDeadLinks: true,
+  // Set to false to treat dead links as errors
+  // or use an array of patterns to explicitly ignore certain links
+  ignoreDeadLinks: [
+    // Example: ignore all localhost links
+    /^https?:\/\/localhost/,
+    // Ignore links to GitHub or GitLab
+    /^https?:\/\/github\.com/,
+    /^https?:\/\/gitlab\.com/,
+    // Ignore anchor links (common in documentation)
+    /^#/,
+  ],
   description: 'Documentation for the AuctiOn real-time auction game platform.',
+  // Set the base path for GitHub Pages deployment
+  // This should match your repository name
+  base: '/AuctiOn/',
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [

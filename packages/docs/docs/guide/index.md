@@ -29,6 +29,6 @@ The platform is built using a microservices architecture with the following comp
 
 ## Next Steps
 
-- Check out the [Game Rules](/game-rules) to understand how to play
-- Explore the [Architecture](/architecture/) to learn about the system design
-- See the [API Reference](/api-reference/) for technical details 
+- Check out the [Game Rules](../game-rules) to understand how to play
+- Explore the [Architecture](../architecture/index) to learn about the system design
+- See the [API Reference](../api-reference/auth-api) for technical details 

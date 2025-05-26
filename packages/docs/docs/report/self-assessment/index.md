@@ -26,9 +26,9 @@ The AuctiOn platform has been thoroughly tested using various testing methodolog
 For detailed information about the testing approach and results,
 please refer to the following sections:
 
-- [Testing Overview](./self-assessment/index): Overview of the testing strategy and tools
-- [Coverage Report](./self-assessment/coverage): Detailed test coverage reports for each microservice
-- [End-to-End Tests](./self-assessment/e2e-tests): Description of end-to-end test scenarios and implementation
+- [Testing Overview](./tests): Overview of the testing strategy and tools
+- [Coverage Report](./coverage): Detailed test coverage reports for each microservice
+- [End-to-End Tests](./e2e-tests): Description of end-to-end test scenarios and implementation
 
 The testing results demonstrate the robustness and reliability of the platform,
 with high test coverage across all microservices and successful end-to-end test scenarios.

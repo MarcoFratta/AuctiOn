@@ -200,6 +200,30 @@ following the [official VitePress deployment guide](https://vitepress.dev/guide/
 
 The documentation will be available at `https://<your-github-username>.github.io/<repository-name>/`.
 
+#### Important Configuration for GitHub Pages
+
+For proper CSS and assets loading on GitHub Pages, you must configure the base path in your VitePress configuration
+file:
+
+1. Open `packages/docs/docs/.vitepress/config.mts`
+2. Add the `base` property with your repository name:
+
+```js
+export default defineConfig({
+   // other configurations...
+   base: '/<repository-name>/',
+   // ...
+})
+```
+
+For example, if your repository is named `ds-project-frattarola-ay2223`, the base path should be:
+
+```js
+base: '/ds-project-frattarola-ay2223/',
+```
+
+This ensures that all assets (CSS, JavaScript, images) load correctly on GitHub Pages.
+
 To enable GitHub Pages:
 
 1. Go to your repository settings

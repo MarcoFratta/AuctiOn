@@ -8,10 +8,10 @@ This page displays the test coverage reports for each microservice in the AuctiO
 
 | Type           | Coverage | Covered/Total |
 |----------------|----------|---------------|
-| **Statements** | 🟢 83%   | 1098/1320     |
-| **Branches**   | 🟡 63%   | 92/146        |
+| **Statements** | 🟢 83%   | 1095/1322     |
+| **Branches**   | 🟡 62%   | 93/149        |
 | **Functions**  | 🟢 85%   | 317/372       |
-| **Lines**      | 🟢 83%   | 1098/1320     |
+| **Lines**      | 🟢 83%   | 1095/1322     |
 
 ### Coverage by Directory
 
@@ -72,66 +72,66 @@ This page displays the test coverage reports for each microservice in the AuctiO
 
 | Type           | Coverage | Covered/Total |
 |----------------|----------|---------------|
-| **Statements** | 🟡 78%   | 76/98         |
+| **Statements** | 🟡 78%   | 77/99         |
 | **Branches**   | 🔴 50%   | 4/8           |
 | **Functions**  | 🟢 89%   | 25/28         |
-| **Lines**      | 🟡 78%   | 76/98         |
+| **Lines**      | 🟡 78%   | 77/99         |
 
 | File                       | Statements      | Branches      | Functions       | Lines           |
 |----------------------------|-----------------|---------------|-----------------|-----------------|
 | TimerRepo.ts               | 🔴 43% (12/28)  | 🔴 0% (0/3)   | 🔴 57% (4/7)    | 🔴 43% (12/28)  |
-| RedisAuctionRepo.ts        | 🟢 83% (24/29)  | 🟢 100% (1/1) | 🟢 100% (10/10) | 🟢 83% (24/29)  |
+| RedisAuctionRepo.ts        | 🟢 83% (25/30)  | 🟢 100% (1/1) | 🟢 100% (10/10) | 🟢 83% (25/30)  |
 | RedisUserInfoRepository.ts | 🟢 93% (13/14)  | 🔴 50% (1/2)  | 🟢 100% (6/6)   | 🟢 93% (13/14)  |
 | PlayerAuctionMapRepo.ts    | 🟢 100% (27/27) | 🟢 100% (2/2) | 🟢 100% (5/5)   | 🟢 100% (27/27) |
-
-#### src/controllers
-
-| Type           | Coverage | Covered/Total |
-|----------------|----------|---------------|
-| **Statements** | 🟢 84%   | 280/335       |
-| **Branches**   | 🔴 50%   | 6/12          |
-| **Functions**  | 🟡 77%   | 86/112        |
-| **Lines**      | 🟢 84%   | 280/335       |
-
-| File               | Statements     | Branches      | Functions       | Lines          |
-|--------------------|----------------|---------------|-----------------|----------------|
-| AuctionConsumer.ts | 🟡 76% (58/76) | 🔴 33% (1/3)  | 🟡 77% (20/26)  | 🟡 76% (58/76) |
-| MessageSender.ts   | 🟡 76% (72/95) | 🔴 50% (3/6)  | 🟡 62% (23/37)  | 🟡 76% (72/95) |
-| LobbyConsumer.ts   | 🟡 79% (34/43) | 🔴 50% (1/2)  | 🟡 64% (9/14)   | 🟡 79% (34/43) |
-| MessageHandler.ts  | 🟢 91% (40/44) | 🟢 100% (0/0) | 🟢 94% (15/16)  | 🟢 91% (40/44) |
-| AuctionProducer.ts | 🟢 99% (76/77) | 🟢 100% (1/1) | 🟢 100% (19/19) | 🟢 99% (76/77) |
 
 #### src/services
 
 | Type           | Coverage | Covered/Total |
 |----------------|----------|---------------|
-| **Statements** | 🟢 85%   | 239/282       |
-| **Branches**   | 🟡 71%   | 29/41         |
+| **Statements** | 🟢 83%   | 235/282       |
+| **Branches**   | 🟡 68%   | 28/41         |
 | **Functions**  | 🟢 90%   | 65/72         |
-| **Lines**      | 🟢 85%   | 239/282       |
+| **Lines**      | 🟢 83%   | 235/282       |
 
 | File                  | Statements       | Branches       | Functions       | Lines            |
 |-----------------------|------------------|----------------|-----------------|------------------|
 | UserServiceImpl.ts    | 🔴 54% (7/13)    | 🔴 0% (0/1)    | 🟡 71% (5/7)    | 🔴 54% (7/13)    |
-| AuctionServiceImpl.ts | 🟢 83% (125/150) | 🟡 71% (15/21) | 🟢 86% (25/29)  | 🟢 83% (125/150) |
+| AuctionServiceImpl.ts | 🟢 81% (121/150) | 🟡 67% (14/21) | 🟢 86% (25/29)  | 🟢 81% (121/150) |
 | TimerServiceImpl.ts   | 🟢 85% (64/75)   | 🟢 81% (13/16) | 🟢 93% (13/14)  | 🟢 85% (64/75)   |
 | RedisLock.ts          | 🟢 95% (19/20)   | 🔴 33% (1/3)   | 🟢 100% (5/5)   | 🟢 95% (19/20)   |
 | CallbacksService.ts   | 🟢 100% (24/24)  | 🟢 100% (0/0)  | 🟢 100% (17/17) | 🟢 100% (24/24)  |
+
+#### src/controllers
+
+| Type           | Coverage | Covered/Total |
+|----------------|----------|---------------|
+| **Statements** | 🟢 84%   | 282/337       |
+| **Branches**   | 🔴 54%   | 7/13          |
+| **Functions**  | 🟡 77%   | 86/112        |
+| **Lines**      | 🟢 84%   | 282/337       |
+
+| File               | Statements     | Branches      | Functions       | Lines          |
+|--------------------|----------------|---------------|-----------------|----------------|
+| AuctionConsumer.ts | 🟡 76% (58/76) | 🔴 33% (1/3)  | 🟡 77% (20/26)  | 🟡 76% (58/76) |
+| MessageSender.ts   | 🟡 76% (73/96) | 🔴 57% (4/7)  | 🟡 62% (23/37)  | 🟡 76% (73/96) |
+| LobbyConsumer.ts   | 🟢 80% (35/44) | 🔴 50% (1/2)  | 🟡 64% (9/14)   | 🟢 80% (35/44) |
+| MessageHandler.ts  | 🟢 91% (40/44) | 🟢 100% (0/0) | 🟢 94% (15/16)  | 🟢 91% (40/44) |
+| AuctionProducer.ts | 🟢 99% (76/77) | 🟢 100% (1/1) | 🟢 100% (19/19) | 🟢 99% (76/77) |
 
 #### src/domain/auctions
 
 | Type           | Coverage | Covered/Total |
 |----------------|----------|---------------|
-| **Statements** | 🟢 92%   | 222/242       |
-| **Branches**   | 🟡 70%   | 31/44         |
+| **Statements** | 🟢 91%   | 221/242       |
+| **Branches**   | 🟡 70%   | 32/46         |
 | **Functions**  | 🟢 96%   | 71/74         |
-| **Lines**      | 🟢 92%   | 222/242       |
+| **Lines**      | 🟢 91%   | 221/242       |
 
 | File                  | Statements       | Branches       | Functions       | Lines            |
 |-----------------------|------------------|----------------|-----------------|------------------|
 | PlayOrderStrategy.ts  | 🔴 25% (2/8)     | 🟢 100% (0/0)  | 🔴 50% (1/2)    | 🔴 25% (2/8)     |
 | Timer.ts              | 🟢 81% (30/37)   | 🔴 38% (3/8)   | 🟢 83% (5/6)    | 🟢 81% (30/37)   |
-| Auction.ts            | 🟢 94% (117/124) | 🟡 73% (22/30) | 🟢 96% (25/26)  | 🟢 94% (117/124) |
+| Auction.ts            | 🟢 94% (116/124) | 🟡 72% (23/32) | 🟢 96% (25/26)  | 🟢 94% (116/124) |
 | AuctionFactory.ts     | 🟢 100% (7/7)    | 🟢 100% (0/0)  | 🟢 100% (2/2)   | 🟢 100% (7/7)    |
 | Modifier.ts           | 🟢 100% (44/44)  | 🟢 100% (2/2)  | 🟢 100% (27/27) | 🟢 100% (44/44)  |
 | PlayerFactory.ts      | 🟢 100% (6/6)    | 🟢 100% (0/0)  | 🟢 100% (1/1)   | 🟢 100% (6/6)    |
@@ -193,14 +193,14 @@ This page displays the test coverage reports for each microservice in the AuctiO
 
 | Type           | Coverage | Covered/Total |
 |----------------|----------|---------------|
-| **Statements** | 🟢 100%  | 44/44         |
+| **Statements** | 🟢 100%  | 43/43         |
 | **Branches**   | 🟢 100%  | 1/1           |
 | **Functions**  | 🟢 100%  | 2/2           |
-| **Lines**      | 🟢 100%  | 44/44         |
+| **Lines**      | 🟢 100%  | 43/43         |
 
 | File           | Statements      | Branches      | Functions     | Lines           |
 |----------------|-----------------|---------------|---------------|-----------------|
-| Auction.ts     | 🟢 100% (10/10) | 🟢 100% (0/0) | 🟢 100% (0/0) | 🟢 100% (10/10) |
+| Auction.ts     | 🟢 100% (9/9)   | 🟢 100% (0/0) | 🟢 100% (0/0) | 🟢 100% (9/9)   |
 | Bid.ts         | 🟢 100% (2/2)   | 🟢 100% (0/0) | 🟢 100% (0/0) | 🟢 100% (2/2)   |
 | Item.ts        | 🟢 100% (14/14) | 🟢 100% (1/1) | 🟢 100% (2/2) | 🟢 100% (14/14) |
 | Leaderboard.ts | 🟢 100% (5/5)   | 🟢 100% (0/0) | 🟢 100% (0/0) | 🟢 100% (5/5)   |
@@ -557,10 +557,10 @@ This page displays the test coverage reports for each microservice in the AuctiO
 
 | Type           | Coverage | Covered/Total |
 |----------------|----------|---------------|
-| **Statements** | 🟢 88%   | 526/601       |
+| **Statements** | 🟢 88%   | 528/602       |
 | **Branches**   | 🟢 80%   | 65/81         |
 | **Functions**  | 🟢 92%   | 107/116       |
-| **Lines**      | 🟢 88%   | 526/601       |
+| **Lines**      | 🟢 88%   | 528/602       |
 
 ### Coverage by Directory
 
@@ -611,14 +611,14 @@ This page displays the test coverage reports for each microservice in the AuctiO
 
 | Type           | Coverage | Covered/Total |
 |----------------|----------|---------------|
-| **Statements** | 🟢 90%   | 133/148       |
+| **Statements** | 🟢 91%   | 135/149       |
 | **Branches**   | 🔴 50%   | 2/4           |
 | **Functions**  | 🟢 96%   | 25/26         |
-| **Lines**      | 🟢 90%   | 133/148       |
+| **Lines**      | 🟢 91%   | 135/149       |
 
 | File               | Statements     | Branches      | Functions       | Lines          |
 |--------------------|----------------|---------------|-----------------|----------------|
-| KafkaProducer.ts   | 🟢 85% (47/55) | 🟢 100% (0/0) | 🟢 100% (11/11) | 🟢 85% (47/55) |
+| KafkaProducer.ts   | 🟢 88% (49/56) | 🟢 100% (0/0) | 🟢 100% (11/11) | 🟢 88% (49/56) |
 | LobbyController.ts | 🟢 92% (61/66) | 🔴 50% (1/2)  | 🟢 100% (8/8)   | 🟢 92% (61/66) |
 | KafkaConsumer.ts   | 🟢 93% (25/27) | 🔴 50% (1/2)  | 🟢 86% (6/7)    | 🟢 93% (25/27) |
 
