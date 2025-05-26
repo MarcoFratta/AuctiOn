@@ -25,13 +25,6 @@ export const AuctionSchema = z
     startTimestamp: z.string().datetime().optional(),
   })
   .merge(auctionConfigSchema)
-z.object({
-  id: z.string(),
-  leaderboard: z.array(PlayerSchema.omit({ status: true })),
-  rounds: z.number(),
-  startTimeStamp: z.string().datetime(),
-  endTimeStamp: z.string().datetime(),
-})
 export const StoredAuctionSchema = AuctionSchema.merge(
   z.object({
     currentSale: SaleSchema.merge(
