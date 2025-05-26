@@ -68,6 +68,10 @@ export class LobbyConsumer {
         })
         .with('lobby-created', async () => {
           const event = validateSchema(lobbyCreatedEventSchema, msg)
+          await this.userService.addUser(event.creator, {
+            username: event.username,
+            status: 'not-ready',
+          })
           const lobby = validateSchema(auctionConfigSchema, { creatorId: event.creator, ...event.lobby })
           await this.auctionService.createAuction(lobby)
         })

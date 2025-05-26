@@ -65,6 +65,8 @@ export class MessageSender {
                   this.playerChannel.sendToPlayer(playerId, playerConnectedMessage(p.id, true))
                 }
                 this.playerChannel.sendToPlayer(playerId, playerInfoMessage(p.id, info, true))
+              } else {
+                logger.error(`User info not found for player ${p.id} in auction ${auction.id}`)
               }
             })
             .catch(err => logger.error(`Error getting user info: ${err}`))

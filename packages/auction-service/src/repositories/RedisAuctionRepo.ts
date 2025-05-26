@@ -58,6 +58,7 @@ export class RedisAuctionRepo implements AuctionRepo {
 
   async deleteAuction(auctionId: string): Promise<void> {
     const key = `auction:${auctionId}`
-    await this.redisClient.del(key)
+    const oneDayInSeconds = 24 * 60 * 60
+    await this.redisClient.expire(key, oneDayInSeconds)
   }
 }

@@ -114,6 +114,7 @@ describe('LobbyConsumer', () => {
         type: 'lobby-created',
         lobby: defaultConfig,
         creator: 'player1',
+        username: 'player1',
       }
 
       await sendMessage(event)
