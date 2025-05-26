@@ -111,7 +111,8 @@ Husky will then:
 - Run Prettier to ensure consistent code formatting
 - Validate commit messages according to conventional commit standards
 
-If a commit fails the quality checks, you'll need to fix the issues before you can commit your changes.
+If a commit fails the quality checks, you'll need to fix the issues
+before you can commit your changes.
 
 ### Building Documentation
 
@@ -135,7 +136,8 @@ Documentation will be available at http://localhost:5173.
 
 ### Testing
 
-The project includes comprehensive test suites for each service. You can run tests for individual services or run all
+The project includes comprehensive test suites for each service.
+You can run tests for individual services or run all
 tests at once.
 
 #### Running All Tests
@@ -177,9 +179,10 @@ The project also includes end-to-end tests that verify the system as a whole:
 npm run test:e2e
 ```
 
-> Note: Integration tests require Docker to be running as they use containers to set up a test environment.
+> Note: Integration tests require Docker to be running as they use containers to set up a
+> test environment.
 
-## Continuous Integration and Deployment
+## CI and Deployment
 
 The project includes CI/CD configuration for automatically publishing documentation:
 
@@ -189,20 +192,24 @@ The `.gitlab-ci.yml` file is configured to automatically build and deploy the Vi
 documentation to GitLab Pages when changes are pushed to the main branch.
 The documentation will be available at `https://<your-gitlab-username>.gitlab.io/<repository-name>/`.
 
-### GitHub Actions
+### GitHub Pages Deployment
 
 For GitHub repositories, a GitHub Actions workflow (`.github/workflows/docs.yml`) is configured
-to build and deploy the VitePress documentation to GitHub Pages.
+to build and deploy the VitePress documentation to GitHub Pages,
+following the [official VitePress deployment guide](https://vitepress.dev/guide/deploy).
+
 The documentation will be available at `https://<your-github-username>.github.io/<repository-name>/`.
 
 To enable GitHub Pages:
 
 1. Go to your repository settings
 2. Navigate to "Pages"
-3. Select "GitHub Actions" as the source
-4. The workflow will automatically deploy your documentation when changes are pushed to the main branch
+3. Select "GitHub Actions" as the source (this should be automatic if the workflow has already run)
 
-## Environment Configuration Details
+The workflow will automatically deploy your documentation when changes are pushed
+to the main branch.
+
+## Environment Configuration
 
 ### Email Server Configuration
 
