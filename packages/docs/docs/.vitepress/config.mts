@@ -6,17 +6,6 @@ export default defineConfig({
   markdown: {
     math: true,
   },
-  // Set to false to treat dead links as errors
-  // or use an array of patterns to explicitly ignore certain links
-  ignoreDeadLinks: [
-    // Example: ignore all localhost links
-    /^https?:\/\/localhost/,
-    // Ignore links to GitHub or GitLab
-    /^https?:\/\/github\.com/,
-    /^https?:\/\/gitlab\.com/,
-    // Ignore anchor links (common in documentation)
-    /^#/,
-  ],
   description: 'Documentation for the AuctiOn real-time auction game platform.',
   // Set the base path for GitHub Pages deployment
   // This should match your repository name
@@ -25,45 +14,13 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Guide', link: '/guide/' },
-      { text: 'Architecture', link: '/architecture/' },
+      { text: 'Usage', link: '/report/usage' },
       { text: 'Game Rules', link: '/game-rules' },
       { text: 'API Reference', link: '/api-reference/auth-api' },
-      { text: 'Final Report', link: '/report/index' },
+      { text: 'Documentation', link: '/report/index' },
     ],
 
     sidebar: {
-      '/guide/': [
-        {
-          text: 'Getting Started',
-          items: [
-            { text: 'Introduction', link: '/guide/' },
-            { text: 'Installation', link: '/guide/installation' },
-            { text: 'Development Setup', link: '/guide/development' },
-          ],
-        },
-        {
-          text: 'Core Concepts',
-          items: [
-            { text: 'Game Overview', link: '/guide/game-overview' },
-            { text: 'Auction Mechanics', link: '/guide/auction-mechanics' },
-          ],
-        },
-      ],
-      '/architecture/': [
-        {
-          text: 'System Architecture',
-          items: [
-            { text: 'Overview', link: '/architecture/' },
-            { text: 'API Gateway', link: '/architecture/api-gateway' },
-            { text: 'Auth Service', link: '/architecture/auth-service' },
-            { text: 'User Service', link: '/architecture/user-service' },
-            { text: 'Lobby Service', link: '/architecture/lobby-service' },
-            { text: 'Auction Service', link: '/architecture/auction-service' },
-            { text: 'Event System', link: '/architecture/event-system' },
-          ],
-        },
-      ],
       '/api-reference/': [
         {
           text: 'API Reference',
@@ -84,12 +41,14 @@ export default defineConfig({
             { text: 'Requirements Analysis', link: '/report/analysis' },
             {
               text: 'Design',
+              collapsed: true,
               items: [
-                { text: 'Overview', link: '/report/design' },
+                { text: 'Overview', link: '/report/design/' },
                 {
                   text: 'Structure',
+                  collapsed: true,
                   items: [
-                    { text: 'Design overview', link: '/report/design/structure' },
+                    { text: 'Overview', link: '/report/design/structure/' },
                     { text: 'Authentication', link: '/report/design/structure/authentication' },
                     { text: 'Users', link: '/report/design/structure/users' },
                     { text: 'Lobbies', link: '/report/design/structure/lobbies' },
@@ -98,6 +57,7 @@ export default defineConfig({
                 },
                 {
                   text: 'Behaviour',
+                  collapsed: true,
                   items: [
                     { text: 'Overview', link: '/report/design/behaviour/' },
                     { text: 'Auction Service', link: '/report/design/behaviour/auction' },
@@ -112,6 +72,7 @@ export default defineConfig({
             { text: 'Implementation Details', link: '/report/implementation' },
             {
               text: 'Self-assessment',
+              collapsed: true,
               items: [
                 { text: 'Overview', link: '/report/self-assessment/index' },
                 { text: 'Testing Overview', link: '/report/self-assessment/tests' },
@@ -129,6 +90,8 @@ export default defineConfig({
 
     socialLinks: [
       { icon: 'github', link: 'https://github.com/MarcoFratta/AuctiOn' },
+      { icon: 'gitlab', link: 'https://dvcs.apice.unibo.it/pika-lab/courses/ds/projects/ds-project-frattarola-ay2223' },
+
     ],
 
     footer: {

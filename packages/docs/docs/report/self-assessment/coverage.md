@@ -1,6 +1,8 @@
 # Test Coverage Reports
 
 This page displays the test coverage reports for each microservice in the AuctiOn platform.
+The coverage reports provide insights into the code quality and testing effectiveness.
+They are generated from the **jest** coverage reports files.
 
 ## Auction service
 

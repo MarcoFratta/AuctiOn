@@ -77,28 +77,30 @@ to implement **distributed locks** based on the
 
 ```typescript
 async
-runWithLock<T>(lockKey
+runWithLock<T>(
+        lockKey
 :
-string, ttlMs
+string,
+        ttlMs
 :
 number,
-  task
+        task
 :
-() => Promise<T>, retryDelayMs = 100
+() => Promise<T>,
+        retryDelayMs = 100
 ):
 Promise < T > {
-
   const lockId = await this.acquireLock(lockKey, ttlMs, retryDelayMs)
-  if(!
+   if(!
 lockId
 )
 {
-  throw new Error(`Failed to acquire distributed lock for ${lockKey}`)
+   throw new Error(`Failed to acquire distributed lock for ${lockKey}`)
 }
 try {
-  return await task()
+   return await task()
 } finally {
-  await this.releaseLock(lockKey, lockId)
+   await this.releaseLock(lockKey, lockId)
 }
 }
 ```
@@ -117,23 +119,26 @@ The `acquireLock` method implements an **atomic lock acquisition** with a retry 
 
 ```typescript
 private async
-acquireLock(lockKey
+acquireLock(
+        lockKey
 :
-string, ttlMs
+string,
+        ttlMs
 :
-number, retryDelayMs
+number,
+        retryDelayMs
 :
 number
 ):
 Promise < string | null > {
   const lockId = randomUUID()
-  while(true
+   while(true
 )
 {
-  const success = await this.redis.set(lockKey, lockId, 'PX', ttlMs, 'NX')
-  if (success) return lockId
+   const success = await this.redis.set(lockKey, lockId, 'PX', ttlMs, 'NX')
+   if (success) return lockId
 
-  await new Promise(resolve => setTimeout(resolve, retryDelayMs))
+   await new Promise(resolve => setTimeout(resolve, retryDelayMs))
 }
 }
 ```
@@ -176,13 +181,13 @@ this atomic operation pattern:
 ```typescript
 private async
 withAuctionLock<T>(
-  auctionId
+        auctionId
 :
 string,
-  operationName
+        operationName
 :
 string,
-  operation
+        operation
 :
 (auction: Auction) => Promise<T>
 ):
@@ -224,9 +229,11 @@ To ensure the lock release itself is atomic, the system uses a **Lua script** ex
 
 ```typescript
 private async
-releaseLock(lockKey
+releaseLock(
+        lockKey
 :
-string, lockId
+string,
+        lockId
 :
 string
 ):
@@ -262,22 +269,22 @@ Bid
 Promise < AuctionInfo > {
   // Does not require a lock
   const playerAuctionId = await this.findPlayerAuction(bid.playerId)
-  if(!
+   if(!
 playerAuctionId
 )
 {
-  throw new Error(`Player ${bid.playerId} not found in any active auction.`)
+   throw new Error(`Player ${bid.playerId} not found in any active auction.`)
 }
 
 return await this.withAuctionLock(playerAuctionId, 'playerBid', async auction => {
-  // Using the auction read from Redis
-  // Business logic validation
-  [...]
-  // Update the auction state
-  auction.bid(bid)
+   // Using the auction read from Redis
+   // Business logic validation
+   [...]
+   // Update the auction state
+   auction.bid(bid)
 
-  // Return the updated state (will be saved by withAuctionLock)
-  return auction.toInfo()
+   // Return the updated state (will be saved by withAuctionLock)
+   return auction.toInfo()
 })
 }
 ```
@@ -515,7 +522,7 @@ This function:
 To account for clock drift and maintain accuracy, the system implements periodic synchronization:
 
 ```typescript
-const startPeriodicSync = (interval = 60000) => {
+const startPeriodicSync = (interval) => {
   syncTime() // Initial sync
 
   // Set up periodic sync
@@ -536,7 +543,7 @@ const startPeriodicSync = (interval = 60000) => {
 This approach ensures that:
 
 1. An initial synchronization occurs when the client connects
-2. Regular synchronizations (default: every 60 seconds) maintain accuracy
+2. Regular synchronizations maintain accuracy
 3. Proper cleanup occurs when the component is unmounted
 
 ::: details Example
@@ -595,3 +602,8 @@ auction system:
   management.
 - [Lobby Service API](../api-reference/lobby-api) - RESTful API for lobby management.
 - [User Service API](../api-reference/user-api) - API for users profile management.
+
+Since all the project packages uses [Zod](https://zod.dev/) for schema validation,
+the API specifications are generated from the Zod schemas defined in each service, using
+[zod-to-openapi](https://github.com/asteasolutions/zod-to-openapi). This ensures that the API documentation
+is always in sync with the actual code and provides a clear contract for each service's API.

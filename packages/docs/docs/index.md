@@ -5,14 +5,11 @@ layout: home
 hero:
   name: "AuctiOn"
   text: "Real-time Auction Game Platform"
-  tagline: A microservices-based auction game with real-time bidding and strategic gameplay
+  tagline: A strategic game of bluffing, bidding, and resource management
   actions:
     - theme: brand
-      text: Get Started
-      link: /guide/
-    - theme: alt
-      text: System Architecture
-      link: /architecture/
+      text: Installation
+      link: /report/deployment
     - theme: alt
       text: Game Rules
       link: /game-rules/
@@ -20,15 +17,15 @@ hero:
 features:
   - icon: 🎮
     title: Strategic Gameplay
-    details: An online real-time auction game of bluffing, bidding, and resource management
-  - icon: 🔌
-    title: Microservices Architecture
-    details: Built with scalable, maintainable microservices communicating via Kafka events
+    details: Maximize currency by the game's conclusion through effective resource management and strategic bidding
   - icon: 🚀
-    title: Real-time Updates
-    details: Socket.IO integration for instant bidding, sales, and game state updates
+    title: Real-time Experience
+    details: Engage in competitive auction sessions with other players in real-time using Socket.IO
   - icon: 🔐
-    title: Secure Authentication
-    details: JWT-based authentication with refresh tokens and secure password management
+    title: Secure & Scalable
+    details: Built with JWT authentication and a microservices architecture for maintainability and performance
+  - icon: 📱
+    title: Easy Setup
+    details: Simple installation process with Docker - get started in minutes with minimal configuration
 ---
 

@@ -82,7 +82,7 @@ The `MultipleMatches.test.ts` validates the system's ability to handle multiple 
 ## MailHog Integration
 
 A crucial part of the E2E testing is validating the forgot password flow, which requires testing email delivery. For
-this purpose, MailHog is integrated into the testing environment.
+this purpose, [MailHog](https://github.com/mailhog/MailHog) is integrated into the testing environment.
 
 ### What is MailHog?
 
@@ -118,3 +118,9 @@ test execution:
 1. Starts all required services using Docker Compose
 2. Runs the Jest test suite
 3. Tears down all containers and volumes after tests complete
+
+::: warning
+The E2E test are long-running and can take several minutes to complete.
+This is because each round must wait for the auction timer to expire, simulating real user interactions.
+:::
+> 

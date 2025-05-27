@@ -1,76 +1,161 @@
-# Game Rules
+# 🎮 AuctiOn Game Rules
 
-AuctiOn is a turn-based auction game where players strategically buy and sell items to accumulate as much virtual
-currency as possible by the end of the game. Players must balance their inventory, engage in bidding wars, bluff, and
-manage their resources effectively.
+> *A strategic auction game of bluffing, bidding, and resource management*
 
-## Introduction
+## 📜 Introduction
 
-AuctiOn is a turn-based auction game where players strategically buy and sell items to accumulate as much virtual
-currency as possible by the end of the game. Players must balance their inventory, engage in bidding wars, bluff, and
-manage their resources effectively.
+**AuctiOn** is a turn-based auction game where players strategically buy and sell items to accumulate as much virtual
+currency as possible. Success requires careful inventory management, clever bidding strategies, effective bluffing, and
+smart resource allocation.
 
-The game features three types of items:
+### Game Items
 
-- **Circle**: Weight 1
-- **Triangle**: Weight 1
-- **Square**: Weight 1
+| Item         | Weight | Set Bonus (3 items) |
+|--------------|--------|---------------------|
+| **Square**   | 1      | +10 coins           |
+| **Circle**   | 3      | +30 coins           |
+| **Triangle** | 5      | +50 coins           |
 
-## Objective & Game Setup
+## 🎯 Objective & Game Setup
 
-### Objective
+### Primary Goal
 
-Players aim to accumulate the highest amount of virtual coins by the end of the game while meeting specific item
-requirements.
+`Accumulate the most coins`
 
 ### Starting Resources
 
-- Each player starts with a random assortment of items (Squares, Triangles, Circles)
-- Total starting item weight: 15
-- Starting coins: 50
+Each player begins with:
+
+- **Initial inventory** of items (Squares, Triangles, Circles)
+- **Starting coins**
+
+Those parameters can be customized in the lobby settings before starting the game.
+
+## ⚙️ Game Mechanics
 
 ### Turn Structure
 
-Each turn, one player acts as the "seller," while the others are "buyers." The seller offers a batch of items, revealing
-only the total weight.
+The game progresses through a series of turns where players alternate roles:
 
-## Game Mechanics
+1. One player acts as the`Seller`
+2. All other players act as `Buyers`
+3. After each round, roles rotate
 
 ### Selling Phase
 
-The seller selects a batch of items to sell and announces the total weight. Buyers do not know the exact quantity or
-types of items.
+**As the Seller:**
 
-**Strategy Tip**: As a seller, consider creating batches that might confuse buyers about the true value.
+1. Select any number of items from your inventory to create a batch
+2. Buyers do not know the specific items or quantities in your batch
+3. Only the **total weight** of the batch (sum of item weights) is revealed to buyers
+
+::: details 💡 Seller Strategy Tip
+Consider creating batches with **mixed** item types that might confuse buyers about the true value.
+For example, a batch with weight 5 could be one Triangle (weight 5) or five Squares (weight 1 each).
+Also be careful not to create batches with all your items, otherwise you risk disqualification!
+More details on disqualification in the **Item Management Rules** section below.
+:::
 
 ### Bidding Phase
 
-Each buyer secretly bids a number of coins. The highest bidder wins and receives the items. The seller earns the bid
-amount.
+**As a Buyer:**
 
-**Strategy Tip**: Consider the potential value of the items versus your current inventory needs when bidding.
+1. Evaluate the potential value of the batch based on its weight
+2. Place a bid using coins. (this is not mandatory)
+3. The highest bidder wins the entire batch and pays their bid amount to the seller
 
-### Bluffing & Strategy
+::: details 💡 Bidding Strategy Tip
+Consider both the potential value of items AND your current **inventory** needs when bidding.
+Sometimes it's worth overbidding to prevent another player from getting crucial items.
+:::
 
-Sellers can bluff to drive up bids; buyers must decide how much to risk based on limited information.
+### Bluffing & Strategic Elements
 
-**Strategy Tip**: Pay attention to other players' bidding patterns to identify when they might be desperate for certain
-items.
+- **Sellers** can create misleading batches to drive up bids
+- **Buyers** must decide how much to risk with limited information
 
-### Item Requirements
+::: details 💡 Advanced Strategy Tip
+Pay close attention to other players' bidding patterns to identify when they might be desperate for certain items.
+Players often bid higher when they need specific items to complete sets.
+In the last round, for example, a player with a lot of items will desperately try to sell them,
+trying to avoid being disqualified from being the player with most items.
+:::
 
-- Players must end the game with at least one item; those with zero items are disqualified from winning.
-- Players cannot win if they finish the game with more items than any other player.
+### ⚠️ Disqualification Rules
 
-**Important Strategy Tip**: Balance your inventory! Too many or too few items will cost you the game.
+- You **MUST** end the game with at least one item
 
-## Victory Conditions
+> Players with zero items are **DISQUALIFIED** from winning
 
-When all turns are completed, players count their remaining coins. The player with the most coins, who also meets the
-item requirements, wins.
+- You **CANNOT** win if you finish with more items than any other player
 
-**To Win, You Must**:
+> Having the most items **DISQUALIFIES** you from winning
 
-- Have at least one item
-- Not have the most items among all players
-- Have the highest number of coins among eligible players 
+::: details 💡 Important Balance Tip
+**Balance your inventory!** Too many items will disqualify you, while too few risk elimination. Aim for the
+second-highest item count among players.
+:::
+
+## 🏆 Victory Conditions
+
+When all turns are completed:
+
+1. Check if any player has been **disqualified**
+2. Calculate your **Set Collection Bonus** (see below)
+3. Add your bonus to your coin total
+4. The player with the most coins who meets all item requirements `wins`
+
+### Set Collection Bonus System
+
+At the end of the game, you earn bonus coins for collecting complete sets of identical items:
+
+- A 'set' consists of exactly **3 identical items**
+- For each complete set, gain **10 × item weight** in bonus coins
+- Incomplete sets provide **NO bonus**
+
+#### Set Bonus Examples
+
+```
+⬜⬜⬜ = 3 Squares = +10 coins (10 × 1 weight)
+🛆🛆🛆= 3 Triangles = +50 coins (10 × 5 weight)
+⭕⭕⭕ = 3 Circles = +30 coins (10 × 3 weight)
+```
+
+::: details 💡 Set Collection Strategy
+Focus on high-value sets like Triangles when possible. A single Triangle set (+50 coins) is worth more than collecting a
+Square and Circle set combined (+40 coins)!
+:::
+
+## 🚀 Coming Soon Features
+
+Future expansions to the AuctiOn game:
+
+### 📈 Market Events
+
+Dynamic economic changes that affect item values during gameplay.
+
+::: details Feature Preview
+Market events will periodically change item values
+or provide temporary bonuses for holding specific combinations of items.
+These events create opportunities for strategic planning and can dramatically shift the game's direction!
+:::
+
+### ⚡ Power-ups
+
+Special abilities that provide tactical advantages during gameplay.
+
+::: details Feature Preview
+`Power-ups` will let you peek at batch contents,
+block specific players from bidding, manipulate auction outcomes, and more.
+Each power-up has a unique cost and timing, adding a new layer of strategy to your decision-making!
+:::
+
+### 👥 Friend System
+
+Connect with other players for enhanced social gameplay.
+
+::: details Feature Preview
+The friend system will let you send requests, maintain a list of friends,
+and invite friends to game lobbies.
+You'll also be able to see when friends are online and track your gameplay history together!
+:::
