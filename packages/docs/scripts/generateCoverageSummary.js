@@ -218,7 +218,9 @@ async function generateCoverageSummary() {
   console.log('Generating coverage summary...')
 
   let markdownContent = '# Test Coverage Reports\n\n'
-  markdownContent += 'This page displays the test coverage reports for each microservice in the AuctiOn platform.\n\n'
+  markdownContent += 'This page displays the test coverage reports for each microservice in the AuctiOn platform.' +
+    'The coverage reports provide insights into the code quality and testing effectiveness.\n' +
+    'They are generated from the **jest** coverage reports files.\n\n'
 
   for (const service of SERVICES) {
     markdownContent += `## ${service.charAt(0).toUpperCase() + service.slice(1).replace(/-/g, ' ')}\n\n`
