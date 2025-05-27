@@ -13,7 +13,7 @@
     "test:frontend": "echo \"No tests for frontend package\"",
     "test:docs": "echo \"No tests for docs package\"",
     "build:common": "npm run build --workspace=@auction/common",
-    "build:frontend": "npm run build --workspace=frontend",
+    "build:frontend": "npm run build-only --workspace=frontend",
     "build:auction-service": "npm run build --workspace=auction-service",
     "build:api-gateway": "npm run build --workspace=api-gateway",
     "build:auth-service": "npm run build --workspace=auth-service",
