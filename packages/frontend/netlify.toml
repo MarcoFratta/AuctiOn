@@ -1,5 +1,5 @@
 [[redirects]]
   from = "/api/*"
-  to = "https://swine-glowing-publicly.ngrok-free.app"
+  to = "https://swine-glowing-publicly.ngrok-free.app/:splat"
   status = 200
   force = true
