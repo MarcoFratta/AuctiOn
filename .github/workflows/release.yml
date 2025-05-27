@@ -16,10 +16,10 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 23
           cache: 'npm'
       - name: Install dependencies
-        run: npm ci
+        run: npm i
       - name: Build project
         run: npm run build
       - name: Build docs
@@ -32,7 +32,7 @@ jobs:
         run: |
           mkdir -p release
           cp docker-compose.yml release/
-          cp env.tempalte release/env.template
+          cp env.template release/env.template
           cp -r packages/api-gateway/dist release/api-gateway
           cp -r packages/auth-service/dist release/auth-service
           cp -r packages/user-service/dist release/user-service
