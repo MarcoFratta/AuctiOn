@@ -1,0 +1,26 @@
+{
+  "branches": ["master", "main"],
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    [
+      "@semantic-release/github",
+      {
+        "assets": [
+          {
+            "path": "frontend.zip",
+            "label": "Frontend Application"
+          },
+          {
+            "path": "docs.zip",
+            "label": "Documentation"
+          },
+          {
+            "path": "auction-services.zip",
+            "label": "Microservices"
+          }
+        ]
+      }
+    ]
+  ]
+}
