@@ -12,13 +12,8 @@ strategic auctions where they buy and sell items, aiming to accumulate the most 
 [![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 [![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white)](https://jwt.io/)
 
-## Features
-
-- Real-time bidding and auction mechanics
-- Secure user authentication with JWT
-- Lobby system for game matchmaking
-- Microservices architecture for scalability
-- Socket.IO integration for instant updates
+A `live` demo is hosted at:
+🌐 **[AuctiOn](https://auctionlinegame.netlify.app/)**
 
 ## Documentation
 
