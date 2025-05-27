@@ -19,39 +19,6 @@ A `live` demo is hosted at:
 
 📚 **[View Documentation on GitHub Pages](https://marcofratta.github.io/AuctiOn/)**
 
-## Using the Releases
-
-Each release provides three downloadable assets:
-
-### 1. Frontend Application
-
-- Download `frontend.zip` from the latest release
-- Extract the files to a web server or hosting service (like Netlify, Vercel, or GitHub Pages)
-- For local testing, you can serve it with a simple HTTP server:
-  ```bash
-  npx serve -s /path/to/extracted/frontend
-  ```
-
-### 2. Documentation
-
-- Download `docs.zip` from the latest release
-- Extract and host on a web server, or browse locally by opening `index.html`
-
-### 3. Microservices Deployment
-
-- Download `auction-services.zip` from the latest release
-- Extract the package to your server
-- Navigate to the extracted directory
-- Copy `env.template` to `.env` and configure your environment variables
-- Run the services with Docker Compose:
-  ```bash
-  docker-compose up -d
-  ```
-- The services will be available at their configured ports (default: API Gateway on port 3000)
-
-For detailed deployment instructions, refer to
-the [documentation](https://marcofratta.github.io/AuctiOn/report/deployment).
-
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
