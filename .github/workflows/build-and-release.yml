@@ -1,0 +1,167 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Build common package first
+      - name: Build common package
+        run: npm run build-common
+
+      # Build backend services
+      - name: Build backend services
+        run: |
+          npm run build:auth-service
+          npm run build:lobby-service
+          npm run build:user-service
+          npm run build:auction-service
+          npm run build:api-gateway
+
+      # Build frontend
+      - name: Build frontend
+        run: npm run build:frontend
+
+      # Build docs
+      - name: Build docs
+        run: cd packages/docs && npm run docs:build
+
+      # Run tests
+      - name: Run tests
+        run: npm test
+
+      # Create artifact archives
+      - name: Package frontend
+        run: |
+          mkdir -p artifacts
+          cd packages/frontend
+          zip -r ../../artifacts/frontend.zip dist
+
+      - name: Package docs
+        run: |
+          cd packages/docs
+          zip -r ../../artifacts/docs.zip docs/.vitepress/dist
+
+      - name: Package backend services
+        run: |
+          mkdir -p artifacts/services
+          cp -r packages/auth-service/dist artifacts/services/auth-service
+          cp -r packages/lobby-service/dist artifacts/services/lobby-service
+          cp -r packages/user-service/dist artifacts/services/user-service
+          cp -r packages/auction-service/dist artifacts/services/auction-service
+          cp -r packages/api-gateway/dist artifacts/services/api-gateway
+          cp -r packages/common/dist artifacts/services/common
+          cd artifacts
+          zip -r auction-services.zip services
+
+      # Upload artifacts
+      - name: Upload frontend artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: frontend
+          path: artifacts/frontend.zip
+
+      - name: Upload docs artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: docs
+          path: artifacts/docs.zip
+
+      - name: Upload backend services artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend-services
+          path: artifacts/auction-services.zip
+
+  release:
+    needs: build
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Download all artifacts
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: artifacts
+
+      - name: Move artifacts to root
+        run: |
+          mv artifacts/frontend/frontend.zip .
+          mv artifacts/docs/docs.zip .
+          mv artifacts/backend-services/auction-services.zip .
+
+      # Use semantic-release to create a release
+      - name: Semantic Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release
+
+  # Optional: Deploy docs to GitHub Pages
+  deploy-docs:
+    needs: build
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Download docs artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: docs
+          path: artifacts
+
+      - name: Unzip docs
+        run: |
+          mkdir -p dist
+          unzip artifacts/docs.zip -d dist
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/docs/.vitepress/dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4 
