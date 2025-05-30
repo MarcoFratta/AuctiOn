@@ -8,8 +8,17 @@
     "outDir": "./dist",
     "rootDir": ".",
     "baseUrl": "./src",
-    "types": ["@types/jest"]
+    "types": ["@types/jest"],
+    "paths": {
+      "@auction/common": ["../../common/src/index.ts"],
+      "@auction/common/*": ["../../common/src/*"]
+    }
   },
   "include": ["./src/**/*", "./__tests__/**/*", "./docs/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules", "dist"],
+  "references": [
+    {
+      "path": "../common"
+    }
+  ]
 }
