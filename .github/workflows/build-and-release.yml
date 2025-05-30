@@ -25,36 +25,9 @@ jobs:
       - name: Install dependencies
         run: npm i
 
-      # First build the common package with its custom build script
-      - name: Build common package
-        run: npm run build --workspace=@auction/common
-        env:
-          NODE_ENV: production
-
-      # Create a custom symlink for CI
-      - name: Create symlinks for the common package
-        run: |
-          for SERVICE in auction-service auth-service lobby-service user-service api-gateway; do
-            echo "Setting up @auction/common for $SERVICE"
-            # Create node_modules/@auction directory if it doesn't exist
-            mkdir -p packages/$SERVICE/node_modules/@auction
-          
-            # Remove existing symlink if it exists
-            rm -rf packages/$SERVICE/node_modules/@auction/common
-          
-            # Create symlink
-            ln -s ../../../common packages/$SERVICE/node_modules/@auction/common
-          done
-
-      # Build all services
-      - name: Build services
-        run: npx tsc --build
-        env:
-          NODE_ENV: production
-
-      # Build frontend
-      - name: Build frontend
-        run: npm run build:frontend
+      # Build all services using the CI-specific build process
+      - name: Build services and frontend
+        run: npm run build:ci
         env:
           NODE_ENV: production
 
