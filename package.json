@@ -30,6 +30,7 @@
     "build": "npm run build-common && npm run link-common && npm run build:services && npm run build:frontend",
     "build:ci": "npm run build-common && npm run setup-common-ci && npm run build:services && npm run build:frontend",
     "build:ci-direct": "node scripts/ci-direct-build.js && npm run build:frontend",
+    "build:workspace": "node scripts/workspace-build.js",
     "lint": "npx eslint --max-warnings=0 --fix --config eslint.config.mjs",
     "prettier": "npx prettier --write .",
     "init": "husky",
