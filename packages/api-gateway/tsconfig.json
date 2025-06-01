@@ -4,21 +4,13 @@
     "composite": true,
     "declaration": true,
     "declarationMap": true,
+    "esModuleInterop": true,
     "incremental": true,
     "outDir": "./dist",
     "rootDir": ".",
     "baseUrl": "./src",
-    "types": ["@types/jest"],
-    "paths": {
-      "@auction/common": ["../../common/src/index.ts"],
-      "@auction/common/*": ["../../common/src/*"]
-    }
+    "types": ["@types/jest"]
   },
   "include": ["./src/**/*", "./__tests__/**/*", "./docs/**/*"],
-  "exclude": ["node_modules", "dist"],
-  "references": [
-    {
-      "path": "../common"
-    }
-  ]
+  "exclude": ["node_modules", "dist"]
 }

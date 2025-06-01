@@ -25,15 +25,9 @@ jobs:
       - name: Install dependencies
         run: npm i
 
-      # Build all services using TypeScript project references
-      - name: Build backend services
-        run: npm run build-ts
-        env:
-          NODE_ENV: production
-
-      # Build frontend
-      - name: Build frontend
-        run: npm run build:frontend
+      # Build all services using the production build script
+      - name: Build backend services and frontend
+        run: npm run build:prod
         env:
           NODE_ENV: production
 

@@ -63,52 +63,6 @@ function createProductionPackageJson() {
   }
 }
 
-// Update the tsconfig.json for a service to include paths to common package
-function updateTsConfig(servicePath) {
-  try {
-    const tsconfigPath = path.join(servicePath, 'tsconfig.json')
-    if (!fs.existsSync(tsconfigPath)) {
-      console.warn(`Warning: tsconfig.json not found in ${servicePath}, skipping TypeScript configuration.`)
-      return
-    }
-
-    const tsconfig = JSON.parse(fs.readFileSync(tsconfigPath, 'utf8'))
-
-    // Ensure compilerOptions and paths exist
-    if (!tsconfig.compilerOptions) {
-      tsconfig.compilerOptions = {}
-    }
-
-    // Add paths mapping for @auction/common
-    tsconfig.compilerOptions.paths = {
-      ...(tsconfig.compilerOptions.paths || {}),
-      '@auction/common': ['../common/src/index.ts'],
-      '@auction/common/*': ['../common/src/*'],
-    }
-
-    // Add reference to common package
-    if (!tsconfig.references) {
-      tsconfig.references = []
-    }
-
-    // Check if reference to common already exists
-    const hasCommonRef = tsconfig.references.some(
-      ref => ref.path === '../common',
-    )
-
-    if (!hasCommonRef) {
-      tsconfig.references.push({ path: '../common' })
-    }
-
-    // Write the updated tsconfig back to the file
-    fs.writeFileSync(tsconfigPath, JSON.stringify(tsconfig, null, 2))
-
-    console.log(`Updated TypeScript configuration for ${path.basename(servicePath)}`)
-  } catch (error) {
-    console.error(`Error updating tsconfig.json for ${servicePath}:`, error)
-  }
-}
-
 // Link common package to all services
 for (const service of services) {
   const servicePath = path.join(packagesDir, service)
@@ -147,21 +101,6 @@ for (const service of services) {
       // Copy dist directory
       fs.cpSync(distPath, path.join(commonLinkPath, 'dist'), { recursive: true })
 
-      // Copy source for TypeScript compilation
-      const srcPath = path.join(commonPackagePath, 'src')
-      if (fs.existsSync(srcPath)) {
-        fs.cpSync(srcPath, path.join(commonLinkPath, 'src'), { recursive: true })
-      }
-
-      // Copy TypeScript definition files
-      const typeFiles = ['tsconfig.json', 'tsconfig.cjs.json', 'tsconfig.esm.json']
-      for (const typeFile of typeFiles) {
-        const typeFilePath = path.join(commonPackagePath, typeFile)
-        if (fs.existsSync(typeFilePath)) {
-          fs.copyFileSync(typeFilePath, path.join(commonLinkPath, typeFile))
-        }
-      }
-
       // Create a minimal package.json
       const prodPackageJson = createProductionPackageJson()
       fs.writeFileSync(
@@ -175,59 +114,9 @@ for (const service of services) {
       fs.symlinkSync(commonPackagePath, commonLinkPath, 'junction')
       console.log(`Successfully linked @auction/common to ${service} for development`)
     }
-
-    // Update TypeScript configuration
-    updateTsConfig(servicePath)
   } catch (error) {
     console.error(`Error linking @auction/common to ${service}:`, error)
   }
-}
-
-// Create a composite tsconfig.json in the root directory for TypeScript project references
-function createCompositeTypescriptConfig() {
-  const rootTsConfigPath = path.join(__dirname, '..', 'tsconfig.json')
-
-  // Create or update the root tsconfig.json
-  try {
-    let rootTsConfig = {}
-    if (fs.existsSync(rootTsConfigPath)) {
-      rootTsConfig = JSON.parse(fs.readFileSync(rootTsConfigPath, 'utf8'))
-    }
-
-    // Set up project references
-    if (!rootTsConfig.references) {
-      rootTsConfig.references = []
-    }
-
-    // Clear existing references and add the common package
-    rootTsConfig.references = [{ path: './packages/common' }]
-
-    // Add references to all services
-    for (const service of services) {
-      const servicePath = path.join(packagesDir, service)
-      if (fs.existsSync(servicePath)) {
-        rootTsConfig.references.push({ path: `./packages/${service}` })
-      }
-    }
-
-    // Set other necessary options
-    rootTsConfig.compilerOptions = {
-      ...(rootTsConfig.compilerOptions || {}),
-      composite: true,
-      declaration: true,
-    }
-
-    // Write the updated config
-    fs.writeFileSync(rootTsConfigPath, JSON.stringify(rootTsConfig, null, 2))
-    console.log('Updated root TypeScript configuration with project references')
-  } catch (error) {
-    console.error('Error creating composite TypeScript configuration:', error)
-  }
-}
-
-// Only create the composite config in development mode
-if (!isProduction) {
-  createCompositeTypescriptConfig()
 }
 
 console.log('Linking complete!')
