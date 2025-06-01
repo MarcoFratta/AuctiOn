@@ -24,12 +24,16 @@ jobs:
 
       - name: Install dependencies
         run: npm i
-
-      # Build all services using the production build script
-      - name: Build backend services and frontend
-        run: npm run build:prod
-        env:
-          NODE_ENV: production
+        # Build backend services
+      - name: Build backend services
+        run: |
+          npm run build-common
+          npm run build:auth-service
+          npm run build:lobby-service
+          npm run build:user-service
+          npm run build:auction-service
+          npm run build:api-gateway
+          npm run build:frontend
 
       # Build docs
       - name: Build docs
@@ -59,13 +63,7 @@ jobs:
           cp -r packages/user-service/dist artifacts/services/user-service
           cp -r packages/auction-service/dist artifacts/services/auction-service
           cp -r packages/api-gateway/dist artifacts/services/api-gateway
-          
-          # Include the common package in the artifacts
-          mkdir -p artifacts/services/common
           cp -r packages/common/dist artifacts/services/common
-          cp packages/common/package.json artifacts/services/common/
-          
-          # Create the archive
           cd artifacts
           zip -r auction-services.zip services
 
