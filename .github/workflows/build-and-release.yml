@@ -19,21 +19,28 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '23.9.0'
+          node-version: '23'
           cache: 'npm'
 
       - name: Install dependencies
         run: npm i
-        # Build backend services
+
+      # Build common package first
+      - name: Build common package
+        run: npm run build-common
+
+      # Build backend services
       - name: Build backend services
         run: |
-          npm run build-common
           npm run build:auth-service
           npm run build:lobby-service
           npm run build:user-service
           npm run build:auction-service
           npm run build:api-gateway
-          npm run build:frontend
+
+      # Build frontend
+      - name: Build frontend
+        run: npm run build:frontend
 
       # Build docs
       - name: Build docs
@@ -99,7 +106,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '23.9.0'
+          node-version: '18'
           cache: 'npm'
 
       - name: Install dependencies
