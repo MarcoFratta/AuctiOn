@@ -25,71 +25,9 @@ jobs:
       - name: Install dependencies
         run: npm i
 
-      # Debug information
-      - name: Debug workspace structure
-        run: |
-          echo "=== Root package.json ==="
-          cat package.json | grep -A 10 workspaces
-          echo "=== Packages directory ==="
-          ls -la packages/
-          echo "=== Common package structure ==="
-          ls -la packages/common/
-          echo "=== Common package.json ==="
-          cat packages/common/package.json | head -20
-
-      # Build common package first
-      - name: Build common package
-        run: npm run build-common
-        env:
-          NODE_ENV: production
-
-      # Debug common package after build
-      - name: Debug common package after build
-        run: |
-          echo "=== Common dist structure ==="
-          ls -la packages/common/dist/
-          echo "=== ESM output ==="
-          ls -la packages/common/dist/esm/src/ || echo "ESM not found"
-          echo "=== CJS output ==="
-          ls -la packages/common/dist/cjs/src/ || echo "CJS not found"
-
-      # Setup common for CI using npm link
-      - name: Setup common package with npm link
-        id: npm_link
-        continue-on-error: true
-        run: |
-          cd packages/common
-          npm link
-          cd ../auction-service
-          npm link @auction/common
-          cd ../auth-service
-          npm link @auction/common
-          cd ../lobby-service
-          npm link @auction/common
-          cd ../user-service
-          npm link @auction/common
-          cd ../api-gateway
-          npm link @auction/common
-
-      # Fallback: Use direct build script if npm link failed
-      - name: Fallback to direct build script
-        if: steps.npm_link.outcome == 'failure'
-        run: npm run build:ci-direct
-
-      # Test one service before building all (only if npm link succeeded)
-      - name: Test build one service
-        if: steps.npm_link.outcome == 'success'
-        run: |
-          cd packages/auction-service
-          echo "=== Checking node_modules ==="
-          ls -la node_modules/@auction/ || echo "No @auction in node_modules"
-          echo "=== Trying to build ==="
-          npm run build
-
-      # Build all services (only if npm link succeeded)
+      # Build all services using the CI-specific build process
       - name: Build services and frontend
-        if: steps.npm_link.outcome == 'success'
-        run: npm run build:services && npm run build:frontend
+        run: npm run build:ci
         env:
           NODE_ENV: production
 
