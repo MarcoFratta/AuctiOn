@@ -5,11 +5,11 @@
     "declaration": true,
     "declarationMap": true,
     "incremental": true,
-    "outDir": "./dist/cjs",
-    "rootDir": "./src",
+    "outDir": "./dist",
+    "rootDir": ".",
     "baseUrl": "./src",
     "types": ["@types/jest"]
   },
-  "include": ["./src/**/*"],
-  "exclude": ["node_modules", "dist", "./__tests__/**/*", "./docs/**/*"]
+  "include": ["./src/**/*", "./__tests__/**/*", "./docs/**/*"],
+  "exclude": ["node_modules", "dist"]
 }

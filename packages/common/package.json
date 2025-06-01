@@ -5,8 +5,7 @@
     "test": "npx jest",
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "build:esm": "tsc -p tsconfig.esm.json",
-    "build:project": "tsc",
-    "build": "npm run build:project && npm run build:cjs && npm run build:esm"
+    "build": "npm run build:cjs && npm run build:esm"
   },
   "exports": {
     ".": {
