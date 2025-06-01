@@ -15,35 +15,15 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          clean: true
-
-      - name: Verify workspace setup
-        run: |
-          echo "=== Current working directory ==="
-          pwd
-          echo "=== Workspace contents ==="
-          ls -la
-          echo "=== Git status ==="
-          git status
-          echo "=== Packages directory ==="
-          ls -la packages/ || echo "No packages directory found"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.18.0'
+          node-version: '23.9.0'
           cache: 'npm'
 
       - name: Install dependencies
-        run: |
-          echo "=== npm version ==="
-          npm --version
-          echo "=== node version ==="
-          node --version
-          echo "=== Installing dependencies ==="
-          npm ci --no-fund --no-audit
-          echo "=== Verifying workspace packages ==="
-          npm ls --depth=0 || true
+        run: npm i
 
       # Debug information
       - name: Debug workspace structure
@@ -57,17 +37,8 @@ jobs:
           echo "=== Common package.json ==="
           cat packages/common/package.json | head -20
 
-      # Try workspace-based build first (npm standard approach)
-      - name: Build with npm workspaces (primary)
-        id: workspace_build
-        continue-on-error: true
-        run: npm run build:workspace
-        env:
-          NODE_ENV: production
-
-      # Fallback to direct file copying approach if workspace build fails
-      - name: Build with direct copying (fallback)
-        if: steps.workspace_build.outcome == 'failure'
+      # Use the robust direct build approach
+      - name: Build all services with direct approach
         run: npm run build:ci-direct
         env:
           NODE_ENV: production
