@@ -18,7 +18,7 @@ RUN npm ci
 RUN npm run build:cjs --workspace=@auction/common
 
 # Build frontend
-RUN npm run build --workspace=@auction/frontend
+RUN npm run build-only --workspace=@auction/frontend
 
 # Production stage
 FROM nginx:alpine
