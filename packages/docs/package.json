@@ -1,4 +1,6 @@
 {
+  "name": "@auction/docs",
+  "version": "1.0.0",
   "scripts": {
     "docs:generate": "node scripts/generateDocs.js",
     "docs:dev": "npm run generate-coverage && vitepress dev docs",

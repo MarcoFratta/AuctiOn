@@ -1,5 +1,6 @@
 {
-  "name": "e2e-tests",
+  "name": "@auction/e2e-tests",
+  "version": "1.0.0",
   "scripts": {
     "test": "./scripts/run-tests.sh"
   },

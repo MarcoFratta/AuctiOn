@@ -1,5 +1,5 @@
 {
-  "name": "frontend",
+  "name": "@auction/frontend",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
@@ -34,7 +34,7 @@
     "chart.js": "^4.4.8",
     "lucide-vue-next": "^0.483.0",
     "motion-v": "^1.0.0-beta.3",
-    "pinia": "^2.3.1",
+    "pinia": "^3.0.2",
     "pinia-plugin-persistedstate": "^4.2.0",
     "simplex-noise": "^4.0.3",
     "socket.io-client": "^4.8.1",

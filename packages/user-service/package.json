@@ -1,5 +1,5 @@
 {
-  "name": "user-service",
+  "name": "@auction/user-service",
   "version": "1.0.0",
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^7.2.0",
