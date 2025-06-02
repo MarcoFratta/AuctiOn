@@ -39,7 +39,7 @@ jobs:
           cd packages/docs && npm ci
 
       - name: Build VitePress site
-        run: cd packages/docs && npm run docs:build
+        run: npm run docs:build -w @auction/docs
         env:
           NODE_ENV: production
 

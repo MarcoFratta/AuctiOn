@@ -11,10 +11,10 @@ services.forEach(service => {
   try {
 
     // Build the service
-    execSync(`npm run build -w ${service}-service`, { stdio: 'inherit' })
+    execSync(`npm run build -w @auction/${service}-service`, { stdio: 'inherit' })
 
     // Generate the documentation
-    execSync(`npm run doc -w ${service}-service`, { stdio: 'inherit' })
+    execSync(`npm run doc -w @auction/${service}-service`, { stdio: 'inherit' })
 
     // Ensure the specs directory exists
     const specsDir = path.join(__dirname, '..', 'docs', 'specs')
