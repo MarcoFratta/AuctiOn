@@ -31,12 +31,17 @@ jobs:
         with:
           node-version: 18
           cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
 
-      - name: Install root dependencies
-        run: npm ci
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd packages/docs && npm ci
 
       - name: Build VitePress site
         run: cd packages/docs && npm run docs:build
+        env:
+          NODE_ENV: production
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
