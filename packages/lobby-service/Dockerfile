@@ -15,7 +15,8 @@ COPY packages/lobby-service ./packages/lobby-service
 RUN rm -rf packages/lobby-service/__tests__
 
 # Install ALL dependencies with workspace linking (remove --production flag)
-RUN npm ci
+RUN npm install -w @auction/common --production
+RUN npm install -w @auction/lobby-service --production
 RUN npm install typescript
 
 # Build common package FIRST (this is crucial)

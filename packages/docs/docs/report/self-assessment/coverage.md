@@ -1,7 +1,7 @@
 # Test Coverage Reports
 
-This page displays the test coverage reports for each microservice in the AuctiOn platform.
-The coverage reports provide insights into the code quality and testing effectiveness.
+This page displays the test coverage reports for each microservice in the AuctiOn platform.The coverage reports provide
+insights into the code quality and testing effectiveness.
 They are generated from the **jest** coverage reports files.
 
 ## Auction service
@@ -736,97 +736,5 @@ They are generated from the **jest** coverage reports files.
 
 ## Api gateway
 
-### Overall Coverage
-
-| Type           | Coverage | Covered/Total |
-|----------------|----------|---------------|
-| **Statements** | 🔴 13%   | 29/221        |
-| **Branches**   | 🔴 27%   | 14/51         |
-| **Functions**  | 🔴 6%    | 2/33          |
-| **Lines**      | 🔴 13%   | 29/221        |
-
-### Coverage by Directory
-
-#### src
-
-| Type           | Coverage | Covered/Total |
-|----------------|----------|---------------|
-| **Statements** | 🔴 0%    | 0/52          |
-| **Branches**   | 🔴 0%    | 0/3           |
-| **Functions**  | 🔴 0%    | 0/2           |
-| **Lines**      | 🔴 0%    | 0/52          |
-
-| File      | Statements   | Branches      | Functions     | Lines        |
-|-----------|--------------|---------------|---------------|--------------|
-| App.ts    | 🔴 0% (0/33) | 🔴 0% (0/3)   | 🟢 100% (0/0) | 🔴 0% (0/33) |
-| WsApp.ts  | 🔴 0% (0/8)  | 🟢 100% (0/0) | 🔴 0% (0/1)   | 🔴 0% (0/8)  |
-| server.ts | 🔴 0% (0/11) | 🟢 100% (0/0) | 🔴 0% (0/1)   | 🔴 0% (0/11) |
-
-#### src/controllers
-
-| Type           | Coverage | Covered/Total |
-|----------------|----------|---------------|
-| **Statements** | 🔴 0%    | 0/84          |
-| **Branches**   | 🔴 0%    | 0/22          |
-| **Functions**  | 🔴 0%    | 0/18          |
-| **Lines**      | 🔴 0%    | 0/84          |
-
-| File               | Statements   | Branches     | Functions    | Lines        |
-|--------------------|--------------|--------------|--------------|--------------|
-| HealthChecker.ts   | 🔴 0% (0/18) | 🔴 0% (0/1)  | 🔴 0% (0/4)  | 🔴 0% (0/18) |
-| ProxyController.ts | 🔴 0% (0/66) | 🔴 0% (0/21) | 🔴 0% (0/14) | 🔴 0% (0/66) |
-
-#### src/routes
-
-| Type           | Coverage | Covered/Total |
-|----------------|----------|---------------|
-| **Statements** | 🔴 0%    | 0/10          |
-| **Branches**   | 🟢 100%  | 0/0           |
-| **Functions**  | 🔴 0%    | 0/2           |
-| **Lines**      | 🔴 0%    | 0/10          |
-
-| File      | Statements   | Branches      | Functions   | Lines        |
-|-----------|--------------|---------------|-------------|--------------|
-| Routes.ts | 🔴 0% (0/10) | 🟢 100% (0/0) | 🔴 0% (0/2) | 🔴 0% (0/10) |
-
-#### src/middlewares
-
-| Type           | Coverage | Covered/Total |
-|----------------|----------|---------------|
-| **Statements** | 🔴 34%   | 23/67         |
-| **Branches**   | 🔴 25%   | 4/16          |
-| **Functions**  | 🔴 13%   | 1/8           |
-| **Lines**      | 🔴 34%   | 23/67         |
-
-| File                 | Statements     | Branches      | Functions    | Lines          |
-|----------------------|----------------|---------------|--------------|----------------|
-| ErrorsMiddleware.ts  | 🔴 0% (0/17)   | 🔴 0% (0/4)   | 🔴 0% (0/3)  | 🔴 0% (0/17)   |
-| LoggingMiddleware.ts | 🔴 0% (0/6)    | 🟢 100% (0/0) | 🔴 0% (0/2)  | 🔴 0% (0/6)    |
-| AuthMiddleware.ts    | 🔴 52% (23/44) | 🔴 33% (4/12) | 🔴 33% (1/3) | 🔴 52% (23/44) |
-
-#### src/errors
-
-| Type           | Coverage | Covered/Total |
-|----------------|----------|---------------|
-| **Statements** | 🟡 67%   | 4/6           |
-| **Branches**   | 🟢 100%  | 0/0           |
-| **Functions**  | 🔴 33%   | 1/3           |
-| **Lines**      | 🟡 67%   | 4/6           |
-
-| File           | Statements   | Branches      | Functions    | Lines        |
-|----------------|--------------|---------------|--------------|--------------|
-| LobbyErrors.ts | 🟡 67% (4/6) | 🟢 100% (0/0) | 🔴 33% (1/3) | 🟡 67% (4/6) |
-
-#### src/configs
-
-| Type           | Coverage | Covered/Total |
-|----------------|----------|---------------|
-| **Statements** | 🟢 100%  | 2/2           |
-| **Branches**   | 🟢 100%  | 10/10         |
-| **Functions**  | 🟢 100%  | 0/0           |
-| **Lines**      | 🟢 100%  | 2/2           |
-
-| File      | Statements    | Branches        | Functions     | Lines         |
-|-----------|---------------|-----------------|---------------|---------------|
-| Config.ts | 🟢 100% (2/2) | 🟢 100% (10/10) | 🟢 100% (0/0) | 🟢 100% (2/2) |
+No coverage data available for this service.
 

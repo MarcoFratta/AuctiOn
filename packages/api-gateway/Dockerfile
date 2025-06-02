@@ -15,7 +15,8 @@ COPY packages/api-gateway ./packages/api-gateway
 RUN rm -rf packages/api-gateway/__tests__
 
 # Install ALL dependencies with workspace linking (remove --production flag)
-RUN npm ci
+RUN npm install -w @auction/common --production
+RUN npm install -w @auction/api-gateway --production
 RUN npm install typescript
 
 # Build common package FIRST (this is crucial)

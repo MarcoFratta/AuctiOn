@@ -12,11 +12,12 @@ COPY packages/common ./packages/common
 COPY packages/frontend ./packages/frontend
 
 # Install dependencies
-RUN npm ci
+RUN npm install -w @auction/common --production
+RUN npm install -w @auction/frontend --production --ignore-scripts
 
 # Build common package first
+RUN npm i -D @types/jest
 RUN npm run build:cjs --workspace=@auction/common
-
 # Build frontend
 RUN npm run build-only --workspace=@auction/frontend
 

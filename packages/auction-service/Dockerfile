@@ -15,7 +15,8 @@ COPY packages/auction-service ./packages/auction-service
 RUN rm -rf packages/auction-service/__tests__
 
 # Install ALL dependencies with workspace linking (remove --production flag)
-RUN npm ci
+RUN npm install -w @auction/common --production
+RUN npm install -w @auction/auction-service --production
 RUN npm install typescript
 
 # Build common package FIRST (this is crucial)

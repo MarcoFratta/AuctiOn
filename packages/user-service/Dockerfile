@@ -15,7 +15,8 @@ COPY packages/user-service ./packages/user-service
 RUN rm -rf packages/user-service/__tests__
 
 # Install ALL dependencies with workspace linking (remove --production flag)
-RUN npm ci
+RUN npm install -w @auction/common --production
+RUN npm install -w @auction/user-service --production
 RUN npm install typescript
 
 # Build common package FIRST (this is crucial)

@@ -15,7 +15,8 @@ COPY packages/auth-service ./packages/auth-service
 RUN rm -rf packages/auth-service/__tests__
 
 # Install ALL dependencies with workspace linking (remove --production flag)
-RUN npm ci
+RUN npm install -w @auction/common --production
+RUN npm install -w @auction/auth-service --production
 RUN npm install typescript
 
 # Build common package FIRST (this is crucial)
