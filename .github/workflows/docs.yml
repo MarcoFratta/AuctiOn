@@ -34,15 +34,10 @@ jobs:
           cache-dependency-path: '**/package-lock.json'
 
       - name: Install dependencies
-        run: |
-          npm ci
-          cd packages/docs && npm ci
-          npm install -D @types/jest
+        run: npm i
 
       - name: Build VitePress site
         run: npm run docs:build -w @auction/docs
-        env:
-          NODE_ENV: production
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
