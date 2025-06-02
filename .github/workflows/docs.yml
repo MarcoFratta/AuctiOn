@@ -37,6 +37,7 @@ jobs:
         run: |
           npm ci
           cd packages/docs && npm ci
+          npm install -D @types/jest
 
       - name: Build VitePress site
         run: npm run docs:build -w @auction/docs
