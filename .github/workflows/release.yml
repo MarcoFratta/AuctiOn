@@ -44,7 +44,7 @@ jobs:
 
       - name: Package docs
         run: |
-          cd packages/docs/.vitepress/dist
+          cd packages/docs/docs/.vitepress/dist
           zip -r ../../../../docs.zip .
 
       - name: Package backend services
