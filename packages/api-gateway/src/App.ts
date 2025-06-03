@@ -7,21 +7,23 @@ import { ProxyController } from './controllers/ProxyController'
 import { LoggingMiddleware } from './middlewares/LoggingMiddleware'
 import { healthChecker } from './controllers/HealthChecker'
 import { config } from './configs/Config'
+import logger from '@auction/common/logger'
 
 const app = express()
-const allowedOrigins = ['http://frontend:5173']
 if (config.nodeEnv != 'production') {
-  allowedOrigins.push('http://localhost:5174')
+  config.corsAllowedOrigins.push('http://localhost:5174')
 }
+logger.info(`API Gateway running in ${config.nodeEnv} mode`)
+
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: config.corsAllowedOrigins,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key'],
   })
 )
-
+logger.info(`CORS enabled for origins: ${config.corsAllowedOrigins.join(', ')}`)
 app.use(express.json())
 app.use(LoggingMiddleware.requestLogger)
 

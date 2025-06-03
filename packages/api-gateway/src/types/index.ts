@@ -6,6 +6,7 @@ export interface ServiceConfig {
 export interface GatewayConfig {
   port: number
   nodeEnv?: string
+  corsAllowedOrigins: string[]
   services: {
     [key: string]: ServiceConfig
   }
