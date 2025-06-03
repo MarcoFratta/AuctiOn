@@ -4,6 +4,8 @@
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^7.2.0",
     "@auction/common": "^1.0.0",
+    "@types/cors": "^2.8.18",
+    "cors": "^2.8.5",
     "express": "^4.21.1",
     "mongoose": "^8.8.2",
     "swagger-ui-express": "^5.0.1",

@@ -25,6 +25,7 @@ import { AuctionConsumer } from './controllers/AuctionConsumer'
 import { MessageSender } from './controllers/MessageSender'
 import { TimerEventSource } from './services/TimerEventSource'
 import { RedisUserInfoRepository } from './repositories/RedisUserInfoRepository'
+import cors from 'cors'
 
 export class App {
   public wsAdapter: WebSocketAdapter
@@ -155,6 +156,14 @@ export class App {
   private setupMiddlewares = () => {
     const app = express()
     app.use(express.json())
+    app.use(
+      cors({
+        origin: config.corsAllowedOrigins,
+        credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key', 'X-User'],
+      })
+    )
 
     app.head('/health', (req, res) => {
       logger.info('Health check requested')

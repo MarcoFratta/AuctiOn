@@ -15,6 +15,8 @@ import { KafkaConsumer } from './controllers/KafkaConsumer'
 import { LobbyService } from './services/LobbyService'
 import logger from '@auction/common/logger'
 import { UserLobbyRepository } from './repositories/UserLobbyRepository'
+import cors from 'cors'
+import { config } from './configs/config'
 
 export class App {
   public app: Application
@@ -64,6 +66,14 @@ export class App {
 
   private setupMiddlewares(): void {
     this.app.use(express.json())
+    this.app.use(
+      cors({
+        origin: config.corsAllowedOrigins,
+        credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key', 'X-User'],
+      })
+    )
     this.app.head('/health', (req, res) => {
       logger.info('Health check requested')
       res.status(200).send('OK')

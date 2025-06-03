@@ -7,5 +7,5 @@ export const config = {
   redisUrl: process.env.REDIS_URL ?? 'redis://localhost:6379',
   redisPort: parseInt(process.env.REDIS_PORT ?? '6379'),
   healthPort: 3006,
-  corsAllowedOrigins: [process.env.API_GATEWAY_URL || 'http://api-gateway:3000'],
+  corsAllowedOrigins: process.env.CORS_ALLOWED_ORIGINS?.split(',') || ['http://api-gateway:3000'],
 }

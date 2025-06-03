@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   lobby-service:
     build:
@@ -5,15 +7,14 @@ services:
       dockerfile: packages/lobby-service/Dockerfile
     restart: always
     environment:
-      - DB_URI=${LOBBY_S_DB_URI:-mongodb://test:27017/lobby}
       - PORT=${LOBBY_S_C_PORT:-3000}
       - NODE_ENV=${LOBBY_S_NODE_ENV:-production}
-      - USER_SERVICE_URI=${LOBBY_S_USER_SERVICE_URI:-http://user-service:3000/users}
-      - KAFKA_BROKERS=${LOBBY_S_KAFKA_BROKERS:-kafka:9092}
+      - DB_URI=${LOBBY_S_DB_URI:-mongodb://localhost:27017/lobby}
+      - KAFKA_BROKERS=${LOBBY_S_KAFKA_BROKERS:-kafka-broker:9092}
+      - CORS_ALLOWED_ORIGINS=${LOBBY_S_CORS_ORIGINS:-http://api-gateway:3000}
     networks:
-      - lobby-network
       - microservices-network
-      - kafka-network
+      - lobby-network
     depends_on:
       - lobby-mongodb
       - kafka-broker
@@ -33,23 +34,25 @@ services:
       - "3000:3000"
     dns: [ "8.8.8.8", "1.1.1.1" ]
     environment:
-      - DB_URI=${AUTH_S_DB_URI:-mongodb://test:27017/auth}
       - PORT=${AUTH_S_C_PORT:-3000}
-      - JWT_ACCESS_SECRET=${AUTH_S_ACCESS_SECRET}
-      - JWT_REFRESH_SECRET=${AUTH_S_REFRESH_SECRET}
-      - ACCESS_EXPIRATION_MINUTES=${AUTH_S_ACCESS_EXPIRATION_MINUTES:-15m}
-      - REFRESH_EXPIRATION_DAYS=${AUTH_S_REFRESH_EXPIRATION_DAYS:-7d}
-      - REDIS_URL=${AUTH_S_REDIS_URI:-redis://redis:6379}
-      - REDIS_PORT=${AUTH_S_REDIS_PORT:-6379}
       - NODE_ENV=${AUTH_S_NODE_ENV:-production}
-      - APP_BASE_URL=${AUTH_S_APP_BASE_URL:-http://localhost:3000}
-      - EMAIL_USER=${AUTH_S_EMAIL_USER}
-      - EMAIL_PASS=${AUTH_S_EMAIL_PASS}
+      - DB_URI=${AUTH_S_DB_URI:-mongodb://localhost:27017/auth}
+      - REDIS_URI=${AUTH_S_REDIS_URI:-redis://redis:6379}
+      - REDIS_PORT=${AUTH_S_REDIS_PORT:-6379}
       - USER_SERVICE_URI=${AUTH_S_USER_SERVICE_URI:-http://user-service:3000/users}
+      - ACCESS_TOKEN_SECRET=${AUTH_S_ACCESS_SECRET:-jwtaccesss}
+      - REFRESH_TOKEN_SECRET=${AUTH_S_REFRESH_SECRET:-jwtrefresh}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${AUTH_S_ACCESS_EXPIRATION_MINUTES:-15}
+      - REFRESH_TOKEN_EXPIRE_DAYS=${AUTH_S_REFRESH_EXPIRATION_DAYS:-7}
+      - RESET_TOKEN_EXPIRE_MINUTES=${AUTH_S_RESET_EXPIRATION_MINUTES:-15}
+      - EMAIL_USER=${AUTH_S_EMAIL_USER:-}
+      - EMAIL_PASS=${AUTH_S_EMAIL_PASS:-}
+      - EMAIL_HOST=${AUTH_S_EMAIL_HOST:-smtp.gmail.com}
+      - EMAIL_PORT=${AUTH_S_EMAIL_PORT:-587}
+      - CORS_ALLOWED_ORIGINS=${AUTH_S_CORS_ORIGINS:-http://api-gateway:3000}
     networks:
-      - auth-network
-      - redis-network
       - microservices-network
+      - auth-network
     depends_on:
       - auth-mongodb
       - redis
@@ -71,6 +74,7 @@ services:
       - PORT=${USER_S_C_PORT:-3000}
       - NODE_ENV=${USER_S_NODE_ENV:-production}
       - DB_URI=${USER_S_DB_URI:-mongodb://localhost:27017/users}
+      - CORS_ALLOWED_ORIGINS=${USER_S_CORS_ORIGINS:-http://api-gateway:3000}
     networks:
       - user-network
       - microservices-network
@@ -117,6 +121,7 @@ services:
       - REDIS_URL=${AUCTION_S_REDIS_URI:-redis://redis:6379}
       - REDIS_PORT=${AUCTION_S_REDIS_PORT:-6379} # Keep if service uses it directly
       - API_GATEWAY_URI=${AUCTION_S_API_GATEWAY_URI:-http://api-gateway:3000}
+      - CORS_ALLOWED_ORIGINS=${AUCTION_S_CORS_ORIGINS:-http://api-gateway:3000}
     networks:
       - microservices-network
       - kafka-network

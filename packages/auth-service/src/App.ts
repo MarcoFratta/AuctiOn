@@ -15,6 +15,7 @@ import Redis from 'ioredis'
 import { MailClientImpl } from './services/MailClientImpl'
 import nodemailer, { Transporter } from 'nodemailer'
 import { emailConfig } from './configs/emailConfig'
+import cors from 'cors'
 
 export class App {
   public app: express.Express
@@ -37,6 +38,14 @@ export class App {
   private initializeMiddleware() {
     this.app.use(express.json())
     this.app.use(cookieParser())
+    this.app.use(
+      cors({
+        origin: config.corsAllowedOrigins,
+        credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key', 'X-User'],
+      })
+    )
     this.app.head('/health', (req, res) => {
       logger.info('Health check requested')
       res.status(200).send('OK')
