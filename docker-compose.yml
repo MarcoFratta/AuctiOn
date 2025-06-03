@@ -15,6 +15,7 @@ services:
     networks:
       - microservices-network
       - lobby-network
+      - kafka-network
     depends_on:
       - lobby-mongodb
       - kafka-broker
@@ -53,6 +54,7 @@ services:
     networks:
       - microservices-network
       - auth-network
+      - redis-network
     depends_on:
       - auth-mongodb
       - redis
@@ -107,7 +109,6 @@ services:
     depends_on: # Optional, but helps with startup order
       - redis
       - kafka-broker
-      - auction-service # Wait for auction service (though LB handles unavailability)
 
   auction-service:
     build:
