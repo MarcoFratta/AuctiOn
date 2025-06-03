@@ -116,6 +116,7 @@ services:
       - KAFKA_BROKERS=${AUCTION_S_KAFKA_BROKERS:-kafka-broker:9092}
       - REDIS_URL=${AUCTION_S_REDIS_URI:-redis://redis:6379}
       - REDIS_PORT=${AUCTION_S_REDIS_PORT:-6379} # Keep if service uses it directly
+      - API_GATEWAY_URI=${AUCTION_S_API_GATEWAY_URI:-http://api-gateway:3000}
     networks:
       - microservices-network
       - kafka-network

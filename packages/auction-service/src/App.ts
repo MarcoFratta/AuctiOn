@@ -125,7 +125,7 @@ export class App {
         }
       },
       cors: {
-        origin: '*',
+        origin: config.corsAllowedOrigins,
         methods: ['GET', 'POST'],
         credentials: true,
       },
