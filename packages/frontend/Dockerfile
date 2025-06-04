@@ -17,7 +17,7 @@ RUN npm install -w @auction/frontend --production --ignore-scripts
 
 # Build common package first
 RUN npm i -D @types/jest
-RUN npm run build:cjs --workspace=@auction/common
+RUN npm run build:esm --workspace=@auction/common
 # Build frontend
 RUN npm run build-only --workspace=@auction/frontend
 
