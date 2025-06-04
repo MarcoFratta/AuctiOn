@@ -125,8 +125,8 @@ export class AuthController {
   ): void {
     const cookieOptions = {
       httpOnly: true,
-      secure: false,
-      sameSite: 'lax' as const,
+      secure: true,
+      sameSite: 'none' as const,
       path: '/',
     }
 
