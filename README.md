@@ -13,7 +13,7 @@ strategic auctions where they buy and sell items, aiming to accumulate the most 
 [![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white)](https://jwt.io/)
 
 A `live` demo is hosted at:
-🌐 **[AuctiOn](https://auctionlinegame.netlify.app/)**
+🌐 **[AuctiOn](https://swine-glowing-publicly.ngrok-free.app)**
 
 ## Documentation
 
