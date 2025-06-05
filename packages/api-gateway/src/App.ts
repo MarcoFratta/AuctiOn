@@ -10,6 +10,7 @@ import { config } from './configs/Config'
 import logger from '@auction/common/logger'
 
 const app = express()
+app.set('trust proxy', 1) // Trust first proxy (for rate limiting and IP address)
 if (config.nodeEnv != 'production') {
   config.corsAllowedOrigins.push('http://localhost:5174')
 }

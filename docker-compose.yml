@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   lobby-service:
     build:
@@ -12,6 +10,10 @@ services:
       - DB_URI=${LOBBY_S_DB_URI:-mongodb://localhost:27017/lobby}
       - KAFKA_BROKERS=${LOBBY_S_KAFKA_BROKERS:-kafka-broker:9092}
       - CORS_ALLOWED_ORIGINS=${LOBBY_S_CORS_ORIGINS:-http://api-gateway:3000}
+      - USER_SERVICE_URI=${LOBBY_S_USER_SERVICE_URI:-http://user-service:3000/users}
+      - AUTH_SERVICE_URI=${LOBBY_S_AUTH_SERVICE_URI:-http://auth-service:3000/auth}
+
+
     networks:
       - microservices-network
       - lobby-network
@@ -31,8 +33,6 @@ services:
       context: .
       dockerfile: packages/auth-service/Dockerfile
     restart: always
-    ports:
-      - "3000:3000"
     dns: [ "8.8.8.8", "1.1.1.1" ]
     environment:
       - PORT=${AUTH_S_C_PORT:-3000}
