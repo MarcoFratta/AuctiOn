@@ -55,8 +55,8 @@
                   shadow-none dark:hover:bg-gray-600  rounded-lg
                   font-semibold transition-all w-full"
                   confirm-button-text="Delete"
-                  confirm-message="Are you sure you want to delete this lobby? This action cannot be undone."
-                  confirm-title="Delete lobby"
+                  :confirm-message="`Are you sure you want to ${amIAdmin ? 'delete' : 'leave'} this lobby?`"
+                  :confirm-title="`${amIAdmin ? 'Delete' : 'Leave'} lobby`"
                   require-confirm
                   @click="leave"
                 >
