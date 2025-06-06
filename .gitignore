@@ -148,7 +148,6 @@ out
 .idea
 dist
 dist/*
-public
 *.http
 docs/*
 /init.bash
