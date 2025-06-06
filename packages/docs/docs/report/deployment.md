@@ -41,8 +41,8 @@ npm start
 
 ### 4. Accessing the Application
 
-- Frontend: http://localhost:8080
-- API Gateway: http://localhost:80/api
+- Frontend: http://localhost
+- API Gateway: http://localhost:8080
 
 ### 5. Stopping the Application
 
@@ -72,7 +72,7 @@ npm run dev -w auth-service
 
 When running services individually, make sure that the
 necessary services are running and accessible. For example, the `auth-service`
-uses **Redis** so make sure to start a `Redis server `before running the service:
+uses **Redis** so make sure to start a `Redis server` before running the service:
 
 ```bash
 docker run -p 6379:6379 redis
