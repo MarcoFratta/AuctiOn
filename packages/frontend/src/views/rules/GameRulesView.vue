@@ -23,14 +23,14 @@
           </p>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
             <InnerCard class="flex flex-col justify-center items-center gap-1">
-              <GameShapes size="lg" type="circle" />
-              <h2 class="text-violet-600 dark:text-app-violet-400 text-lg font-bold">Circle</h2>
-              <p class="text-gray-600 dark:text-app-violet-300 text-sm">Weight: 1</p>
-            </InnerCard>
-            <InnerCard class="flex flex-col justify-center items-center gap-1">
               <GameShapes size="lg" type="triangle" />
               <h2 class="text-violet-600 dark:text-app-violet-400 text-lg font-bold">Triangle</h2>
-              <p class="text-gray-600 dark:text-app-violet-300 text-sm">Weight: 1</p>
+              <p class="text-gray-600 dark:text-app-violet-300 text-sm">Weight: 5</p>
+            </InnerCard>
+            <InnerCard class="flex flex-col justify-center items-center gap-1">
+              <GameShapes size="lg" type="circle" />
+              <h2 class="text-violet-600 dark:text-app-violet-400 text-lg font-bold">Circle</h2>
+              <p class="text-gray-600 dark:text-app-violet-300 text-sm">Weight: 3</p>
             </InnerCard>
             <InnerCard class="flex flex-col justify-center items-center gap-1">
               <GameShapes size="lg" type="square" />
@@ -63,8 +63,6 @@
                 <li>
                   Each player starts with a random assortment of items (Squares, Triangles, Circles)
                 </li>
-                <li>Total starting item weight: 15</li>
-                <li>Starting coins: 50</li>
               </ul>
             </InnerCard>
             <InnerCard>
@@ -115,8 +113,8 @@
                 <h3 class="text-xl text-zinc-900 dark:text-white font-semibold">Bidding Phase</h3>
               </div>
               <p class="text-gray-700 dark:text-app-white mb-2">
-                Each buyer secretly bids a number of coins. The highest bidder wins and receives the
-                items. The seller earns the bid amount.
+                Each buyer bids a number of coins. The highest bidder wins and receives the items.
+                The seller earns the bid amount.
               </p>
               <StrategyTip>
                 Consider the potential value of the items versus your current inventory needs when
@@ -201,7 +199,7 @@
             </div>
           </InnerCard>
 
-          <!-- New Set Collection Bonus Card -->
+          <!-- Set Collection Bonus Card -->
           <InnerCard>
             <div class="flex items-center mb-3">
               <div class="bg-violet-100 dark:bg-app-fuchsia-900/20 p-2 rounded-full mr-3">
