@@ -50,6 +50,7 @@ services:
       - EMAIL_PASS=${AUTH_S_EMAIL_PASS:-}
       - EMAIL_HOST=${AUTH_S_EMAIL_HOST:-smtp.gmail.com}
       - EMAIL_PORT=${AUTH_S_EMAIL_PORT:-587}
+      - APP_BASE_URL=${AUTH_S_APP_BASE_URL:-http://localhost:3000}
       - CORS_ALLOWED_ORIGINS=${AUTH_S_CORS_ORIGINS:-http://api-gateway:3000}
     networks:
       - microservices-network
