@@ -15,44 +15,67 @@
           <h2 class="text-2xl font-bold text-zinc-900 dark:text-white mb-4 flex items-center">
             <span class="mr-2">📜</span> Introduction
           </h2>
-          <p class="text-gray-700 dark:text-app-white mb-6">
+          <p class="text-gray-700 dark:text-app-white mb-4">
             AuctiOn is a turn-based auction game where players strategically buy and sell items to
             accumulate as much virtual currency as possible by the end of the game. Players must
             balance their inventory, engage in bidding wars, bluff, and manage their resources
             effectively.
           </p>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+          <p class="text-gray-700 dark:text-app-white">
+            The game revolves around limited information - sellers reveal only the total weight of
+            their items, creating opportunities for strategic deception and calculated risk-taking.
+          </p>
+        </BaseCard>
+      </section>
+
+      <!-- Game Items Section -->
+      <section class="mb-10">
+        <BaseCard>
+          <h2 class="text-2xl font-bold text-zinc-900 dark:text-white mb-4 flex items-center">
+            <span class="mr-2">🎲</span> Game Items
+          </h2>
+          <p class="text-gray-700 dark:text-app-white mb-6">
+            The game features three types of items, each with different weights that determine their
+            strategic value:
+          </p>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <InnerCard class="flex flex-col justify-center items-center gap-1">
               <GameShapes size="lg" type="triangle" />
               <h2 class="text-violet-600 dark:text-app-violet-400 text-lg font-bold">Triangle</h2>
               <p class="text-gray-600 dark:text-app-violet-300 text-sm">Weight: 5</p>
+              <p class="text-gray-500 dark:text-gray-400 text-xs text-center">Highest value item</p>
             </InnerCard>
             <InnerCard class="flex flex-col justify-center items-center gap-1">
               <GameShapes size="lg" type="circle" />
               <h2 class="text-violet-600 dark:text-app-violet-400 text-lg font-bold">Circle</h2>
               <p class="text-gray-600 dark:text-app-violet-300 text-sm">Weight: 3</p>
+              <p class="text-gray-500 dark:text-gray-400 text-xs text-center">Medium value item</p>
             </InnerCard>
             <InnerCard class="flex flex-col justify-center items-center gap-1">
               <GameShapes size="lg" type="square" />
               <h2 class="text-violet-600 dark:text-app-violet-400 text-lg font-bold">Square</h2>
               <p class="text-gray-600 dark:text-app-violet-300 text-sm">Weight: 1</p>
+              <p class="text-gray-500 dark:text-gray-400 text-xs text-center">Basic value item</p>
             </InnerCard>
           </div>
+          <StrategyTip>
+            Item weights are crucial for both sellers (determining batch weight) and buyers
+            (estimating value)!
+          </StrategyTip>
         </BaseCard>
       </section>
 
-      <!-- Objective and Setup Section -->
+      <!-- Game Setup Section -->
       <section class="mb-10">
         <BaseCard>
           <h2 class="text-2xl font-bold text-zinc-900 dark:text-white mb-4 flex items-center">
-            <span class="mr-2">🎯</span> Objective & Game Setup
+            <span class="mr-2">⚙️</span> Game Setup
           </h2>
           <div class="space-y-4">
             <InnerCard>
-              <h3 class="text-xl text-zinc-900 dark:text-white font-semibold mb-2">Objective</h3>
+              <h3 class="text-xl text-zinc-900 dark:text-white font-semibold mb-2">Players</h3>
               <p class="text-gray-700 dark:text-app-white">
-                Players aim to accumulate the highest amount of virtual coins by the end of the game
-                while meeting specific item requirements.
+                Multiple players can participate in each game session with no maximum limit.
               </p>
             </InnerCard>
             <InnerCard>
@@ -63,29 +86,55 @@
                 <li>
                   Each player starts with a random assortment of items (Squares, Triangles, Circles)
                 </li>
+                <li>All players begin with the same number of virtual coins for bidding</li>
+                <li>Starting inventory is balanced to ensure fair gameplay</li>
+                <li>No player knows the exact starting inventory of other players</li>
               </ul>
             </InnerCard>
             <InnerCard>
-              <h3 class="text-xl text-zinc-900 dark:text-white font-semibold mb-2">
-                Turn Structure
-              </h3>
+              <h3 class="text-xl text-zinc-900 dark:text-white font-semibold mb-2">Game Length</h3>
               <p class="text-gray-700 dark:text-app-white">
-                Each turn, one player acts as the "seller," while the others are "buyers." The
-                seller offers a batch of items, revealing only the total weight.
+                Each player gets exactly one turn as the seller, making the total number of rounds
+                equal to the number of players.
               </p>
             </InnerCard>
           </div>
         </BaseCard>
       </section>
 
-      <!-- Game Mechanics Section -->
+      <!-- Turn Structure & Mechanics Section -->
       <section class="mb-10">
         <BaseCard>
           <h2 class="text-2xl font-bold text-zinc-900 dark:text-white mb-4 flex items-center">
-            <span class="mr-2">⚙️</span> Game Mechanics
+            <span class="mr-2">🔄</span> Turn Structure & Mechanics
           </h2>
 
           <div class="space-y-6">
+            <!-- Turn Overview -->
+            <InnerCard>
+              <h3 class="text-xl text-zinc-900 dark:text-white font-semibold mb-3">
+                Turn Overview
+              </h3>
+              <p class="text-gray-700 dark:text-app-white mb-4">
+                Each turn, one player acts as the "seller," while all others become "buyers." The
+                seller role rotates through all players until everyone has had one turn to sell.
+              </p>
+              <div
+                class="bg-violet-50 dark:bg-neutral-800 p-4 rounded-lg border border-violet-200 dark:border-app-fuchsia-600/30"
+              >
+                <h4 class="text-lg font-semibold text-violet-600 dark:text-app-fuchsia-400 mb-2">
+                  Turn Phases
+                </h4>
+                <ol class="list-decimal list-inside text-gray-700 dark:text-app-white space-y-1">
+                  <li>Seller selects items to auction</li>
+                  <li>Seller announces total weight only</li>
+                  <li>Buyers place their bids simultaneously</li>
+                  <li>Highest bidder wins the items</li>
+                  <li>Coins and items are transferred</li>
+                </ol>
+              </div>
+            </InnerCard>
+
             <!-- Selling Phase -->
             <InnerCard>
               <div class="flex items-center mb-3">
@@ -95,12 +144,13 @@
                 <h3 class="text-xl text-zinc-900 dark:text-white font-semibold">Selling Phase</h3>
               </div>
               <p class="text-gray-700 dark:text-app-white mb-2">
-                The seller selects a batch of items to sell and announces the total weight. Buyers
-                do not know the exact quantity or types of items.
+                The seller selects a batch of items from their inventory to auction and announces
+                only the total weight. Buyers do not know the exact quantity, types, or distribution
+                of items in the batch.
               </p>
               <StrategyTip>
                 As a seller, consider creating batches that might confuse buyers about the true
-                value.
+                value - mix high and low value items strategically!
               </StrategyTip>
             </InnerCard>
 
@@ -112,60 +162,115 @@
                 </div>
                 <h3 class="text-xl text-zinc-900 dark:text-white font-semibold">Bidding Phase</h3>
               </div>
-              <p class="text-gray-700 dark:text-app-white mb-2">
-                Each buyer bids a number of coins. The highest bidder wins and receives the items.
-                The seller earns the bid amount.
+              <p class="text-gray-700 dark:text-app-white mb-4">
+                All buyers simultaneously place their bids using their available coins. The highest
+                bidder wins the entire batch and pays their bid amount to the seller.
               </p>
-              <StrategyTip>
-                Consider the potential value of the items versus your current inventory needs when
-                bidding.
-              </StrategyTip>
-            </InnerCard>
-
-            <!-- Bluffing and Strategy -->
-            <InnerCard>
-              <div class="flex items-center mb-3">
-                <div class="bg-violet-100 dark:bg-app-fuchsia-900/20 p-2 rounded-full mr-3">
-                  <span class="text-xl">🎭</span>
-                </div>
-                <h3 class="text-xl text-zinc-900 dark:text-white font-semibold">
-                  Bluffing & Strategy
-                </h3>
+              <div class="bg-gray-50 dark:bg-neutral-800 p-3 rounded border">
+                <h4 class="font-semibold text-gray-800 dark:text-gray-200 mb-2">Bidding Rules:</h4>
+                <ul
+                  class="list-disc list-inside text-gray-700 dark:text-app-white space-y-1 text-sm"
+                >
+                  <li>Bids are placed simultaneously and revealed together</li>
+                  <li>Ties are resolved randomly</li>
+                  <li>You cannot bid more coins than you currently have</li>
+                  <li>Winning bidder receives all items in the batch</li>
+                </ul>
               </div>
-              <p class="text-gray-700 dark:text-app-white mb-2">
-                Sellers can bluff to drive up bids; buyers must decide how much to risk based on
-                limited information.
-              </p>
               <StrategyTip>
-                Pay attention to other players' bidding patterns to identify when they might be
-                desperate for certain items.
-              </StrategyTip>
-            </InnerCard>
-
-            <!-- Item Rules -->
-            <InnerCard>
-              <div class="flex items-center mb-3">
-                <div class="bg-violet-100 dark:bg-app-fuchsia-900/20 p-2 rounded-full mr-3">
-                  <span class="text-xl">⚠️</span>
-                </div>
-                <h3 class="text-xl text-zinc-900 dark:text-white font-semibold">
-                  Item Requirements
-                </h3>
-              </div>
-              <ul class="list-disc list-inside text-gray-700 dark:text-app-white space-y-2">
-                <li>
-                  Players must end the game with at least one item; those with zero items are
-                  disqualified from winning.
-                </li>
-                <li>
-                  Players cannot win if they finish the game with more items than any other player.
-                </li>
-              </ul>
-              <StrategyTip label="Important">
-                Balance your inventory! Too many or too few items will cost you the game.
+                Consider the potential value range based on weight and your current inventory needs
+                when bidding!
               </StrategyTip>
             </InnerCard>
           </div>
+        </BaseCard>
+      </section>
+
+      <!-- Strategic Elements Section -->
+      <section class="mb-10">
+        <BaseCard>
+          <h2 class="text-2xl font-bold text-zinc-900 dark:text-white mb-4 flex items-center">
+            <span class="mr-2">🎭</span> Strategic Elements
+          </h2>
+
+          <div class="space-y-6">
+            <!-- Bluffing and Deception -->
+            <InnerCard>
+              <div class="flex items-center mb-3">
+                <div class="bg-violet-100 dark:bg-app-fuchsia-900/20 p-2 rounded-full mr-3">
+                  <span class="text-xl">🃏</span>
+                </div>
+                <h3 class="text-xl text-zinc-900 dark:text-white font-semibold">
+                  Bluffing & Information Warfare
+                </h3>
+              </div>
+              <p class="text-gray-700 dark:text-app-white mb-2">
+                Since only total weight is revealed, sellers can strategically mislead buyers about
+                the actual contents. A weight of 15 could be 3 triangles (high value) or 15 squares
+                (low value)!
+              </p>
+              <StrategyTip>
+                Pay attention to other players' bidding patterns and inventory needs to identify
+                when they might be desperate for certain items.
+              </StrategyTip>
+            </InnerCard>
+
+            <!-- Resource Management -->
+            <InnerCard>
+              <div class="flex items-center mb-3">
+                <div class="bg-violet-100 dark:bg-app-fuchsia-900/20 p-2 rounded-full mr-3">
+                  <span class="text-xl">⚖️</span>
+                </div>
+                <h3 class="text-xl text-zinc-900 dark:text-white font-semibold">
+                  Resource Management
+                </h3>
+              </div>
+              <p class="text-gray-700 dark:text-app-white mb-2">
+                Balance your coin spending with inventory management. Spending too much early might
+                leave you unable to bid on crucial later auctions.
+              </p>
+              <StrategyTip>
+                Remember that earning coins as a seller is just as important as winning auctions as
+                a buyer!
+              </StrategyTip>
+            </InnerCard>
+          </div>
+        </BaseCard>
+      </section>
+
+      <!-- Item Requirements & Restrictions Section -->
+      <section class="mb-10">
+        <BaseCard>
+          <h2 class="text-2xl font-bold text-zinc-900 dark:text-white mb-4 flex items-center">
+            <span class="mr-2">⚠️</span> Item Requirements & Restrictions
+          </h2>
+
+          <InnerCard>
+            <p class="text-gray-700 dark:text-app-white mb-4">
+              To be eligible for victory, players must meet specific inventory requirements at game
+              end:
+            </p>
+            <div
+              class="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-600/30 mb-4"
+            >
+              <h3 class="text-lg font-semibold text-red-600 dark:text-red-400 mb-2">
+                Disqualification Conditions:
+              </h3>
+              <ul class="list-disc list-inside text-gray-700 dark:text-app-white space-y-2">
+                <li>
+                  <strong>Zero items:</strong> Players with no items at game end are disqualified
+                </li>
+                <li>
+                  <strong>Too many items:</strong> Players with the most items among all players
+                  cannot win
+                </li>
+              </ul>
+            </div>
+            <StrategyTip label="Critical">
+              Balance your inventory carefully! You need at least one item but cannot have the most
+              items to win.
+            </StrategyTip>
+          </InnerCard>
         </BaseCard>
       </section>
 
@@ -179,23 +284,22 @@
           <InnerCard class="mb-6">
             <p class="text-gray-700 dark:text-app-white mb-4">
               When all turns are completed, players first calculate their Set Collection Bonus (see
-              below), which is added to their coin total. Then, the player with the most coins, who
-              also meets the item requirements, wins.
+              below), which is added to their coin total. The player with the most coins who also
+              meets the item requirements wins.
             </p>
-            <!-- Existing Win Conditions Box -->
             <div
               class="bg-violet-50 dark:bg-neutral-800 p-4 rounded-lg border border-violet-200 dark:border-app-fuchsia-600/30"
             >
               <h3 class="text-xl text-violet-600 dark:text-app-fuchsia-400 font-semibold mb-2">
                 To Win, You Must:
               </h3>
-              <ul class="list-disc list-inside text-gray-700 dark:text-app-white space-y-2">
-                <li>Have at least one item</li>
+              <ol class="list-decimal list-inside text-gray-700 dark:text-app-white space-y-2">
+                <li>Have at least one item in your inventory</li>
                 <li>Not have the most items among all players</li>
                 <li>
                   Have the highest number of coins (including Set Bonus) among eligible players
                 </li>
-              </ul>
+              </ol>
             </div>
           </InnerCard>
 
@@ -204,19 +308,17 @@
             <div class="flex items-center mb-3">
               <div class="bg-violet-100 dark:bg-app-fuchsia-900/20 p-2 rounded-full mr-3">
                 <span class="text-xl">🎁</span>
-                <!-- Using a gift box icon for bonus -->
               </div>
               <h3 class="text-xl text-zinc-900 dark:text-white font-semibold">
                 Set Collection Bonus
               </h3>
             </div>
             <p class="text-gray-700 dark:text-app-white mb-4">
-              At the end of the game, after all rounds are complete, players earn bonus coins for
-              collecting sets of identical items. A 'set' consists of exactly
-              <strong>3</strong> identical items.
+              At game end, players earn bonus coins for collecting sets of identical items. A 'set'
+              consists of exactly <strong>3</strong> identical items.
             </p>
             <p class="text-gray-700 dark:text-app-white mb-4">
-              For each complete set you possess, you gain bonus coins equal to
+              For each complete set, you gain bonus coins equal to
               <strong>10 times the item's weight</strong>. Only complete sets count; leftover items
               do not contribute to this bonus.
             </p>
@@ -228,16 +330,7 @@
                 <p class="font-semibold text-zinc-800 dark:text-gray-200">1 Set of Squares</p>
                 <p class="text-sm text-gray-600 dark:text-gray-400">(3 items)</p>
                 <p class="text-lg font-bold text-violet-600 dark:text-app-violet-400">+10 Coins</p>
-                <p class="text-xs text-gray-500 dark:text-gray-500">(10 x 1 weight)</p>
-              </div>
-              <div
-                class="text-center p-3 bg-gray-50 dark:bg-neutral-800 rounded border border-gray-200 dark:border-gray-700"
-              >
-                <GameShapes class="mx-auto mb-1" size="md" type="triangle" />
-                <p class="font-semibold text-zinc-800 dark:text-gray-200">1 Set of Triangles</p>
-                <p class="text-sm text-gray-600 dark:text-gray-400">(3 items)</p>
-                <p class="text-lg font-bold text-violet-600 dark:text-app-violet-400">+50 Coins</p>
-                <p class="text-xs text-gray-500 dark:text-gray-500">(10 x 5 weight)</p>
+                <p class="text-xs text-gray-500 dark:text-gray-500">(10 × 1 weight)</p>
               </div>
               <div
                 class="text-center p-3 bg-gray-50 dark:bg-neutral-800 rounded border border-gray-200 dark:border-gray-700"
@@ -246,14 +339,121 @@
                 <p class="font-semibold text-zinc-800 dark:text-gray-200">1 Set of Circles</p>
                 <p class="text-sm text-gray-600 dark:text-gray-400">(3 items)</p>
                 <p class="text-lg font-bold text-violet-600 dark:text-app-violet-400">+30 Coins</p>
-                <p class="text-xs text-gray-500 dark:text-gray-500">(10 x 3 weight)</p>
+                <p class="text-xs text-gray-500 dark:text-gray-500">(10 × 3 weight)</p>
+              </div>
+              <div
+                class="text-center p-3 bg-gray-50 dark:bg-neutral-800 rounded border border-gray-200 dark:border-gray-700"
+              >
+                <GameShapes class="mx-auto mb-1" size="md" type="triangle" />
+                <p class="font-semibold text-zinc-800 dark:text-gray-200">1 Set of Triangles</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400">(3 items)</p>
+                <p class="text-lg font-bold text-violet-600 dark:text-app-violet-400">+50 Coins</p>
+                <p class="text-xs text-gray-500 dark:text-gray-500">(10 × 5 weight)</p>
               </div>
             </div>
             <StrategyTip>
-              Collecting sets, especially high-weight ones like Triangles, can significantly boost
-              your final score! Balance set collection with the standard item requirements.
+              Collecting sets, especially high-weight triangles, can significantly boost your final
+              score! Balance set collection with meeting the item requirements.
             </StrategyTip>
           </InnerCard>
+        </BaseCard>
+      </section>
+
+      <!-- Disconnection Handling Section -->
+      <section class="mb-10">
+        <BaseCard>
+          <h2 class="text-2xl font-bold text-zinc-900 dark:text-white mb-4 flex items-center">
+            <span class="mr-2">🔌</span> Disconnection Handling
+          </h2>
+
+          <div class="space-y-4">
+            <InnerCard>
+              <div class="flex items-center mb-3">
+                <div class="bg-violet-100 dark:bg-app-fuchsia-900/20 p-2 rounded-full mr-3">
+                  <span class="text-xl">⏰</span>
+                </div>
+                <h3 class="text-xl text-zinc-900 dark:text-white font-semibold">Turn Skipping</h3>
+              </div>
+              <p class="text-gray-700 dark:text-app-white mb-2">
+                If a player is disconnected when their turn to be the seller arrives, their turn is
+                automatically skipped. The game continues with the next player in the rotation.
+              </p>
+              <div
+                class="bg-blue-50 dark:bg-blue-900/20 p-3 rounded border border-blue-200 dark:border-blue-600/30"
+              >
+                <p class="text-blue-800 dark:text-blue-300 text-sm">
+                  <strong>Note:</strong> Skipped players lose their opportunity to earn coins as a
+                  seller for that round.
+                </p>
+              </div>
+            </InnerCard>
+
+            <InnerCard>
+              <div class="flex items-center mb-3">
+                <div class="bg-violet-100 dark:bg-app-fuchsia-900/20 p-2 rounded-full mr-3">
+                  <span class="text-xl">🔄</span>
+                </div>
+                <h3 class="text-xl text-zinc-900 dark:text-white font-semibold">
+                  Reconnection Policy
+                </h3>
+              </div>
+              <p class="text-gray-700 dark:text-app-white mb-4">
+                Players can reconnect to the game at any time if they experience connection issues:
+              </p>
+              <div class="space-y-3">
+                <div
+                  class="bg-green-50 dark:bg-green-900/20 p-3 rounded border border-green-200 dark:border-green-600/30"
+                >
+                  <h4 class="font-semibold text-green-700 dark:text-green-400 mb-1">
+                    ✅ Can Reconnect:
+                  </h4>
+                  <ul
+                    class="list-disc list-inside text-green-800 dark:text-green-300 text-sm space-y-1"
+                  >
+                    <li>Temporary disconnections due to network issues</li>
+                    <li>Browser crashes or accidental tab closures</li>
+                    <li>Any intentional disconnection</li>
+                  </ul>
+                </div>
+                <div
+                  class="bg-red-50 dark:bg-red-900/20 p-3 rounded border border-red-200 dark:border-red-600/30"
+                >
+                  <h4 class="font-semibold text-red-700 dark:text-red-400 mb-1">
+                    ❌ Cannot Reconnect:
+                  </h4>
+                  <ul
+                    class="list-disc list-inside text-red-800 dark:text-red-300 text-sm space-y-1"
+                  >
+                    <li>Players who voluntarily leave the lobby/game</li>
+                    <li>Players who are kicked by the host</li>
+                  </ul>
+                </div>
+              </div>
+            </InnerCard>
+
+            <InnerCard>
+              <div class="flex items-center mb-3">
+                <div class="bg-violet-100 dark:bg-app-fuchsia-900/20 p-2 rounded-full mr-3">
+                  <span class="text-xl">⚡</span>
+                </div>
+                <h3 class="text-xl text-zinc-900 dark:text-white font-semibold">Game Continuity</h3>
+              </div>
+              <p class="text-gray-700 dark:text-app-white mb-2">
+                The game continues regardless of player disconnections. Disconnected players:
+              </p>
+              <ul class="list-disc list-inside text-gray-700 dark:text-app-white space-y-1 ml-4">
+                <li>Cannot participate in bidding while disconnected</li>
+                <li>Have their selling turns skipped if disconnected</li>
+                <li>Retain their inventory and coins when they reconnect</li>
+                <li>Can resume normal gameplay once reconnected</li>
+              </ul>
+            </InnerCard>
+          </div>
+
+          <StrategyTip label="Connection Tips">
+            Ensure a stable internet connection throughout the game. Missing your selling turn means
+            losing a valuable opportunity to earn coins!
+          </StrategyTip>
         </BaseCard>
       </section>
 
@@ -261,8 +461,6 @@
       <section class="mb-10">
         <BaseCard class="overflow-hidden">
           <div class="relative">
-            <!-- Remove the violet background gradient -->
-
             <div class="relative z-10">
               <!-- Header with animated stars -->
               <div class="flex items-center justify-between mb-6">
@@ -348,7 +546,7 @@
                 </div>
               </div>
 
-              <!-- Newsletter signup teaser - replace violet background with a subtle border -->
+              <!-- Newsletter signup teaser -->
               <div
                 class="mt-6 p-4 bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row items-center justify-between shadow-sm"
               >
