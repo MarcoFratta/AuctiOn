@@ -34,7 +34,7 @@ export class RedisTimerRepo implements TimerRepo {
       return null
     }
 
-    return JSON.parse(timerData)
+    return JSON.parse(timerData).startTime || null
   }
 
   async removeTimer(auctionId: string): Promise<void> {
