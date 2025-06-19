@@ -7,6 +7,7 @@ import './custom.css'
 
 export default {
   extends: DefaultTheme,
+
   async enhanceApp({ app }) {
     theme.enhanceApp({ app })
   },
