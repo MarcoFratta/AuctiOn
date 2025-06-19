@@ -24,3 +24,29 @@
 * Data consistency and integrity across multiple services.
 * Handle user authentication and authorization securely.
 * The Auction timer should be consistent across all players.
+
+## Glossary
+
+* **Seller**: The player who is currently selling items during an auction round. Each auction has one seller who
+  presents items for bidding.
+
+* **Buyer**: Any player participating in an auction who can place bids on the items being sold by the seller.
+
+* **Lobby Admin/Lobby Creator**: These terms are synonymous and refer to the user who created the lobby. The lobby admin
+  has special privileges including the ability to kick players from the lobby and delete the entire lobby.
+
+* **Leaving vs Disconnecting**:
+  - **Leaving** means permanently exiting the lobby. Once a player leaves, they lose their membership and cannot
+    reconnect to that lobby anymore.
+  - **Disconnecting** is a temporary separation from the lobby due to network issues or client closure. Disconnected
+    players can always reconnect to the lobby as they remain members.
+
+* **Join vs Connect**:
+  - **Join** means becoming a member of a lobby, which grants permission to connect to that lobby multiple times.
+  - **Connect** means establishing an active real-time connection to a lobby you have already joined.
+
+* **Auction**: A single round of the game where one player acts as the seller, presenting items for sale, while other
+  players act as buyers and can place bids on those items.
+
+* **Game**: A complete gaming session consisting of one or more auction turns, where players take turns being the seller
+  until the game concludes.
