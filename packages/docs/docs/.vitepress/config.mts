@@ -10,11 +10,15 @@ export default defineConfig({
   // Set the base path for GitHub Pages deployment
   // This should match your repository name
   base: '/AuctiOn/',
+  head: [
+    ['link', { rel: 'icon', href: '/AuctiOn/app-logo.svg' }],
+  ],
   ignoreDeadLinks: [
     /^http:\/\/localhost/,
     /^https:\/\/localhost/,
   ],
   themeConfig: {
+    logo: '/app-logo.svg',
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },

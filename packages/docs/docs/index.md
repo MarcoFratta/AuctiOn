@@ -8,6 +8,9 @@ hero:
   tagline: A strategic game of bluffing, bidding, and resource management
   actions:
     - theme: brand
+      text: Live Demo
+      link: https://auctiongame.it
+    - theme: alt
       text: Installation
       link: /report/deployment
     - theme: alt
