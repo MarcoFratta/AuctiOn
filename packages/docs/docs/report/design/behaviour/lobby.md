@@ -26,7 +26,6 @@ These are the following rules for the lobby lifecycle:
 > The creator does not have a ready state, as they are always ready to start the game.
 
 ![Lobby Service Behavior](../../images/LobbyBehavior.svg "Lobby service Behavior")
-> Click <a href="../../images/LobbyBehavior.svg" target="_blank">here</a> to enlarge
 
 
 Stateful lobby management allows for robust handling of player readiness,

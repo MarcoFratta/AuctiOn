@@ -68,7 +68,3 @@ The following tools and libraries were used for testing:
 - **MongoDB Memory Server**: In-memory MongoDB server for testing
 - **Redis Memory Server**: In-memory Redis server for testing
 - **Cypress**: End-to-end testing framework
-
-## Continuous Integration
-
-All tests are automatically run as part of the CI/CD pipeline to ensure code quality and prevent regressions. 

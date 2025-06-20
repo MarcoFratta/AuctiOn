@@ -10,10 +10,10 @@ They are generated from the **jest** coverage reports files.
 
 | Type           | Coverage | Covered/Total |
 |----------------|----------|---------------|
-| **Statements** | 🟢 83%   | 1095/1322     |
-| **Branches**   | 🟡 62%   | 93/149        |
+| **Statements** | 🟢 83%   | 1097/1324     |
+| **Branches**   | 🟡 62%   | 95/153        |
 | **Functions**  | 🟢 85%   | 317/372       |
-| **Lines**      | 🟢 83%   | 1095/1322     |
+| **Lines**      | 🟢 83%   | 1097/1324     |
 
 ### Coverage by Directory
 
@@ -47,15 +47,15 @@ They are generated from the **jest** coverage reports files.
 
 | Type           | Coverage | Covered/Total |
 |----------------|----------|---------------|
-| **Statements** | 🟡 66%   | 73/110        |
+| **Statements** | 🟡 67%   | 75/112        |
 | **Branches**   | 🔴 50%   | 1/2           |
 | **Functions**  | 🟡 67%   | 14/21         |
-| **Lines**      | 🟡 66%   | 73/110        |
+| **Lines**      | 🟡 67%   | 75/112        |
 
 | File      | Statements     | Branches      | Functions      | Lines          |
 |-----------|----------------|---------------|----------------|----------------|
 | Server.ts | 🔴 0% (0/21)   | 🟢 100% (0/0) | 🔴 0% (0/4)    | 🔴 0% (0/21)   |
-| App.ts    | 🟢 82% (73/89) | 🔴 50% (1/2)  | 🟢 82% (14/17) | 🟢 82% (73/89) |
+| App.ts    | 🟢 82% (75/91) | 🔴 50% (1/2)  | 🟢 82% (14/17) | 🟢 82% (75/91) |
 
 #### src/adapters
 
@@ -75,13 +75,13 @@ They are generated from the **jest** coverage reports files.
 | Type           | Coverage | Covered/Total |
 |----------------|----------|---------------|
 | **Statements** | 🟡 78%   | 77/99         |
-| **Branches**   | 🔴 50%   | 4/8           |
+| **Branches**   | 🔴 40%   | 4/10          |
 | **Functions**  | 🟢 89%   | 25/28         |
 | **Lines**      | 🟡 78%   | 77/99         |
 
 | File                       | Statements      | Branches      | Functions       | Lines           |
 |----------------------------|-----------------|---------------|-----------------|-----------------|
-| TimerRepo.ts               | 🔴 43% (12/28)  | 🔴 0% (0/3)   | 🔴 57% (4/7)    | 🔴 43% (12/28)  |
+| TimerRepo.ts               | 🔴 43% (12/28)  | 🔴 0% (0/5)   | 🔴 57% (4/7)    | 🔴 43% (12/28)  |
 | RedisAuctionRepo.ts        | 🟢 83% (25/30)  | 🟢 100% (1/1) | 🟢 100% (10/10) | 🟢 83% (25/30)  |
 | RedisUserInfoRepository.ts | 🟢 93% (13/14)  | 🔴 50% (1/2)  | 🟢 100% (6/6)   | 🟢 93% (13/14)  |
 | PlayerAuctionMapRepo.ts    | 🟢 100% (27/27) | 🟢 100% (2/2) | 🟢 100% (5/5)   | 🟢 100% (27/27) |
@@ -170,13 +170,13 @@ They are generated from the **jest** coverage reports files.
 | Type           | Coverage | Covered/Total |
 |----------------|----------|---------------|
 | **Statements** | 🟢 100%  | 2/2           |
-| **Branches**   | 🟢 90%   | 9/10          |
+| **Branches**   | 🟢 92%   | 11/12         |
 | **Functions**  | 🟢 100%  | 0/0           |
 | **Lines**      | 🟢 100%  | 2/2           |
 
-| File      | Statements    | Branches      | Functions     | Lines         |
-|-----------|---------------|---------------|---------------|---------------|
-| config.ts | 🟢 100% (2/2) | 🟢 90% (9/10) | 🟢 100% (0/0) | 🟢 100% (2/2) |
+| File      | Statements    | Branches       | Functions     | Lines         |
+|-----------|---------------|----------------|---------------|---------------|
+| config.ts | 🟢 100% (2/2) | 🟢 92% (11/12) | 🟢 100% (0/0) | 🟢 100% (2/2) |
 
 #### src/converters
 

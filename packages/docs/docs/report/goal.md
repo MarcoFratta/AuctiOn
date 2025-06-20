@@ -25,7 +25,7 @@ manage player identities.
 * A player can always leave the game, but he will not be able to rejoin if the game is in progress.
 * The lobby creator can always kick a player from the game.
 
-![Lobby Use Case Diagram](./images/LobbyUc.png "Lobby Use Case Diagram")
+![Lobby Use Case Diagram](images/LobbyUc.png "Lobby Use Case Diagram")
 
 ### Gameplay:
 
@@ -39,7 +39,7 @@ aiming to maximize their virtual currency according to the defined [Game Rules](
 * If the maximum number of rounds is reached, the game should conclude.
 * On each valid bid, the timer should reset to the default value.
 
-![Game Use Case Diagram](./images/GameUc.png "Game Use Case Diagram")
+![Game Use Case Diagram](images/GameUc.png "Game Use Case Diagram")
 
 ### Disconnection Handling:
 
@@ -93,7 +93,7 @@ The users can interact with the system through a web interface. These are the ma
     4. **Logout:** An authenticated user can choose to log out.
        The system terminates their session, requiring them to log in again for future access.
 
-![Authentication Flow](./images/AuthFlow.png "Authentication Flow")
+![Authentication Flow](images/AuthFlow.png "Authentication Flow")
 
 * **Lobby Scenario:**
     1. **Lobby Creation/Joining:** A player either creates a new game lobby or joins an existing one (e.g., using a
@@ -109,7 +109,7 @@ they will be automatically set to not ready.
 They must indicate again their readiness for the game.
 :::
 
-![Join lobby Flow](./images/JoinLobbyFLow.png "Join Lobby Flow")
+![Join lobby Flow](images/JoinLobbyFLow.png "Join Lobby Flow")
 
 * **Gameplay Scenario:**
     1. **Seller Turn:** The designated seller for the current round chooses any number of items from his inventory

@@ -24,7 +24,7 @@ Despite JavaScript's event loop being single-threaded, concurrency issues still 
 to the **asynchronous nature** of I/O operations. Consider this diagram illustrating how race conditions
 can occur even in a single-threaded environment:
 
-![Race Condition](./images/AuctionRaceCondition.png "Race Condition Example")
+![Race Condition](images/AuctionRaceCondition.png "Race Condition Example")
 
 In this scenario, the higher bid (150) is overwritten by the lower bid (120) due to the interleaving
 of asynchronous operations, leading to an **inconsistent state**.
@@ -37,25 +37,16 @@ Initially, the auction service used the [async-lock](https://www.npmjs.com/packa
 library to provide **in-memory locking** within a single service instance:
 
 ```typescript
-private
-asyncLock: AsyncLock
+private asyncLock: AsyncLock
 
-constructor()
-{
-  this.asyncLock = new AsyncLock()
+constructor() {
+   this.asyncLock = new AsyncLock()
 }
 
-async
-withLock<T>(key
-:
-string, task
-:
-() => Promise<T>
-):
-Promise < T > {
-  return this.asyncLock.acquire(key, async () => {
-    return await task()
-  })
+async withLock<T>(key: string, task: () => Promise<T>): Promise<T> {
+   return this.asyncLock.acquire(key, async () => {
+      return await task()
+   })
 }
 ```
 
@@ -76,25 +67,14 @@ to implement **distributed locks** based on the
 [Redis Lock algorithm](https://redis.io/glossary/redis-lock/) algorithm:
 
 ```typescript
-async
-runWithLock<T>(
-        lockKey
-:
-string,
-        ttlMs
-:
-number,
-        task
-:
-() => Promise<T>,
+async runWithLock<T>(
+        lockKey: string,
+        ttlMs: number,
+        task: () => Promise<T>,
         retryDelayMs = 100
-):
-Promise < T > {
-  const lockId = await this.acquireLock(lockKey, ttlMs, retryDelayMs)
-   if(!
-lockId
-)
-{
+): Promise<T> {
+   const lockId = await this.acquireLock(lockKey, ttlMs, retryDelayMs)
+   if (!lockId) {
    throw new Error(`Failed to acquire distributed lock for ${lockKey}`)
 }
 try {
@@ -118,23 +98,13 @@ The lock acquisition process is a critical component of the distributed locking 
 The `acquireLock` method implements an **atomic lock acquisition** with a retry mechanism:
 
 ```typescript
-private async
-acquireLock(
-        lockKey
-:
-string,
-        ttlMs
-:
-number,
-        retryDelayMs
-:
-number
-):
-Promise < string | null > {
-  const lockId = randomUUID()
-   while(true
-)
-{
+private async acquireLock(
+        lockKey: string,
+        ttlMs: number,
+        retryDelayMs: number
+): Promise<string | null> {
+   const lockId = randomUUID()
+   while (true) {
    const success = await this.redis.set(lockKey, lockId, 'PX', ttlMs, 'NX')
    if (success) return lockId
 
@@ -179,42 +149,34 @@ The auction service implements a higher-level abstraction called `withAuctionLoc
 this atomic operation pattern:
 
 ```typescript
-private async
-withAuctionLock<T>(
-        auctionId
-:
-string,
-        operationName
-:
-string,
-        operation
-:
-(auction: Auction) => Promise<T>
-):
-Promise < T > {
-  const lockKey = `${this.LOCK_PREFIX}${auctionId}`
-  return await this.redlock.runWithLock(
-    lockKey,
-    this.LOCK_TTL,
-    async () => {
-      try {
-        // READ: Get the current auction state
-        const auction = await this.findAuctionById(auctionId)
+private async withAuctionLock<T>(
+        auctionId: string,
+        operationName: string,
+        operation: (auction: Auction) => Promise<T>
+): Promise<T> {
+   const lockKey = `${this.LOCK_PREFIX}${auctionId}`
+   return await this.redlock.runWithLock(
+           lockKey,
+           this.LOCK_TTL,
+           async () => {
+              try {
+                 // READ: Get the current auction state
+                 const auction = await this.findAuctionById(auctionId)
 
-        // UPDATE: Apply business logic changes to the auction
-        const result = await operation(auction)
+                 // UPDATE: Apply business logic changes to the auction
+                 const result = await operation(auction)
 
-        // WRITE: Save the updated auction state
-        await this.saveAuction(auction)
+                 // WRITE: Save the updated auction state
+                 await this.saveAuction(auction)
 
-        return result
-      } catch (err) {
-        logger.error(`[${operationName}] Failed:`, err)
-        throw err
-      }
-    },
-    50
-  )
+                 return result
+              } catch (err) {
+                 logger.error(`[${operationName}] Failed:`, err)
+                 throw err
+              }
+           },
+           50
+   )
 }
 ```
 
@@ -228,17 +190,8 @@ This pattern ensures that:
 To ensure the lock release itself is atomic, the system uses a **Lua script** executed by Redis:
 
 ```typescript
-private async
-releaseLock(
-        lockKey
-:
-string,
-        lockId
-:
-string
-):
-Promise < void > {
-  const luaScript = `
+private async releaseLock(lockKey: string, lockId: string): Promise<void> {
+   const luaScript = `
     if redis.call("GET", KEYS[1]) == ARGV[1]
     then
       return redis.call("DEL", KEYS[1])
@@ -246,7 +199,7 @@ Promise < void > {
       return 0
     end
   `
-  await this.redis.eval(luaScript, 1, lockKey, lockId)
+   await this.redis.eval(luaScript, 1, lockKey, lockId)
 }
 ```
 
@@ -261,25 +214,17 @@ Here are some examples:
 **Example: Processing a Bid**
 
 ```typescript
-async
-playerBid(bid
-:
-Bid
-):
-Promise < AuctionInfo > {
-  // Does not require a lock
-  const playerAuctionId = await this.findPlayerAuction(bid.playerId)
-   if(!
-playerAuctionId
-)
-{
+async playerBid(bid: Bid): Promise<AuctionInfo> {
+   // Does not require a lock
+   const playerAuctionId = await this.findPlayerAuction(bid.playerId)
+   if (!playerAuctionId) {
    throw new Error(`Player ${bid.playerId} not found in any active auction.`)
 }
 
 return await this.withAuctionLock(playerAuctionId, 'playerBid', async auction => {
    // Using the auction read from Redis
    // Business logic validation
-   [...]
+   // [...]
    // Update the auction state
    auction.bid(bid)
 

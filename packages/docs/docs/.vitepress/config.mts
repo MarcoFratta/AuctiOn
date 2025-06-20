@@ -11,7 +11,7 @@ export default defineConfig({
   // This should match your repository name
   base: '/AuctiOn/',
   head: [
-    ['link', { rel: 'icon', href: '/AuctiOn/app-logo.svg' }],
+    ['link', { rel: 'icon', href: '/app-logo.svg' }],
   ],
   ignoreDeadLinks: [
     /^http:\/\/localhost/,

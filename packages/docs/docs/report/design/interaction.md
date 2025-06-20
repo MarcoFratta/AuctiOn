@@ -14,7 +14,6 @@ The system employs three primary communication patterns, each selected for speci
 ## Service Interaction Model
 
 ![System Interaction](../images/SystemInteraction.svg "System Interaction")
-> Click <a href="../images/SystemInteraction.svg" target="_blank">here</a> to enlarge
 
 The system uses an **API Gateway** to manage incoming requests and route them to the appropriate service.
 It also handles authentication, ensuring that only valid requests reach the services.
@@ -83,7 +82,6 @@ each instance produces `auction-events` for its connected players and consumes e
 from other instances (including itself).
 
 ![Auction Replicas Interaction](../images/AuctionReplicaInteraction.svg "Auction Replica Interaction")
-> Click <a href="../images/AuctionReplicaInteraction.svg" target="_blank">here</a> to enlarge
 
 There is no direct link between the system services and the **Message Sender** component.
 The **Auction Consumer** component aggregates all `auction-events` and serves as

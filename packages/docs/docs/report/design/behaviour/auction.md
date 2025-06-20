@@ -61,7 +61,6 @@ and ensuring robust handling of disconnections and edge cases.
 ## State Diagram
 
 ![Auction Service Behavior](../../images/AuctionBehavior.svg "Auction service Behavior")
-> Click <a href="../../images/AuctionBehavior.svg" target="_blank">here</a> to enlarge
 
 Disconnection handling is crucial for the game logic; particularly when the seller leaves the game.
 In such cases, other players would wait indefinitely for a sale that will never arrive,

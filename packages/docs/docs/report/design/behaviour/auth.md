@@ -24,7 +24,6 @@
   it cannot be used after logout or after a refresh, providing robust session invalidation and security.
 
 ![Auth Service Behavior](../../images/AuthBehavior.svg "Auth service Behavior")
-> Click <a href="../../images/AuthBehavior.svg" target="_blank">here</a> to enlarge
 
 Token state management ensures security,
 support for revocation, and robust session handling.
