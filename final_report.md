@@ -1102,22 +1102,13 @@ Initially, the auction service used the [async-lock](https://www.npmjs.com/packa
 library to provide **in-memory locking** within a single service instance:
 
 ```typescript
-private
-asyncLock: AsyncLock
+private asyncLock: AsyncLock
 
-constructor()
-{
+constructor() {
   this.asyncLock = new AsyncLock()
 }
 
-async
-withLock<T>(key
-:
-string, task
-:
-() => Promise<T>
-):
-Promise < T > {
+async withLock<T>(key: string, task: () => Promise<T>): Promise<T> {
   return this.asyncLock.acquire(key, async () => {
     return await task()
   })
@@ -1141,32 +1132,21 @@ to implement **distributed locks** based on the
 [Redis Lock algorithm](https://redis.io/glossary/redis-lock/) algorithm:
 
 ```typescript
-async
-runWithLock<T>(
-  lockKey
-:
-string,
-  ttlMs
-:
-number,
-  task
-:
-() => Promise<T>,
+async runWithLock<T>(
+  lockKey: string,
+  ttlMs: number,
+  task: () => Promise<T>,
   retryDelayMs = 100
-):
-Promise < T > {
+): Promise<T> {
   const lockId = await this.acquireLock(lockKey, ttlMs, retryDelayMs)
-  if(!
-lockId
-)
-{
-  throw new Error(`Failed to acquire distributed lock for ${lockKey}`)
-}
-try {
-  return await task()
-} finally {
-  await this.releaseLock(lockKey, lockId)
-}
+  if (!lockId) {
+    throw new Error(`Failed to acquire distributed lock for ${lockKey}`)
+  }
+  try {
+    return await task()
+  } finally {
+    await this.releaseLock(lockKey, lockId)
+  }
 }
 ```
 
@@ -1183,28 +1163,18 @@ The lock acquisition process is a critical component of the distributed locking 
 The `acquireLock` method implements an **atomic lock acquisition** with a retry mechanism:
 
 ```typescript
-private async
-acquireLock(
-  lockKey
-:
-string,
-  ttlMs
-:
-number,
-  retryDelayMs
-:
-number
-):
-Promise < string | null > {
+private async acquireLock(
+  lockKey: string,
+  ttlMs: number,
+  retryDelayMs: number
+): Promise<string | null> {
   const lockId = randomUUID()
-  while(true
-)
-{
-  const success = await this.redis.set(lockKey, lockId, 'PX', ttlMs, 'NX')
-  if (success) return lockId
+  while (true) {
+    const success = await this.redis.set(lockKey, lockId, 'PX', ttlMs, 'NX')
+    if (success) return lockId
 
-  await new Promise(resolve => setTimeout(resolve, retryDelayMs))
-}
+    await new Promise(resolve => setTimeout(resolve, retryDelayMs))
+  }
 }
 ```
 
@@ -1244,19 +1214,11 @@ The auction service implements a higher-level abstraction called `withAuctionLoc
 this atomic operation pattern:
 
 ```typescript
-private async
-withAuctionLock<T>(
-  auctionId
-:
-string,
-  operationName
-:
-string,
-  operation
-:
-(auction: Auction) => Promise<T>
-):
-Promise < T > {
+private async withAuctionLock<T>(
+  auctionId: string,
+  operationName: string,
+  operation: (auction: Auction) => Promise<T>
+): Promise<T> {
   const lockKey = `${this.LOCK_PREFIX}${auctionId}`
   return await this.redlock.runWithLock(
     lockKey,
@@ -1293,14 +1255,7 @@ This pattern ensures that:
 To ensure the lock release itself is atomic, the system uses a **Lua script** executed by Redis:
 
 ```typescript
-private async
-releaseLock(lockKey
-:
-string, lockId
-:
-string
-):
-Promise < void > {
+private async releaseLock(lockKey: string, lockId: string): Promise<void> {
   const luaScript = `
     if redis.call("GET", KEYS[1]) == ARGV[1]
     then
@@ -1324,31 +1279,23 @@ Here are some examples:
 **Example: Processing a Bid**
 
 ```typescript
-async
-playerBid(bid
-:
-Bid
-):
-Promise < AuctionInfo > {
+async playerBid(bid: Bid): Promise<AuctionInfo> {
   // Does not require a lock
   const playerAuctionId = await this.findPlayerAuction(bid.playerId)
-  if(!
-playerAuctionId
-)
-{
-  throw new Error(`Player ${bid.playerId} not found in any active auction.`)
-}
+  if (!playerAuctionId) {
+    throw new Error(`Player ${bid.playerId} not found in any active auction.`)
+  }
 
-return await this.withAuctionLock(playerAuctionId, 'playerBid', async auction => {
-  // Using the auction read from Redis
-  // Business logic validation
-  // [...]
-  // Update the auction state
-  auction.bid(bid)
+  return await this.withAuctionLock(playerAuctionId, 'playerBid', async auction => {
+    // Using the auction read from Redis
+    // Business logic validation
+    // [...]
+    // Update the auction state
+    auction.bid(bid)
 
-  // Return the updated state (will be saved by withAuctionLock)
-  return auction.toInfo()
-})
+    // Return the updated state (will be saved by withAuctionLock)
+    return auction.toInfo()
+  })
 }
 ```
 
