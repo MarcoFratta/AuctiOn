@@ -37,7 +37,7 @@ jobs:
         run: npm i
 
       - name: Build VitePress site
-        run: npm run docs:build -w @auction/docs
+        run: npm run docs:build-no-coverage -w @auction/docs
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
