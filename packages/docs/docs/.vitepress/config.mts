@@ -82,7 +82,7 @@ export default defineConfig({
               text: 'Self-assessment',
               collapsed: true,
               items: [
-                { text: 'Overview', link: '/report/self-assessment/index' },
+                { text: 'Overview', link: '/report/self-assessment/' },
                 { text: 'Testing Overview', link: '/report/self-assessment/tests' },
                 { text: 'Coverage Report', link: '/report/self-assessment/coverage' },
                 { text: 'E2E Tests', link: '/report/self-assessment/e2e-tests' },
